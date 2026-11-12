@@ -1,0 +1,1818 @@
+{
+  "schema": "open-ocarina.graphics-compile/v1",
+  "date": "2026-11-12",
+  "scope": "Compile-only diagnostic pipelines; no shader execution, runtime identity proof, rendering or equivalence evidence",
+  "compile_only": true,
+  "queue_retrieved": false,
+  "commands_recorded": false,
+  "queue_submitted": false,
+  "render_executed": false,
+  "conditional_transform_runtime_execution_authorized": false,
+  "cases": [
+    {
+      "case": "d8-baseline-final",
+      "program": "d8e59341cf4f629c",
+      "conditional_transform": false,
+      "lane_mapping_verified": false,
+      "equivalence_verified": false,
+      "runtime_execution_authorized": false,
+      "helper_source_sha256": "78da1aec2db969a606a10c85ee8fa80f347a2a53ed02b0f60eb43cc8260c9397",
+      "helper_binary_sha256": "bf1a8a0d362ba67ad50c33605c06bccd12783925dac584f9c52e3ef40277f552",
+      "wrapper_sha256": "ce9d57931f593bfa866733fd686788937cd1397e482b36e586b79f00fa1843c3",
+      "helper_build_flags": [
+        "-std=c11",
+        "-O2",
+        "-DNDEBUG",
+        "-Wall",
+        "-Wextra",
+        "-Werror"
+      ],
+      "driver_identity": {
+        "icd_sha256": "f8b0481b1769d3f1135245ec09bb54be5bdc3b20127efae50915b9f7f4ddaa32",
+        "library_name": "libvulkan_intel.so",
+        "library_sha256": "5ea19ac96aa52d061ecf2b8e23df7ed3d7d3b36c7d2ae7fe62f01c5a9b610aaa",
+        "mesa_build_options": {
+          "buildtype": "debugoptimized",
+          "debug": true,
+          "optimization": "2",
+          "b_lto": false,
+          "b_ndebug": "true"
+        },
+        "compute_compiler_flags": [
+          "-DNDEBUG",
+          "-O2",
+          "-g"
+        ],
+        "build_library_digest_matches": true,
+        "graphics_compiler_flags": {
+          "brw_compile_mesh.cpp": [
+            "-DNDEBUG",
+            "-O2",
+            "-g"
+          ],
+          "brw_compile_fs.cpp": [
+            "-DNDEBUG",
+            "-O2",
+            "-g"
+          ]
+        }
+      },
+      "stage_identities": [
+        {
+          "stage": "mesh",
+          "stage_flags": 128,
+          "sha256": "835aa59799c6ecb621034d946e2fa4eadb1aa2407d293321ae3e3052882bc9b3",
+          "byte_count": 171756,
+          "required_subgroup_size": 32,
+          "require_full_subgroups": false
+        },
+        {
+          "stage": "fragment",
+          "stage_flags": 16,
+          "sha256": "569b378a012388d711a115030bd1f41af66d38aebb645118baacd1e90a8f5a3a",
+          "byte_count": 119064,
+          "required_subgroup_size": 0,
+          "require_full_subgroups": false
+        }
+      ],
+      "descriptor_mode": "push",
+      "descriptor_binding_count": 30,
+      "descriptor_count": 32,
+      "push_constant_bytes": 88,
+      "diagnostic_state": {
+        "color_format": 37,
+        "depth_format": 126,
+        "samples": 1,
+        "extent": [
+          1536,
+          864
+        ],
+        "depth_test": true,
+        "depth_write": true,
+        "depth_compare_op": 3,
+        "cull_mode": 0,
+        "front_face": 0,
+        "alpha_to_coverage": false,
+        "color_write_mask": 15
+      },
+      "enabled_feature_policy": [
+        "robustBufferAccess",
+        "robustBufferAccess2",
+        "shaderInt16",
+        "shaderInt64",
+        "shaderStorageBufferArrayDynamicIndexing",
+        "shaderImageGatherExtended",
+        "fragmentStoresAndAtomics",
+        "uniformBufferStandardLayout",
+        "bufferDeviceAddress",
+        "shaderFloat16",
+        "shaderInt8",
+        "subgroupSizeControl",
+        "dynamicRendering",
+        "meshShader"
+      ],
+      "additional_feature_policy": {
+        "nullDescriptor": "enabled if supported",
+        "pipelineExecutableInfo": "enabled if supported",
+        "computeFullSubgroups": false,
+        "sampleRateShading": false
+      },
+      "validator": {
+        "version": "SPIRV-Tools v2026.1 unknown hash, 2026-02-16T00:00:00+00:00",
+        "flags": [
+          "--target-env",
+          "vulkan1.3",
+          "--uniform-buffer-standard-layout"
+        ]
+      },
+      "result": {
+        "schema": 1,
+        "compile_only": true,
+        "dispatch_executed": false,
+        "render_executed": false,
+        "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "driver": "Intel open-source Mesa driver",
+        "driver_info": "Mesa 26.2.4",
+        "vendor_id": 32902,
+        "device_id": 22176,
+        "api_version": 4211042,
+        "pipeline_optimization_disabled": false,
+        "capture_statistics_enabled": true,
+        "descriptor_mode": "push",
+        "push_constant_range_bytes": 88,
+        "null_descriptor_enabled": true,
+        "max_push_descriptors": 32,
+        "mesh_limits": {
+          "maxTaskWorkGroupInvocations": 1024,
+          "maxMeshWorkGroupInvocations": 1024,
+          "maxMeshOutputVertices": 256,
+          "maxMeshOutputPrimitives": 256,
+          "maxTaskPayloadSize": 65504,
+          "maxMeshSharedMemorySize": 65536,
+          "maxMeshPayloadAndSharedMemorySize": 131040
+        },
+        "required_subgroup_stage_mask": 224,
+        "stages": [
+          {
+            "stage_flags": 128,
+            "required_subgroup_size": 32,
+            "require_full_subgroups": false
+          },
+          {
+            "stage_flags": 16,
+            "required_subgroup_size": 0,
+            "require_full_subgroups": false
+          }
+        ],
+        "pipeline_create_seconds": 9.394579278,
+        "executables": [
+          {
+            "index": 0,
+            "stage_flags": 128,
+            "name": "mesh",
+            "subgroup_size": 32,
+            "statistics": [
+              {
+                "name": "Instructions",
+                "value": 100640
+              },
+              {
+                "name": "Code size",
+                "value": 2050752
+              },
+              {
+                "name": "SENDs",
+                "value": 1504
+              },
+              {
+                "name": "Loops",
+                "value": 72
+              },
+              {
+                "name": "Cycles",
+                "value": 3062401
+              },
+              {
+                "name": "Spills",
+                "value": 4574
+              },
+              {
+                "name": "Fills",
+                "value": 11351
+              },
+              {
+                "name": "Scratch Memory Size",
+                "value": 32768
+              },
+              {
+                "name": "GRF registers",
+                "value": 0
+              },
+              {
+                "name": "Push constant ranges",
+                "value": 0
+              },
+              {
+                "name": "Push constant registers",
+                "value": 0
+              },
+              {
+                "name": "Max dispatch width",
+                "value": 32
+              },
+              {
+                "name": "Max live registers",
+                "value": 712
+              },
+              {
+                "name": "Workgroup Memory Size",
+                "value": 14356
+              },
+              {
+                "name": "Non SSA regs after NIR",
+                "value": 1194
+              },
+              {
+                "name": "Source hash",
+                "value": 17049687014362602868
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "stage_flags": 16,
+            "name": "SIMD8 fragment",
+            "subgroup_size": 8,
+            "statistics": [
+              {
+                "name": "Instructions",
+                "value": 2588
+              },
+              {
+                "name": "Code size",
+                "value": 47856
+              },
+              {
+                "name": "SENDs",
+                "value": 57
+              },
+              {
+                "name": "Loops",
+                "value": 1
+              },
+              {
+                "name": "Cycles",
+                "value": 105739
+              },
+              {
+                "name": "Spills",
+                "value": 43
+              },
+              {
+                "name": "Fills",
+                "value": 96
+              },
+              {
+                "name": "Scratch Memory Size",
+                "value": 2048
+              },
+              {
+                "name": "GRF registers",
+                "value": 0
+              },
+              {
+                "name": "Push constant ranges",
+                "value": 4
+              },
+              {
+                "name": "Push constant registers",
+                "value": 11
+              },
+              {
+                "name": "Max dispatch width",
+                "value": 8
+              },
+              {
+                "name": "Max live registers",
+                "value": 159
+              },
+              {
+                "name": "Workgroup Memory Size",
+                "value": 0
+              },
+              {
+                "name": "Non SSA regs after NIR",
+                "value": 489
+              },
+              {
+                "name": "Source hash",
+                "value": 10758258269664525574
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "43-baseline-final",
+      "program": "43ec86f35fd937b9",
+      "conditional_transform": false,
+      "lane_mapping_verified": false,
+      "equivalence_verified": false,
+      "runtime_execution_authorized": false,
+      "helper_source_sha256": "78da1aec2db969a606a10c85ee8fa80f347a2a53ed02b0f60eb43cc8260c9397",
+      "helper_binary_sha256": "bf1a8a0d362ba67ad50c33605c06bccd12783925dac584f9c52e3ef40277f552",
+      "wrapper_sha256": "ce9d57931f593bfa866733fd686788937cd1397e482b36e586b79f00fa1843c3",
+      "helper_build_flags": [
+        "-std=c11",
+        "-O2",
+        "-DNDEBUG",
+        "-Wall",
+        "-Wextra",
+        "-Werror"
+      ],
+      "driver_identity": {
+        "icd_sha256": "f8b0481b1769d3f1135245ec09bb54be5bdc3b20127efae50915b9f7f4ddaa32",
+        "library_name": "libvulkan_intel.so",
+        "library_sha256": "5ea19ac96aa52d061ecf2b8e23df7ed3d7d3b36c7d2ae7fe62f01c5a9b610aaa",
+        "mesa_build_options": {
+          "buildtype": "debugoptimized",
+          "debug": true,
+          "optimization": "2",
+          "b_lto": false,
+          "b_ndebug": "true"
+        },
+        "compute_compiler_flags": [
+          "-DNDEBUG",
+          "-O2",
+          "-g"
+        ],
+        "build_library_digest_matches": true,
+        "graphics_compiler_flags": {
+          "brw_compile_mesh.cpp": [
+            "-DNDEBUG",
+            "-O2",
+            "-g"
+          ],
+          "brw_compile_fs.cpp": [
+            "-DNDEBUG",
+            "-O2",
+            "-g"
+          ]
+        }
+      },
+      "stage_identities": [
+        {
+          "stage": "task",
+          "stage_flags": 64,
+          "sha256": "5e7d8f02e2dbd5ae1cd625d42366bc532dcdf7d71bb56ac3bc303b5e9655d086",
+          "byte_count": 86956,
+          "required_subgroup_size": 32,
+          "require_full_subgroups": false
+        },
+        {
+          "stage": "mesh",
+          "stage_flags": 128,
+          "sha256": "4c5eee851f4140ff089d4abb0bdd445566c7980ee47669d962778171d143131d",
+          "byte_count": 890228,
+          "required_subgroup_size": 32,
+          "require_full_subgroups": false
+        },
+        {
+          "stage": "fragment",
+          "stage_flags": 16,
+          "sha256": "9268b2ceafeeb6ef1acb9f029197c818e90b3bcc5516451a2298c6c613374115",
+          "byte_count": 107924,
+          "required_subgroup_size": 0,
+          "require_full_subgroups": false
+        }
+      ],
+      "descriptor_mode": "sets",
+      "descriptor_binding_count": 36,
+      "descriptor_count": 40,
+      "push_constant_bytes": 88,
+      "diagnostic_state": {
+        "color_format": 37,
+        "depth_format": 126,
+        "samples": 1,
+        "extent": [
+          1536,
+          864
+        ],
+        "depth_test": true,
+        "depth_write": true,
+        "depth_compare_op": 3,
+        "cull_mode": 0,
+        "front_face": 0,
+        "alpha_to_coverage": false,
+        "color_write_mask": 15
+      },
+      "enabled_feature_policy": [
+        "robustBufferAccess",
+        "robustBufferAccess2",
+        "shaderInt16",
+        "shaderInt64",
+        "shaderStorageBufferArrayDynamicIndexing",
+        "shaderImageGatherExtended",
+        "fragmentStoresAndAtomics",
+        "uniformBufferStandardLayout",
+        "bufferDeviceAddress",
+        "shaderFloat16",
+        "shaderInt8",
+        "subgroupSizeControl",
+        "dynamicRendering",
+        "meshShader",
+        "taskShader"
+      ],
+      "additional_feature_policy": {
+        "nullDescriptor": "enabled if supported",
+        "pipelineExecutableInfo": "enabled if supported",
+        "computeFullSubgroups": false,
+        "sampleRateShading": false
+      },
+      "validator": {
+        "version": "SPIRV-Tools v2026.1 unknown hash, 2026-02-16T00:00:00+00:00",
+        "flags": [
+          "--target-env",
+          "vulkan1.3",
+          "--uniform-buffer-standard-layout"
+        ]
+      },
+      "result": {
+        "schema": 1,
+        "compile_only": true,
+        "dispatch_executed": false,
+        "render_executed": false,
+        "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "driver": "Intel open-source Mesa driver",
+        "driver_info": "Mesa 26.2.4",
+        "vendor_id": 32902,
+        "device_id": 22176,
+        "api_version": 4211042,
+        "pipeline_optimization_disabled": false,
+        "capture_statistics_enabled": true,
+        "descriptor_mode": "sets",
+        "push_constant_range_bytes": 88,
+        "null_descriptor_enabled": true,
+        "max_push_descriptors": 32,
+        "mesh_limits": {
+          "maxTaskWorkGroupInvocations": 1024,
+          "maxMeshWorkGroupInvocations": 1024,
+          "maxMeshOutputVertices": 256,
+          "maxMeshOutputPrimitives": 256,
+          "maxTaskPayloadSize": 65504,
+          "maxMeshSharedMemorySize": 65536,
+          "maxMeshPayloadAndSharedMemorySize": 131040
+        },
+        "required_subgroup_stage_mask": 224,
+        "stages": [
+          {
+            "stage_flags": 64,
+            "required_subgroup_size": 32,
+            "require_full_subgroups": false
+          },
+          {
+            "stage_flags": 128,
+            "required_subgroup_size": 32,
+            "require_full_subgroups": false
+          },
+          {
+            "stage_flags": 16,
+            "required_subgroup_size": 0,
+            "require_full_subgroups": false
+          }
+        ],
+        "pipeline_create_seconds": 12.03059335,
+        "executables": [
+          {
+            "index": 0,
+            "stage_flags": 64,
+            "name": "task",
+            "subgroup_size": 32,
+            "statistics": [
+              {
+                "name": "Instructions",
+                "value": 7651
+              },
+              {
+                "name": "Code size",
+                "value": 150704
+              },
+              {
+                "name": "SENDs",
+                "value": 136
+              },
+              {
+                "name": "Loops",
+                "value": 9
+              },
+              {
+                "name": "Cycles",
+                "value": 1264498
+              },
+              {
+                "name": "Spills",
+                "value": 205
+              },
+              {
+                "name": "Fills",
+                "value": 617
+              },
+              {
+                "name": "Scratch Memory Size",
+                "value": 8192
+              },
+              {
+                "name": "GRF registers",
+                "value": 0
+              },
+              {
+                "name": "Push constant ranges",
+                "value": 0
+              },
+              {
+                "name": "Push constant registers",
+                "value": 0
+              },
+              {
+                "name": "Max dispatch width",
+                "value": 32
+              },
+              {
+                "name": "Max live registers",
+                "value": 228
+              },
+              {
+                "name": "Workgroup Memory Size",
+                "value": 0
+              },
+              {
+                "name": "Non SSA regs after NIR",
+                "value": 543
+              },
+              {
+                "name": "Source hash",
+                "value": 17731379681960544110
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "stage_flags": 128,
+            "name": "mesh",
+            "subgroup_size": 32,
+            "statistics": [
+              {
+                "name": "Instructions",
+                "value": 110305
+              },
+              {
+                "name": "Code size",
+                "value": 2188880
+              },
+              {
+                "name": "SENDs",
+                "value": 1556
+              },
+              {
+                "name": "Loops",
+                "value": 77
+              },
+              {
+                "name": "Cycles",
+                "value": 3261202
+              },
+              {
+                "name": "Spills",
+                "value": 4596
+              },
+              {
+                "name": "Fills",
+                "value": 11355
+              },
+              {
+                "name": "Scratch Memory Size",
+                "value": 32768
+              },
+              {
+                "name": "GRF registers",
+                "value": 0
+              },
+              {
+                "name": "Push constant ranges",
+                "value": 0
+              },
+              {
+                "name": "Push constant registers",
+                "value": 0
+              },
+              {
+                "name": "Max dispatch width",
+                "value": 32
+              },
+              {
+                "name": "Max live registers",
+                "value": 678
+              },
+              {
+                "name": "Workgroup Memory Size",
+                "value": 9236
+              },
+              {
+                "name": "Non SSA regs after NIR",
+                "value": 1718
+              },
+              {
+                "name": "Source hash",
+                "value": 17589063623395674653
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "stage_flags": 16,
+            "name": "SIMD8 fragment",
+            "subgroup_size": 8,
+            "statistics": [
+              {
+                "name": "Instructions",
+                "value": 2850
+              },
+              {
+                "name": "Code size",
+                "value": 50416
+              },
+              {
+                "name": "SENDs",
+                "value": 60
+              },
+              {
+                "name": "Loops",
+                "value": 1
+              },
+              {
+                "name": "Cycles",
+                "value": 156070
+              },
+              {
+                "name": "Spills",
+                "value": 42
+              },
+              {
+                "name": "Fills",
+                "value": 74
+              },
+              {
+                "name": "Scratch Memory Size",
+                "value": 1024
+              },
+              {
+                "name": "GRF registers",
+                "value": 0
+              },
+              {
+                "name": "Push constant ranges",
+                "value": 4
+              },
+              {
+                "name": "Push constant registers",
+                "value": 30
+              },
+              {
+                "name": "Max dispatch width",
+                "value": 8
+              },
+              {
+                "name": "Max live registers",
+                "value": 159
+              },
+              {
+                "name": "Workgroup Memory Size",
+                "value": 0
+              },
+              {
+                "name": "Non SSA regs after NIR",
+                "value": 414
+              },
+              {
+                "name": "Source hash",
+                "value": 6747776024740743913
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "d8-conditional-8",
+      "program": "d8e59341cf4f629c",
+      "conditional_transform": true,
+      "lane_mapping_verified": false,
+      "equivalence_verified": false,
+      "runtime_execution_authorized": false,
+      "helper_source_sha256": "78da1aec2db969a606a10c85ee8fa80f347a2a53ed02b0f60eb43cc8260c9397",
+      "helper_binary_sha256": "bf1a8a0d362ba67ad50c33605c06bccd12783925dac584f9c52e3ef40277f552",
+      "wrapper_sha256": "ce9d57931f593bfa866733fd686788937cd1397e482b36e586b79f00fa1843c3",
+      "helper_build_flags": [
+        "-std=c11",
+        "-O2",
+        "-DNDEBUG",
+        "-Wall",
+        "-Wextra",
+        "-Werror"
+      ],
+      "driver_identity": {
+        "icd_sha256": "f8b0481b1769d3f1135245ec09bb54be5bdc3b20127efae50915b9f7f4ddaa32",
+        "library_name": "libvulkan_intel.so",
+        "library_sha256": "5ea19ac96aa52d061ecf2b8e23df7ed3d7d3b36c7d2ae7fe62f01c5a9b610aaa",
+        "mesa_build_options": {
+          "buildtype": "debugoptimized",
+          "debug": true,
+          "optimization": "2",
+          "b_lto": false,
+          "b_ndebug": "true"
+        },
+        "compute_compiler_flags": [
+          "-DNDEBUG",
+          "-O2",
+          "-g"
+        ],
+        "build_library_digest_matches": true,
+        "graphics_compiler_flags": {
+          "brw_compile_mesh.cpp": [
+            "-DNDEBUG",
+            "-O2",
+            "-g"
+          ],
+          "brw_compile_fs.cpp": [
+            "-DNDEBUG",
+            "-O2",
+            "-g"
+          ]
+        }
+      },
+      "stage_identities": [
+        {
+          "stage": "mesh",
+          "stage_flags": 128,
+          "sha256": "9d23b7ebf3677f53fe6901c9b94f2c4927f1f0c47ed207c04c53df9b59ae9638",
+          "byte_count": 176172,
+          "required_subgroup_size": 8,
+          "require_full_subgroups": false
+        },
+        {
+          "stage": "fragment",
+          "stage_flags": 16,
+          "sha256": "569b378a012388d711a115030bd1f41af66d38aebb645118baacd1e90a8f5a3a",
+          "byte_count": 119064,
+          "required_subgroup_size": 0,
+          "require_full_subgroups": false
+        }
+      ],
+      "descriptor_mode": "push",
+      "descriptor_binding_count": 30,
+      "descriptor_count": 32,
+      "push_constant_bytes": 88,
+      "diagnostic_state": {
+        "color_format": 37,
+        "depth_format": 126,
+        "samples": 1,
+        "extent": [
+          1536,
+          864
+        ],
+        "depth_test": true,
+        "depth_write": true,
+        "depth_compare_op": 3,
+        "cull_mode": 0,
+        "front_face": 0,
+        "alpha_to_coverage": false,
+        "color_write_mask": 15
+      },
+      "enabled_feature_policy": [
+        "robustBufferAccess",
+        "robustBufferAccess2",
+        "shaderInt16",
+        "shaderInt64",
+        "shaderStorageBufferArrayDynamicIndexing",
+        "shaderImageGatherExtended",
+        "fragmentStoresAndAtomics",
+        "uniformBufferStandardLayout",
+        "bufferDeviceAddress",
+        "shaderFloat16",
+        "shaderInt8",
+        "subgroupSizeControl",
+        "dynamicRendering",
+        "meshShader"
+      ],
+      "additional_feature_policy": {
+        "nullDescriptor": "enabled if supported",
+        "pipelineExecutableInfo": "enabled if supported",
+        "computeFullSubgroups": false,
+        "sampleRateShading": false
+      },
+      "validator": {
+        "version": "SPIRV-Tools v2026.1 unknown hash, 2026-02-16T00:00:00+00:00",
+        "flags": [
+          "--target-env",
+          "vulkan1.3",
+          "--uniform-buffer-standard-layout"
+        ]
+      },
+      "result": {
+        "schema": 1,
+        "compile_only": true,
+        "dispatch_executed": false,
+        "render_executed": false,
+        "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "driver": "Intel open-source Mesa driver",
+        "driver_info": "Mesa 26.2.4",
+        "vendor_id": 32902,
+        "device_id": 22176,
+        "api_version": 4211042,
+        "pipeline_optimization_disabled": false,
+        "capture_statistics_enabled": true,
+        "descriptor_mode": "push",
+        "push_constant_range_bytes": 88,
+        "null_descriptor_enabled": true,
+        "max_push_descriptors": 32,
+        "mesh_limits": {
+          "maxTaskWorkGroupInvocations": 1024,
+          "maxMeshWorkGroupInvocations": 1024,
+          "maxMeshOutputVertices": 256,
+          "maxMeshOutputPrimitives": 256,
+          "maxTaskPayloadSize": 65504,
+          "maxMeshSharedMemorySize": 65536,
+          "maxMeshPayloadAndSharedMemorySize": 131040
+        },
+        "required_subgroup_stage_mask": 224,
+        "stages": [
+          {
+            "stage_flags": 128,
+            "required_subgroup_size": 8,
+            "require_full_subgroups": false
+          },
+          {
+            "stage_flags": 16,
+            "required_subgroup_size": 0,
+            "require_full_subgroups": false
+          }
+        ],
+        "pipeline_create_seconds": 1.450819021,
+        "executables": [
+          {
+            "index": 0,
+            "stage_flags": 128,
+            "name": "mesh",
+            "subgroup_size": 8,
+            "statistics": [
+              {
+                "name": "Instructions",
+                "value": 16741
+              },
+              {
+                "name": "Code size",
+                "value": 294736
+              },
+              {
+                "name": "SENDs",
+                "value": 840
+              },
+              {
+                "name": "Loops",
+                "value": 72
+              },
+              {
+                "name": "Cycles",
+                "value": 603532
+              },
+              {
+                "name": "Spills",
+                "value": 110
+              },
+              {
+                "name": "Fills",
+                "value": 174
+              },
+              {
+                "name": "Scratch Memory Size",
+                "value": 4096
+              },
+              {
+                "name": "GRF registers",
+                "value": 0
+              },
+              {
+                "name": "Push constant ranges",
+                "value": 0
+              },
+              {
+                "name": "Push constant registers",
+                "value": 0
+              },
+              {
+                "name": "Max dispatch width",
+                "value": 8
+              },
+              {
+                "name": "Max live registers",
+                "value": 195
+              },
+              {
+                "name": "Workgroup Memory Size",
+                "value": 14612
+              },
+              {
+                "name": "Non SSA regs after NIR",
+                "value": 1204
+              },
+              {
+                "name": "Source hash",
+                "value": 13390532142229694005
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "stage_flags": 16,
+            "name": "SIMD8 fragment",
+            "subgroup_size": 8,
+            "statistics": [
+              {
+                "name": "Instructions",
+                "value": 2588
+              },
+              {
+                "name": "Code size",
+                "value": 47856
+              },
+              {
+                "name": "SENDs",
+                "value": 57
+              },
+              {
+                "name": "Loops",
+                "value": 1
+              },
+              {
+                "name": "Cycles",
+                "value": 105739
+              },
+              {
+                "name": "Spills",
+                "value": 43
+              },
+              {
+                "name": "Fills",
+                "value": 96
+              },
+              {
+                "name": "Scratch Memory Size",
+                "value": 2048
+              },
+              {
+                "name": "GRF registers",
+                "value": 0
+              },
+              {
+                "name": "Push constant ranges",
+                "value": 4
+              },
+              {
+                "name": "Push constant registers",
+                "value": 11
+              },
+              {
+                "name": "Max dispatch width",
+                "value": 8
+              },
+              {
+                "name": "Max live registers",
+                "value": 159
+              },
+              {
+                "name": "Workgroup Memory Size",
+                "value": 0
+              },
+              {
+                "name": "Non SSA regs after NIR",
+                "value": 489
+              },
+              {
+                "name": "Source hash",
+                "value": 10758258269664525574
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "d8-conditional-16",
+      "program": "d8e59341cf4f629c",
+      "conditional_transform": true,
+      "lane_mapping_verified": false,
+      "equivalence_verified": false,
+      "runtime_execution_authorized": false,
+      "helper_source_sha256": "78da1aec2db969a606a10c85ee8fa80f347a2a53ed02b0f60eb43cc8260c9397",
+      "helper_binary_sha256": "bf1a8a0d362ba67ad50c33605c06bccd12783925dac584f9c52e3ef40277f552",
+      "wrapper_sha256": "ce9d57931f593bfa866733fd686788937cd1397e482b36e586b79f00fa1843c3",
+      "helper_build_flags": [
+        "-std=c11",
+        "-O2",
+        "-DNDEBUG",
+        "-Wall",
+        "-Wextra",
+        "-Werror"
+      ],
+      "driver_identity": {
+        "icd_sha256": "f8b0481b1769d3f1135245ec09bb54be5bdc3b20127efae50915b9f7f4ddaa32",
+        "library_name": "libvulkan_intel.so",
+        "library_sha256": "5ea19ac96aa52d061ecf2b8e23df7ed3d7d3b36c7d2ae7fe62f01c5a9b610aaa",
+        "mesa_build_options": {
+          "buildtype": "debugoptimized",
+          "debug": true,
+          "optimization": "2",
+          "b_lto": false,
+          "b_ndebug": "true"
+        },
+        "compute_compiler_flags": [
+          "-DNDEBUG",
+          "-O2",
+          "-g"
+        ],
+        "build_library_digest_matches": true,
+        "graphics_compiler_flags": {
+          "brw_compile_mesh.cpp": [
+            "-DNDEBUG",
+            "-O2",
+            "-g"
+          ],
+          "brw_compile_fs.cpp": [
+            "-DNDEBUG",
+            "-O2",
+            "-g"
+          ]
+        }
+      },
+      "stage_identities": [
+        {
+          "stage": "mesh",
+          "stage_flags": 128,
+          "sha256": "9d23b7ebf3677f53fe6901c9b94f2c4927f1f0c47ed207c04c53df9b59ae9638",
+          "byte_count": 176172,
+          "required_subgroup_size": 16,
+          "require_full_subgroups": false
+        },
+        {
+          "stage": "fragment",
+          "stage_flags": 16,
+          "sha256": "569b378a012388d711a115030bd1f41af66d38aebb645118baacd1e90a8f5a3a",
+          "byte_count": 119064,
+          "required_subgroup_size": 0,
+          "require_full_subgroups": false
+        }
+      ],
+      "descriptor_mode": "push",
+      "descriptor_binding_count": 30,
+      "descriptor_count": 32,
+      "push_constant_bytes": 88,
+      "diagnostic_state": {
+        "color_format": 37,
+        "depth_format": 126,
+        "samples": 1,
+        "extent": [
+          1536,
+          864
+        ],
+        "depth_test": true,
+        "depth_write": true,
+        "depth_compare_op": 3,
+        "cull_mode": 0,
+        "front_face": 0,
+        "alpha_to_coverage": false,
+        "color_write_mask": 15
+      },
+      "enabled_feature_policy": [
+        "robustBufferAccess",
+        "robustBufferAccess2",
+        "shaderInt16",
+        "shaderInt64",
+        "shaderStorageBufferArrayDynamicIndexing",
+        "shaderImageGatherExtended",
+        "fragmentStoresAndAtomics",
+        "uniformBufferStandardLayout",
+        "bufferDeviceAddress",
+        "shaderFloat16",
+        "shaderInt8",
+        "subgroupSizeControl",
+        "dynamicRendering",
+        "meshShader"
+      ],
+      "additional_feature_policy": {
+        "nullDescriptor": "enabled if supported",
+        "pipelineExecutableInfo": "enabled if supported",
+        "computeFullSubgroups": false,
+        "sampleRateShading": false
+      },
+      "validator": {
+        "version": "SPIRV-Tools v2026.1 unknown hash, 2026-02-16T00:00:00+00:00",
+        "flags": [
+          "--target-env",
+          "vulkan1.3",
+          "--uniform-buffer-standard-layout"
+        ]
+      },
+      "result": {
+        "schema": 1,
+        "compile_only": true,
+        "dispatch_executed": false,
+        "render_executed": false,
+        "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "driver": "Intel open-source Mesa driver",
+        "driver_info": "Mesa 26.2.4",
+        "vendor_id": 32902,
+        "device_id": 22176,
+        "api_version": 4211042,
+        "pipeline_optimization_disabled": false,
+        "capture_statistics_enabled": true,
+        "descriptor_mode": "push",
+        "push_constant_range_bytes": 88,
+        "null_descriptor_enabled": true,
+        "max_push_descriptors": 32,
+        "mesh_limits": {
+          "maxTaskWorkGroupInvocations": 1024,
+          "maxMeshWorkGroupInvocations": 1024,
+          "maxMeshOutputVertices": 256,
+          "maxMeshOutputPrimitives": 256,
+          "maxTaskPayloadSize": 65504,
+          "maxMeshSharedMemorySize": 65536,
+          "maxMeshPayloadAndSharedMemorySize": 131040
+        },
+        "required_subgroup_stage_mask": 224,
+        "stages": [
+          {
+            "stage_flags": 128,
+            "required_subgroup_size": 16,
+            "require_full_subgroups": false
+          },
+          {
+            "stage_flags": 16,
+            "required_subgroup_size": 0,
+            "require_full_subgroups": false
+          }
+        ],
+        "pipeline_create_seconds": 2.004992386,
+        "executables": [
+          {
+            "index": 0,
+            "stage_flags": 128,
+            "name": "mesh",
+            "subgroup_size": 16,
+            "statistics": [
+              {
+                "name": "Instructions",
+                "value": 26232
+              },
+              {
+                "name": "Code size",
+                "value": 492480
+              },
+              {
+                "name": "SENDs",
+                "value": 865
+              },
+              {
+                "name": "Loops",
+                "value": 72
+              },
+              {
+                "name": "Cycles",
+                "value": 766414
+              },
+              {
+                "name": "Spills",
+                "value": 1066
+              },
+              {
+                "name": "Fills",
+                "value": 966
+              },
+              {
+                "name": "Scratch Memory Size",
+                "value": 16384
+              },
+              {
+                "name": "GRF registers",
+                "value": 0
+              },
+              {
+                "name": "Push constant ranges",
+                "value": 0
+              },
+              {
+                "name": "Push constant registers",
+                "value": 0
+              },
+              {
+                "name": "Max dispatch width",
+                "value": 16
+              },
+              {
+                "name": "Max live registers",
+                "value": 366
+              },
+              {
+                "name": "Workgroup Memory Size",
+                "value": 14612
+              },
+              {
+                "name": "Non SSA regs after NIR",
+                "value": 1206
+              },
+              {
+                "name": "Source hash",
+                "value": 13390532142229694005
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "stage_flags": 16,
+            "name": "SIMD8 fragment",
+            "subgroup_size": 8,
+            "statistics": [
+              {
+                "name": "Instructions",
+                "value": 2588
+              },
+              {
+                "name": "Code size",
+                "value": 47856
+              },
+              {
+                "name": "SENDs",
+                "value": 57
+              },
+              {
+                "name": "Loops",
+                "value": 1
+              },
+              {
+                "name": "Cycles",
+                "value": 105739
+              },
+              {
+                "name": "Spills",
+                "value": 43
+              },
+              {
+                "name": "Fills",
+                "value": 96
+              },
+              {
+                "name": "Scratch Memory Size",
+                "value": 2048
+              },
+              {
+                "name": "GRF registers",
+                "value": 0
+              },
+              {
+                "name": "Push constant ranges",
+                "value": 4
+              },
+              {
+                "name": "Push constant registers",
+                "value": 11
+              },
+              {
+                "name": "Max dispatch width",
+                "value": 8
+              },
+              {
+                "name": "Max live registers",
+                "value": 159
+              },
+              {
+                "name": "Workgroup Memory Size",
+                "value": 0
+              },
+              {
+                "name": "Non SSA regs after NIR",
+                "value": 489
+              },
+              {
+                "name": "Source hash",
+                "value": 10758258269664525574
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "case": "d8-conditional-32",
+      "program": "d8e59341cf4f629c",
+      "conditional_transform": true,
+      "lane_mapping_verified": false,
+      "equivalence_verified": false,
+      "runtime_execution_authorized": false,
+      "helper_source_sha256": "78da1aec2db969a606a10c85ee8fa80f347a2a53ed02b0f60eb43cc8260c9397",
+      "helper_binary_sha256": "bf1a8a0d362ba67ad50c33605c06bccd12783925dac584f9c52e3ef40277f552",
+      "wrapper_sha256": "ce9d57931f593bfa866733fd686788937cd1397e482b36e586b79f00fa1843c3",
+      "helper_build_flags": [
+        "-std=c11",
+        "-O2",
+        "-DNDEBUG",
+        "-Wall",
+        "-Wextra",
+        "-Werror"
+      ],
+      "driver_identity": {
+        "icd_sha256": "f8b0481b1769d3f1135245ec09bb54be5bdc3b20127efae50915b9f7f4ddaa32",
+        "library_name": "libvulkan_intel.so",
+        "library_sha256": "5ea19ac96aa52d061ecf2b8e23df7ed3d7d3b36c7d2ae7fe62f01c5a9b610aaa",
+        "mesa_build_options": {
+          "buildtype": "debugoptimized",
+          "debug": true,
+          "optimization": "2",
+          "b_lto": false,
+          "b_ndebug": "true"
+        },
+        "compute_compiler_flags": [
+          "-DNDEBUG",
+          "-O2",
+          "-g"
+        ],
+        "build_library_digest_matches": true,
+        "graphics_compiler_flags": {
+          "brw_compile_mesh.cpp": [
+            "-DNDEBUG",
+            "-O2",
+            "-g"
+          ],
+          "brw_compile_fs.cpp": [
+            "-DNDEBUG",
+            "-O2",
+            "-g"
+          ]
+        }
+      },
+      "stage_identities": [
+        {
+          "stage": "mesh",
+          "stage_flags": 128,
+          "sha256": "9d23b7ebf3677f53fe6901c9b94f2c4927f1f0c47ed207c04c53df9b59ae9638",
+          "byte_count": 176172,
+          "required_subgroup_size": 32,
+          "require_full_subgroups": false
+        },
+        {
+          "stage": "fragment",
+          "stage_flags": 16,
+          "sha256": "569b378a012388d711a115030bd1f41af66d38aebb645118baacd1e90a8f5a3a",
+          "byte_count": 119064,
+          "required_subgroup_size": 0,
+          "require_full_subgroups": false
+        }
+      ],
+      "descriptor_mode": "push",
+      "descriptor_binding_count": 30,
+      "descriptor_count": 32,
+      "push_constant_bytes": 88,
+      "diagnostic_state": {
+        "color_format": 37,
+        "depth_format": 126,
+        "samples": 1,
+        "extent": [
+          1536,
+          864
+        ],
+        "depth_test": true,
+        "depth_write": true,
+        "depth_compare_op": 3,
+        "cull_mode": 0,
+        "front_face": 0,
+        "alpha_to_coverage": false,
+        "color_write_mask": 15
+      },
+      "enabled_feature_policy": [
+        "robustBufferAccess",
+        "robustBufferAccess2",
+        "shaderInt16",
+        "shaderInt64",
+        "shaderStorageBufferArrayDynamicIndexing",
+        "shaderImageGatherExtended",
+        "fragmentStoresAndAtomics",
+        "uniformBufferStandardLayout",
+        "bufferDeviceAddress",
+        "shaderFloat16",
+        "shaderInt8",
+        "subgroupSizeControl",
+        "dynamicRendering",
+        "meshShader"
+      ],
+      "additional_feature_policy": {
+        "nullDescriptor": "enabled if supported",
+        "pipelineExecutableInfo": "enabled if supported",
+        "computeFullSubgroups": false,
+        "sampleRateShading": false
+      },
+      "validator": {
+        "version": "SPIRV-Tools v2026.1 unknown hash, 2026-02-16T00:00:00+00:00",
+        "flags": [
+          "--target-env",
+          "vulkan1.3",
+          "--uniform-buffer-standard-layout"
+        ]
+      },
+      "result": {
+        "schema": 1,
+        "compile_only": true,
+        "dispatch_executed": false,
+        "render_executed": false,
+        "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "driver": "Intel open-source Mesa driver",
+        "driver_info": "Mesa 26.2.4",
+        "vendor_id": 32902,
+        "device_id": 22176,
+        "api_version": 4211042,
+        "pipeline_optimization_disabled": false,
+        "capture_statistics_enabled": true,
+        "descriptor_mode": "push",
+        "push_constant_range_bytes": 88,
+        "null_descriptor_enabled": true,
+        "max_push_descriptors": 32,
+        "mesh_limits": {
+          "maxTaskWorkGroupInvocations": 1024,
+          "maxMeshWorkGroupInvocations": 1024,
+          "maxMeshOutputVertices": 256,
+          "maxMeshOutputPrimitives": 256,
+          "maxTaskPayloadSize": 65504,
+          "maxMeshSharedMemorySize": 65536,
+          "maxMeshPayloadAndSharedMemorySize": 131040
+        },
+        "required_subgroup_stage_mask": 224,
+        "stages": [
+          {
+            "stage_flags": 128,
+            "required_subgroup_size": 32,
+            "require_full_subgroups": false
+          },
+          {
+            "stage_flags": 16,
+            "required_subgroup_size": 0,
+            "require_full_subgroups": false
+          }
+        ],
+        "pipeline_create_seconds": 9.582066259,
+        "executables": [
+          {
+            "index": 0,
+            "stage_flags": 128,
+            "name": "mesh",
+            "subgroup_size": 32,
+            "statistics": [
+              {
+                "name": "Instructions",
+                "value": 100794
+              },
+              {
+                "name": "Code size",
+                "value": 2054240
+              },
+              {
+                "name": "SENDs",
+                "value": 1514
+              },
+              {
+                "name": "Loops",
+                "value": 72
+              },
+              {
+                "name": "Cycles",
+                "value": 3053439
+              },
+              {
+                "name": "Spills",
+                "value": 4575
+              },
+              {
+                "name": "Fills",
+                "value": 11373
+              },
+              {
+                "name": "Scratch Memory Size",
+                "value": 32768
+              },
+              {
+                "name": "GRF registers",
+                "value": 0
+              },
+              {
+                "name": "Push constant ranges",
+                "value": 0
+              },
+              {
+                "name": "Push constant registers",
+                "value": 0
+              },
+              {
+                "name": "Max dispatch width",
+                "value": 32
+              },
+              {
+                "name": "Max live registers",
+                "value": 712
+              },
+              {
+                "name": "Workgroup Memory Size",
+                "value": 14612
+              },
+              {
+                "name": "Non SSA regs after NIR",
+                "value": 1194
+              },
+              {
+                "name": "Source hash",
+                "value": 13390532142229694005
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "stage_flags": 16,
+            "name": "SIMD8 fragment",
+            "subgroup_size": 8,
+            "statistics": [
+              {
+                "name": "Instructions",
+                "value": 2588
+              },
+              {
+                "name": "Code size",
+                "value": 47856
+              },
+              {
+                "name": "SENDs",
+                "value": 57
+              },
+              {
+                "name": "Loops",
+                "value": 1
+              },
+              {
+                "name": "Cycles",
+                "value": 105739
+              },
+              {
+                "name": "Spills",
+                "value": 43
+              },
+              {
+                "name": "Fills",
+                "value": 96
+              },
+              {
+                "name": "Scratch Memory Size",
+                "value": 2048
+              },
+              {
+                "name": "GRF registers",
+                "value": 0
+              },
+              {
+                "name": "Push constant ranges",
+                "value": 4
+              },
+              {
+                "name": "Push constant registers",
+                "value": 11
+              },
+              {
+                "name": "Max dispatch width",
+                "value": 8
+              },
+              {
+                "name": "Max live registers",
+                "value": 159
+              },
+              {
+                "name": "Workgroup Memory Size",
+                "value": 0
+              },
+              {
+                "name": "Non SSA regs after NIR",
+                "value": 489
+              },
+              {
+                "name": "Source hash",
+                "value": 10758258269664525574
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "cpu_spirv_pressure_metadata": [
+    {
+      "reachable_functions": [
+        {
+          "entry": false,
+          "instructions": 137,
+          "call_sites_to_this_function": 11,
+          "calls": 0,
+          "phis": 0,
+          "selections": 4,
+          "loops": 1,
+          "array_length": 4,
+          "loads": 13,
+          "stores": 2,
+          "physical_pointer_conversions": 0
+        },
+        {
+          "entry": false,
+          "instructions": 137,
+          "call_sites_to_this_function": 61,
+          "calls": 0,
+          "phis": 0,
+          "selections": 4,
+          "loops": 1,
+          "array_length": 4,
+          "loads": 13,
+          "stores": 2,
+          "physical_pointer_conversions": 0
+        },
+        {
+          "entry": true,
+          "instructions": 6726,
+          "call_sites_to_this_function": 0,
+          "calls": 72,
+          "phis": 92,
+          "selections": 29,
+          "loops": 0,
+          "array_length": 0,
+          "loads": 345,
+          "stores": 389,
+          "physical_pointer_conversions": 0
+        }
+      ],
+      "main_parts": [
+        {
+          "part": "initialization",
+          "instructions": 458,
+          "calls": 0,
+          "phis": 0,
+          "loops": 0,
+          "loads": 1,
+          "stores": 114,
+          "workgroup_access_chains": 113,
+          "dynamic_workgroup_access_chains": 113,
+          "group_ops": 0
+        },
+        {
+          "part": "body",
+          "instructions": 5336,
+          "calls": 72,
+          "phis": 92,
+          "loops": 0,
+          "loads": 222,
+          "stores": 107,
+          "workgroup_access_chains": 106,
+          "dynamic_workgroup_access_chains": 106,
+          "group_ops": 2
+        },
+        {
+          "part": "export",
+          "instructions": 932,
+          "calls": 0,
+          "phis": 0,
+          "loops": 0,
+          "loads": 122,
+          "stores": 168,
+          "workgroup_access_chains": 120,
+          "dynamic_workgroup_access_chains": 120,
+          "group_ops": 0
+        }
+      ],
+      "module_function_count": 7,
+      "reachable_static_instruction_count": 7000,
+      "program": "d8e59341cf4f629c"
+    },
+    {
+      "reachable_functions": [
+        {
+          "entry": false,
+          "instructions": 164,
+          "call_sites_to_this_function": 12,
+          "calls": 0,
+          "phis": 0,
+          "selections": 5,
+          "loops": 1,
+          "array_length": 5,
+          "loads": 16,
+          "stores": 2,
+          "physical_pointer_conversions": 0
+        },
+        {
+          "entry": false,
+          "instructions": 164,
+          "call_sites_to_this_function": 61,
+          "calls": 0,
+          "phis": 0,
+          "selections": 5,
+          "loops": 1,
+          "array_length": 5,
+          "loads": 16,
+          "stores": 2,
+          "physical_pointer_conversions": 0
+        },
+        {
+          "entry": false,
+          "instructions": 165,
+          "call_sites_to_this_function": 4,
+          "calls": 0,
+          "phis": 0,
+          "selections": 5,
+          "loops": 1,
+          "array_length": 5,
+          "loads": 11,
+          "stores": 2,
+          "physical_pointer_conversions": 0
+        },
+        {
+          "entry": true,
+          "instructions": 38689,
+          "call_sites_to_this_function": 0,
+          "calls": 77,
+          "phis": 708,
+          "selections": 404,
+          "loops": 0,
+          "array_length": 0,
+          "loads": 899,
+          "stores": 244,
+          "physical_pointer_conversions": 0
+        }
+      ],
+      "main_parts": [
+        {
+          "part": "initialization",
+          "instructions": 298,
+          "calls": 0,
+          "phis": 0,
+          "loops": 0,
+          "loads": 1,
+          "stores": 74,
+          "workgroup_access_chains": 73,
+          "dynamic_workgroup_access_chains": 73,
+          "group_ops": 0
+        },
+        {
+          "part": "body",
+          "instructions": 37786,
+          "calls": 77,
+          "phis": 708,
+          "loops": 0,
+          "loads": 818,
+          "stores": 68,
+          "workgroup_access_chains": 66,
+          "dynamic_workgroup_access_chains": 66,
+          "group_ops": 68
+        },
+        {
+          "part": "export",
+          "instructions": 605,
+          "calls": 0,
+          "phis": 0,
+          "loops": 0,
+          "loads": 80,
+          "stores": 102,
+          "workgroup_access_chains": 78,
+          "dynamic_workgroup_access_chains": 78,
+          "group_ops": 0
+        }
+      ],
+      "module_function_count": 19,
+      "reachable_static_instruction_count": 39182,
+      "program": "43ec86f35fd937b9"
+    }
+  ],
+  "compiler_option_profile": {
+    "explicitly_unset": [
+      "HS_CS32_MAX_INSTS",
+      "HS_SPILL_BATCH",
+      "HS_PUSH_SHADOW",
+      "shader_spilling_rate",
+      "INTEL_DEBUG"
+    ],
+    "runtime_policy_match": false,
+    "known_runtime_difference": {
+      "HS_SPILL_BATCH": "1",
+      "shader_spilling_rate": "1"
+    },
+    "complete_environment_snapshot": false,
+    "limitation": "Known runtime spill overrides differ; diagnostics are controlled codegen exploration, not matching-policy runtime evidence."
+  }
+}
