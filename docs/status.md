@@ -87,3 +87,13 @@ the next missing producer boundaries: original backing lifetimes/generations,
 committed sparse bind intervals and complete writer coverage. Guest interval
 equality cannot substitute for those identities, and frozen replay agreement
 must remain distinct from live snapshot atomicity.
+
+The [sampled-image stage](sampled-image-capture.md) and
+[dispatch-parameters overlay](dispatch-parameters.md) have now been built and
+run together. Independent checks verified all four sampled-image/sampler inputs,
+the complete pushed byte range, actual descriptor layout, direct grid and
+requested subgroup policy, linked to the same completed buffer/table capture.
+[Sanitized metadata](../research/gpu-image-dispatch-observation.json) pins the
+tested artifacts. Backing alias provenance, CPU mutation, remaining device and
+temporal state, and independent output comparison still prevent a complete
+replay claim. No shader optimization has yet passed a real output comparison.

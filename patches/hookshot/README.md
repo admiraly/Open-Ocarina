@@ -9,9 +9,13 @@
 Upstream: <https://github.com/NotRexed/Hookshot/tree/4cf785a0b143bb34026506c9a3fe4f4bb93c797d>. Hookshot and this patch are GPL-3.0-or-later. Existing upstream notices remain applicable. The new helper and tests are independently authored; no game files, shader code or generated game translations are present.
 
 The renderer capture series applies in order: `compute-identity.patch`,
-`page-table-snapshot.patch`, then `allocation-capture.patch`. See
+`page-table-snapshot.patch`, `allocation-capture.patch`,
+`occurrence-capture.patch`, `graphics-identity.patch`,
+`sampled-image-capture.patch`, then `dispatch-parameters.patch`. See
 [GPU table capture](../../docs/page-table-snapshot.md) and
-[allocation payload capture](../../docs/allocation-capture.md) for opt-in controls,
+[allocation payload capture](../../docs/allocation-capture.md),
+[sampled-image capture](../../docs/sampled-image-capture.md) and
+[dispatch parameters](../../docs/dispatch-parameters.md) for opt-in controls,
 build/runtime evidence and remaining replay gaps. Each patch retains the upstream
 license. The independent [input-isolation patch](../../docs/input-isolation.md)
 changes host input routing and does not depend on the renderer series.

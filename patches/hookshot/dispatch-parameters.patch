@@ -1,0 +1,278 @@
+diff --git a/gpu/vk/dispatch_parameters.h b/gpu/vk/dispatch_parameters.h
+new file mode 100644
+index 0000000..dea54e6
+--- /dev/null
++++ b/gpu/vk/dispatch_parameters.h
+@@ -0,0 +1,150 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Exact host-pushed bytes, associated with one completed diagnostic recording.
++#pragma once
++#include "allocation_capture.h"
++#include <fstream>
++#include <mutex>
++#include <sstream>
++#include <unordered_map>
++namespace mkwvk::oo_dp {
++inline bool enabled() {
++    static const bool value=[] {
++        const char* flag=std::getenv("RX_VK_OO_DISPATCH_PARAMETERS");
++        if(!flag||std::string(flag)!="1"||!oo_alloc::config().enabled)return false;
++        for(const char* name:{"dispatch-parameters.json","dispatch-parameters.json.part","push-constants.bin","push-constants.bin.part"})
++            if(oo_pt::present(std::filesystem::path(oo_pt::config().directory)/name))return false;
++        return true;
++    }();return value;
++}
++struct Binding { uint32_t set=0,binding=0,type=0,count=0,stage_flags=0; };
++struct Layout {
++    uint64_t key=0,variant=0,handle=0,set_handle=0;
++    uint32_t set_flags=0,push_offset=0,push_size=0,push_stages=0;
++    std::vector<Binding> bindings;
++};
++inline std::mutex layout_mutex;
++inline std::unordered_map<uint64_t,Layout> layouts;
++inline void note_layout(Layout layout) {
++    if(!enabled()||!oo_identity::selected(layout.key,layout.variant)||!layout.handle)return;
++    if(layout.bindings.size()>256||layout.push_size>256)return;
++    std::lock_guard lock(layout_mutex);
++    if(layouts.size()<64||layouts.count(layout.handle))layouts[layout.handle]=std::move(layout);
++}
++struct Shadow {
++    bool fresh=false;
++    uint64_t command=0,key=0,variant=0,layout=0,part=0,logical=0;
++    uint32_t stages=0,offset=0,root_offset=0;
++    std::vector<uint8_t> bytes;
++};
++inline thread_local Shadow shadow;
++inline void invalidate_push() { if(enabled())shadow={}; }
++inline void note_push(uint64_t command,uint64_t key,uint64_t variant,uint64_t layout,uint64_t part,uint64_t logical,
++                      uint32_t stages,uint32_t offset,uint32_t size,const uint8_t* data,uint32_t root_offset) {
++    if(!enabled())return;
++    shadow={};
++    if(!oo_identity::selected(key,variant)||!command||!layout||!data||!size||size>256||offset>256-size)return;
++    shadow.fresh=true;shadow.command=command;shadow.key=key;shadow.variant=variant;shadow.layout=layout;
++    shadow.part=part;shadow.logical=logical;shadow.stages=stages;shadow.offset=offset;shadow.root_offset=root_offset;
++    shadow.bytes.assign(data,data+size);
++}
++struct Policy {
++    uint64_t command=0,key=0,variant=0,layout=0,cache_stamp=0;
++    uint32_t local_size[3]{},required_size=0;
++    bool require_full=false,null_descriptor=false;
++};
++inline thread_local Policy policy;
++inline void note_policy(const Policy& value) { if(enabled())policy=value; }
++struct Capture {
++    bool selected=false,push_complete=false,layout_complete=false,policy_complete=false;
++    uint64_t occurrence=0;
++    oo_pt::Request request;
++    Shadow pushed;
++    Policy pipeline;
++    Layout layout;
++    std::vector<std::string> failures;
++};
++inline Capture select(uint64_t command,const oo_pt::Request& request,uint64_t occurrence) {
++    Capture capture;
++    if(!enabled()||!oo_identity::selected(request.key,request.variant)||request.shader_digest!=oo_pt::config().digest)return capture;
++    capture.selected=true;capture.request=request;capture.occurrence=occurrence;
++    auto pushed=std::move(shadow);shadow={}; // a matching fresh push may be consumed once only
++    const bool match=pushed.fresh&&pushed.command==command&&pushed.key==request.key&&pushed.variant==request.variant&&
++        pushed.part==request.recording_part&&pushed.logical==request.logical_value;
++    const bool policy_match=policy.command==command&&policy.key==request.key&&policy.variant==request.variant&&policy.layout==pushed.layout;
++    if(match&&policy_match) {
++        capture.pushed=std::move(pushed);capture.pipeline=policy;capture.policy_complete=true;
++        std::lock_guard lock(layout_mutex);
++        const auto found=layouts.find(capture.pushed.layout);
++        if(found!=layouts.end()&&found->second.key==request.key&&found->second.variant==request.variant) {
++            capture.layout=found->second;
++            const auto& l=capture.layout;const auto& p=capture.pushed;
++            capture.layout_complete=l.push_offset==p.offset&&l.push_size==p.bytes.size()&&l.push_stages==p.stages;
++        }
++        capture.push_complete=capture.layout_complete;
++        uint64_t root=0;
++        if(capture.pushed.root_offset!=request.root_push_offset||request.root_push_offset<capture.pushed.offset||
++           request.root_push_offset-capture.pushed.offset>capture.pushed.bytes.size()||
++           capture.pushed.bytes.size()-(request.root_push_offset-capture.pushed.offset)<sizeof root)capture.push_complete=false;
++        else {
++            const size_t at=request.root_push_offset-capture.pushed.offset;
++            for(unsigned i=0;i<8;++i)root|=uint64_t(capture.pushed.bytes[at+i])<<(8*i);
++            if(root!=request.root_address)capture.push_complete=false;
++        }
++        if(!capture.push_complete)capture.failures.push_back("push_range_or_page_root_mismatch");
++        if(!capture.layout_complete)capture.failures.push_back("actual_layout_not_retained_or_range_mismatch");
++    } else capture.failures.push_back("fresh_matching_push_or_pipeline_policy_missing");
++    policy={};
++    if(request.indirect)capture.failures.push_back("indirect_gpu_grid_not_captured");
++    return capture;
++}
++inline std::string hex64(uint64_t value) {char text[17];std::snprintf(text,sizeof text,"%016llx",(unsigned long long)value);return text;}
++inline std::string artifact_digest(const char* name) {
++    const auto path=std::filesystem::path(oo_pt::config().directory)/name;
++    std::error_code error;
++    if(!std::filesystem::is_regular_file(std::filesystem::symlink_status(path,error)))return {};
++    const auto size=std::filesystem::file_size(path,error);
++    if(error||!size||size>(16u<<20))return {};
++    std::vector<uint8_t> bytes(size);std::ifstream input(path,std::ios::binary);
++    if(!input.read(reinterpret_cast<char*>(bytes.data()),bytes.size())||input.peek()!=std::char_traits<char>::eof())return {};
++    return oo_identity::hex(oo_identity::sha256(bytes.data(),bytes.size()));
++}
++inline bool write_completed(const Capture& capture,const oo_pt::Request& submitted,uint64_t completed) {
++    const auto& r=capture.request;
++    if(!enabled()||!capture.selected||!submitted.submitted_sequence||completed<submitted.submitted_sequence||
++       r.key!=submitted.key||r.variant!=submitted.variant||r.shader_digest!=submitted.shader_digest||
++       r.recording_part!=submitted.recording_part||r.logical_value!=submitted.logical_value||
++       r.root_address!=submitted.root_address||r.root_push_offset!=submitted.root_push_offset||
++       r.x!=submitted.x||r.y!=submitted.y||r.z!=submitted.z||r.indirect!=submitted.indirect||r.present!=submitted.present)return false;
++    const auto directory=std::filesystem::path(oo_pt::config().directory);
++    const auto path=directory/"dispatch-parameters.json",part=directory/"dispatch-parameters.json.part";
++    if(oo_pt::present(path)||oo_pt::present(part))return false;
++    auto failures=capture.failures;std::string push_sha;
++    if(capture.push_complete&&!oo_alloc::save_payload("push-constants.bin",capture.pushed.bytes.data(),capture.pushed.bytes.size(),push_sha))failures.push_back("push_blob_export_failed");
++    const bool parameters_complete=capture.push_complete&&capture.layout_complete&&!push_sha.empty()&&!r.indirect;
++    std::ostringstream out;
++    out<<"{\"schema\":\"open-ocarina.dispatch-parameters/v1\",\"replay_complete\":false,\"parameters_complete\":"<<(parameters_complete?"true":"false")
++       <<",\"recording_part\":"<<r.recording_part<<",\"logical_value\":"<<r.logical_value<<",\"recording_sequence\":"<<submitted.submitted_sequence
++       <<",\"completed_recording_sequence\":"<<completed<<",\"selected_occurrence\":"<<capture.occurrence
++       <<",\"pipeline\":{\"policy_complete\":"<<(capture.policy_complete?"true":"false")<<",\"layout_complete\":"<<(capture.layout_complete?"true":"false")<<",\"program\":\""<<hex64(r.key)<<"\",\"variant\":\""<<hex64(r.variant)<<"\",\"spirv_sha256\":\""<<r.shader_digest
++       <<"\",\"cache_stamp\":\""<<hex64(capture.pipeline.cache_stamp)<<"\",\"layout_handle\":\""<<hex64(capture.pushed.layout)<<"\",\"entry_point\":\"main\",\"specialization\":[],\"local_size\":["
++       <<capture.pipeline.local_size[0]<<","<<capture.pipeline.local_size[1]<<","<<capture.pipeline.local_size[2]<<"],\"subgroup\":{\"required_size\":";
++    if(capture.pipeline.required_size)out<<capture.pipeline.required_size;else out<<"null";
++    out<<",\"require_full_subgroups\":"<<(capture.pipeline.require_full?"true":"false")<<"},\"push_range\":{\"offset\":"<<capture.layout.push_offset<<",\"size\":"<<capture.layout.push_size<<",\"stage_flags\":"<<capture.layout.push_stages
++       <<"},\"descriptor_set_layout_handle\":\""<<hex64(capture.layout.set_handle)<<"\",\"descriptor_set_layout_flags\":"<<capture.layout.set_flags<<",\"descriptor_layout\":[";
++    for(size_t i=0;i<capture.layout.bindings.size();++i){const auto& b=capture.layout.bindings[i];out<<(i?",":"")<<"{\"set\":"<<b.set<<",\"binding\":"<<b.binding<<",\"type\":"<<b.type<<",\"count\":"<<b.count<<",\"stage_flags\":"<<b.stage_flags<<"}";}
++    out<<"]},\"dispatch\":{\"kind\":\""<<(r.indirect?"indirect":"direct")<<"\",\"group_count\":";
++    if(r.indirect)out<<"null";else out<<"["<<r.x<<","<<r.y<<","<<r.z<<"]";
++    out<<"},\"push_constants\":";
++    if(!push_sha.empty())out<<"{\"artifact\":\"push-constants.bin\",\"size\":"<<capture.pushed.bytes.size()<<",\"sha256\":\""<<push_sha<<"\",\"offset\":"<<capture.pushed.offset<<",\"stage_flags\":"<<capture.pushed.stages<<",\"root_push_offset\":"<<capture.pushed.root_offset<<"}";else out<<"null";
++    out<<",\"associations\":[";
++    const char* manifests[]{"manifest.json","allocations.json","images.json"};
++    for(size_t i=0;i<3;++i){const auto digest=artifact_digest(manifests[i]);if(digest.empty())failures.push_back(std::string("missing_manifest_")+manifests[i]);out<<(i?",":"")<<"{\"artifact\":\""<<manifests[i]<<"\",\"sha256\":";if(digest.empty())out<<"null";else out<<"\""<<digest<<"\"";out<<"}";}
++    out<<"],\"features\":{\"nullDescriptor\":"<<(capture.pipeline.null_descriptor?"true":"false")<<",\"enabled_feature_chain_complete\":false,\"float_controls_captured\":false},\"failures\":[";
++    for(size_t i=0;i<failures.size();++i)out<<(i?",":"")<<"\""<<failures[i]<<"\"";
++    out<<"],\"remaining_gates\":[\"full_enabled_device_features\",\"float_controls\",\"sampled_image_and_sampler_semantics\",\"submitted_descriptor_words\",\"underlying_import_aliases\",\"cpu_writers_quiesced\",\"temporal_state\",\"independent_output_comparison\"],\"provenance\":{\"producer_revision\":null,\"patch_sha256\":null,\"binary_sha256\":null,\"external_frozen_build_receipt_required\":true},\"capture_position\":\"exact host bytes after vkCmdPushConstants; consumed before selected dispatch; exported after exact recording completion\"}\n";
++    const auto text=out.str();FILE* file=std::fopen(part.string().c_str(),"wbx");if(!file)return false;
++    const bool written=std::fwrite(text.data(),1,text.size(),file)==text.size();const bool closed=std::fclose(file)==0;
++    if(!written||!closed){std::remove(part.string().c_str());return false;}
++    std::error_code error;std::filesystem::rename(part,path,error);return !error;
++}
++} // namespace mkwvk::oo_dp
+diff --git a/gpu/vk/vk_draw.cpp b/gpu/vk/vk_draw.cpp
+index 8ef149d..9462dd3 100644
+--- a/gpu/vk/vk_draw.cpp
++++ b/gpu/vk/vk_draw.cpp
+@@ -49,6 +49,7 @@
+ #include "vk_jobs.h"
+ #include "vk_shader.h"
+ #include "graphics_identity.h"
++#include "dispatch_parameters.h"
+ #include "vk_texture.h"
+ #include "movie_upscale_policy.h"
+ #include "skip_code.h"
+@@ -699,6 +700,14 @@ void ensure_layout(Program& p) {
+     pi.pPushConstantRanges = &range;
+     VkPipelineLayout layout = VK_NULL_HANDLE;
+     vkCreatePipelineLayout(dev.device, &pi, nullptr, &layout);
++    if (oo_dp::enabled() && oo_identity::selected(p.key, p.variant)) {
++        oo_dp::Layout captured;captured.key=p.key;captured.variant=p.variant;
++        captured.handle=(uint64_t)(uintptr_t)layout;captured.set_handle=(uint64_t)(uintptr_t)p.set_layout;
++        captured.set_flags=li.flags;captured.push_offset=range.offset;captured.push_size=range.size;captured.push_stages=range.stageFlags;
++        for (const auto& binding : bindings)
++            captured.bindings.push_back({0,binding.binding,(uint32_t)binding.descriptorType,binding.descriptorCount,binding.stageFlags});
++        oo_dp::note_layout(std::move(captured));
++    }
+     p.push_stages = stages;
+     for (const Stage& st : p.stages) p.uses_render_area |= st.info.uses_render_area;
+     p.uses_push = p.uses_render_area;
+@@ -3901,6 +3910,7 @@ thread_local uint64_t fallback_payload_address = 0, fallback_records_address = 0
+ thread_local uint64_t fallback_indirect_input = 0;
+ 
+ void push_constants(VkCommandBuffer cmd, const Program& p, const Targets* at, uint32_t fallback_first = 0) {
++    oo_dp::invalidate_push();
+     checkpoint(cmd, p, at ? 'd' : 'c');
+     if (!p.uses_push) return;   // (most programs read none: a push a draw was ~5% of the replay's commands)
+     FINE_N(FC_PUSHC, 1);
+@@ -3931,6 +3941,12 @@ void push_constants(VkCommandBuffer cmd, const Program& p, const Targets* at, ui
+         std::memcpy(data + Shader::Backend::SPIRV::RENDERAREA_LAYOUT_OFFSET, ra, sizeof ra);
+     }
+     vkCmdPushConstants(cmd, p.layout, p.push_stages, 0, kPushSize, data);
++    if (oo_dp::enabled() && oo_identity::selected(p.key, p.variant)) {
++        uint64_t part=0,logical=0;
++        if (memory_pt_recording_info(cmd,&part,&logical))
++            oo_dp::note_push((uint64_t)(uintptr_t)cmd,p.key,p.variant,(uint64_t)(uintptr_t)p.layout,part,logical,
++                             p.push_stages,0,kPushSize,data, Shader::Backend::SPIRV::GUEST_PAGES_PUSH_OFFSET);
++    }
+ }
+ 
+ } // namespace
+@@ -9120,12 +9136,6 @@ void predicted_check() {
+ // no barriers or subgroup policies change, and this is explicitly NOT a replay capture.
+ void oo_compute_identity(VkCommandBuffer cmd, const Program& p, const NvnState& s, uint32_t x, uint32_t y, uint32_t z, uint64_t indirect) {
+     if (p.stages.empty()) return;
+-    if (p.stages[0].oo_identity.valid) {
+-        const auto digest=oo_identity::hex(p.stages[0].oo_identity.digest);
+-        memory_allocation_descriptors(cmd,dw().writes);
+-        memory_pt_snapshot_record(cmd, p.key, p.variant, digest.c_str(), x,y,z,indirect,presents_now,
+-                                  Shader::Backend::SPIRV::GUEST_PAGES_PUSH_OFFSET);
+-    }
+     uint64_t fingerprint = 14695981039346656037ull;
+     for (const auto& b : s.ubo[5]) oo_identity::mix(fingerprint, b.addr), oo_identity::mix(fingerprint, b.size);
+     for (const auto& b : s.ssbo[5]) oo_identity::mix(fingerprint, b.addr), oo_identity::mix(fingerprint, b.size);
+@@ -9142,6 +9152,19 @@ void oo_compute_identity(VkCommandBuffer cmd, const Program& p, const NvnState&
+         const auto* size = static_cast<const VkPipelineShaderStageRequiredSubgroupSizeCreateInfo*>(ci.stage.pNext);
+         if (size->sType == VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO) required = size->requiredSubgroupSize;
+     }
++    if (oo_dp::enabled()) {
++        oo_dp::Policy policy;policy.command=(uint64_t)(uintptr_t)cmd;policy.key=p.key;policy.variant=p.variant;
++        policy.layout=(uint64_t)(uintptr_t)p.layout;policy.cache_stamp=program_cache_stamp();
++        for (unsigned i=0;i<3;++i)policy.local_size[i]=p.workgroup[i];
++        policy.required_size=required;policy.require_full=(ci.stage.flags & VK_PIPELINE_SHADER_STAGE_CREATE_REQUIRE_FULL_SUBGROUPS_BIT)!=0;
++        policy.null_descriptor=dev.null_descriptor;oo_dp::note_policy(policy);
++    }
++    if (p.stages[0].oo_identity.valid) {
++        const auto digest=oo_identity::hex(p.stages[0].oo_identity.digest);
++        memory_allocation_descriptors(cmd,dw().writes);
++        memory_pt_snapshot_record(cmd, p.key, p.variant, digest.c_str(), x,y,z,indirect,presents_now,
++                                  Shader::Backend::SPIRV::GUEST_PAGES_PUSH_OFFSET);
++    }
+     oo_identity::emit(p.stages[0].oo_identity, p.key, p.variant, program_cache_stamp(), p.workgroup,
+         x, y, z, indirect, fingerprint, presents_now, required,
+         (ci.stage.flags & VK_PIPELINE_SHADER_STAGE_CREATE_REQUIRE_FULL_SUBGROUPS_BIT) != 0,
+diff --git a/gpu/vk/vk_memory.cpp b/gpu/vk/vk_memory.cpp
+index ef52356..8f226fc 100644
+--- a/gpu/vk/vk_memory.cpp
++++ b/gpu/vk/vk_memory.cpp
+@@ -29,6 +29,7 @@
+ #include "vk_internal.h"
+ #include "page_table_capture.h"
+ #include "image_capture.h"
++#include "dispatch_parameters.h"
+ #include <vk_mem_alloc.h>
+ #include "vk_texture.h"   // (upload_command_buffer)
+ #include "vk_gprof.h"      // (RX_VK_PASS_TIMING)
+@@ -493,6 +494,7 @@ struct OoPagePending {
+     oo_pt::Request request;
+ };
+ OoPagePending oo_page_pending;
++oo_dp::Capture oo_dispatch_pending;
+ oo_alloc::SelectionCounter oo_capture_selection;
+ std::mutex oo_page_mutex;
+ }
+@@ -534,6 +536,7 @@ void memory_pt_snapshot_record(VkCommandBuffer cmd,uint64_t key,uint64_t variant
+     pending.request.recording_part=recording_part;pending.request.logical_value=logical_value;
+     pending.request.x=x;pending.request.y=y;pending.request.z=z;pending.request.indirect=indirect!=0;pending.request.present=present;
+     pending.command=cmd;
++    oo_dispatch_pending=oo_dp::select((uint64_t)(uintptr_t)cmd,pending.request,oo_capture_selection.observed);
+     VkBufferMemoryBarrier2 before{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2};
+     before.srcStageMask=VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;before.srcAccessMask=VK_ACCESS_2_MEMORY_WRITE_BIT;
+     before.dstStageMask=VK_PIPELINE_STAGE_2_COPY_BIT;before.dstAccessMask=VK_ACCESS_2_TRANSFER_READ_BIT;
+@@ -588,6 +591,12 @@ void memory_pt_snapshot_collect(uint64_t completed_sequence) {
+         catch(const std::exception& error){logf("vk: Open-Ocarina page snapshot export failed: %s",error.what());}
+     }
+     oo_allocation_collect(pending.request,completed_sequence,ok,ok?static_cast<const uint8_t*>(pending.mapped):nullptr);
++    if (oo_dp::enabled()) {
++        try {if (!oo_dp::write_completed(oo_dispatch_pending,pending.request,completed_sequence))
++            logf("vk: Open-Ocarina dispatch parameters export refused or failed (NOT full replay)");}
++        catch (const std::exception& error) {logf("vk: Open-Ocarina dispatch parameters export failed: %s",error.what());}
++        oo_dispatch_pending={};
++    }
+     destroy_buffer(pending.buffer,pending.allocation);pending.buffer=VK_NULL_HANDLE;pending.allocation=nullptr;pending.mapped=nullptr;pending.active=false;
+     logf("vk: Open-Ocarina GPU page-table snapshot %s after recording sequence %llu completed (page-table-only; NOT replay)",
+          ok?"exported":"failed",(unsigned long long)pending.request.submitted_sequence);

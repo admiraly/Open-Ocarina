@@ -1,0 +1,584 @@
+diff --git a/gpu/vk/image_capture.h b/gpu/vk/image_capture.h
+new file mode 100644
+index 0000000..08426d3
+--- /dev/null
++++ b/gpu/vk/image_capture.h
+@@ -0,0 +1,137 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Selected sampled-image GPU inputs. Explicit support boundaries; never complete replay.
++#pragma once
++#include "allocation_capture.h"
++#include <sstream>
++namespace mkwvk::oo_img {
++struct Config { bool enabled=false; uint64_t budget=256ull<<20; };
++inline const Config& config() {
++ static const Config result=[] {
++  Config c;const char* enabled=std::getenv("RX_VK_OO_IMAGES");
++  if(!enabled||std::string(enabled)!="1"||!oo_alloc::config().enabled)return c;
++  if(const char* cap=std::getenv("RX_VK_OO_IMAGE_BUDGET_MIB")) {
++   uint64_t n=0;if(!oo_alloc::decimal_bound(cap,8,4096,n)){std::fprintf(stderr,"Open-Ocarina: invalid image budget; image capture disabled\n");return c;}c.budget=n<<20;
++  }
++  for(const char* name:{"images.json","images.json.part"})if(oo_pt::present(std::filesystem::path(oo_pt::config().directory)/name))return c;
++  c.enabled=true;return c;
++ }();return result;
++}
++struct Image {
++ uint64_t handle=0,memory=0,memory_offset=0;
++ uint32_t flags=0,type=0,format=0,width=0,height=0,depth=0,mips=0,layers=0,samples=0,tiling=0,usage=0,sharing=0,initial_layout=0;
++ std::vector<uint32_t> queue_families,pnext_types,format_list;
++ bool complete=true;
++};
++struct View {
++ uint64_t handle=0,image=0;
++ uint32_t flags=0,type=0,format=0,aspect=0,base_mip=0,mip_count=0,base_layer=0,layer_count=0,usage=0;
++ std::array<uint32_t,4> components{};
++ std::vector<uint32_t> pnext_types;
++ bool complete=true,explicit_usage=false;
++};
++struct Extension { uint32_t type=0;std::vector<uint32_t> words; };
++struct Sampler {
++ uint64_t handle=0;
++ // VkSamplerCreateInfo in declaration order, starting at flags; floats retain exact u32 bits.
++ std::array<uint32_t,16> core{};
++ std::vector<Extension> extensions;
++ bool complete=true;
++};
++struct Mip { uint32_t level=0,width=0,height=0,depth=0;uint64_t offset=0,bytes=0; };
++struct Plan { bool supported=false;std::string reason;uint32_t bw=0,bh=0,bpb=0,layers=0;uint64_t bytes=0;std::vector<Mip> mips; };
++inline std::array<uint32_t,3> block(uint32_t f) {
++ if(f>=9&&f<=15)return {1,1,1};if(f>=16&&f<=22)return {1,1,2};
++ if(f>=37&&f<=69)return {1,1,4};if(f>=70&&f<=76)return {1,1,2};
++ if(f>=77&&f<=83)return {1,1,4};if(f>=91&&f<=97)return {1,1,8};
++ if(f>=98&&f<=100)return {1,1,4};if(f>=101&&f<=103)return {1,1,8};
++ if(f>=107&&f<=109)return {1,1,16};if(f==122||f==123)return {1,1,4};
++ if(f>=131&&f<=146)return {4,4,((f<=134)||(f>=139&&f<=140))?8u:16u};
++ return {};
++}
++inline bool add(uint64_t a,uint64_t b,uint64_t& out){if(a>UINT64_MAX-b)return false;out=a+b;return true;}
++inline bool mul(uint64_t a,uint64_t b,uint64_t& out){if(b&&a>UINT64_MAX/b)return false;out=a*b;return true;}
++inline Plan plan(const Image& image,const View& view,uint32_t layout) {
++ Plan p;auto fail=[&](const char* why){p.reason=why;return p;};
++ if(!image.complete||!view.complete)return fail("unsupported_create_info_pnext_or_ownership");
++ if(!image.handle||view.image!=image.handle)return fail("image_view_owner_unknown");
++ if(layout!=1)return fail("descriptor_layout_not_general");
++ if(image.flags&~(8u|16u|128u|256u))return fail("unsupported_image_flags_sparse_alias_or_protected");
++ if(image.samples!=1||image.type>1||image.depth!=1)return fail("unsupported_multisample_or_three_dimensional_image");
++ if(view.aspect!=1)return fail("unsupported_noncolor_aspect");
++ if(!(image.usage&1)||!(image.usage&4))return fail("image_transfer_or_sample_usage_missing");
++ const uint32_t usage=view.explicit_usage?view.usage:image.usage;
++ if(!(usage&4)||(usage&image.usage)!=usage)return fail("view_usage_conflicts_with_image");
++ if(view.format!=image.format&&!(image.flags&8))return fail("view_format_conflicts_with_image");
++ if(image.type==0&&image.height!=1)return fail("invalid_image_or_view_bounds");
++ if(view.flags||!(image.width&&image.height&&image.mips&&image.layers)||image.mips>32)return fail("invalid_image_or_view_bounds");
++ if((image.type==0&&(view.type!=0&&view.type!=4))||(image.type==1&&(view.type!=1&&view.type!=3&&view.type!=5&&view.type!=6)))return fail("unsupported_view_type");
++ if(view.base_mip>=image.mips||view.base_layer>=image.layers)return fail("view_subresource_out_of_bounds");
++ uint32_t maximum_levels=0;for(uint32_t d=std::max(image.width,image.height);d;d>>=1)++maximum_levels;
++ if(image.mips>maximum_levels)return fail("invalid_image_or_view_bounds");
++ const uint32_t count=view.mip_count==UINT32_MAX?image.mips-view.base_mip:view.mip_count;
++ p.layers=view.layer_count==UINT32_MAX?image.layers-view.base_layer:view.layer_count;
++ if(!count||count>image.mips-view.base_mip||!p.layers||p.layers>image.layers-view.base_layer)return fail("view_subresource_out_of_bounds");
++ if((view.type==0||view.type==1)&&p.layers!=1)return fail("view_subresource_out_of_bounds");
++ if((view.type==3||view.type==6)&&(!(image.flags&16)||image.width!=image.height||p.layers%6||(view.type==3&&p.layers!=6)))return fail("view_subresource_out_of_bounds");
++ const auto b=block(image.format);p.bw=b[0];p.bh=b[1];p.bpb=b[2];if(!p.bpb)return fail("unsupported_backing_format");
++ for(uint32_t n=0;n<count;++n) {
++  Mip m;m.level=view.base_mip+n;m.width=std::max(1u,image.width>>m.level);m.height=std::max(1u,image.height>>m.level);m.depth=1;
++  const uint64_t align=std::max(4u,p.bpb);uint64_t aligned=0;
++  if(!add(p.bytes,align-1,aligned))return fail("image_footprint_overflow");m.offset=aligned/align*align;
++  uint64_t bytes=0;
++  if(!mul((uint64_t(m.width)+p.bw-1)/p.bw,(uint64_t(m.height)+p.bh-1)/p.bh,bytes)||!mul(bytes,p.bpb,bytes)||
++     !mul(bytes,p.layers,m.bytes)||!add(m.offset,m.bytes,p.bytes))return fail("image_footprint_overflow");
++  p.mips.push_back(m);
++ }
++ uint64_t rounded=0;if(!add(p.bytes,3,rounded))return fail("image_footprint_overflow");p.bytes=rounded/4*4;
++ p.supported=true;return p;
++}
++struct Row {
++ uint32_t binding=0,element=0,type=0,layout=0;
++ uint64_t image_view=0,sampler_handle=0;
++ Image image;View view;Sampler sampler;Plan copy;
++ std::string payload_sha;std::vector<std::string> failures;
++};
++inline std::string hex(uint64_t value){char text[32];std::snprintf(text,sizeof text,"%016llx",(unsigned long long)value);return text;}
++template<class Range>inline std::string numbers(const Range& range){std::string out="[";bool comma=false;for(auto value:range){if(comma)out+=",";comma=true;out+=std::to_string(value);}return out+"]";}
++inline bool write_manifest(const oo_pt::Request& request,uint64_t completed,uint64_t occurrence,
++                           uint64_t buffer_staging,const std::vector<Row>& rows,const std::vector<std::string>& failures,
++                           bool invalidated,bool complete) {
++ if(!config().enabled||!request.submitted_sequence||completed<request.submitted_sequence)return false;
++ const auto root=std::filesystem::path(oo_pt::config().directory),path=root/"images.json",part=root/"images.json.part";
++ if(oo_pt::present(path))return false;
++ std::ostringstream out;
++ out<<"{\"schema\":\"open-ocarina.sampled-images/v1\",\"replay_complete\":false,\"image_inputs_complete\":"<<(complete?"true":"false")
++    <<",\"program\":\""<<hex(request.key)<<"\",\"variant\":\""<<hex(request.variant)<<"\",\"spirv_sha256\":\""<<request.shader_digest
++    <<"\",\"recording_part\":"<<request.recording_part<<",\"recording_sequence\":"<<request.submitted_sequence<<",\"completed_recording_sequence\":"<<completed
++    <<",\"selected_occurrence\":"<<occurrence<<",\"image_budget_bytes\":"<<config().budget<<",\"aggregate_budget_bytes\":"<<oo_alloc::config().budget
++    <<",\"buffer_staging_bytes\":"<<buffer_staging<<",\"command_position\":\"before selected compute dispatch\",\"mapped_memory_invalidated\":"<<(invalidated?"true":"false")
++    <<",\"coverage\":{\"image_physical_aliases_resolved\":false,\"cpu_writers_quiesced\":false,\"temporal_state\":false,\"complete_push_constants\":false,\"submitted_descriptor_words_decoded\":false},\"failures\":[";
++ for(size_t n=0;n<failures.size();++n){if(n)out<<',';out<<'"'<<failures[n]<<'"';}out<<"],\"images\":[";
++ for(size_t n=0;n<rows.size();++n) {
++  const auto& r=rows[n];const auto& i=r.image;const auto& v=r.view;const auto& s=r.sampler;
++  if(n)out<<',';
++  out<<"{\"id\":"<<n<<",\"binding\":"<<r.binding<<",\"element\":"<<r.element<<",\"descriptor_type\":"<<r.type<<",\"descriptor_layout\":"<<r.layout
++     <<",\"image_view\":\""<<hex(r.image_view)<<"\",\"sampler_handle\":\""<<hex(r.sampler_handle)<<"\",\"image\":{\"handle\":\""<<hex(i.handle)
++     <<"\",\"memory\":\""<<hex(i.memory)<<"\",\"memory_offset\":"<<i.memory_offset<<",\"flags\":"<<i.flags<<",\"type\":"<<i.type<<",\"format\":"<<i.format
++     <<",\"extent\":["<<i.width<<','<<i.height<<','<<i.depth<<"],\"mip_levels\":"<<i.mips<<",\"array_layers\":"<<i.layers<<",\"samples\":"<<i.samples
++     <<",\"tiling\":"<<i.tiling<<",\"usage\":"<<i.usage<<",\"sharing_mode\":"<<i.sharing<<",\"initial_layout\":"<<i.initial_layout
++     <<",\"queue_families\":"<<numbers(i.queue_families)<<",\"pnext_types\":"<<numbers(i.pnext_types)<<",\"format_list\":"<<numbers(i.format_list)<<",\"complete\":"<<(i.complete?"true":"false")
++     <<"},\"view\":{\"handle\":\""<<hex(v.handle)<<"\",\"image\":\""<<hex(v.image)<<"\",\"flags\":"<<v.flags<<",\"type\":"<<v.type<<",\"format\":"<<v.format
++     <<",\"components\":"<<numbers(v.components)<<",\"aspect\":"<<v.aspect<<",\"base_mip\":"<<v.base_mip<<",\"mip_count\":"<<v.mip_count
++     <<",\"base_layer\":"<<v.base_layer<<",\"layer_count\":"<<v.layer_count<<",\"usage\":"<<v.usage<<",\"explicit_usage\":"<<(v.explicit_usage?"true":"false")
++     <<",\"pnext_types\":"<<numbers(v.pnext_types)<<",\"complete\":"<<(v.complete?"true":"false")<<"},\"sampler\":{\"handle\":\""<<hex(s.handle)
++     <<"\",\"core_words\":"<<numbers(s.core)<<",\"complete\":"<<(s.complete?"true":"false")<<",\"pnext\":[";
++  for(size_t e=0;e<s.extensions.size();++e){if(e)out<<',';out<<"{\"type\":"<<s.extensions[e].type<<",\"words\":"<<numbers(s.extensions[e].words)<<'}';}
++  out<<"]},\"copy\":{\"supported\":"<<(r.copy.supported?"true":"false")<<",\"reason\":\""<<r.copy.reason<<"\",\"bytes\":"<<r.copy.bytes<<",\"block\":["<<r.copy.bw<<','<<r.copy.bh<<','<<r.copy.bpb<<"],\"layers\":"<<r.copy.layers<<",\"mips\":[";
++  for(size_t m=0;m<r.copy.mips.size();++m){const auto& x=r.copy.mips[m];if(m)out<<',';out<<"{\"level\":"<<x.level<<",\"extent\":["<<x.width<<','<<x.height<<','<<x.depth<<"],\"offset\":"<<x.offset<<",\"bytes\":"<<x.bytes<<'}';}
++  out<<"]},\"before\":";
++  if(r.payload_sha.empty())out<<"null";else out<<"{\"artifact\":\"image-"<<n<<"-before.bin\",\"sha256\":\""<<r.payload_sha<<"\"}";
++  out<<",\"failures\":[";for(size_t f=0;f<r.failures.size();++f){if(f)out<<',';out<<'"'<<r.failures[f]<<'"';}out<<"]}";
++ }
++ out<<"]}\n";const auto text=out.str();FILE* f=std::fopen(part.string().c_str(),"wbx");if(!f)return false;
++ const bool wrote=std::fwrite(text.data(),1,text.size(),f)==text.size();const bool closed=std::fclose(f)==0;
++ if(!wrote||!closed){std::remove(part.string().c_str());return false;}
++ std::error_code error;std::filesystem::rename(part,path,error);return !error;
++}
++} // namespace mkwvk::oo_img
+diff --git a/gpu/vk/vk_draw.cpp b/gpu/vk/vk_draw.cpp
+index a873163..8ef149d 100644
+--- a/gpu/vk/vk_draw.cpp
++++ b/gpu/vk/vk_draw.cpp
+@@ -2735,9 +2735,11 @@ VkSampler sampler_make(int id, bool compare) {
+         remember_failure();   // (an error's output handle is undefined, not a resource to cache or destroy)
+         return VK_NULL_HANDLE;
+     }
++    memory_capture_sampler_created(sm,ci);
+     try {
+         samplers.emplace(key, sm);
+     } catch (const std::exception&) {
++        memory_capture_sampler_destroyed(sm);
+         vkDestroySampler(dev.device, sm, nullptr);   // (only the new sampler whose ownership was not committed)
+         remember_failure();
+         return VK_NULL_HANDLE;
+diff --git a/gpu/vk/vk_internal.h b/gpu/vk/vk_internal.h
+index 67553a9..14ad262 100644
+--- a/gpu/vk/vk_internal.h
++++ b/gpu/vk/vk_internal.h
+@@ -254,6 +254,14 @@ uint64_t memory_capture_view();          // (bumped when a capture is published
+ uint32_t memory_page_stamp(uint64_t gpu); // (that address's page only)
+ uint64_t gpu_pool_end(uint64_t gpu);   // (hookshot) where the memory pool holding that address ends, 0: in none (vk_memory.cpp)
+ uint64_t gpu_pool_start(uint64_t gpu); // (EvilOOT) and where it begins
++namespace oo_img { struct Image;struct View;struct Sampler; }
++bool memory_image_retain(VkImageView view,oo_img::Image* image,oo_img::View* metadata);
++void memory_image_release(VkImage image);
++VkResult memory_capture_create_view(VkDevice device,const VkImageViewCreateInfo* info,const VkAllocationCallbacks* callbacks,VkImageView* view);
++void memory_capture_destroy_view(VkDevice device,VkImageView view,const VkAllocationCallbacks* callbacks);
++void memory_capture_sampler_created(VkSampler sampler,const VkSamplerCreateInfo& info);
++void memory_capture_sampler_destroyed(VkSampler sampler);
++bool memory_capture_sampler(VkSampler sampler,oo_img::Sampler* metadata);
+ // Open-Ocarina opt-in: exact VMA buffer creation bounds, retained until capture completion.
+ struct OoBufferOwner { uint64_t size=0; VkBufferUsageFlags usage=0; VmaAllocation allocation=nullptr; };
+ bool memory_allocation_retain_buffer(VkBuffer buffer,OoBufferOwner* owner);
+diff --git a/gpu/vk/vk_memory.cpp b/gpu/vk/vk_memory.cpp
+index f700841..ef52356 100644
+--- a/gpu/vk/vk_memory.cpp
++++ b/gpu/vk/vk_memory.cpp
+@@ -28,7 +28,7 @@
+ 
+ #include "vk_internal.h"
+ #include "page_table_capture.h"
+-#include "allocation_capture.h"
++#include "image_capture.h"
+ #include <vk_mem_alloc.h>
+ #include "vk_texture.h"   // (upload_command_buffer)
+ #include "vk_gprof.h"      // (RX_VK_PASS_TIMING)
+@@ -4561,6 +4561,11 @@ struct OoAllocationPending {
+     std::vector<std::string> failures;
+     std::vector<OoAllocationCopy> copies_by_row;
+     std::vector<VkBuffer> retained_renderer_buffers;
++    std::vector<oo_img::Row> image_rows;
++    std::vector<OoAllocationCopy> image_staging;
++    std::vector<VkImage> retained_images;
++    std::vector<std::string> image_failures;
++    uint64_t image_bytes=0;
+ };
+ OoAllocationPending oo_alloc_pending;
+ void oo_allocation_copy_phase(VkCommandBuffer cmd,bool after) {
+@@ -4594,8 +4599,14 @@ void memory_allocation_descriptors(VkCommandBuffer cmd,const std::vector<VkWrite
+     if(!oo_alloc::config().enabled)return;
+     std::lock_guard lock(oo_page_mutex);auto& state=oo_alloc_pending;
+     if(oo_page_pending.attempted)return;
+-    state.command=cmd;state.descriptors.clear();
++    state.command=cmd;state.descriptors.clear();state.image_rows.clear();
+     for(const auto& write:writes) {
++        if(oo_img::config().enabled&&write.pImageInfo)for(uint32_t i=0;i<write.descriptorCount;++i) {
++            if(state.image_rows.size()>=64)break;
++            const auto& info=write.pImageInfo[i];oo_img::Row row;
++            row.binding=write.dstBinding;row.element=write.dstArrayElement+i;row.type=write.descriptorType;row.layout=info.imageLayout;
++            row.image_view=(uint64_t)(uintptr_t)info.imageView;row.sampler_handle=(uint64_t)(uintptr_t)info.sampler;state.image_rows.push_back(row);
++        }
+         if(!write.pBufferInfo)continue;
+         for(uint32_t i=0;i<write.descriptorCount;++i) {
+             const auto& info=write.pBufferInfo[i];
+@@ -4604,6 +4615,90 @@ void memory_allocation_descriptors(VkCommandBuffer cmd,const std::vector<VkWrite
+         }
+     }
+ }
++void oo_image_prepare(VkCommandBuffer cmd) { // oo_page_mutex held, source images pinned before any budget decision.
++ if(!oo_img::config().enabled)return;auto& state=oo_alloc_pending;
++ state.image_failures={"image_physical_aliases_unresolved","cpu_writers_not_quiesced","temporal_state_not_captured"};
++ if(oo_page_pending.request.key!=0xcc62764061c44f6aull||oo_page_pending.request.variant!=0x095931037888515aull||
++    oo_page_pending.request.shader_digest!="b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b")state.image_failures.push_back("image_shader_readonly_contract_unverified");
++ std::set<uint32_t> bindings;
++ for(auto& row:state.image_rows) {
++  bindings.insert(row.binding);
++  if(row.type!=VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER||row.element||row.binding<8||row.binding>11)row.failures.push_back("unsupported_image_descriptor_contract");
++  if(memory_image_retain((VkImageView)(uintptr_t)row.image_view,&row.image,&row.view)) {
++   state.retained_images.push_back((VkImage)(uintptr_t)row.image.handle);row.copy=oo_img::plan(row.image,row.view,row.layout);
++  }else {row.copy=oo_img::plan(row.image,row.view,row.layout);row.failures.push_back("image_view_owner_unknown");}
++  if(!memory_capture_sampler((VkSampler)(uintptr_t)row.sampler_handle,&row.sampler))row.failures.push_back("sampler_owner_unknown");
++  else if(!row.sampler.complete)row.failures.push_back("sampler_pnext_unsupported");
++  if(!row.copy.supported)row.failures.push_back(row.copy.reason);
++  if(row.copy.supported&&!oo_img::add(state.image_bytes,row.copy.bytes,state.image_bytes))state.image_failures.push_back("image_footprint_overflow");
++ }
++ if(bindings!=std::set<uint32_t>{8,9,10,11}||state.image_rows.size()!=4)state.image_failures.push_back("selected_sampled_image_bindings_incomplete");
++ for(size_t i=0;i<state.image_rows.size();++i)for(size_t j=0;j<i;++j)
++  if(state.image_rows[i].image.handle&&state.image_rows[i].image.handle==state.image_rows[j].image.handle&&
++     state.image_rows[i].layout!=state.image_rows[j].layout)state.image_failures.push_back("aliased_view_descriptor_layout_conflict");
++ uint64_t aggregate=0;
++ const bool budget=state.candidate_bytes<=UINT64_MAX/2&&oo_img::add(state.candidate_bytes*2,state.image_bytes,aggregate)&&
++     state.image_bytes<=oo_img::config().budget&&aggregate<=oo_alloc::config().budget;
++ logf("vk: Open-Ocarina sampled-image catalog: %zu descriptors, %llu image staging bytes, %llu buffer staging bytes, aggregate budget %llu",
++     state.image_rows.size(),(unsigned long long)state.image_bytes,(unsigned long long)(state.candidate_bytes*2),(unsigned long long)oo_alloc::config().budget);
++ if(!budget){state.image_failures.push_back("image_or_aggregate_staging_budget_exceeded");return;}
++ if(state.image_failures.size()!=3)return;
++ state.image_staging.resize(state.image_rows.size());bool made=true;
++ for(size_t i=0;i<state.image_rows.size();++i) {
++  const auto& row=state.image_rows[i];auto& copy=state.image_staging[i];if(!row.copy.supported)continue;
++  if(!create_buffer_cached(row.copy.bytes,VK_BUFFER_USAGE_TRANSFER_DST_BIT,copy.before,copy.before_alloc,&copy.before_map,true)||!copy.before_map){made=false;break;}
++ }
++ if(!made) {
++  state.image_failures.push_back("image_staging_allocation_failed");
++  for(auto& copy:state.image_staging)if(copy.before||copy.before_alloc)destroy_buffer(copy.before,copy.before_alloc);
++  state.image_staging.clear();return;
++ }
++ for(size_t i=0;i<state.image_rows.size();++i) {
++  const auto& row=state.image_rows[i];const auto& copy=state.image_staging[i];if(!copy.before)continue;
++  vkCmdFillBuffer(cmd,copy.before,0,row.copy.bytes,0); // Defined zero padding between mip payloads.
++  VkImageMemoryBarrier2 source{VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER_2};
++  source.srcStageMask=VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;source.srcAccessMask=VK_ACCESS_2_MEMORY_WRITE_BIT;
++  source.dstStageMask=VK_PIPELINE_STAGE_2_COPY_BIT;source.dstAccessMask=VK_ACCESS_2_TRANSFER_READ_BIT;
++  source.oldLayout=(VkImageLayout)row.layout;source.newLayout=VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
++  source.srcQueueFamilyIndex=source.dstQueueFamilyIndex=VK_QUEUE_FAMILY_IGNORED;source.image=(VkImage)(uintptr_t)row.image.handle;
++  source.subresourceRange={VK_IMAGE_ASPECT_COLOR_BIT,row.view.base_mip,(uint32_t)row.copy.mips.size(),row.view.base_layer,row.copy.layers};
++  VkBufferMemoryBarrier2 target{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2};
++  target.srcStageMask=VK_PIPELINE_STAGE_2_ALL_TRANSFER_BIT;target.srcAccessMask=VK_ACCESS_2_TRANSFER_WRITE_BIT;
++  target.dstStageMask=VK_PIPELINE_STAGE_2_COPY_BIT;target.dstAccessMask=VK_ACCESS_2_TRANSFER_WRITE_BIT;
++  target.srcQueueFamilyIndex=target.dstQueueFamilyIndex=VK_QUEUE_FAMILY_IGNORED;target.buffer=copy.before;target.size=row.copy.bytes;
++  VkDependencyInfo dependency{VK_STRUCTURE_TYPE_DEPENDENCY_INFO};dependency.imageMemoryBarrierCount=1;dependency.pImageMemoryBarriers=&source;
++  dependency.bufferMemoryBarrierCount=1;dependency.pBufferMemoryBarriers=&target;vkCmdPipelineBarrier2(cmd,&dependency);
++  std::vector<VkBufferImageCopy> regions;
++  for(const auto& mip:row.copy.mips) {
++   VkBufferImageCopy region{};region.bufferOffset=mip.offset;region.imageSubresource={VK_IMAGE_ASPECT_COLOR_BIT,mip.level,row.view.base_layer,row.copy.layers};
++   region.imageExtent={mip.width,mip.height,1};regions.push_back(region);
++  }
++  vkCmdCopyImageToBuffer(cmd,source.image,VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,copy.before,(uint32_t)regions.size(),regions.data());
++  source.srcStageMask=VK_PIPELINE_STAGE_2_COPY_BIT;source.srcAccessMask=VK_ACCESS_2_TRANSFER_READ_BIT;
++  source.dstStageMask=VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;source.dstAccessMask=VK_ACCESS_2_MEMORY_READ_BIT|VK_ACCESS_2_MEMORY_WRITE_BIT;
++  source.oldLayout=VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;source.newLayout=(VkImageLayout)row.layout;
++  target.srcStageMask=VK_PIPELINE_STAGE_2_ALL_TRANSFER_BIT;target.srcAccessMask=VK_ACCESS_2_TRANSFER_WRITE_BIT;
++  target.dstStageMask=VK_PIPELINE_STAGE_2_HOST_BIT;target.dstAccessMask=VK_ACCESS_2_HOST_READ_BIT;
++  vkCmdPipelineBarrier2(cmd,&dependency);
++ }
++}
++void oo_image_collect(const oo_pt::Request& request,uint64_t completed) {
++ if(!oo_img::config().enabled)return;auto& state=oo_alloc_pending;bool invalidated=std::any_of(state.image_staging.begin(),state.image_staging.end(),[](const auto& copy){return copy.before!=VK_NULL_HANDLE;});
++ try {
++  for(size_t i=0;i<state.image_rows.size();++i) {
++   auto& row=state.image_rows[i];
++   if(i>=state.image_staging.size()||!state.image_staging[i].before){row.failures.push_back("image_payload_missing");continue;}
++   const auto& copy=state.image_staging[i];
++   if(!invalidate_mapped_checked(copy.before_alloc,row.copy.bytes)){invalidated=false;row.failures.push_back("image_invalidation_failed");continue;}
++   if(!oo_alloc::save_payload("image-"+std::to_string(i)+"-before.bin",static_cast<const uint8_t*>(copy.before_map),row.copy.bytes,row.payload_sha))row.failures.push_back("image_payload_export_failed");
++  }
++  bool complete=invalidated&&state.image_rows.size()==4&&state.image_failures.size()==3;
++  for(const auto& row:state.image_rows)complete&=row.failures.empty()&&!row.payload_sha.empty()&&row.sampler.complete;
++  const bool ok=oo_img::write_manifest(request,completed,oo_capture_selection.observed,state.candidate_bytes*2,state.image_rows,state.image_failures,invalidated,complete);
++  logf("vk: Open-Ocarina sampled-image evidence %s: %zu descriptors, input payloads %s (NOT full replay)",ok?"exported":"failed",state.image_rows.size(),complete?"complete":"incomplete");
++ }catch(const std::exception& error){logf("vk: Open-Ocarina sampled-image export failed: %s",error.what());}
++}
++
+ void oo_allocation_record(VkCommandBuffer cmd) { // oo_page_mutex held; no CPU guest payload read.
+     if(!oo_alloc::config().enabled)return;
+     auto& state=oo_alloc_pending;state.active=true;state.command=cmd;
+@@ -4667,6 +4762,7 @@ void oo_allocation_record(VkCommandBuffer cmd) { // oo_page_mutex held; no CPU g
+         else if(descriptor.offset>=it->size||(descriptor.range!=VK_WHOLE_SIZE&&descriptor.range>it->size-descriptor.offset))
+             state.failures.push_back("descriptor_range_unresolved");
+     }
++    oo_image_prepare(cmd);
+     logf("vk: Open-Ocarina allocation catalog: %zu candidates, %llu source bytes, %llu required staging bytes, budget %llu (not replay)",
+         state.rows.size(),(unsigned long long)state.candidate_bytes,(unsigned long long)(state.candidate_bytes*2),(unsigned long long)oo_alloc::config().budget);
+     const bool bounded=state.candidate_bytes<=UINT64_MAX/2&&state.candidate_bytes*2<=oo_alloc::config().budget&&
+@@ -4698,12 +4794,17 @@ void oo_allocation_release() { // oo_page_mutex held; cancellation or exact comp
+     if(!state.active)return;
+     for(auto& copy:state.copies_by_row){if(copy.before||copy.before_alloc)destroy_buffer(copy.before,copy.before_alloc);if(copy.after||copy.after_alloc)destroy_buffer(copy.after,copy.after_alloc);}
+     {std::lock_guard pool_lock(pools_mu);oo_retained_buffers.clear();}
++    for(auto& copy:state.image_staging)if(copy.before||copy.before_alloc)destroy_buffer(copy.before,copy.before_alloc);
++    state.image_staging.clear();
++    for(auto image:state.retained_images)memory_image_release(image);
++    state.retained_images.clear();
+     for(auto buffer:state.retained_renderer_buffers)memory_allocation_release_buffer(buffer);
+     state.retained_renderer_buffers.clear();state.copies_by_row.clear();state.active=false;
+ }
+ void oo_allocation_collect(const oo_pt::Request& request,uint64_t completed,bool table_ok,const uint8_t* table) {
+     auto& state=oo_alloc_pending;if(!state.active)return;
+     bool invalidated=state.copies&&state.after_recorded;
++    oo_image_collect(request,completed);
+     try {
+         for(size_t i=0;i<state.copies_by_row.size();++i) {
+             auto& row=state.rows[i];const auto& copy=state.copies_by_row[i];
+diff --git a/gpu/vk/vk_texture.cpp b/gpu/vk/vk_texture.cpp
+index 1fda3f4..c21fd50 100644
+--- a/gpu/vk/vk_texture.cpp
++++ b/gpu/vk/vk_texture.cpp
+@@ -317,7 +317,7 @@ bool pool_take(uint64_t key, VkImage& image, VmaAllocation& allocation, std::uno
+ }
+ void pool_destroy(Pooled& p) {
+     for (auto& kv : p.views)
+-        if (kv.second) vkDestroyImageView(dev.device, kv.second, nullptr);
++        if (kv.second) memory_capture_destroy_view(dev.device, kv.second, nullptr);
+     destroy_image(p.image, p.allocation);
+     st_pool_destroyed++;
+ }
+@@ -558,14 +558,14 @@ VkImageView make_view(Texture* tex, VkImageViewType type, VkFormat f, VkImageAsp
+     vi.components = cm;
+     vi.subresourceRange = {aspect, level0, nlevels, layer0, nlayers};
+     VkImageView v = VK_NULL_HANDLE;
+-    const VkResult first = vkCreateImageView(dev.device, &vi, nullptr, &v);
++    const VkResult first = memory_capture_create_view(dev.device, &vi, nullptr, &v);
+     if (result) *result = first;
+     if (first == VK_SUCCESS) return v;
+     if (!block_view || nlayers == 1) return VK_NULL_HANDLE;
+     // (Vulkan 1.1 says a block-texel view is of a single layer; some drivers hold to it)
+     vi.subresourceRange.layerCount = 1;
+     if (vi.viewType == VK_IMAGE_VIEW_TYPE_2D_ARRAY) vi.viewType = VK_IMAGE_VIEW_TYPE_2D;
+-    const VkResult last = vkCreateImageView(dev.device, &vi, nullptr, &v);
++    const VkResult last = memory_capture_create_view(dev.device, &vi, nullptr, &v);
+     if (result) *result = last == VK_SUCCESS || (first != VK_ERROR_OUT_OF_HOST_MEMORY && first != VK_ERROR_OUT_OF_DEVICE_MEMORY)
+                               ? last : first;
+     if (last != VK_SUCCESS) return VK_NULL_HANDLE;
+@@ -585,11 +585,11 @@ VkImageView cached_image_view(Texture* tex, uint64_t key, Make&& make) {
+     }
+     try {
+         auto [it, inserted] = tex->views.emplace(key, view);
+-        if (!inserted && view) vkDestroyImageView(dev.device, view, nullptr);
++        if (!inserted && view) memory_capture_destroy_view(dev.device, view, nullptr);
+         return it->second;
+     } catch (const std::exception&) {
+         // The new view has no owner when its cache entry cannot be committed.
+-        if (view) vkDestroyImageView(dev.device, view, nullptr);
++        if (view) memory_capture_destroy_view(dev.device, view, nullptr);
+         tex->view_failed_frame = frame_no;
+         return VK_NULL_HANDLE;
+     }
+@@ -677,8 +677,8 @@ bool bc_scratch_make() {   // (bc_mu held)
+         if (told++ < 4) logf("vk: VRAM full: the BC3 scratch's output buffer (%llu MB) in system memory", (unsigned long long)(out >> 20));
+         return true;
+     };
+-    if (vkCreateImageView(dev.device, &vi, nullptr, &bc_scratch_view) != VK_SUCCESS || !make_out()) {
+-        if (bc_scratch_view) vkDestroyImageView(dev.device, bc_scratch_view, nullptr);
++    if (memory_capture_create_view(dev.device, &vi, nullptr, &bc_scratch_view) != VK_SUCCESS || !make_out()) {
++        if (bc_scratch_view) memory_capture_destroy_view(dev.device, bc_scratch_view, nullptr);
+         destroy_image(bc_scratch, bc_scratch_alloc);
+         bc_scratch = VK_NULL_HANDLE, bc_scratch_view = VK_NULL_HANDLE;
+         return false;
+@@ -765,7 +765,7 @@ bool bc_scratch2_make() {
+     vi.viewType = VK_IMAGE_VIEW_TYPE_2D_ARRAY;
+     vi.format = VK_FORMAT_R8G8B8A8_UNORM;
+     vi.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, 0, kBcLayers};
+-    if (vkCreateImageView(dev.device, &vi, nullptr, &bc_scratch2_view) != VK_SUCCESS) {
++    if (memory_capture_create_view(dev.device, &vi, nullptr, &bc_scratch2_view) != VK_SUCCESS) {
+         destroy_image(bc_scratch2, bc_scratch2_alloc);
+         bc_scratch2 = VK_NULL_HANDLE, bc_scratch2_view = VK_NULL_HANDLE;
+         return false;
+@@ -2902,7 +2902,7 @@ TextureAttachment texture_attachment(Texture* tex, const nvn_tex* t, const nvn_v
+         vi.format = format;
+         vi.subresourceRange = {VK_IMAGE_ASPECT_COLOR_BIT, 0, 1, slice, 1};
+         VkImageView view = VK_NULL_HANDLE;
+-        *result = vkCreateImageView(dev.device, &vi, nullptr, &view);
++        *result = memory_capture_create_view(dev.device, &vi, nullptr, &view);
+         return *result == VK_SUCCESS ? view : VK_NULL_HANDLE;
+     });
+     out.format = format;
+@@ -3917,7 +3917,7 @@ void compact_step(uint64_t completed) {
+     if (!compact_on()) return;
+     if (compact.in_pass) {
+         if (compact.value > completed) return;   // (the GPU has not run the copies yet)
+-        for (VkImageView v : compact.old_views) vkDestroyImageView(dev.device, v, nullptr);
++        for (VkImageView v : compact.old_views) memory_capture_destroy_view(dev.device, v, nullptr);
+         for (VkImage i : compact.old_images) vkDestroyImage(dev.device, i, nullptr);   // (their memory is VMA's: the pass's end frees it)
+         compact.old_views.clear(), compact.old_images.clear();
+         compact.in_pass = false;
+@@ -4170,7 +4170,7 @@ void texture_frame(uint64_t completed) {
+             it = dead.erase(it);
+             continue;
+         }
+-        for (VkImageView v : it->views) vkDestroyImageView(dev.device, v, nullptr);
++        for (VkImageView v : it->views) memory_capture_destroy_view(dev.device, v, nullptr);
+         destroy_image(it->image, it->allocation);
+         if (it->buffer) destroy_buffer(it->buffer, it->buffer_alloc);
+         for (VkDeviceMemory m : it->memory) vkFreeMemory(dev.device, m, nullptr);
+diff --git a/gpu/vk/vk_vma.cpp b/gpu/vk/vk_vma.cpp
+index a9bd3f8..386ab1e 100644
+--- a/gpu/vk/vk_vma.cpp
++++ b/gpu/vk/vk_vma.cpp
+@@ -15,7 +15,7 @@
+ #include "hookshot_env.h"
+ #endif
+ #include "vram_compact.h"
+-#include "allocation_capture.h"
++#include "image_capture.h"
+ #include <map>
+ #include <mutex>
+ #include "vk_work.h"   // (last: RX_VK_RECORDER=defer drains before the destructions and the invalidate below)
+@@ -51,6 +51,98 @@ void memory_allocation_release_buffer(VkBuffer buffer) {
+     if(destroy)vmaDestroyBuffer(vma,buffer,destroy);
+ }
+ 
++namespace {
++struct OoOwnedImage { oo_img::Image owner;VmaAllocation allocation=nullptr;uint32_t references=0;bool destroy_pending=false; };
++std::map<VkImage,OoOwnedImage> oo_images;
++std::map<VkImageView,oo_img::View> oo_views;
++std::map<VkSampler,oo_img::Sampler> oo_samplers;
++std::mutex oo_images_mutex;
++void oo_image_created(VkImage image,VmaAllocation allocation,const VkImageCreateInfo& ci) {
++ if(!oo_img::config().enabled)return;
++ oo_img::Image value;value.handle=(uint64_t)(uintptr_t)image;value.flags=ci.flags;value.type=ci.imageType;value.format=ci.format;
++ value.width=ci.extent.width;value.height=ci.extent.height;value.depth=ci.extent.depth;value.mips=ci.mipLevels;value.layers=ci.arrayLayers;
++ value.samples=ci.samples;value.tiling=ci.tiling;value.usage=ci.usage;value.sharing=ci.sharingMode;value.initial_layout=ci.initialLayout;
++ if(ci.queueFamilyIndexCount>32||(!ci.pQueueFamilyIndices&&ci.queueFamilyIndexCount))value.complete=false;
++ else if(ci.queueFamilyIndexCount)value.queue_families.assign(ci.pQueueFamilyIndices,ci.pQueueFamilyIndices+ci.queueFamilyIndexCount);
++ const auto* node=static_cast<const VkBaseInStructure*>(ci.pNext);
++ for(size_t n=0;node&&n<16;++n,node=node->pNext) {
++  value.pnext_types.push_back(node->sType);
++  if(node->sType==VK_STRUCTURE_TYPE_IMAGE_FORMAT_LIST_CREATE_INFO) {
++   const auto& list=*reinterpret_cast<const VkImageFormatListCreateInfo*>(node);
++   if(list.viewFormatCount>32||(!list.pViewFormats&&list.viewFormatCount))value.complete=false;
++   else for(uint32_t f=0;f<list.viewFormatCount;++f)value.format_list.push_back(list.pViewFormats[f]);
++  } else value.complete=false;
++ }
++ if(node)value.complete=false;
++ VmaAllocationInfo info{};vmaGetAllocationInfo(vma,allocation,&info);value.memory=(uint64_t)(uintptr_t)info.deviceMemory;value.memory_offset=info.offset;
++ std::lock_guard lock(oo_images_mutex);if(oo_images.size()<65536)oo_images[image]={value,allocation};
++}
++}
++bool memory_image_retain(VkImageView view,oo_img::Image* image,oo_img::View* metadata) {
++ if(!oo_img::config().enabled||!image||!metadata)return false;
++ std::lock_guard lock(oo_images_mutex);const auto v=oo_views.find(view);if(v==oo_views.end())return false;
++ *metadata=v->second;
++ const auto i=oo_images.find((VkImage)(uintptr_t)v->second.image);
++ if(i==oo_images.end()||i->second.destroy_pending||i->second.references==UINT32_MAX)return false;
++ ++i->second.references;*image=i->second.owner;*metadata=v->second;return true;
++}
++void memory_image_release(VkImage image) {
++ VmaAllocation destroy=nullptr;
++ {std::lock_guard lock(oo_images_mutex);const auto it=oo_images.find(image);if(it==oo_images.end()||!it->second.references)return;
++  if(!--it->second.references&&it->second.destroy_pending){destroy=it->second.allocation;oo_images.erase(it);}}
++ if(destroy)vmaDestroyImage(vma,image,destroy);
++}
++VkResult memory_capture_create_view(VkDevice device,const VkImageViewCreateInfo* ci,const VkAllocationCallbacks* callbacks,VkImageView* view) {
++ const auto result=vkCreateImageView(device,ci,callbacks,view);
++ if(result!=VK_SUCCESS||!oo_img::config().enabled)return result;
++ oo_img::View value;value.handle=(uint64_t)(uintptr_t)*view;value.image=(uint64_t)(uintptr_t)ci->image;value.flags=ci->flags;value.type=ci->viewType;value.format=ci->format;
++ value.components={(uint32_t)ci->components.r,(uint32_t)ci->components.g,(uint32_t)ci->components.b,(uint32_t)ci->components.a};
++ value.aspect=ci->subresourceRange.aspectMask;value.base_mip=ci->subresourceRange.baseMipLevel;value.mip_count=ci->subresourceRange.levelCount;
++ value.base_layer=ci->subresourceRange.baseArrayLayer;value.layer_count=ci->subresourceRange.layerCount;
++ const auto* node=static_cast<const VkBaseInStructure*>(ci->pNext);
++ for(size_t n=0;node&&n<16;++n,node=node->pNext) {
++  value.pnext_types.push_back(node->sType);
++  if(node->sType==VK_STRUCTURE_TYPE_IMAGE_VIEW_USAGE_CREATE_INFO&&!value.explicit_usage) {
++   value.explicit_usage=true;value.usage=reinterpret_cast<const VkImageViewUsageCreateInfo*>(node)->usage;
++  }else value.complete=false;
++ }
++ if(node)value.complete=false;
++ std::lock_guard lock(oo_images_mutex);if(oo_views.size()<65536)oo_views[*view]=value;
++ return result;
++}
++void memory_capture_destroy_view(VkDevice device,VkImageView view,const VkAllocationCallbacks* callbacks) {
++ if(oo_img::config().enabled){std::lock_guard lock(oo_images_mutex);oo_views.erase(view);}
++ vkDestroyImageView(device,view,callbacks);
++}
++void memory_capture_sampler_created(VkSampler sampler,const VkSamplerCreateInfo& ci) {
++ if(!oo_img::config().enabled)return;
++ auto bits=[](float value){uint32_t word;std::memcpy(&word,&value,4);return word;};
++ oo_img::Sampler value;value.handle=(uint64_t)(uintptr_t)sampler;
++ value.core={ci.flags,(uint32_t)ci.magFilter,(uint32_t)ci.minFilter,(uint32_t)ci.mipmapMode,(uint32_t)ci.addressModeU,(uint32_t)ci.addressModeV,
++  (uint32_t)ci.addressModeW,bits(ci.mipLodBias),ci.anisotropyEnable,bits(ci.maxAnisotropy),ci.compareEnable,(uint32_t)ci.compareOp,
++  bits(ci.minLod),bits(ci.maxLod),(uint32_t)ci.borderColor,ci.unnormalizedCoordinates};
++ const auto* node=static_cast<const VkBaseInStructure*>(ci.pNext);
++ for(size_t n=0;node&&n<16;++n,node=node->pNext) {
++  oo_img::Extension extension;extension.type=node->sType;
++  if(node->sType==VK_STRUCTURE_TYPE_SAMPLER_CUSTOM_BORDER_COLOR_CREATE_INFO_EXT) {
++   const auto& color=*reinterpret_cast<const VkSamplerCustomBorderColorCreateInfoEXT*>(node);
++   extension.words.assign(color.customBorderColor.uint32,color.customBorderColor.uint32+4);extension.words.push_back(color.format);
++  }else if(node->sType==VK_STRUCTURE_TYPE_SAMPLER_REDUCTION_MODE_CREATE_INFO)
++   extension.words.push_back(reinterpret_cast<const VkSamplerReductionModeCreateInfo*>(node)->reductionMode);
++  else value.complete=false;
++  value.extensions.push_back(extension);
++ }
++ if(node)value.complete=false;
++ std::lock_guard lock(oo_images_mutex);if(oo_samplers.size()<16384)oo_samplers[sampler]=value;
++}
++void memory_capture_sampler_destroyed(VkSampler sampler) {
++ if(!oo_img::config().enabled)return;std::lock_guard lock(oo_images_mutex);oo_samplers.erase(sampler);
++}
++bool memory_capture_sampler(VkSampler sampler,oo_img::Sampler* metadata) {
++ if(!oo_img::config().enabled||!metadata)return false;std::lock_guard lock(oo_images_mutex);
++ const auto it=oo_samplers.find(sampler);if(it==oo_samplers.end())return false;*metadata=it->second;return true;
++}
++
+ bool vma_init(PFN_vkGetInstanceProcAddr gipa) {
+     VmaVulkanFunctions f{};
+     f.vkGetInstanceProcAddr = gipa;
+@@ -251,7 +343,7 @@ bool create_image(const VkImageCreateInfo& ci, VkImage& image, VmaAllocation& al
+     if (dedicated) {   // (a memory object of its own, which freeing gives back whole: a pool's block is kept by VMA when it empties)
+         VmaAllocationCreateInfo dai = ai;
+         dai.flags |= VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
+-        if (vmaCreateImage(vma, &ci, &dai, &image, &allocation, nullptr) == VK_SUCCESS) return true;
++        if (vmaCreateImage(vma, &ci, &dai, &image, &allocation, nullptr) == VK_SUCCESS) {oo_image_created(image,allocation,ci);return true;}
+     }
+     static const bool no_pool = env_on("RX_VK_NO_IMAGE_POOL");
+     if (VmaPool pool = no_pool ? VK_NULL_HANDLE
+@@ -260,15 +352,15 @@ bool create_image(const VkImageCreateInfo& ci, VkImage& image, VmaAllocation& al
+         VmaAllocationCreateInfo pai = ai;
+         pai.pool = pool;
+         pai.usage = VMA_MEMORY_USAGE_UNKNOWN;
+-        if (vmaCreateImage(vma, &ci, &pai, &image, &allocation, nullptr) == VK_SUCCESS) return true;
++        if (vmaCreateImage(vma, &ci, &pai, &image, &allocation, nullptr) == VK_SUCCESS) {oo_image_created(image,allocation,ci);return true;}
+     }
+-    if (vmaCreateImage(vma, &ci, &ai, &image, &allocation, nullptr) == VK_SUCCESS) return true;
++    if (vmaCreateImage(vma, &ci, &ai, &image, &allocation, nullptr) == VK_SUCCESS) {oo_image_created(image,allocation,ci);return true;}
+     if (ai.flags & VMA_ALLOCATION_CREATE_WITHIN_BUDGET_BIT) {
+         static std::atomic<int> told_budget{0};
+         if (told_budget++ < 10) logf("vk: image over budget, retrying without WITHIN_BUDGET");
+         VmaAllocationCreateInfo vai = ai;
+         vai.flags &= ~VMA_ALLOCATION_CREATE_WITHIN_BUDGET_BIT;
+-        if (vmaCreateImage(vma, &ci, &vai, &image, &allocation, nullptr) == VK_SUCCESS) return true;
++        if (vmaCreateImage(vma, &ci, &vai, &image, &allocation, nullptr) == VK_SUCCESS) {oo_image_created(image,allocation,ci);return true;}
+     }
+     // (hookshot) VRAM is full (a 4 GB card at a high resolution, #96): an image left unmade is a black screen, so it goes
+     // to system memory instead, slow but drawn
+@@ -276,11 +368,16 @@ bool create_image(const VkImageCreateInfo& ci, VkImage& image, VmaAllocation& al
+     VmaAllocationCreateInfo sai{};
+     sai.usage = VMA_MEMORY_USAGE_AUTO;
+     if (vmaCreateImage(vma, &ci, &sai, &image, &allocation, nullptr) != VK_SUCCESS) return false;
++    oo_image_created(image,allocation,ci);
+     static std::atomic<int> told{0};
+     if (told++ < 4) logf("vk: VRAM full: a %ux%u image (format %d) in system memory", ci.extent.width, ci.extent.height, (int)ci.format);
+     return true;
+ }
+ void destroy_image(VkImage image, VmaAllocation allocation) {
++    if(oo_img::config().enabled) {
++        std::lock_guard lock(oo_images_mutex);const auto it=oo_images.find(image);
++        if(it!=oo_images.end()){if(it->second.references){it->second.destroy_pending=true;return;}oo_images.erase(it);}
++    }
+     vmaDestroyImage(vma, image, allocation);
+ }
+ uint64_t allocation_size(VmaAllocation allocation) {
