@@ -1,0 +1,312 @@
+diff --git a/gpu/vk/allocation_capture.h b/gpu/vk/allocation_capture.h
+index 57fdc23..6811a96 100644
+--- a/gpu/vk/allocation_capture.h
++++ b/gpu/vk/allocation_capture.h
+@@ -4,14 +4,39 @@
+ #include "page_table_capture.h"
+ #include <algorithm>
+ #include <cerrno>
++#include <charconv>
+ #include <limits>
+ namespace mkwvk::oo_alloc {
++struct SelectionConfig { bool valid=true; uint64_t occurrence=1; };
++inline bool decimal_bound(const char* value,uint64_t minimum,uint64_t maximum,uint64_t& result) {
++    if(!value||!*value)return false;
++    const auto end=value+std::strlen(value);uint64_t parsed=0;
++    const auto converted=std::from_chars(value,end,parsed);
++    if(converted.ec!=std::errc{}||converted.ptr!=end||parsed<minimum||parsed>maximum)return false;
++    result=parsed;return true;
++}
++inline const SelectionConfig& selection_config() {
++    static const SelectionConfig result=[] {
++        SelectionConfig c;
++        if(const char* value=std::getenv("RX_VK_OO_CAPTURE_OCCURRENCE"))
++            c.valid=decimal_bound(value,1,65536,c.occurrence);
++        if(!c.valid)std::fprintf(stderr,"Open-Ocarina: invalid capture occurrence; expected decimal 1..65536; selected-dispatch capture disabled\n");
++        return c;
++    }();return result;
++}
++struct SelectionCounter {
++    uint64_t observed=0;
++    bool observe(bool exact_identity_match,const SelectionConfig& selection) {
++        if(!exact_identity_match||!selection.valid||observed>=65536)return false;
++        return ++observed==selection.occurrence;
++    }
++};
+ struct Config { bool enabled=false; uint64_t budget=2ull<<30; };
+ inline const Config& config() {
+     static const Config c=[] {
+         Config value;
+         const char* enable=std::getenv("RX_VK_OO_ALLOC_CAPTURE");
+-        if(!enable||std::string(enable)!="1"||!oo_pt::config().enabled)return value;
++        if(!enable||std::string(enable)!="1"||!oo_pt::config().enabled||!selection_config().valid)return value;
+         if(const char* cap=std::getenv("RX_VK_OO_ALLOC_BUDGET_MIB")) {
+             char* end=nullptr;errno=0;const auto n=std::strtoull(cap,&end,10);
+             if(errno||!*cap||*end||n<32||n>8192)return value;
+@@ -27,7 +52,7 @@ struct Row {
+     uint64_t usage=0,piece_count=0;
+     std::string role,before_sha,after_sha;
+     std::vector<uint64_t> memory_pieces;
+-    bool copy_supported=false;
++    bool copy_supported=false,guest_range=true;
+ };
+ struct Descriptor {
+     uint32_t binding=0,element=0,type=0;
+@@ -63,7 +88,7 @@ inline TableCoverage table_coverage(const uint8_t* table,size_t bytes,const std:
+         const uint64_t guest=i<(2ull<<20)?0x1000000000ull+i*4096:0x7f00000000ull+(i-(2ull<<20))*4096;
+         for(const auto& row:rows) {
+             const auto n=available(row,address);
+-            if(!n||guest<row.guest_lo||guest>=row.guest_hi||guest-row.guest_lo!=address-row.address)continue;
++            if(!row.guest_range||!n||guest<row.guest_lo||guest>=row.guest_hi||guest-row.guest_lo!=address-row.address)continue;
+             ++hits;longest=std::max(longest,n);payload|=!row.before_sha.empty()&&!row.after_sha.empty();
+         }
+         if(!hits)++result.unresolved;
+@@ -73,23 +98,24 @@ inline TableCoverage table_coverage(const uint8_t* table,size_t bytes,const std:
+ }
+ inline bool write_manifest(const oo_pt::Request& req,uint64_t completed,const std::vector<Row>& rows,
+                            const std::vector<Descriptor>& descriptors,const std::vector<std::string>& failures,
+-                           bool after_recorded,bool invalidated,bool table_exported,const TableCoverage& table,uint64_t candidate_bytes) {
++                           bool after_recorded,bool invalidated,bool table_exported,const TableCoverage& table,uint64_t candidate_bytes,
++                           uint64_t occurrence=1,bool null_descriptor_enabled=false) {
+     if(!config().enabled||!req.submitted_sequence||completed<req.submitted_sequence)return false;
+     const auto root=std::filesystem::path(oo_pt::config().directory);
+     const auto path=root/"allocations.json",part=root/"allocations.json.part";
+     if(oo_pt::present(path))return false;
+     FILE* f=std::fopen(part.string().c_str(),"wbx");if(!f)return false;
+-    bool ok=std::fprintf(f,"{\"schema\":\"open-ocarina.gpu-allocations/v1\",\"replay_complete\":false,"
++    bool ok=std::fprintf(f,"{\"schema\":\"open-ocarina.gpu-allocations/v2\",\"replay_complete\":false,"
+       "\"recording_part\":%llu,\"recording_sequence\":%llu,\"completed_recording_sequence\":%llu,"
+       "\"program\":\"%016llx\",\"variant\":\"%016llx\",\"spirv_sha256\":\"%s\","
+-      "\"candidate_count\":%zu,\"candidate_bytes\":%llu,\"required_staging_bytes\":%llu,\"budget_bytes\":%llu,\"table_manifest\":\"manifest.json\",\"table_exported\":%s,"
++      "\"selected_occurrence\":%llu,\"occurrence_filter\":\"exact program, variant and emitted SPIR-V SHA-256\",\"null_descriptor_enabled\":%s,\"candidate_count\":%zu,\"candidate_bytes\":%llu,\"required_staging_bytes\":%llu,\"budget_bytes\":%llu,\"table_manifest\":\"manifest.json\",\"table_exported\":%s,"
+       "\"before_position\":\"immediately before selected dispatch\",\"after_position\":\"immediately after selected dispatch\","
+       "\"table_resolution\":{\"mapped\":%llu,\"unresolved\":%llu,\"ambiguous\":%llu,\"partial\":%llu,\"missing_payload\":%llu},\"after_recorded\":%s,\"mapped_memory_invalidated\":%s,"
+       "\"coverage\":{\"images\":false,\"temporal_state\":false,\"underlying_import_aliases_resolved\":false,"
+       "\"cpu_writers_quiesced\":false,\"complete_physical_replay\":false},\"failures\":[",
+       (unsigned long long)req.recording_part,(unsigned long long)req.submitted_sequence,(unsigned long long)completed,
+       (unsigned long long)req.key,(unsigned long long)req.variant,req.shader_digest.c_str(),
+-      rows.size(),(unsigned long long)candidate_bytes,(unsigned long long)(candidate_bytes*2),
++      (unsigned long long)occurrence,null_descriptor_enabled?"true":"false",rows.size(),(unsigned long long)candidate_bytes,(unsigned long long)(candidate_bytes*2),
+       (unsigned long long)config().budget,table_exported?"true":"false",
+       (unsigned long long)table.mapped,(unsigned long long)table.unresolved,(unsigned long long)table.ambiguous,
+       (unsigned long long)table.partial,(unsigned long long)table.missing_payload,after_recorded?"true":"false",invalidated?"true":"false")>=0;
+@@ -101,10 +127,10 @@ inline bool write_manifest(const oo_pt::Request& req,uint64_t completed,const st
+         for(size_t n=0;n<r.memory_pieces.size();++n){char text[32];std::snprintf(text,sizeof text,"\"%016llx\"",(unsigned long long)r.memory_pieces[n]);if(n)pieces+=",";pieces+=text;}
+         pieces+="]";
+         ok&=std::fprintf(f,"%s{\"id\":%zu,\"buffer\":\"%016llx\",\"address\":\"%016llx\",\"size\":%llu,"
+-          "\"guest_lo\":\"%016llx\",\"guest_hi\":\"%016llx\",\"memory\":\"%016llx\",\"memory_offset\":%llu,"
++          "\"guest_range\":%s,\"guest_lo\":\"%016llx\",\"guest_hi\":\"%016llx\",\"memory\":\"%016llx\",\"memory_offset\":%llu,"
+           "\"memory_piece_count\":%llu,\"memory_piece_handles\":%s,\"usage\":%llu,\"role\":\"%s\",\"copy_supported\":%s,"
+           "\"before\":%s,\"after\":%s}",i?",":"",i,(unsigned long long)r.buffer,(unsigned long long)r.address,
+-          (unsigned long long)r.size,(unsigned long long)r.guest_lo,(unsigned long long)r.guest_hi,(unsigned long long)r.memory,
++          (unsigned long long)r.size,r.guest_range?"true":"false",(unsigned long long)r.guest_lo,(unsigned long long)r.guest_hi,(unsigned long long)r.memory,
+           (unsigned long long)r.memory_offset,(unsigned long long)r.piece_count,pieces.c_str(),(unsigned long long)r.usage,r.role.c_str(),
+           r.copy_supported?"true":"false",
+           r.before_sha.empty()?"null":("{\"artifact\":\"buffer-"+std::to_string(i)+"-before.bin\",\"sha256\":\""+r.before_sha+"\"}").c_str(),
+diff --git a/gpu/vk/vk_internal.h b/gpu/vk/vk_internal.h
+index d420510..67553a9 100644
+--- a/gpu/vk/vk_internal.h
++++ b/gpu/vk/vk_internal.h
+@@ -254,6 +254,10 @@ uint64_t memory_capture_view();          // (bumped when a capture is published
+ uint32_t memory_page_stamp(uint64_t gpu); // (that address's page only)
+ uint64_t gpu_pool_end(uint64_t gpu);   // (hookshot) where the memory pool holding that address ends, 0: in none (vk_memory.cpp)
+ uint64_t gpu_pool_start(uint64_t gpu); // (EvilOOT) and where it begins
++// Open-Ocarina opt-in: exact VMA buffer creation bounds, retained until capture completion.
++struct OoBufferOwner { uint64_t size=0; VkBufferUsageFlags usage=0; VmaAllocation allocation=nullptr; };
++bool memory_allocation_retain_buffer(VkBuffer buffer,OoBufferOwner* owner);
++void memory_allocation_release_buffer(VkBuffer buffer);
+ bool create_buffer_cached(uint64_t size, VkBufferUsageFlags usage, VkBuffer& buffer, VmaAllocation& allocation,
+                           void** mapped, bool dedicated = false);   // (vk_vma.cpp: cached host memory, mapped)
+ void flush_mapped(VmaAllocation allocation, uint64_t size);
+diff --git a/gpu/vk/vk_memory.cpp b/gpu/vk/vk_memory.cpp
+index 9ecedaa..f700841 100644
+--- a/gpu/vk/vk_memory.cpp
++++ b/gpu/vk/vk_memory.cpp
+@@ -493,6 +493,7 @@ struct OoPagePending {
+     oo_pt::Request request;
+ };
+ OoPagePending oo_page_pending;
++oo_alloc::SelectionCounter oo_capture_selection;
+ std::mutex oo_page_mutex;
+ }
+ extern VmaAllocator vma;
+@@ -504,6 +505,7 @@ void memory_pt_snapshot_record(VkCommandBuffer cmd,uint64_t key,uint64_t variant
+                                uint32_t x,uint32_t y,uint32_t z,uint64_t indirect,int64_t present,
+                                uint32_t root_push_offset) {
+     if(!oo_pt::config().enabled||!oo_identity::selected(key,variant)||!digest||oo_pt::config().digest!=digest) return;
++    if(!oo_alloc::selection_config().valid)return;
+     if(!memory_pt_recording_supported()) {
+         static bool told=false;
+         if(!told)logf("vk: Open-Ocarina page snapshot requires serial non-batched replay and the recording timeline"),told=true;
+@@ -514,6 +516,12 @@ void memory_pt_snapshot_record(VkCommandBuffer cmd,uint64_t key,uint64_t variant
+     uint64_t recording_part=0,logical_value=0;
+     if(pending.attempted||!cmd||!guest_pages_buffer||!guest_pages_address||
+        !memory_pt_recording_info(cmd,&recording_part,&logical_value)) return;
++    const bool selected=oo_capture_selection.observe(true,oo_alloc::selection_config());
++    if(oo_capture_selection.observed==1||selected)
++        logf("vk: Open-Ocarina exact capture filter %016llx:%016llx sha256 %s matched occurrence %llu; requested %llu",
++            (unsigned long long)key,(unsigned long long)variant,digest,(unsigned long long)oo_capture_selection.observed,
++            (unsigned long long)oo_alloc::selection_config().occurrence);
++    if(!selected)return;
+     pending.attempted=true;
+     if(!create_buffer_cached(oo_pt::kTableBytes,VK_BUFFER_USAGE_TRANSFER_DST_BIT,pending.buffer,
+                              pending.allocation,&pending.mapped,true)||!pending.buffer||!pending.allocation||!pending.mapped) {
+@@ -4552,6 +4560,7 @@ struct OoAllocationPending {
+     std::vector<oo_alloc::Descriptor> descriptors;
+     std::vector<std::string> failures;
+     std::vector<OoAllocationCopy> copies_by_row;
++    std::vector<VkBuffer> retained_renderer_buffers;
+ };
+ OoAllocationPending oo_alloc_pending;
+ void oo_allocation_copy_phase(VkCommandBuffer cmd,bool after) {
+@@ -4601,20 +4610,20 @@ void oo_allocation_record(VkCommandBuffer cmd) { // oo_page_mutex held; no CPU g
+     state.failures={"images_not_captured","temporal_state_not_captured","underlying_import_aliases_unresolved","cpu_writers_not_quiesced"};
+     std::lock_guard pool_lock(pools_mu);
+     auto add=[&](VkBuffer buffer,VmaAllocation alloc,VkDeviceMemory memory,uint64_t lo,uint64_t hi,
+-                 uint64_t usage,const std::vector<VkDeviceMemory>& pieces,const char* role) {
++                 uint64_t usage,const std::vector<VkDeviceMemory>& pieces,const char* role,uint64_t exact_size=0) {
+         if(!buffer)return;
+         if(std::any_of(state.rows.begin(),state.rows.end(),[&](const auto& r){return r.buffer==(uint64_t)(uintptr_t)buffer;}))return;
+         if(state.rows.size()>=16384){state.failures.push_back("catalog_entry_limit_exceeded");return;}
+-        oo_alloc::Row row;row.buffer=(uint64_t)(uintptr_t)buffer;row.size=hi-lo;row.guest_lo=lo;row.guest_hi=hi;
++        oo_alloc::Row row;row.buffer=(uint64_t)(uintptr_t)buffer;row.size=exact_size?exact_size:hi-lo;row.guest_lo=lo;row.guest_hi=hi;row.guest_range=hi>lo;
+         row.role=role;row.usage=usage;row.memory=(uint64_t)(uintptr_t)memory;
+         VkBufferDeviceAddressInfo address{VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO};address.buffer=buffer;
+-        row.address=vkGetBufferDeviceAddress(dev.device,&address);
++        if(usage&VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT)row.address=vkGetBufferDeviceAddress(dev.device,&address);
+         if(alloc){VmaAllocationInfo info{};vmaGetAllocationInfo(vma,alloc,&info);row.memory=(uint64_t)(uintptr_t)info.deviceMemory;row.memory_offset=info.offset;}
+         if(row.memory)row.memory_pieces.push_back(row.memory);
+         for(auto piece:pieces)row.memory_pieces.push_back((uint64_t)(uintptr_t)piece);
+         row.piece_count=row.memory_pieces.size();
+         row.copy_supported=(usage&VK_BUFFER_USAGE_TRANSFER_SRC_BIT)&&row.size&&row.size%4==0;
+-        if(!row.address)state.failures.push_back("buffer_device_address_missing");
++        if(row.guest_range&&!row.address)state.failures.push_back("buffer_device_address_missing");
+         if(!pieces.empty())state.failures.push_back("sparse_memory_piece_identity_unresolved");
+         if(!row.copy_supported)state.failures.push_back("source_usage_or_copy_alignment_unsupported");
+         if(row.size>UINT64_MAX-state.candidate_bytes){state.failures.push_back("candidate_bytes_overflow");row.copy_supported=false;}
+@@ -4640,6 +4649,20 @@ void oo_allocation_record(VkCommandBuffer cmd) { // oo_page_mutex held; no CPU g
+     state.failures.push_back("late_allocations_require_completed_table_resolution");
+     for(const auto& descriptor:state.descriptors) {
+         auto it=std::find_if(state.rows.begin(),state.rows.end(),[&](const auto& row){return row.buffer==descriptor.buffer;});
++        if(!descriptor.buffer) {
++            if(!dev.null_descriptor)state.failures.push_back("null_descriptor_feature_not_enabled");
++            continue;
++        }
++        if(it==state.rows.end()) {
++            OoBufferOwner owner;
++            if(memory_allocation_retain_buffer((VkBuffer)(uintptr_t)descriptor.buffer,&owner)) {
++                const size_t count=state.rows.size();
++                add((VkBuffer)(uintptr_t)descriptor.buffer,owner.allocation,VK_NULL_HANDLE,0,0,owner.usage,{},"renderer-buffer",owner.size);
++                if(state.rows.size()>count)state.retained_renderer_buffers.push_back((VkBuffer)(uintptr_t)descriptor.buffer);
++                else memory_allocation_release_buffer((VkBuffer)(uintptr_t)descriptor.buffer);
++                it=std::find_if(state.rows.begin(),state.rows.end(),[&](const auto& row){return row.buffer==descriptor.buffer;});
++            }
++        }
+         if(it==state.rows.end())state.failures.push_back("descriptor_owner_unknown");
+         else if(descriptor.offset>=it->size||(descriptor.range!=VK_WHOLE_SIZE&&descriptor.range>it->size-descriptor.offset))
+             state.failures.push_back("descriptor_range_unresolved");
+@@ -4675,7 +4698,8 @@ void oo_allocation_release() { // oo_page_mutex held; cancellation or exact comp
+     if(!state.active)return;
+     for(auto& copy:state.copies_by_row){if(copy.before||copy.before_alloc)destroy_buffer(copy.before,copy.before_alloc);if(copy.after||copy.after_alloc)destroy_buffer(copy.after,copy.after_alloc);}
+     {std::lock_guard pool_lock(pools_mu);oo_retained_buffers.clear();}
+-    state.copies_by_row.clear();state.active=false;
++    for(auto buffer:state.retained_renderer_buffers)memory_allocation_release_buffer(buffer);
++    state.retained_renderer_buffers.clear();state.copies_by_row.clear();state.active=false;
+ }
+ void oo_allocation_collect(const oo_pt::Request& request,uint64_t completed,bool table_ok,const uint8_t* table) {
+     auto& state=oo_alloc_pending;if(!state.active)return;
+@@ -4699,7 +4723,7 @@ void oo_allocation_collect(const oo_pt::Request& request,uint64_t completed,bool
+         if(coverage.partial)state.failures.push_back("gpu_table_has_partial_pages");
+         if(coverage.missing_payload)state.failures.push_back("gpu_table_has_missing_payloads");
+         std::sort(state.failures.begin(),state.failures.end());state.failures.erase(std::unique(state.failures.begin(),state.failures.end()),state.failures.end());
+-        const bool ok=oo_alloc::write_manifest(request,completed,state.rows,state.descriptors,state.failures,state.after_recorded,invalidated,table_ok,coverage,state.candidate_bytes);
++        const bool ok=oo_alloc::write_manifest(request,completed,state.rows,state.descriptors,state.failures,state.after_recorded,invalidated,table_ok,coverage,state.candidate_bytes,oo_capture_selection.observed,dev.null_descriptor);
+         logf("vk: Open-Ocarina allocation evidence %s: mapped %llu unresolved %llu ambiguous %llu partial %llu missing payload %llu (NOT full replay)",ok?"exported":"failed",
+             (unsigned long long)coverage.mapped,(unsigned long long)coverage.unresolved,(unsigned long long)coverage.ambiguous,(unsigned long long)coverage.partial,(unsigned long long)coverage.missing_payload);
+     }catch(const std::exception& error){logf("vk: Open-Ocarina allocation export failed: %s",error.what());}
+diff --git a/gpu/vk/vk_vma.cpp b/gpu/vk/vk_vma.cpp
+index 6fa1d75..a9bd3f8 100644
+--- a/gpu/vk/vk_vma.cpp
++++ b/gpu/vk/vk_vma.cpp
+@@ -15,11 +15,41 @@
+ #include "hookshot_env.h"
+ #endif
+ #include "vram_compact.h"
++#include "allocation_capture.h"
++#include <map>
++#include <mutex>
+ #include "vk_work.h"   // (last: RX_VK_RECORDER=defer drains before the destructions and the invalidate below)
+ 
+ namespace mkwvk {
+ 
+ VmaAllocator vma;
++namespace {
++struct OoOwnedBuffer { OoBufferOwner owner; uint32_t references=0; bool destroy_pending=false; };
++std::map<VkBuffer,OoOwnedBuffer> oo_buffer_owners;
++std::mutex oo_buffer_owners_mutex;
++void oo_register_buffer(VkBuffer buffer,uint64_t size,VkBufferUsageFlags usage,VmaAllocation allocation) {
++    if(!oo_alloc::config().enabled)return;
++    std::lock_guard lock(oo_buffer_owners_mutex);
++    if(oo_buffer_owners.size()>=65536){logf("vk: Open-Ocarina VMA owner registry limit reached; further descriptor owners unresolved");return;}
++    oo_buffer_owners.emplace(buffer,OoOwnedBuffer{{size,usage,allocation}});
++}
++}
++bool memory_allocation_retain_buffer(VkBuffer buffer,OoBufferOwner* owner) {
++    if(!oo_alloc::config().enabled||!buffer||!owner)return false;
++    std::lock_guard lock(oo_buffer_owners_mutex);
++    const auto it=oo_buffer_owners.find(buffer);
++    if(it==oo_buffer_owners.end()||it->second.destroy_pending||it->second.references==UINT32_MAX)return false;
++    ++it->second.references;*owner=it->second.owner;return true;
++}
++void memory_allocation_release_buffer(VkBuffer buffer) {
++    VmaAllocation destroy=nullptr;
++    {
++        std::lock_guard lock(oo_buffer_owners_mutex);const auto it=oo_buffer_owners.find(buffer);
++        if(it==oo_buffer_owners.end()||!it->second.references)return;
++        if(!--it->second.references&&it->second.destroy_pending){destroy=it->second.owner.allocation;oo_buffer_owners.erase(it);}
++    }
++    if(destroy)vmaDestroyBuffer(vma,buffer,destroy);
++}
+ 
+ bool vma_init(PFN_vkGetInstanceProcAddr gipa) {
+     VmaVulkanFunctions f{};
+@@ -273,6 +303,7 @@ bool create_buffer(uint64_t size, VkBufferUsageFlags usage, bool host_visible, V
+     VmaAllocationInfo info{};
+     if (vmaCreateBuffer(vma, &bi, &ai, &buffer, &allocation, &info) != VK_SUCCESS) return false;
+     if (mapped) *mapped = info.pMappedData;
++    oo_register_buffer(buffer,size,usage,allocation);
+     return true;
+ }
+ /// A buffer in cached host memory, mapped: written on one thread, read back on the CPU too (the captures: the game's
+@@ -289,6 +320,7 @@ bool create_buffer_cached(uint64_t size, VkBufferUsageFlags usage, VkBuffer& buf
+     VmaAllocationInfo info{};
+     if (vmaCreateBuffer(vma, &bi, &ai, &buffer, &allocation, &info) != VK_SUCCESS) return false;
+     if (mapped) *mapped = info.pMappedData;
++    oo_register_buffer(buffer,size,usage,allocation);
+     return true;
+ }
+ bool host_cached(VmaAllocation allocation) {
+@@ -312,6 +344,13 @@ bool invalidate_mapped_checked(VmaAllocation allocation, uint64_t size) {
+     return !size || vmaInvalidateAllocation(vma, allocation, 0, size) == VK_SUCCESS;
+ }
+ void destroy_buffer(VkBuffer buffer, VmaAllocation allocation) {
++    if(oo_alloc::config().enabled) {
++        std::lock_guard lock(oo_buffer_owners_mutex);const auto it=oo_buffer_owners.find(buffer);
++        if(it!=oo_buffer_owners.end()) {
++            if(it->second.references){it->second.destroy_pending=true;return;}
++            oo_buffer_owners.erase(it);
++        }
++    }
+     vmaDestroyBuffer(vma, buffer, allocation);
+ }
+ bool create_device_buffer(uint64_t size, VkBufferUsageFlags usage, VkBuffer& buffer, VmaAllocation& allocation, bool dedicated) {
+@@ -323,7 +362,8 @@ bool create_device_buffer(uint64_t size, VkBufferUsageFlags usage, VkBuffer& buf
+     ai.requiredFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
+     if (dev.memory_budget) ai.flags = VMA_ALLOCATION_CREATE_WITHIN_BUDGET_BIT;
+     if (dedicated) ai.flags |= VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
+-    return vmaCreateBuffer(vma, &bi, &ai, &buffer, &allocation, nullptr) == VK_SUCCESS;
++    if(vmaCreateBuffer(vma,&bi,&ai,&buffer,&allocation,nullptr)!=VK_SUCCESS)return false;
++    oo_register_buffer(buffer,size,usage,allocation);return true;
+ }
+ /// (every heap: what VMA has in blocks and allocations there, what the process uses of it, its budget; one line)
+ /// The image pools: their blocks, the images in them, and the free ranges between them (every 600 presents, with the heaps)
