@@ -1,6 +1,6 @@
 # Script-exclusive native mouse isolation
 
-Status: a host-only patch, optimized game-free tests and a separate optimized host executable are implemented. No patched game run or complete deterministic-camera producer has been validated by this lane.
+Status: a host-only patch, optimized game-free tests and a separate optimized host executable are implemented. The patched host reached the selected dispatch in an isolated diagnostic game run; live input suppression and a complete deterministic-camera producer remain unvalidated by that run.
 
 The original `read_input` returns before merging player devices during an exclusive control-bridge lease, or while `HOS_INPUT_EXCLUSIVE=1` owns a parsed script's time window. Native mouse camera updates consume mouse motion separately, so that return did not isolate that camera path. The patch makes both paths consult the same ownership policy and consumes mouse deltas while they are excluded.
 
@@ -39,8 +39,11 @@ translation/runtime object cache. The build verified cache keys, rebuilt 46 host
 objects and reused 234 compatible objects, including all 80 game chunks. It used
 the bundled Clang 23.1.5 and glibc 2.35 sysroot, `-O2 -DNDEBUG`,
 `-march=x86-64-v3`, `-ffp-contract=off`, and four compile workers. The renderer and
-existing host executables were preserved. The new executable has not yet been
-run with the game.
+existing host executables were preserved. The new executable subsequently entered
+the game and reached the selected dispatch with persistent exclusivity requested;
+[the capture evidence](../research/gpu-buffer-closure-observation.json) pins the
+tested host and renderer. No live device input was independently injected, and
+camera/workload determinism remains unproved.
 
 Frozen patch SHA-256:
 `5664975cb661fe5f17a2d599e22420d461fddd5b3b56c67f7c6e4896e406f66b`.

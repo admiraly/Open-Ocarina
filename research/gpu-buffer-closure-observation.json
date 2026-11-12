@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "date": "2026-11-12",
+  "stage": "GPU table and buffer payload range closure for explicitly selected dispatches; replay incomplete",
+  "source_pin": "4cf785a0b143bb34026506c9a3fe4f4bb93c797d",
+  "renderer_sha256": "7b7f2625fe070d4fc1931eb6e53db1fe1a471ef0187bf132b92b55c03ed8c2c6",
+  "host_sha256": "587186b80aa3068addf8aaace5de1bab758043498d1e26a3c92e8b9ef5b0ba8c",
+  "patches_sha256": {
+    "patches/hookshot/compute-identity.patch": "2f14873edfdb47b1f915e75bc4bbe6683ef6632bc66fcbfa1d918aa1c176f018",
+    "patches/hookshot/page-table-snapshot.patch": "c236b96851bc95426202abec6447e672577fdda747fd8405cc435dae435834ab",
+    "patches/hookshot/allocation-capture.patch": "7d8f23d3824374002472bc4a65f3f078c3306d4c5cd395f97e2a1e083fe49aab",
+    "patches/hookshot/occurrence-capture.patch": "defdda2dced583678e39daea0dc7e671fcc8926df8374a62ad45fe675692b752",
+    "patches/hookshot/input-isolation.patch": "5664975cb661fe5f17a2d599e22420d461fddd5b3b56c67f7c6e4896e406f66b"
+  },
+  "observations": [
+    {
+      "selected_occurrence": 2,
+      "pipeline": {
+        "program": "cc62764061c44f6a",
+        "variant": "095931037888515a",
+        "spirv_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b"
+      },
+      "dispatch": {
+        "kind": "direct",
+        "group_count": [
+          2,
+          1,
+          1
+        ],
+        "present_observed": 995,
+        "identity_event_id": null
+      },
+      "submission": {
+        "recording_part": 7034,
+        "logical_value": 6973,
+        "recording_sequence": 7034,
+        "completed_recording_sequence": 7065
+      },
+      "candidate_count": 86,
+      "candidate_bytes": 2254438400,
+      "payload_bytes": 4508876800,
+      "budget_bytes": 5368709120,
+      "table_resolution": {
+        "mapped": 265216,
+        "unresolved": 24576,
+        "ambiguous": 0,
+        "partial": 0,
+        "missing_payload": 0
+      },
+      "unresolved_descriptor_count": 0,
+      "defined_null_descriptor_count": 2,
+      "null_descriptor_enabled": true,
+      "descriptor_payload_ranges_complete": true,
+      "table_payload_ranges_complete": false,
+      "table_sha256": "015a6e2189cf357aac79751766781612d5f4bf2bb88fd1e159bb9ba326087fae",
+      "artifact_integrity_verified": true,
+      "independent_gpu_attestation": false,
+      "replay_complete": false,
+      "test_process_stopped_cleanly": true
+    },
+    {
+      "selected_occurrence": 64,
+      "pipeline": {
+        "program": "cc62764061c44f6a",
+        "variant": "095931037888515a",
+        "spirv_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b"
+      },
+      "dispatch": {
+        "kind": "direct",
+        "group_count": [
+          2,
+          1,
+          1
+        ],
+        "present_observed": 1039,
+        "identity_event_id": null
+      },
+      "submission": {
+        "recording_part": 7643,
+        "logical_value": 7281,
+        "recording_sequence": 7643,
+        "completed_recording_sequence": 7649
+      },
+      "candidate_count": 128,
+      "candidate_bytes": 2560622592,
+      "payload_bytes": 5121245184,
+      "budget_bytes": 5368709120,
+      "table_resolution": {
+        "mapped": 286720,
+        "unresolved": 0,
+        "ambiguous": 0,
+        "partial": 0,
+        "missing_payload": 0
+      },
+      "unresolved_descriptor_count": 0,
+      "defined_null_descriptor_count": 2,
+      "null_descriptor_enabled": true,
+      "descriptor_payload_ranges_complete": true,
+      "table_payload_ranges_complete": true,
+      "table_sha256": "8436adacf7b3b8617d853f830b06b2b412a3d8f01ed489cc5fbab7c6089045d8",
+      "artifact_integrity_verified": true,
+      "independent_gpu_attestation": false,
+      "replay_complete": false,
+      "test_process_stopped_cleanly": true
+    }
+  ],
+  "input_host": {
+    "optimized_build_entered_game_and_recorded_selected_dispatch": true,
+    "script_exclusivity_persistent_requested": true,
+    "live_device_suppression_independently_observed": false,
+    "deterministic_camera_workload_proven": false
+  },
+  "performance_run": false,
+  "working_install_and_original_saves_preserved": true,
+  "replay_complete": false,
+  "limitations": [
+    "Occurrence64 has complete declared buffer/table payload ranges, not proof that imported host-memory aliases or CPU mutation were normalized.",
+    "Images, samplers, complete push constants and external temporal state are not yet complete.",
+    "The later occurrence is a different dynamic input set; it does not repair or replace the earlier occurrence capture.",
+    "Diagnostic barriers and copying affect execution; no timing, shader-equivalence, image-quality or 60 FPS result is claimed."
+  ]
+}

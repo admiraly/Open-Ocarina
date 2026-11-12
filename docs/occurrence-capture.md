@@ -98,6 +98,23 @@ validate v1 artifacts. The new report separates:
 A complete buffer-input report therefore remains an intermediate capture stage.
 No native-feature, rendering-quality or FPS improvement is claimed by it.
 
+## Runtime observation
+
+The frozen fourth-patch renderer and separate optimized input-isolation host
+were exercised in isolated diagnostic runs. [Sanitized evidence](../research/gpu-buffer-closure-observation.json)
+pins both binaries, all patches, the shader digest and exact recording completion.
+Occurrence 2 still had the late-import table hole. The explicitly selected
+occurrence 64 captured 128 buffer pairs; the independent checker verified every
+artifact and resolved all 286,720 nonzero GPU-table entries without ambiguity,
+partial pages or missing payloads. All live buffer descriptors had payloads;
+two null array entries had enabled-feature evidence. Both processes stopped.
+
+This establishes buffer/table range coverage for that later dispatch. Images,
+samplers, alias normalization, CPU mutation and temporal state remain open, so
+`replay_complete` stays false. The patched host entered the game and reached the
+selected dispatch with persistent script exclusivity requested; this run did not
+independently inject live input or prove camera/workload determinism.
+
 ## Validation and patch composition
 
 ```sh
