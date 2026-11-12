@@ -1,0 +1,502 @@
+diff --git a/gpu/vk/allocation_capture.h b/gpu/vk/allocation_capture.h
+new file mode 100644
+index 0000000..57fdc23
+--- /dev/null
++++ b/gpu/vk/allocation_capture.h
+@@ -0,0 +1,124 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Bounded GPU pool payload evidence. Images/aliasing/temporal state still prevent replay.
++#pragma once
++#include "page_table_capture.h"
++#include <algorithm>
++#include <cerrno>
++#include <limits>
++namespace mkwvk::oo_alloc {
++struct Config { bool enabled=false; uint64_t budget=2ull<<30; };
++inline const Config& config() {
++    static const Config c=[] {
++        Config value;
++        const char* enable=std::getenv("RX_VK_OO_ALLOC_CAPTURE");
++        if(!enable||std::string(enable)!="1"||!oo_pt::config().enabled)return value;
++        if(const char* cap=std::getenv("RX_VK_OO_ALLOC_BUDGET_MIB")) {
++            char* end=nullptr;errno=0;const auto n=std::strtoull(cap,&end,10);
++            if(errno||!*cap||*end||n<32||n>8192)return value;
++            value.budget=n<<20;
++        }
++        for(const char* name:{"allocations.json","allocations.json.part"})
++            if(oo_pt::present(std::filesystem::path(oo_pt::config().directory)/name))return value;
++        value.enabled=true;return value;
++    }();return c;
++}
++struct Row {
++    uint64_t buffer=0,address=0,size=0,guest_lo=0,guest_hi=0,memory=0,memory_offset=0;
++    uint64_t usage=0,piece_count=0;
++    std::string role,before_sha,after_sha;
++    std::vector<uint64_t> memory_pieces;
++    bool copy_supported=false;
++};
++struct Descriptor {
++    uint32_t binding=0,element=0,type=0;
++    uint64_t buffer=0,offset=0,range=0;
++};
++inline bool fits(uint64_t used,uint64_t size,uint64_t budget) {
++    return size&&size<=std::numeric_limits<uint64_t>::max()/2&&used<=budget&&size*2<=budget-used;
++}
++// A partial final page is explicit. No alignment assumption about buffer BDA.
++inline uint64_t available(const Row& row,uint64_t address) {
++    return row.address&&address>=row.address&&address-row.address<row.size?row.size-(address-row.address):0;
++}
++inline bool save_payload(const std::string& name,const uint8_t* data,uint64_t size,std::string& digest) {
++    if(!config().enabled||!data||!size||name.find('/')!=std::string::npos)return false;
++    const auto path=std::filesystem::path(oo_pt::config().directory)/name;
++    const auto part=std::filesystem::path(path.string()+".part");
++    if(oo_pt::present(path))return false;
++    FILE* file=std::fopen(part.string().c_str(),"wbx");if(!file)return false;
++    const bool written=std::fwrite(data,1,size,file)==size;
++    const bool closed=std::fclose(file)==0;
++    if(!written||!closed){std::remove(part.string().c_str());return false;}
++    const auto actual_digest=oo_identity::hex(oo_identity::sha256(data,size));
++    std::error_code error;std::filesystem::rename(part,path,error);
++    if(error){std::remove(part.string().c_str());return false;}
++    digest=actual_digest;return true;
++}
++struct TableCoverage { uint64_t mapped=0,unresolved=0,ambiguous=0,partial=0,missing_payload=0; };
++inline TableCoverage table_coverage(const uint8_t* table,size_t bytes,const std::vector<Row>& rows) {
++    TableCoverage result;
++    for(size_t i=0;i<bytes/8;++i) {
++        uint64_t address=0;std::memcpy(&address,table+i*8,8);if(!address)continue;
++        ++result.mapped;size_t hits=0;uint64_t longest=0;bool payload=false;
++        const uint64_t guest=i<(2ull<<20)?0x1000000000ull+i*4096:0x7f00000000ull+(i-(2ull<<20))*4096;
++        for(const auto& row:rows) {
++            const auto n=available(row,address);
++            if(!n||guest<row.guest_lo||guest>=row.guest_hi||guest-row.guest_lo!=address-row.address)continue;
++            ++hits;longest=std::max(longest,n);payload|=!row.before_sha.empty()&&!row.after_sha.empty();
++        }
++        if(!hits)++result.unresolved;
++        else {if(hits>1)++result.ambiguous;if(longest<4096)++result.partial;if(!payload)++result.missing_payload;}
++    }
++    return result;
++}
++inline bool write_manifest(const oo_pt::Request& req,uint64_t completed,const std::vector<Row>& rows,
++                           const std::vector<Descriptor>& descriptors,const std::vector<std::string>& failures,
++                           bool after_recorded,bool invalidated,bool table_exported,const TableCoverage& table,uint64_t candidate_bytes) {
++    if(!config().enabled||!req.submitted_sequence||completed<req.submitted_sequence)return false;
++    const auto root=std::filesystem::path(oo_pt::config().directory);
++    const auto path=root/"allocations.json",part=root/"allocations.json.part";
++    if(oo_pt::present(path))return false;
++    FILE* f=std::fopen(part.string().c_str(),"wbx");if(!f)return false;
++    bool ok=std::fprintf(f,"{\"schema\":\"open-ocarina.gpu-allocations/v1\",\"replay_complete\":false,"
++      "\"recording_part\":%llu,\"recording_sequence\":%llu,\"completed_recording_sequence\":%llu,"
++      "\"program\":\"%016llx\",\"variant\":\"%016llx\",\"spirv_sha256\":\"%s\","
++      "\"candidate_count\":%zu,\"candidate_bytes\":%llu,\"required_staging_bytes\":%llu,\"budget_bytes\":%llu,\"table_manifest\":\"manifest.json\",\"table_exported\":%s,"
++      "\"before_position\":\"immediately before selected dispatch\",\"after_position\":\"immediately after selected dispatch\","
++      "\"table_resolution\":{\"mapped\":%llu,\"unresolved\":%llu,\"ambiguous\":%llu,\"partial\":%llu,\"missing_payload\":%llu},\"after_recorded\":%s,\"mapped_memory_invalidated\":%s,"
++      "\"coverage\":{\"images\":false,\"temporal_state\":false,\"underlying_import_aliases_resolved\":false,"
++      "\"cpu_writers_quiesced\":false,\"complete_physical_replay\":false},\"failures\":[",
++      (unsigned long long)req.recording_part,(unsigned long long)req.submitted_sequence,(unsigned long long)completed,
++      (unsigned long long)req.key,(unsigned long long)req.variant,req.shader_digest.c_str(),
++      rows.size(),(unsigned long long)candidate_bytes,(unsigned long long)(candidate_bytes*2),
++      (unsigned long long)config().budget,table_exported?"true":"false",
++      (unsigned long long)table.mapped,(unsigned long long)table.unresolved,(unsigned long long)table.ambiguous,
++      (unsigned long long)table.partial,(unsigned long long)table.missing_payload,after_recorded?"true":"false",invalidated?"true":"false")>=0;
++    for(size_t i=0;i<failures.size();++i)ok&=std::fprintf(f,"%s\"%s\"",i?",":"",failures[i].c_str())>=0;
++    ok&=std::fprintf(f,"],\"buffers\":[")>=0;
++    for(size_t i=0;i<rows.size();++i) {
++        const auto& r=rows[i];
++        std::string pieces="[";
++        for(size_t n=0;n<r.memory_pieces.size();++n){char text[32];std::snprintf(text,sizeof text,"\"%016llx\"",(unsigned long long)r.memory_pieces[n]);if(n)pieces+=",";pieces+=text;}
++        pieces+="]";
++        ok&=std::fprintf(f,"%s{\"id\":%zu,\"buffer\":\"%016llx\",\"address\":\"%016llx\",\"size\":%llu,"
++          "\"guest_lo\":\"%016llx\",\"guest_hi\":\"%016llx\",\"memory\":\"%016llx\",\"memory_offset\":%llu,"
++          "\"memory_piece_count\":%llu,\"memory_piece_handles\":%s,\"usage\":%llu,\"role\":\"%s\",\"copy_supported\":%s,"
++          "\"before\":%s,\"after\":%s}",i?",":"",i,(unsigned long long)r.buffer,(unsigned long long)r.address,
++          (unsigned long long)r.size,(unsigned long long)r.guest_lo,(unsigned long long)r.guest_hi,(unsigned long long)r.memory,
++          (unsigned long long)r.memory_offset,(unsigned long long)r.piece_count,pieces.c_str(),(unsigned long long)r.usage,r.role.c_str(),
++          r.copy_supported?"true":"false",
++          r.before_sha.empty()?"null":("{\"artifact\":\"buffer-"+std::to_string(i)+"-before.bin\",\"sha256\":\""+r.before_sha+"\"}").c_str(),
++          r.after_sha.empty()?"null":("{\"artifact\":\"buffer-"+std::to_string(i)+"-after.bin\",\"sha256\":\""+r.after_sha+"\"}").c_str())>=0;
++    }
++    ok&=std::fprintf(f,"],\"descriptors\":[")>=0;
++    for(size_t i=0;i<descriptors.size();++i) {
++        const auto& d=descriptors[i];
++        ok&=std::fprintf(f,"%s{\"binding\":%u,\"element\":%u,\"type\":%u,\"buffer\":\"%016llx\",\"offset\":%llu,\"range\":%llu}",
++          i?",":"",d.binding,d.element,d.type,(unsigned long long)d.buffer,(unsigned long long)d.offset,(unsigned long long)d.range)>=0;
++    }
++    ok&=std::fprintf(f,"]}\n")>=0;
++    ok&=std::fclose(f)==0;
++    if(!ok){std::remove(part.string().c_str());return false;}
++    std::error_code error;std::filesystem::rename(part,path,error);return !error;
++}
++} // namespace mkwvk::oo_alloc
+diff --git a/gpu/vk/vk_draw.cpp b/gpu/vk/vk_draw.cpp
+index 943bbdd..aecbcfd 100644
+--- a/gpu/vk/vk_draw.cpp
++++ b/gpu/vk/vk_draw.cpp
+@@ -9059,6 +9059,7 @@ void oo_compute_identity(VkCommandBuffer cmd, const Program& p, const NvnState&
+     if (p.stages.empty()) return;
+     if (p.stages[0].oo_identity.valid) {
+         const auto digest=oo_identity::hex(p.stages[0].oo_identity.digest);
++        memory_allocation_descriptors(cmd,dw().writes);
+         memory_pt_snapshot_record(cmd, p.key, p.variant, digest.c_str(), x,y,z,indirect,presents_now,
+                                   Shader::Backend::SPIRV::GUEST_PAGES_PUSH_OFFSET);
+     }
+@@ -9420,9 +9421,11 @@ void dispatch(VkCommandBuffer cmd, NvnState& s, uint32_t x, uint32_t y, uint32_t
+             }
+             if (oo_identity::selected(p.key, p.variant)) oo_compute_identity(cmd, p, s, x, y, z, indirect);
+             vkCmdDispatchIndirect(cmd, args.buffer, args.offset);
++            memory_allocation_after(cmd);
+         } else {
+             if (oo_identity::selected(p.key, p.variant)) oo_compute_identity(cmd, p, s, x, y, z, 0);
+             vkCmdDispatch(cmd, x, y, z);
++            memory_allocation_after(cmd);
+         }
+     }
+     if (dump_on() && dump_ssbo_wanted(p.key)) dump_ssbos(cmd, p, "after");
+diff --git a/gpu/vk/vk_internal.h b/gpu/vk/vk_internal.h
+index 6fa0abb..d420510 100644
+--- a/gpu/vk/vk_internal.h
++++ b/gpu/vk/vk_internal.h
+@@ -150,6 +150,8 @@ bool memory_pt_recording_info(VkCommandBuffer cmd, uint64_t* part, uint64_t* log
+ void memory_pt_snapshot_record(VkCommandBuffer cmd, uint64_t key, uint64_t variant, const char* digest,
+                                uint32_t x, uint32_t y, uint32_t z, uint64_t indirect, int64_t present,
+                                uint32_t root_push_offset);
++void memory_allocation_descriptors(VkCommandBuffer cmd,const std::vector<VkWriteDescriptorSet>& writes);
++void memory_allocation_after(VkCommandBuffer cmd);
+ void memory_pt_snapshot_submitted(VkCommandBuffer cmd, uint64_t part, uint64_t sequence, bool succeeded);
+ void memory_pt_snapshot_collect(uint64_t completed_recording_sequence);
+ void memory_pt_snapshot_discard(VkCommandBuffer cmd, uint64_t recording_part);
+diff --git a/gpu/vk/vk_memory.cpp b/gpu/vk/vk_memory.cpp
+index c25ef5f..9ecedaa 100644
+--- a/gpu/vk/vk_memory.cpp
++++ b/gpu/vk/vk_memory.cpp
+@@ -28,6 +28,8 @@
+ 
+ #include "vk_internal.h"
+ #include "page_table_capture.h"
++#include "allocation_capture.h"
++#include <vk_mem_alloc.h>
+ #include "vk_texture.h"   // (upload_command_buffer)
+ #include "vk_gprof.h"      // (RX_VK_PASS_TIMING)
+ #include "import_hold.h"
+@@ -123,6 +125,8 @@ struct SrwMutex {   // (a slim reader/writer lock: half std::mutex's cost, taken
+     void unlock() { ReleaseSRWLockExclusive(&l); }
+ };
+ SrwMutex pools_mu;
++// pools_mu owns this set. Retirement queues retain a copied source until exact recording completion.
++std::set<VkBuffer> oo_retained_buffers;
+ uint32_t generation = ~0u;
+ uint64_t align = 4096;
+ uint64_t max_import_size = UINT64_MAX;
+@@ -491,6 +495,10 @@ struct OoPagePending {
+ OoPagePending oo_page_pending;
+ std::mutex oo_page_mutex;
+ }
++extern VmaAllocator vma;
++void oo_allocation_record(VkCommandBuffer cmd);
++void oo_allocation_release();
++void oo_allocation_collect(const oo_pt::Request&,uint64_t,bool,const uint8_t*);
+ bool memory_pt_snapshot_enabled() { return oo_pt::config().enabled; }
+ void memory_pt_snapshot_record(VkCommandBuffer cmd,uint64_t key,uint64_t variant,const char* digest,
+                                uint32_t x,uint32_t y,uint32_t z,uint64_t indirect,int64_t present,
+@@ -537,6 +545,7 @@ void memory_pt_snapshot_record(VkCommandBuffer cmd,uint64_t key,uint64_t variant
+     for(auto& barrier:after)barrier.srcQueueFamilyIndex=barrier.dstQueueFamilyIndex=VK_QUEUE_FAMILY_IGNORED;
+     dependency.bufferMemoryBarrierCount=2;dependency.pBufferMemoryBarriers=after;vkCmdPipelineBarrier2(cmd,&dependency);
+     pending.active=true;
++    oo_allocation_record(cmd);
+     logf("vk: Open-Ocarina GPU page-table copy recorded for part %llu (not yet submitted/completed)",
+          (unsigned long long)pending.request.recording_part);
+ }
+@@ -545,6 +554,7 @@ void memory_pt_snapshot_submitted(VkCommandBuffer cmd,uint64_t part,uint64_t seq
+     std::lock_guard lock(oo_page_mutex);auto& pending=oo_page_pending;
+     if(!pending.active||pending.command!=cmd||pending.request.recording_part!=part)return;
+     if(!succeeded) {
++        oo_allocation_release();
+         destroy_buffer(pending.buffer,pending.allocation);pending.buffer=VK_NULL_HANDLE;pending.allocation=nullptr;pending.mapped=nullptr;pending.active=false;
+         logf("vk: Open-Ocarina page snapshot submission failed; staging released without exporting a snapshot");return;
+     }
+@@ -556,6 +566,7 @@ void memory_pt_snapshot_discard(VkCommandBuffer cmd,uint64_t part) {
+     std::lock_guard lock(oo_page_mutex);auto& pending=oo_page_pending;
+     if(!pending.active||pending.command!=cmd||pending.request.recording_part!=part||pending.request.submitted_sequence)return;
+     // Called only after the slot's recording wait and immediately before its command-pool reset.
++    oo_allocation_release();
+     destroy_buffer(pending.buffer,pending.allocation);pending.buffer=VK_NULL_HANDLE;pending.allocation=nullptr;pending.mapped=nullptr;pending.active=false;
+     logf("vk: Open-Ocarina canceled unsubmitted page-table snapshot released at recording reset");
+ }
+@@ -568,6 +579,7 @@ void memory_pt_snapshot_collect(uint64_t completed_sequence) {
+         try {ok=oo_pt::write_completed(pending.request,static_cast<const uint8_t*>(pending.mapped),oo_pt::kTableBytes,completed_sequence);}
+         catch(const std::exception& error){logf("vk: Open-Ocarina page snapshot export failed: %s",error.what());}
+     }
++    oo_allocation_collect(pending.request,completed_sequence,ok,ok?static_cast<const uint8_t*>(pending.mapped):nullptr);
+     destroy_buffer(pending.buffer,pending.allocation);pending.buffer=VK_NULL_HANDLE;pending.allocation=nullptr;pending.mapped=nullptr;pending.active=false;
+     logf("vk: Open-Ocarina GPU page-table snapshot %s after recording sequence %llu completed (page-table-only; NOT replay)",
+          ok?"exported":"failed",(unsigned long long)pending.request.submitted_sequence);
+@@ -3312,7 +3324,7 @@ uint64_t st_mirror_bytes_freed = 0;
+ // last_value counts the draws and dispatches that bound it, not the shaders that reach it through the guest page table:
+ // a culling or fog compute pass already running read a mirror destroyed under it (device lost in 53caac5f and ee7764a6,
+ // issues 132 and 195, AMD after a scene change). The table goes back to guest memory at once, as before
+-struct DeadMirror { VkBuffer buffer; VmaAllocation alloc; uint64_t value; };
++struct DeadMirror { VkBuffer buffer; VmaAllocation alloc; uint64_t value,lo,hi; };
+ std::deque<DeadMirror> dead_mirrors;
+ // A retired pool's import, given back the same way. Each import is a userptr buffer object to amdgpu, and RADV lists every
+ // buffer object in every submission (buffer device addresses): the kernel checks every page of every userptr object at each
+@@ -3320,12 +3332,12 @@ std::deque<DeadMirror> dead_mirrors;
+ // Forest ~1.3 GB of imports, 15-45 ms a submission (3-4 fps on an RX 7800 XT with 11 ms of GPU time; issues 312, 413). Its
+ // table entries went at its retirement, and its mirror goes before (mstate), so once the GPU is past retired_value nothing
+ // reaches it. The node stays (pointers to it are kept elsewhere); only its buffer and memory go. RX_VK_KEEP_RETIRED=1: kept
+-struct DeadImport { VkBuffer buffer; VkDeviceMemory memory; uint64_t value; uint64_t bytes; std::vector<VkDeviceMemory> pieces; };
++struct DeadImport { VkBuffer buffer; VkDeviceMemory memory; uint64_t value; uint64_t bytes; std::vector<VkDeviceMemory> pieces; uint64_t lo,hi; };
+ std::deque<DeadImport> dead_imports;
+ uint64_t st_retired_imports_freed = 0, st_retired_import_bytes_freed = 0;
+ uint64_t dead_import_bytes = 0;   // (queued in dead_imports: still in the heap's use until the GPU is past them)
+ void reap_mirrors() {   // (pools_mu held)
+-    while (!dead_mirrors.empty() && dead_mirrors.front().value <= mem_completed) {
++    while (!dead_mirrors.empty() && dead_mirrors.front().value <= mem_completed && !oo_retained_buffers.count(dead_mirrors.front().buffer)) {
+         if (env_on("RX_VK_LOG_ADDR")) {
+             VkBufferDeviceAddressInfo da{VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO};
+             da.buffer = dead_mirrors.front().buffer;
+@@ -3335,7 +3347,7 @@ void reap_mirrors() {   // (pools_mu held)
+         destroy_buffer(dead_mirrors.front().buffer, dead_mirrors.front().alloc);
+         dead_mirrors.pop_front();
+     }
+-    while (!dead_imports.empty() && dead_imports.front().value <= mem_completed) {
++    while (!dead_imports.empty() && dead_imports.front().value <= mem_completed && !oo_retained_buffers.count(dead_imports.front().buffer)) {
+         destroy_import_buffer(dead_imports.front().buffer);
+         vkFreeMemory(dev.device, dead_imports.front().memory, nullptr);
+         for (VkDeviceMemory m : dead_imports.front().pieces) vkFreeMemory(dev.device, m, nullptr);
+@@ -3404,7 +3416,7 @@ void retired_imports_give_back() {   // (pools_mu held)
+         if ((p.mstate == Pool::MIRROR_NONE || p.mstate == Pool::MIRROR_REFUSED) && !p.inherit_pending &&
+             p.retired_value <= mem_completed &&
+             p.last_value <= mem_completed && retired_give_back::due(mode, idle, idle_ms, floor_ms, want > 0)) {
+-            dead_imports.push_back({p.buffer, p.memory, std::max(mem_rec_value, p.last_value), p.hi - p.lo, std::move(p.pieces)});
++            dead_imports.push_back({p.buffer, p.memory, std::max(mem_rec_value, p.last_value), p.hi - p.lo, std::move(p.pieces), p.lo, p.hi});
+             dead_import_bytes += p.hi - p.lo;
+             p.pieces.clear();
+             p.buffer = VK_NULL_HANDLE, p.memory = VK_NULL_HANDLE, p.address = 0;
+@@ -3429,7 +3441,7 @@ void mirror_free(Pool& p) {
+         const auto live = imported.find(p.lo);
+         if (live != imported.end() && &live->second == &p) guest_pages_set(p.lo, p.hi, p.address);
+     }
+-    dead_mirrors.push_back({p.mirror, p.mirror_alloc, std::max(mem_rec_value, p.last_value)});
++    dead_mirrors.push_back({p.mirror, p.mirror_alloc, std::max(mem_rec_value, p.last_value), p.lo, p.hi});
+     shadow_free(p);
+     p.mirror = VK_NULL_HANDLE, p.mirror_alloc = nullptr;
+     mirror_bytes -= p.hi - p.lo;
+@@ -3506,7 +3518,7 @@ uint64_t st_import_bytes_evicted = 0;
+ constexpr uint64_t kImportIdle = 600;
+ 
+ void imports_give_back() {   // (pools_mu held)
+-    while (!evicted_pools.empty() && evicted_pools.front().mapped().retired_value <= mem_completed) {
++    while (!evicted_pools.empty() && evicted_pools.front().mapped().retired_value <= mem_completed && !oo_retained_buffers.count(evicted_pools.front().mapped().buffer)) {
+         Pool& p = evicted_pools.front().mapped();
+         destroy_import_buffer(p.buffer);
+         vkFreeMemory(dev.device, p.memory, nullptr);
+@@ -3923,7 +3935,7 @@ int64_t st_wbd_known_game = 0, st_wbd_known_collected = 0, st_wbd_known_replay =
+ struct DeadShadow {
+     VkBuffer buffer;
+     VmaAllocation alloc;
+-    uint64_t value;
++    uint64_t value,lo,hi;
+ };
+ std::deque<DeadShadow> dead_shadows;
+ uint64_t shadow_bytes = 0;
+@@ -3940,13 +3952,13 @@ bool wb_diff_on() {
+ }
+ void shadow_free(Pool& p) {   // (pools_mu held: destroyed once the submissions so far are done)
+     if (!p.shadow) return;
+-    dead_shadows.push_back({p.shadow, p.shadow_alloc, std::max(mem_rec_value, p.last_value)});
++    dead_shadows.push_back({p.shadow, p.shadow_alloc, std::max(mem_rec_value, p.last_value), p.lo, p.hi});
+     shadow_bytes -= p.hi - p.lo;
+     p.shadow = VK_NULL_HANDLE, p.shadow_alloc = nullptr, p.shadow_address = 0;
+     p.shadow_known.clear();
+ }
+ void shadows_reap() {
+-    while (!dead_shadows.empty() && dead_shadows.front().value <= mem_completed) {
++    while (!dead_shadows.empty() && dead_shadows.front().value <= mem_completed && !oo_retained_buffers.count(dead_shadows.front().buffer)) {
+         destroy_buffer(dead_shadows.front().buffer, dead_shadows.front().alloc);
+         dead_shadows.pop_front();
+     }
+@@ -3984,7 +3996,7 @@ bool shadow_make(Pool& p) {
+     const uint64_t n = p.hi - p.lo;
+     if (!p.mirror || !shadow_room(n)) return false;
+     if (!create_device_buffer(n, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_STORAGE_BUFFER_BIT |
+-                                     VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT, p.shadow, p.shadow_alloc))
++                                     VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | (oo_alloc::config().enabled ? VK_BUFFER_USAGE_TRANSFER_SRC_BIT : 0), p.shadow, p.shadow_alloc))
+         return false;
+     VkBufferDeviceAddressInfo da{VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO};
+     da.buffer = p.shadow;
+@@ -4525,6 +4537,175 @@ void memory_end_submission(VkCommandBuffer cmd, uint64_t part) {
+     mirror_upload = false;
+ }
+ 
++// Open-Ocarina: one conservative pool catalog, GPU payloads at the selected dispatch's boundaries.
++namespace {
++struct OoAllocationCopy {
++    VkBuffer before=VK_NULL_HANDLE,after=VK_NULL_HANDLE;
++    VmaAllocation before_alloc=nullptr,after_alloc=nullptr;
++    void* before_map=nullptr;void* after_map=nullptr;
++};
++struct OoAllocationPending {
++    bool active=false,after_recorded=false,copies=false;
++    VkCommandBuffer command=VK_NULL_HANDLE;
++    uint64_t candidate_bytes=0;
++    std::vector<oo_alloc::Row> rows;
++    std::vector<oo_alloc::Descriptor> descriptors;
++    std::vector<std::string> failures;
++    std::vector<OoAllocationCopy> copies_by_row;
++};
++OoAllocationPending oo_alloc_pending;
++void oo_allocation_copy_phase(VkCommandBuffer cmd,bool after) {
++    auto& state=oo_alloc_pending;
++    if(!state.copies)return;
++    VkMemoryBarrier2 source{VK_STRUCTURE_TYPE_MEMORY_BARRIER_2};
++    source.srcStageMask=VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;source.srcAccessMask=VK_ACCESS_2_MEMORY_WRITE_BIT;
++    source.dstStageMask=VK_PIPELINE_STAGE_2_COPY_BIT;source.dstAccessMask=VK_ACCESS_2_TRANSFER_READ_BIT;
++    VkDependencyInfo dependency{VK_STRUCTURE_TYPE_DEPENDENCY_INFO};dependency.memoryBarrierCount=1;dependency.pMemoryBarriers=&source;
++    vkCmdPipelineBarrier2(cmd,&dependency);
++    std::vector<VkBufferMemoryBarrier2> host_barriers;
++    for(size_t i=0;i<state.rows.size();++i) {
++        const auto& row=state.rows[i];const auto& buffers=state.copies_by_row[i];
++        const auto destination=after?buffers.after:buffers.before;
++        if(!destination)continue;
++        const VkBufferCopy copy{0,0,row.size};
++        vkCmdCopyBuffer(cmd,(VkBuffer)(uintptr_t)row.buffer,destination,1,&copy);
++        VkBufferMemoryBarrier2 host_barrier{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2};
++        host_barrier.srcStageMask=VK_PIPELINE_STAGE_2_COPY_BIT;host_barrier.srcAccessMask=VK_ACCESS_2_TRANSFER_WRITE_BIT;
++        host_barrier.dstStageMask=VK_PIPELINE_STAGE_2_HOST_BIT;host_barrier.dstAccessMask=VK_ACCESS_2_HOST_READ_BIT;
++        host_barrier.srcQueueFamilyIndex=host_barrier.dstQueueFamilyIndex=VK_QUEUE_FAMILY_IGNORED;
++        host_barrier.buffer=destination;host_barrier.size=row.size;host_barriers.push_back(host_barrier);
++    }
++    source.srcStageMask=VK_PIPELINE_STAGE_2_COPY_BIT;source.srcAccessMask=VK_ACCESS_2_TRANSFER_READ_BIT;
++    source.dstStageMask=VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;source.dstAccessMask=VK_ACCESS_2_MEMORY_READ_BIT|VK_ACCESS_2_MEMORY_WRITE_BIT;
++    dependency.bufferMemoryBarrierCount=(uint32_t)host_barriers.size();dependency.pBufferMemoryBarriers=host_barriers.data();
++    vkCmdPipelineBarrier2(cmd,&dependency);
++}
++}
++void memory_allocation_descriptors(VkCommandBuffer cmd,const std::vector<VkWriteDescriptorSet>& writes) {
++    if(!oo_alloc::config().enabled)return;
++    std::lock_guard lock(oo_page_mutex);auto& state=oo_alloc_pending;
++    if(oo_page_pending.attempted)return;
++    state.command=cmd;state.descriptors.clear();
++    for(const auto& write:writes) {
++        if(!write.pBufferInfo)continue;
++        for(uint32_t i=0;i<write.descriptorCount;++i) {
++            const auto& info=write.pBufferInfo[i];
++            state.descriptors.push_back({write.dstBinding,write.dstArrayElement+i,(uint32_t)write.descriptorType,
++                                         (uint64_t)(uintptr_t)info.buffer,info.offset,info.range});
++        }
++    }
++}
++void oo_allocation_record(VkCommandBuffer cmd) { // oo_page_mutex held; no CPU guest payload read.
++    if(!oo_alloc::config().enabled)return;
++    auto& state=oo_alloc_pending;state.active=true;state.command=cmd;
++    state.failures={"images_not_captured","temporal_state_not_captured","underlying_import_aliases_unresolved","cpu_writers_not_quiesced"};
++    std::lock_guard pool_lock(pools_mu);
++    auto add=[&](VkBuffer buffer,VmaAllocation alloc,VkDeviceMemory memory,uint64_t lo,uint64_t hi,
++                 uint64_t usage,const std::vector<VkDeviceMemory>& pieces,const char* role) {
++        if(!buffer)return;
++        if(std::any_of(state.rows.begin(),state.rows.end(),[&](const auto& r){return r.buffer==(uint64_t)(uintptr_t)buffer;}))return;
++        if(state.rows.size()>=16384){state.failures.push_back("catalog_entry_limit_exceeded");return;}
++        oo_alloc::Row row;row.buffer=(uint64_t)(uintptr_t)buffer;row.size=hi-lo;row.guest_lo=lo;row.guest_hi=hi;
++        row.role=role;row.usage=usage;row.memory=(uint64_t)(uintptr_t)memory;
++        VkBufferDeviceAddressInfo address{VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO};address.buffer=buffer;
++        row.address=vkGetBufferDeviceAddress(dev.device,&address);
++        if(alloc){VmaAllocationInfo info{};vmaGetAllocationInfo(vma,alloc,&info);row.memory=(uint64_t)(uintptr_t)info.deviceMemory;row.memory_offset=info.offset;}
++        if(row.memory)row.memory_pieces.push_back(row.memory);
++        for(auto piece:pieces)row.memory_pieces.push_back((uint64_t)(uintptr_t)piece);
++        row.piece_count=row.memory_pieces.size();
++        row.copy_supported=(usage&VK_BUFFER_USAGE_TRANSFER_SRC_BIT)&&row.size&&row.size%4==0;
++        if(!row.address)state.failures.push_back("buffer_device_address_missing");
++        if(!pieces.empty())state.failures.push_back("sparse_memory_piece_identity_unresolved");
++        if(!row.copy_supported)state.failures.push_back("source_usage_or_copy_alignment_unsupported");
++        if(row.size>UINT64_MAX-state.candidate_bytes){state.failures.push_back("candidate_bytes_overflow");row.copy_supported=false;}
++        else state.candidate_bytes+=row.size;
++        state.rows.push_back(row);
++    };
++    auto pool=[&](const Pool& p,const char* role) {
++        add(p.buffer,nullptr,p.memory,p.lo,p.hi,kUsage,p.pieces,role);
++        add(p.mirror,p.mirror_alloc,VK_NULL_HANDLE,p.lo,p.hi,kUsage,{},"pool-mirror");
++        add(p.shadow,p.shadow_alloc,VK_NULL_HANDLE,p.lo,p.hi,VK_BUFFER_USAGE_TRANSFER_SRC_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT|
++            VK_BUFFER_USAGE_STORAGE_BUFFER_BIT|VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,{},"writeback-shadow");
++    };
++    for(const auto& item:imported)pool(item.second,"live-import");
++    for(const auto& node:retired_pools)pool(node.mapped(),"retired-import");
++    for(const auto& node:evicted_pools)pool(node.mapped(),"evicted-import");
++    for(const auto& item:dead_imports)add(item.buffer,nullptr,item.memory,item.lo,item.hi,kUsage,item.pieces,"queued-import");
++    for(const auto& item:dead_mirrors)add(item.buffer,item.alloc,VK_NULL_HANDLE,item.lo,item.hi,kUsage,{},"queued-mirror");
++    for(const auto& item:dead_shadows)add(item.buffer,item.alloc,VK_NULL_HANDLE,item.lo,item.hi,
++        VK_BUFFER_USAGE_TRANSFER_SRC_BIT|VK_BUFFER_USAGE_TRANSFER_DST_BIT|VK_BUFFER_USAGE_STORAGE_BUFFER_BIT|
++        VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT,{},"queued-shadow");
++    {std::lock_guard background_lock(bg_mu);if(!bg_ready.empty()||!bg_inflight.empty())state.failures.push_back("background_imports_not_cataloged");}
++    // Capturing early cannot prove that later recording work creates no new source. The copied GPU table is checked after completion.
++    state.failures.push_back("late_allocations_require_completed_table_resolution");
++    for(const auto& descriptor:state.descriptors) {
++        auto it=std::find_if(state.rows.begin(),state.rows.end(),[&](const auto& row){return row.buffer==descriptor.buffer;});
++        if(it==state.rows.end())state.failures.push_back("descriptor_owner_unknown");
++        else if(descriptor.offset>=it->size||(descriptor.range!=VK_WHOLE_SIZE&&descriptor.range>it->size-descriptor.offset))
++            state.failures.push_back("descriptor_range_unresolved");
++    }
++    logf("vk: Open-Ocarina allocation catalog: %zu candidates, %llu source bytes, %llu required staging bytes, budget %llu (not replay)",
++        state.rows.size(),(unsigned long long)state.candidate_bytes,(unsigned long long)(state.candidate_bytes*2),(unsigned long long)oo_alloc::config().budget);
++    const bool bounded=state.candidate_bytes<=UINT64_MAX/2&&state.candidate_bytes*2<=oo_alloc::config().budget&&
++        std::find(state.failures.begin(),state.failures.end(),"catalog_entry_limit_exceeded")==state.failures.end();
++    if(!bounded){state.failures.push_back("staging_budget_or_catalog_limit_exceeded");return;}
++    state.copies_by_row.resize(state.rows.size());
++    bool made=true;
++    for(size_t i=0;i<state.rows.size();++i) {
++        const auto& row=state.rows[i];auto& copy=state.copies_by_row[i];if(!row.copy_supported)continue;
++        if(!create_buffer_cached(row.size,VK_BUFFER_USAGE_TRANSFER_DST_BIT,copy.before,copy.before_alloc,&copy.before_map,true)||!copy.before_map||
++           !create_buffer_cached(row.size,VK_BUFFER_USAGE_TRANSFER_DST_BIT,copy.after,copy.after_alloc,&copy.after_map,true)||!copy.after_map){made=false;break;}
++    }
++    if(!made) {
++        state.failures.push_back("staging_allocation_failed");
++        for(auto& copy:state.copies_by_row){if(copy.before||copy.before_alloc)destroy_buffer(copy.before,copy.before_alloc);if(copy.after||copy.after_alloc)destroy_buffer(copy.after,copy.after_alloc);}
++        state.copies_by_row.clear();return;
++    }
++    for(const auto& row:state.rows)oo_retained_buffers.insert((VkBuffer)(uintptr_t)row.buffer);
++    state.copies=true;oo_allocation_copy_phase(cmd,false);
++}
++void memory_allocation_after(VkCommandBuffer cmd) {
++    if(!oo_alloc::config().enabled)return;
++    std::lock_guard lock(oo_page_mutex);auto& state=oo_alloc_pending;
++    if(!state.active||state.command!=cmd||state.after_recorded)return;
++    oo_allocation_copy_phase(cmd,true);state.after_recorded=true;
++}
++void oo_allocation_release() { // oo_page_mutex held; cancellation or exact completion only.
++    auto& state=oo_alloc_pending;
++    if(!state.active)return;
++    for(auto& copy:state.copies_by_row){if(copy.before||copy.before_alloc)destroy_buffer(copy.before,copy.before_alloc);if(copy.after||copy.after_alloc)destroy_buffer(copy.after,copy.after_alloc);}
++    {std::lock_guard pool_lock(pools_mu);oo_retained_buffers.clear();}
++    state.copies_by_row.clear();state.active=false;
++}
++void oo_allocation_collect(const oo_pt::Request& request,uint64_t completed,bool table_ok,const uint8_t* table) {
++    auto& state=oo_alloc_pending;if(!state.active)return;
++    bool invalidated=state.copies&&state.after_recorded;
++    try {
++        for(size_t i=0;i<state.copies_by_row.size();++i) {
++            auto& row=state.rows[i];const auto& copy=state.copies_by_row[i];
++            if(!copy.before)continue;
++            const bool before_ok=invalidate_mapped_checked(copy.before_alloc,row.size);
++            const bool after_ok=state.after_recorded&&invalidate_mapped_checked(copy.after_alloc,row.size);
++            invalidated&=before_ok&&after_ok;
++            if(before_ok&&!oo_alloc::save_payload("buffer-"+std::to_string(i)+"-before.bin",static_cast<const uint8_t*>(copy.before_map),row.size,row.before_sha))state.failures.push_back("before_payload_export_failed");
++            if(after_ok&&!oo_alloc::save_payload("buffer-"+std::to_string(i)+"-after.bin",static_cast<const uint8_t*>(copy.after_map),row.size,row.after_sha))state.failures.push_back("after_payload_export_failed");
++        }
++        if(!state.after_recorded)state.failures.push_back("after_dispatch_copy_not_recorded");
++        if(!invalidated)state.failures.push_back("payloads_not_all_invalidated");
++        if(!table_ok)state.failures.push_back("gpu_page_table_export_failed");
++        const auto coverage=table?oo_alloc::table_coverage(table,oo_pt::kTableBytes,state.rows):oo_alloc::TableCoverage{};
++        if(coverage.unresolved)state.failures.push_back("gpu_table_has_unresolved_pages");
++        if(coverage.ambiguous)state.failures.push_back("gpu_table_has_ambiguous_pages");
++        if(coverage.partial)state.failures.push_back("gpu_table_has_partial_pages");
++        if(coverage.missing_payload)state.failures.push_back("gpu_table_has_missing_payloads");
++        std::sort(state.failures.begin(),state.failures.end());state.failures.erase(std::unique(state.failures.begin(),state.failures.end()),state.failures.end());
++        const bool ok=oo_alloc::write_manifest(request,completed,state.rows,state.descriptors,state.failures,state.after_recorded,invalidated,table_ok,coverage,state.candidate_bytes);
++        logf("vk: Open-Ocarina allocation evidence %s: mapped %llu unresolved %llu ambiguous %llu partial %llu missing payload %llu (NOT full replay)",ok?"exported":"failed",
++            (unsigned long long)coverage.mapped,(unsigned long long)coverage.unresolved,(unsigned long long)coverage.ambiguous,(unsigned long long)coverage.partial,(unsigned long long)coverage.missing_payload);
++    }catch(const std::exception& error){logf("vk: Open-Ocarina allocation export failed: %s",error.what());}
++    oo_allocation_release();
++}
++
+ void memory_stats(int64_t* mirrors, uint64_t* mirror_mb, int64_t* sync_bytes, int64_t* sync_copies, int64_t* wb_bytes) {
+     *mirrors = st_mirrors, *mirror_mb = mirror_bytes >> 20, *sync_bytes = st_sync_bytes, *sync_copies = st_sync_copies;
+     *wb_bytes = st_wb_bytes;

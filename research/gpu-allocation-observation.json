@@ -1,0 +1,79 @@
+{
+  "schema": 1,
+  "date": "2026-11-12",
+  "stage": "actual GPU before/after pool buffer payloads; incomplete replay",
+  "source_pin": "4cf785a0b143bb34026506c9a3fe4f4bb93c797d",
+  "renderer_sha256": "8d541ef48e8464d8482dade7c3f142ec0797238884856925c447dfbfb891a6a5",
+  "patches_sha256": {
+    "patches/hookshot/compute-identity.patch": "2f14873edfdb47b1f915e75bc4bbe6683ef6632bc66fcbfa1d918aa1c176f018",
+    "patches/hookshot/page-table-snapshot.patch": "c236b96851bc95426202abec6447e672577fdda747fd8405cc435dae435834ab",
+    "patches/hookshot/allocation-capture.patch": "7d8f23d3824374002472bc4a65f3f078c3306d4c5cd395f97e2a1e083fe49aab"
+  },
+  "pipeline": {
+    "program": "cc62764061c44f6a",
+    "variant": "095931037888515a",
+    "spirv_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b"
+  },
+  "dispatch": {
+    "kind": "direct",
+    "group_count": [
+      2,
+      1,
+      1
+    ],
+    "present_observed": 991,
+    "identity_event_id": null
+  },
+  "submission": {
+    "recording_part": 7006,
+    "logical_value": 6945,
+    "recording_sequence": 7006,
+    "completed_recording_sequence": 7037
+  },
+  "buffers": {
+    "candidate_count": 89,
+    "source_bytes": 2243952640,
+    "payload_bytes": 4487905280,
+    "budget_bytes": 5368709120,
+    "before_and_after_pairs": 89,
+    "roles": {
+      "live-import": 43,
+      "pool-mirror": 41,
+      "writeback-shadow": 5
+    }
+  },
+  "gpu_table_resolution": {
+    "mapped": 264192,
+    "unresolved": 24576,
+    "ambiguous": 0,
+    "partial": 0,
+    "missing_payload": 0
+  },
+  "descriptor_observation": {
+    "total_buffer_descriptors": 10,
+    "catalog_resolved": 7,
+    "unknown_nonnull_stream_ubo": 1,
+    "null_storage_array_placeholders": 2,
+    "null_descriptor_feature_not_attested_in_manifest": true
+  },
+  "changes": {
+    "allocations_with_different_before_after_hashes": 2,
+    "binding6_owner_changed_bytes": 2001,
+    "binding6_owner_changed_bytes_outside_binding6_range": 0,
+    "other_import_changed_bytes": 124,
+    "other_import_changes_not_attributed_to_shader": true
+  },
+  "artifact_integrity_verified": true,
+  "table_payload_ranges_complete": false,
+  "replay_complete": false,
+  "test_process_stopped_cleanly": true,
+  "performance_run": false,
+  "working_install_and_original_saves_preserved": true,
+  "limitations": [
+    "A late 96 MiB import is absent from the recording-time catalog but present in the actual submitted GPU table; its payload is missing.",
+    "One stream UBO owner is outside the pool catalog. Two further unknown-owner records are null storage descriptors and require explicit null-descriptor semantics.",
+    "Images, samplers, complete push constants, underlying host-import aliases and temporal state remain incomplete.",
+    "Host CPU writers were not quiesced; unrelated import changes prevent treating every changed byte as shader output.",
+    "This instrumented serial non-batched diagnostic does not measure performance, shader equivalence or image quality."
+  ]
+}

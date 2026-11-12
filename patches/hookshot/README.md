@@ -1,4 +1,4 @@
-# Hookshot compute-identity instrumentation
+# Hookshot diagnostic patch series
 
 `compute-identity.patch` is an opt-in metadata-only patch against official Hookshot revision:
 
@@ -7,6 +7,14 @@
 ```
 
 Upstream: <https://github.com/NotRexed/Hookshot/tree/4cf785a0b143bb34026506c9a3fe4f4bb93c797d>. Hookshot and this patch are GPL-3.0-or-later. Existing upstream notices remain applicable. The new helper and tests are independently authored; no game files, shader code or generated game translations are present.
+
+The renderer capture series applies in order: `compute-identity.patch`,
+`page-table-snapshot.patch`, then `allocation-capture.patch`. See
+[GPU table capture](../../docs/page-table-snapshot.md) and
+[allocation payload capture](../../docs/allocation-capture.md) for opt-in controls,
+build/runtime evidence and remaining replay gaps. Each patch retains the upstream
+license. The independent [input-isolation patch](../../docs/input-isolation.md)
+changes host input routing and does not depend on the renderer series.
 
 ## Purpose
 
@@ -40,7 +48,6 @@ The patch updates three upstream cache/seed-test fixtures to include the new Sta
 - All five selected upstream program-cache checks and the seed-variant cleanup check passed, covering module cleanup, whole/light variant loading and seed-owned module lifetimes.
 - The full upstream game-free suite with the installed Vulkan/SPIR-V headers finished with **501 passed, 1 failed, 20 skipped**. The remaining failure is the existing README menu-row check for `Skip opening`; it reproduces using pristine files from the pinned commit. It is not hidden or fixed by this patch. Platform/GPU-dependent skips remain explicit.
 - A subsequent isolated headless run recorded the bounded set of real identity events; its sanitized metadata is in `research/runtime-identity-observation.json`. Every event matched the selected program, variant and SPIR-V digest. The run preserved the default subgroup policy and stopped cleanly; original installs and saves remained separate. This establishes runtime identity, not resource equivalence or a performance gain.
-- The game-free upstream suite reported 501 passed, one failed and 20 skipped. The sole remaining failure, the README's missing “Skip opening” row, was reproduced against pristine files from the pinned revision; it is not hidden or credited as a passing test.
 
 ## Default behavior
 
