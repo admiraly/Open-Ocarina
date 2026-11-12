@@ -8,6 +8,10 @@ Updated 2026-11-12. This page distinguishes working tools, local observations, a
 - GPU-profile analysis streams Hookshot timing tables, rejects incomplete captures, and ranks consumers using the combined recording/upload denominator.
 - Byte-range comparison requires a hash-pinned reference and explicit bounds. It reports mismatches without dumping original bytes.
 - The publication gate checks tracked/staged files for common private artifact types, binary content, credential-like strings, symlinks and machine-specific paths.
+- NSO analysis conversion validates segment hashes and produces an unrelocated AArch64 ELF locally. The original `main` module was imported successfully.
+- Official Ghidra 12.2, with its release digest verified, completed bounded headless decompilation of two original entries. Decompiled output remains private; original types and source identity are not recovered by this step.
+- Three independently authored C probes are compiled with Clang and compared against complete extents confirmed by original unwind records. Two small leaves match; the lookup probe remains unmatched. See `research/cpu-matching-probe.md`. No project-wide source percentage is inferred.
+- The shader catalog resolved the initial compute target to native seed identity and cached variant/SPIR-V metadata. Full replay capture and the timed variant's runtime identity remain to be implemented; see `research/shader-target.md`.
 
 These tools establish inputs and evidence. They do not reconstruct the game's source or prove a complete matching executable. The synthetic test suite is the CI entry point; optional external-tool probes are validated separately.
 
@@ -27,9 +31,9 @@ The current investigation uses an Intel Arc A770 on Linux and an existing Hooksh
 | Measure | State | Required evidence |
 |---|---|---|
 | Input identity | Inventory tooling implemented | Reproducible module hashes and header validation |
-| Original toolchain reproduction | Unknown | Compiler fingerprints and a repeatable matching probe |
-| Authored source reconstruction | Not established | Reviewed source with provenance and bounded verification |
-| Byte matching | Comparator primitive implemented | Verified function identities, boundaries and reference revision |
+| Original toolchain reproduction | Unknown; leaf feasibility probes run | Nontrivial compiler/ABI and relocation evidence |
+| Authored source reconstruction | Initial independently authored leaf probes | Wider reviewed source with provenance and bounded verification |
+| Byte matching | Two complete leaf probes matched; lookup mismatch retained | Expand function complexity without weakening checks |
 | Relocations and integration | Not established | Relocation-aware checks and an ordinary successful link |
 | Standalone playability | Not established by this repository | Startup, gameplay, save and load tests |
 | Rendering equivalence | Not established for a native rewrite | Reproducible replay and image/behavior checks |
@@ -38,4 +42,4 @@ The current investigation uses an Intel Arc A770 on Linux and an existing Hooksh
 
 ## Next work
 
-Follow the exit tests in [the roadmap](roadmap.md). Prioritize reproducible function and shader targets over broad setting sweeps. Keep private analysis outputs local and publish enough metadata to reproduce the procedure.
+Follow [the Arc-first decision](strategy.md) and the exit tests in [the roadmap](roadmap.md). Prioritize complete shader capture and contract validation, using targeted CPU reconstruction where it resolves an unknown. Keep private analysis outputs local and publish enough metadata to reproduce the procedure.

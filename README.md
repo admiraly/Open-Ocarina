@@ -4,7 +4,9 @@ Source reconstruction and native PC porting research for **The Legend of Zelda: 
 
 The first performance target is correct rendering at a sustained, real **60 FPS on Intel Arc A770**, with a defined scene and settings. Higher quality follows a measured frame-time budget. Modern integrated GPUs are a later, device-specific target.
 
-**Current state:** research tools and verification infrastructure. This repository has no completed source reconstruction or validated performance gain yet. [Status](docs/status.md) records the evidence and limitations; [the roadmap](docs/roadmap.md) defines the next exit tests.
+**Current state:** working analysis tools, bounded Ghidra decompilation, and the first independently authored leaf-function matching probes. There is no complete reconstructed game or validated performance gain yet. [Status](docs/status.md) records the evidence and limitations; [the roadmap](docs/roadmap.md) defines the next exit tests.
+
+**Development strategy:** [Arc-first targeted reconstruction](docs/strategy.md). Full CPU matching is a supporting long-term track, not a prerequisite for fixing the existing open renderer and shader translator.
 
 ## Approach
 
@@ -34,6 +36,13 @@ python3 tools/verify_bytes.py --help
 ```
 
 `inventory.py` reads module hashes and NSO header metadata. `profile.py` ranks captured GPU timing spans and rejects incomplete or loading-only tables by default. `verify_bytes.py` compares an explicitly bounded range against a hash-pinned reference; it does not establish source provenance or validate relocations.
+
+Additional working tools:
+
+- [NSO-to-ELF analysis conversion](docs/nso.md), with segment hash validation and synthetic tests.
+- [Bounded headless Ghidra probes](docs/ghidra.md), validated on two original entry points with private outputs.
+- [Reproducible authored matching probes](research/cpu-matching-probe.md): two complete leaf matches and an honestly reported lookup mismatch.
+- [Metadata-only shader identity catalog](research/shader-target.md) and the [complete replay contract](docs/shader-replay.md).
 
 ## Contribute
 

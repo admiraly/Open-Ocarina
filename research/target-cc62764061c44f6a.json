@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "program": "cc62764061c44f6a",
+  "status": "identified; replay and optimization not implemented",
+  "algorithm": "unknown",
+  "asset_archive": "unknown",
+  "timing_observation": {
+    "source": "Hookshot GPU pass timing, full workload table, 2026-11-12",
+    "ms_per_frame": 7.517,
+    "dispatches_per_frame": 6.0,
+    "combined_profile_total_ms": 80.52,
+    "limitation": "Instrumented spans serialize work; not normal frame latency. Timed variant not proven by program key alone."
+  },
+  "native_identity": {
+    "stage_index": 31129,
+    "nvn_stage": 5,
+    "program": "cc62764061c44f6a",
+    "stored_seed_key": "43c6c94992030687",
+    "native_control_code_sha256": "d25230e04da68341232d28cee40127b6ad03fed45badc68cfcb510ea5587a8be",
+    "native_code_bytes": 43264
+  },
+  "cached_variants": [
+    {
+      "build": "v2.1.0",
+      "cache_stamp": "7f43a9ed301dc7a0",
+      "program": "cc62764061c44f6a",
+      "record_offset": 28054003,
+      "stored_bytes": 264221,
+      "flags": 1,
+      "compute": true,
+      "mesh": false,
+      "variant": "095931037888515a",
+      "answer_count": 4,
+      "question_count": 5,
+      "workgroup": [
+        64,
+        1,
+        1
+      ],
+      "shared_memory_bytes": 0,
+      "stage_count": 1,
+      "first_stage": {
+        "nvn_stage": 5,
+        "vk_stage": 32,
+        "spirv_words": 65730,
+        "spirv_sha256": "0b162edbbc03eb7e59f7f691f3735af2a2932b33910d21a4240cf4bde4965857",
+        "constants_bytes": 0,
+        "constants_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "coverage": "First stage only; compiler-ABI-dependent Shader::Info and remaining stages are not decoded"
+    },
+    {
+      "build": "v2.1.0-rc.3-306-g4cf785a0, native atomic add enabled",
+      "cache_stamp": "d6c0514818a93a6e",
+      "program": "cc62764061c44f6a",
+      "record_offset": 20804167,
+      "stored_bytes": 260557,
+      "flags": 1,
+      "compute": true,
+      "mesh": false,
+      "variant": "095931037888515a",
+      "answer_count": 4,
+      "question_count": 5,
+      "workgroup": [
+        64,
+        1,
+        1
+      ],
+      "shared_memory_bytes": 0,
+      "stage_count": 1,
+      "first_stage": {
+        "nvn_stage": 5,
+        "vk_stage": 32,
+        "spirv_words": 64814,
+        "spirv_file_offset": 20804292,
+        "spirv_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+        "constants_bytes": 0,
+        "constants_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "coverage": "First stage only; compiler-ABI-dependent Shader::Info and remaining stages are not decoded"
+    }
+  ],
+  "nightly_spirv_inspection": {
+    "validator": "SPIRV-Tools v2026.1 unknown hash, 2026-02-16T00:00:00+00:00",
+    "validation_command": "spirv-val --target-env vulkan1.3 --uniform-buffer-standard-layout local/shader-target.spv",
+    "validation_passed": true,
+    "builtins": [
+      "LocalInvocationId",
+      "WorkgroupId"
+    ],
+    "capabilities": [
+      "ImageGatherExtended",
+      "SampledBuffer",
+      "SignedZeroInfNanPreserve",
+      "StorageBufferArrayDynamicIndexing",
+      "PhysicalStorageBufferAddresses",
+      "ImageQuery",
+      "Int64",
+      "Int16",
+      "Shader"
+    ],
+    "group_matrix_barrier_opcode_counts": {},
+    "selected_opcode_counts": {
+      "OpAccessChain": 337,
+      "OpFunctionCall": 72,
+      "OpLoad": 327,
+      "OpLoopMerge": 6,
+      "OpStore": 46
+    },
+    "workgroup_variable_count": 0
+  },
+  "candidate": "Key- and variant-specific unpin experiment after memory-dependency inspection and deterministic output comparison; absence of explicit subgroup operations does not rule out implicit lockstep assumptions or memory races.",
+  "public_artifacts": "Metadata only; native code, SPIR-V and disassembly are not included."
+}
