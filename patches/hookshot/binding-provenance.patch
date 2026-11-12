@@ -1,0 +1,549 @@
+diff --git a/gpu/vk/binding_provenance.h b/gpu/vk/binding_provenance.h
+new file mode 100644
+index 0000000..dde7400
+--- /dev/null
++++ b/gpu/vk/binding_provenance.h
+@@ -0,0 +1,209 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Observation only: no pin, import, discard or shader behavior is changed.
++#pragma once
++#include "allocation_capture.h"
++#include "../../host/capture_backing.h"
++#include <atomic>
++#include <map>
++#include <memory>
++#include <mutex>
++#include <set>
++#ifdef __linux__
++#include <dlfcn.h>
++#endif
++namespace mkwvk::oo_bind {
++inline bool enabled() {
++ static const bool value=[] {const char* p=std::getenv("RX_VK_OO_BINDING_PROVENANCE");return p&&std::string(p)=="1"&&oo_alloc::config().enabled;}();
++ return value;
++}
++struct Host {
++ decltype(&hos_capture_backing_acquire) acquire=nullptr;
++ decltype(&hos_capture_backing_validate) validate=nullptr;
++ decltype(&hos_capture_backing_release) release=nullptr;
++ decltype(&hos_capture_backing_events) events=nullptr;
++};
++inline const Host& host_api() {
++ static const Host api=[] {Host h;
++#ifdef __linux__
++ h.acquire=reinterpret_cast<decltype(h.acquire)>(dlsym(RTLD_DEFAULT,"hos_capture_backing_acquire"));
++ h.validate=reinterpret_cast<decltype(h.validate)>(dlsym(RTLD_DEFAULT,"hos_capture_backing_validate"));
++ h.release=reinterpret_cast<decltype(h.release)>(dlsym(RTLD_DEFAULT,"hos_capture_backing_release"));
++ h.events=reinterpret_cast<decltype(h.events)>(dlsym(RTLD_DEFAULT,"hos_capture_backing_events"));
++#endif
++ return h;}();return api;
++}
++struct Lease {
++ Host api;HosCaptureBackingInfoV1 acquired{};int result=HOS_BACKING_UNKNOWN;
++ explicit Lease(Host h):api(h){}
++ ~Lease(){if(acquired.lease_id&&api.release)api.release(HOS_CAPTURE_BACKING_ABI,acquired.lease_id);}
++ Lease(const Lease&)=delete;Lease& operator=(const Lease&)=delete;
++};
++using LeasePtr=std::shared_ptr<Lease>;
++inline LeasePtr acquire(const Host& api,uint64_t guest,uint64_t size) {
++ auto lease=std::make_shared<Lease>(api);
++ if(api.acquire&&api.validate&&api.release)
++  lease->result=api.acquire(HOS_CAPTURE_BACKING_ABI,guest,size,&lease->acquired,sizeof(lease->acquired));
++ return lease;
++}
++inline bool valid_info(const HosCaptureBackingInfoV1& a,const HosCaptureBackingInfoV1& b,int result) {
++ // A disjoint discard may advance current_generation. The host validation result, immutable acquired
++ // fields, and invalid_reason determine consistency; generation equality alone would reject valid leases.
++ return result==HOS_BACKING_OK&&a.abi_version==HOS_CAPTURE_BACKING_ABI&&a.struct_size==sizeof(a)&&
++  !a.invalid_reason&&!a.invalidated_event&&(a.kind==HOS_BACKING_FILE||a.kind==HOS_BACKING_ANONYMOUS)&&b.kind==a.kind&&b.abi_version==HOS_CAPTURE_BACKING_ABI&&b.struct_size==sizeof(b)&&
++  !b.invalid_reason&&!b.invalidated_event&&b.lease_id==a.lease_id&&b.backing_id==a.backing_id&&
++  b.mapping_id==a.mapping_id&&b.backing_offset==a.backing_offset&&b.size==a.size&&
++  b.acquired_generation==a.acquired_generation&&b.acquired_event==a.acquired_event&&
++  b.current_generation>=a.current_generation&&a.lease_id&&a.backing_id&&a.acquired_generation;
++}
++struct Edge {uint64_t resource_offset=0,size=0,memory_id=0,memory_offset=0,flags=0,sequence=0,completion_sequence=0;bool sparse=false;};
++struct Memory {uint64_t id=0,handle=0,size=0,created=0;std::string kind;LeasePtr lease;};
++struct Object {uint64_t id=0,handle=0,size=0,created=0,allocation_id=0;std::string kind;std::vector<Edge> edges;};
++struct Event {uint64_t sequence=0,object=0,related=0,offset=0,size=0,memory_offset=0,flags=0;std::string kind;int64_t result=0;};
++struct Wanted {uint64_t handle=0,catalog_id=0;std::string kind;};
++struct Captured {Wanted wanted;Object object;bool known=false;};
++struct Snapshot {uint64_t selected_sequence=0;bool lost=false;std::vector<Captured> objects;std::map<uint64_t,Memory> memories;std::vector<Event> events;};
++class Ledger {
++ std::mutex mutex_;uint64_t serial_=0;bool lost_=false;
++ std::map<uint64_t,Object> buffers_,images_;std::map<uint64_t,Memory> memories_;
++ std::vector<Event> events_;
++ uint64_t next(){if(serial_==UINT64_MAX){lost_=true;return 0;}return ++serial_;}
++ uint64_t event(const char* kind,uint64_t object=0,uint64_t related=0,uint64_t offset=0,uint64_t size=0,uint64_t mo=0,uint64_t flags=0,int64_t result=0) {
++  if(events_.size()>=131072){lost_=true;return 0;}
++  const auto n=next();events_.push_back({n,object,related,offset,size,mo,flags,kind,result});return n;
++ }
++ std::map<uint64_t,Object>& objects(const std::string& kind){return kind=="image"?images_:buffers_;}
++public:
++ void lose(){std::lock_guard lock(mutex_);lost_=true;}
++ uint64_t attempt(const char* kind,uint64_t size) {std::lock_guard lock(mutex_);return event(kind,0,0,0,size);}
++ void failed(uint64_t attempt,int64_t result){std::lock_guard lock(mutex_);event("import_rollback",0,attempt,0,0,0,0,result);}
++ void memory(uint64_t handle,uint64_t size,const char* kind,LeasePtr lease={},uint64_t attempt=0) {
++  if(!handle)return;
++  std::lock_guard lock(mutex_);
++  if(memories_.count(handle)||memories_.size()>=65536){lost_=true;return;}
++  Memory m;m.id=next();m.handle=handle;m.size=size;m.kind=kind;m.lease=std::move(lease);m.created=event("memory_create",m.id,attempt,0,size);
++  memories_.emplace(handle,std::move(m));
++ }
++ LeasePtr free_memory(uint64_t handle){std::lock_guard lock(mutex_);auto it=memories_.find(handle);if(it==memories_.end()){if(handle)lost_=true;return {};}event("memory_free",it->second.id);auto lease=it->second.lease;memories_.erase(it);return lease;}
++ void object(uint64_t handle,uint64_t size,const char* kind="buffer",bool allocation=false) {
++  if(!handle)return;
++  std::lock_guard lock(mutex_);auto& table=objects(kind);
++  if(table.count(handle)||table.size()>=65536){lost_=true;return;}
++  Object o;o.id=next();o.handle=handle;o.size=size;o.kind=kind;o.allocation_id=allocation?next():0;o.created=event("resource_create",o.id,o.allocation_id,0,size);
++  table.emplace(handle,std::move(o));
++ }
++ void destroy(uint64_t handle,const char* kind="buffer") {std::lock_guard lock(mutex_);auto& table=objects(kind);auto it=table.find(handle);if(it==table.end()){if(handle)lost_=true;return;}event("resource_destroy",it->second.id,it->second.allocation_id);table.erase(it);}
++ void bind(uint64_t handle,uint64_t memory,uint64_t resource_offset,uint64_t size,uint64_t memory_offset,uint64_t flags=0,bool sparse=false,uint64_t completed=0,const char* kind="buffer") {
++  std::lock_guard lock(mutex_);auto& table=objects(kind);auto object=table.find(handle);auto m=memories_.find(memory);
++  if(object==table.end()||m==memories_.end()||!size||resource_offset>UINT64_MAX-size||memory_offset>m->second.size||size>m->second.size-memory_offset){lost_=true;return;}
++  const auto seq=event(sparse?"sparse_bind_commit":"ordinary_bind_commit",object->second.id,m->second.id,resource_offset,size,memory_offset,flags);
++  object->second.edges.push_back({resource_offset,size,m->second.id,memory_offset,flags,seq,completed,sparse});
++ }
++ uint64_t sparse_submitted(uint64_t buffer,int64_t result){std::lock_guard lock(mutex_);auto it=buffers_.find(buffer);return event("sparse_queue_result",it==buffers_.end()?0:it->second.id,0,0,0,0,0,result);}
++ uint64_t sparse_completed(uint64_t submitted,int64_t result){std::lock_guard lock(mutex_);return event("sparse_fence_result",0,submitted,0,0,0,0,result);}
++ Snapshot snapshot(const std::vector<Wanted>& wanted) {
++  std::lock_guard lock(mutex_);Snapshot s;s.selected_sequence=event("capture_selected");s.lost=lost_;s.events=events_;
++  for(const auto& w:wanted) {
++   Captured c;c.wanted=w;auto& table=objects(w.kind);auto it=table.find(w.handle);
++   if(it!=table.end()){c.known=true;c.object=it->second;
++    for(const auto& edge:c.object.edges){auto m=std::find_if(memories_.begin(),memories_.end(),[&](const auto& p){return p.second.id==edge.memory_id;});
++     if(m==memories_.end())s.lost=true;else s.memories.emplace(m->second.id,m->second);}
++   }s.objects.push_back(std::move(c));
++  }return s;
++ }
++ bool healthy(){std::lock_guard lock(mutex_);return !lost_;}
++};
++inline Ledger& ledger(){static Ledger value;return value;}
++template<class F> inline void observe(F fn) noexcept {if(!enabled())return;try{fn(ledger());}catch(...){ledger().lose();}}
++inline LeasePtr import_lease(uint64_t guest,uint64_t size) noexcept {
++ if(!enabled())return {};
++ try{return acquire(host_api(),guest,size);}catch(...){ledger().lose();return {};}
++}
++struct ImportAttempt {
++ uint64_t sequence=0;LeasePtr lease;bool committed=false;int64_t result=-1;
++ ImportAttempt(uint64_t guest,uint64_t size,const char* kind) {
++  if(!enabled())return;
++  // Acquired before udmabuf creation / VkImportMemoryHostPointerInfoEXT allocation.
++  lease=import_lease(guest,size);observe([&](Ledger& l){sequence=l.attempt(kind,size);});
++ }
++ void commit(uint64_t memory,uint64_t size,const char* kind) {
++  observe([&](Ledger& l){l.memory(memory,size,kind,lease,sequence);});committed=true;
++ }
++ ~ImportAttempt(){if(sequence&&!committed)observe([&](Ledger& l){l.failed(sequence,result);});}
++};
++inline std::string hex(uint64_t n){char b[17];std::snprintf(b,sizeof b,"%016llx",(unsigned long long)n);return b;}
++inline void info_json(std::ostream& out,const HosCaptureBackingInfoV1& i) {
++ out<<"{\"abi_version\":"<<i.abi_version<<",\"struct_size\":"<<i.struct_size<<",\"kind\":"<<i.kind<<",\"invalid_reason\":"<<i.invalid_reason
++ <<",\"lease_id\":"<<i.lease_id<<",\"backing_id\":"<<i.backing_id<<",\"mapping_id\":"<<i.mapping_id<<",\"backing_offset\":"<<i.backing_offset
++ <<",\"size\":"<<i.size<<",\"acquired_generation\":"<<i.acquired_generation<<",\"current_generation\":"<<i.current_generation
++ <<",\"acquired_event\":"<<i.acquired_event<<",\"invalidated_event\":"<<i.invalidated_event<<"}";
++}
++inline bool covered(const Object& object,const std::map<uint64_t,Memory>& memories) {
++ if(object.kind=="image")return object.edges.size()==1; // Exact image VMA allocation interval, not a linear image footprint.
++ std::vector<std::pair<uint64_t,uint64_t>> intervals;
++ for(const auto& e:object.edges) {
++  if(!memories.count(e.memory_id)||!e.sequence||(e.sparse&&!e.completion_sequence))return false;
++  const auto hi=std::min(object.size,e.resource_offset+e.size);if(e.resource_offset<hi)intervals.emplace_back(e.resource_offset,hi);
++ }
++ std::sort(intervals.begin(),intervals.end());uint64_t end=0;
++ for(const auto& i:intervals){if(i.first!=end)return false;end=i.second;}
++ return end==object.size&&object.size;
++}
++inline bool write_completed(const Snapshot& s,const oo_pt::Request& req,uint64_t completed,uint64_t occurrence,bool runtime_healthy=true) {
++ if(!enabled()||!req.submitted_sequence||completed<req.submitted_sequence||!s.selected_sequence)return false;
++ std::vector<std::string> gaps;if(s.objects.empty())gaps.push_back("empty_catalog");if(s.lost||!runtime_healthy)gaps.push_back("ledger_history_lost");
++ for(const auto& c:s.objects)if(!c.known)gaps.push_back("untracked_resource_owner");else if(!covered(c.object,s.memories))gaps.push_back("bind_interval_gap_or_overlap");
++ struct Validation {int result=HOS_BACKING_UNKNOWN;HosCaptureBackingInfoV1 info{};};std::map<uint64_t,Validation> validation;
++ for(const auto& item:s.memories){const auto& m=item.second;if(m.kind=="vma")continue;Validation v;
++  if(m.lease&&m.lease->result==HOS_BACKING_OK&&m.lease->api.validate)v.result=m.lease->api.validate(HOS_CAPTURE_BACKING_ABI,m.lease->acquired.lease_id,&v.info,sizeof(v.info));
++  if(!m.lease||m.lease->result!=HOS_BACKING_OK||m.lease->acquired.size!=m.size||!valid_info(m.lease->acquired,v.info,v.result))gaps.push_back("host_backing_lease_invalid_or_unavailable");
++  validation[item.first]=v;
++ }
++ std::vector<HosCaptureBackingEventV1> host_events;uint64_t host_endpoint=0;bool host_complete=true;
++ if(!validation.empty()) {
++  const auto& api=host_api();host_complete=api.events!=nullptr;
++  while(host_complete&&host_events.size()<65536) {
++   HosCaptureBackingEventV1 batch[256]{};uint64_t next=host_endpoint;
++   const int count=api.events(HOS_CAPTURE_BACKING_ABI,host_endpoint,batch,256,sizeof(batch[0]),&next);
++   if(count<0||count>256||(count&&next<=host_endpoint)){host_complete=false;break;}
++   if(!count)break;
++   for(int i=0;i<count;++i) {
++    if(batch[i].abi_version!=HOS_CAPTURE_BACKING_ABI||batch[i].struct_size!=sizeof(batch[i])||batch[i].event_id<=host_endpoint){host_complete=false;break;}
++    host_endpoint=batch[i].event_id;host_events.push_back(batch[i]);
++   }
++   if(next!=host_endpoint){host_complete=false;break;}
++  }
++  if(host_events.size()>=65536)host_complete=false;
++  if(!host_complete)gaps.push_back("host_event_history_unavailable_or_exhausted");
++  // Detect an overlapping invalidation after an earlier individual validation. This remains
++  // diagnostic metadata at host_endpoint, not an atomic content/writer epoch or a discard gate.
++  for(const auto& item:s.memories)if(item.second.lease) {
++   const auto& a=item.second.lease->acquired;
++   for(const auto& e:host_events)if(e.event_id>a.acquired_event&&e.backing_id==a.backing_id&&
++      e.kind!=HOS_BACKING_MAPPING_COMMIT&&a.backing_offset<=UINT64_MAX-a.size&&e.backing_offset<=UINT64_MAX-e.size&&
++      a.backing_offset<e.backing_offset+e.size&&e.backing_offset<a.backing_offset+a.size)
++       gaps.push_back("host_invalidation_before_export_endpoint");
++  }
++ }
++ std::sort(gaps.begin(),gaps.end());gaps.erase(std::unique(gaps.begin(),gaps.end()),gaps.end());
++ const auto final=std::filesystem::path(oo_pt::config().directory)/"binding-provenance.json";const auto part=std::filesystem::path(final.string()+".part");
++ if(oo_pt::present(final)||oo_pt::present(part))return false;
++ std::ostringstream out;out<<"{\"schema\":\"open-ocarina.binding-provenance/v1\",\"replay_complete\":false,\"cpu_writers_quiesced\":false,\"backing_provenance_complete\":"<<(gaps.empty()?"true":"false")
++ <<",\"catalog_scope\":\"selected buffer and image catalog; not all Vulkan objects\",\"host_event_endpoint\":"<<host_endpoint<<",\"host_event_history_complete\":"<<(host_complete?"true":"false")
++ <<",\"registry_start_sequence\":0,\"selected_ledger_sequence\":"<<s.selected_sequence<<",\"recording_part\":"<<req.recording_part<<",\"logical_value\":"<<req.logical_value
++ <<",\"recording_sequence\":"<<req.submitted_sequence<<",\"completed_recording_sequence\":"<<completed<<",\"selected_occurrence\":"<<occurrence
++ <<",\"program\":\""<<hex(req.key)<<"\",\"variant\":\""<<hex(req.variant)<<"\",\"spirv_sha256\":\""<<req.shader_digest<<"\",\"objects\":[";
++ bool comma=false;for(const auto& c:s.objects){if(comma)out<<',';comma=true;out<<"{\"catalog_id\":"<<c.wanted.catalog_id<<",\"kind\":\""<<c.wanted.kind<<"\",\"handle\":\""<<hex(c.wanted.handle)<<"\",\"tracked\":"<<(c.known?"true":"false");
++  if(c.known){const auto& o=c.object;out<<",\"lifetime_id\":"<<o.id<<",\"created_sequence\":"<<o.created<<",\"size\":"<<o.size<<",\"allocation_lifetime_id\":"<<o.allocation_id<<",\"edges\":[";
++   bool ec=false;for(const auto& e:o.edges){if(ec)out<<',';ec=true;out<<"{\"resource_offset\":"<<e.resource_offset<<",\"size\":"<<e.size<<",\"memory_lifetime_id\":"<<e.memory_id<<",\"memory_offset\":"<<e.memory_offset<<",\"flags\":"<<e.flags<<",\"bind_sequence\":"<<e.sequence<<",\"sparse\":"<<(e.sparse?"true":"false")<<",\"fence_completion_sequence\":"<<e.completion_sequence<<"}";}out<<']';}out<<'}';
++ }out<<"],\"memories\":[";comma=false;
++ for(const auto& item:s.memories){if(comma)out<<',';comma=true;const auto& m=item.second;out<<"{\"lifetime_id\":"<<m.id<<",\"handle\":\""<<hex(m.handle)<<"\",\"size\":"<<m.size<<",\"kind\":\""<<m.kind<<"\",\"created_sequence\":"<<m.created;
++  if(m.kind!="vma"){const auto& v=validation.at(item.first);out<<",\"acquire_result\":"<<(m.lease?m.lease->result:HOS_BACKING_UNKNOWN)<<",\"acquired\":";info_json(out,m.lease?m.lease->acquired:HosCaptureBackingInfoV1{});out<<",\"validation_result\":"<<v.result<<",\"validated\":";info_json(out,v.info);}out<<'}';
++ }out<<"],\"events\":[";comma=false;for(const auto& e:s.events){if(comma)out<<',';comma=true;out<<"{\"sequence\":"<<e.sequence<<",\"kind\":\""<<e.kind<<"\",\"object\":"<<e.object<<",\"related\":"<<e.related<<",\"offset\":"<<e.offset<<",\"size\":"<<e.size<<",\"memory_offset\":"<<e.memory_offset<<",\"flags\":"<<e.flags<<",\"result\":"<<e.result<<'}';}
++ out<<"],\"host_events\":[";comma=false;for(const auto& e:host_events){if(comma)out<<',';comma=true;out<<"{\"event_id\":"<<e.event_id<<",\"kind\":"<<e.kind<<",\"result_errno\":"<<e.result_errno<<",\"backing_id\":"<<e.backing_id<<",\"mapping_id\":"<<e.mapping_id<<",\"backing_offset\":"<<e.backing_offset<<",\"size\":"<<e.size<<",\"generation\":"<<e.generation<<'}';}
++ out<<"],\"gaps\":[";comma=false;for(const auto& g:gaps){if(comma)out<<',';comma=true;out<<'"'<<g<<'"';}out<<"],\"remaining_gates\":[\"cpu_writer_epoch\",\"temporal_state\",\"canonical_alias_payload_agreement\",\"independent_output_comparison\"]}\n";
++ const auto bytes=out.str();FILE* file=std::fopen(part.string().c_str(),"wbx");if(!file)return false;
++ const bool wrote=std::fwrite(bytes.data(),1,bytes.size(),file)==bytes.size();const bool closed=std::fclose(file)==0;
++ if(!wrote||!closed){std::remove(part.string().c_str());return false;}
++ std::error_code error;std::filesystem::rename(part,final,error);if(error){std::remove(part.string().c_str());return false;}return true;
++}
++} // namespace mkwvk::oo_bind
+diff --git a/gpu/vk/vk_memory.cpp b/gpu/vk/vk_memory.cpp
+index 8f226fc..ba805fc 100644
+--- a/gpu/vk/vk_memory.cpp
++++ b/gpu/vk/vk_memory.cpp
+@@ -28,6 +28,7 @@
+ 
+ #include "vk_internal.h"
+ #include "page_table_capture.h"
++#include "binding_provenance.h"
+ #include "image_capture.h"
+ #include "dispatch_parameters.h"
+ #include <vk_mem_alloc.h>
+@@ -60,9 +61,19 @@ namespace {
+ // Published imports reach it only at the existing completion/eviction gates; no additional GPU wait.
+ void destroy_import_buffer(VkBuffer buffer) {
+     release_texel_buffer_views(buffer);
++    oo_bind::observe([&](auto& ledger){ledger.destroy((uint64_t)(uintptr_t)buffer);});
+     vkDestroyBuffer(dev.device, buffer, nullptr);
+ }
+ 
++// Remove a lifetime before its handle can be recycled, but keep the original import lease
++// through vkFreeMemory. Snapshot copies can retain that lease beyond resource retirement.
++void free_import_memory(VkDeviceMemory memory) {
++    if(!memory)return;
++    oo_bind::LeasePtr lease;
++    oo_bind::observe([&](auto& ledger){lease=ledger.free_memory((uint64_t)(uintptr_t)memory);});
++    vkFreeMemory(dev.device,memory,nullptr);
++}
++
+ struct Pool {
+     uint64_t lo = 0, hi = 0;   // guest range imported (aligned outwards)
+     uint64_t range_lo = 0, range_hi = 0;   // (the game's pool range it was found for: pool_of's last hit)
+@@ -173,6 +184,7 @@ uint64_t dmabuf_limit = 0;
+ 
+ /// The memory of guest [lo, lo + size) as an imported dma-buf; VK_NULL_HANDLE when udmabuf or the import refused it
+ VkDeviceMemory dma_buf_memory(uint64_t lo, uint64_t size) {
++    oo_bind::ImportAttempt provenance(lo,size,"dmabuf_attempt");
+     UdmabufCreate c{(uint32_t)dmabuf_memfd, 1 /* UDMABUF_FLAGS_CLOEXEC */, lo, size};
+     const int fd = ioctl(dmabuf_dev, kUdmabufCreate, &c);
+     if (fd < 0) {
+@@ -217,6 +229,7 @@ VkDeviceMemory dma_buf_memory(uint64_t lo, uint64_t size) {
+                  (unsigned long long)(lo + size), (int)r);
+         return VK_NULL_HANDLE;
+     }
++    provenance.commit((uint64_t)(uintptr_t)memory,size,"dma-buf");
+     return memory;
+ }
+ 
+@@ -234,6 +247,7 @@ bool import_dma_buf_pieces(uint64_t lo, uint64_t hi, uint64_t piece, Pool& p) {
+         if (dmabuf_failures++ < 8) logf("vk: pool %#llx..%#llx: no sparse buffer for its dma-bufs", (unsigned long long)lo, (unsigned long long)hi);
+         return false;
+     }
++    oo_bind::observe([&](auto& ledger){ledger.object((uint64_t)(uintptr_t)buffer,bi.size);});
+     VkMemoryRequirements req{};
+     vkGetBufferMemoryRequirements(dev.device, buffer, &req);
+     // (each piece starts at a multiple of the sparse block size; the last runs to the end of what the buffer needs, past hi
+@@ -257,6 +271,7 @@ bool import_dma_buf_pieces(uint64_t lo, uint64_t hi, uint64_t piece, Pool& p) {
+         memories.push_back(m);
+         binds.push_back({off, n, m, 0, 0});
+     }
++    uint64_t provenance_submission=0,provenance_completion=0;
+     VkResult res = VK_ERROR_UNKNOWN;
+     if (binds.size() == (req.size + piece - 1) / piece) {
+         VkSparseBufferMemoryBindInfo bb{buffer, (uint32_t)binds.size(), binds.data()};
+@@ -274,20 +289,24 @@ bool import_dma_buf_pieces(uint64_t lo, uint64_t hi, uint64_t piece, Pool& p) {
+             std::lock_guard qk(dev.present_mu);
+             queue_flush_locked();
+             res = vkQueueBindSparse(dev.queue, 1, &si, fence);
++            oo_bind::observe([&](auto& ledger){provenance_submission=ledger.sparse_submitted((uint64_t)(uintptr_t)buffer,res);});
+         }
+         if (res == VK_SUCCESS) {
+             res = vkWaitForFences(dev.device, 1, &fence, VK_TRUE, UINT64_MAX);
++            oo_bind::observe([&](auto& ledger){provenance_completion=ledger.sparse_completed(provenance_submission,res);});
+             vkResetFences(dev.device, 1, &fence);
+         }
+     }
+     if (res != VK_SUCCESS) {
+         destroy_import_buffer(buffer);
+-        for (VkDeviceMemory m : memories) vkFreeMemory(dev.device, m, nullptr);
++        for (VkDeviceMemory m : memories) free_import_memory(m);
+         if (dmabuf_failures++ < 8)
+             logf("vk: pool %#llx..%#llx: its %zu dma-bufs not bound (VkResult %d)", (unsigned long long)lo, (unsigned long long)hi,
+                  memories.size(), (int)res);
+         return false;
+     }
++    oo_bind::observe([&](auto& ledger){for(const auto& bind:binds)ledger.bind((uint64_t)(uintptr_t)buffer,
++        (uint64_t)(uintptr_t)bind.memory,bind.resourceOffset,bind.size,bind.memoryOffset,bind.flags,true,provenance_completion);});
+     p.lo = lo, p.hi = hi, p.buffer = buffer, p.memory = memories[0];
+     p.pieces.assign(memories.begin() + 1, memories.end());
+     return true;
+@@ -340,14 +359,16 @@ bool import_dma_buf(uint64_t lo, uint64_t hi, Pool& p) {
+         bi.usage = kUsage;
+         VkBuffer buffer = VK_NULL_HANDLE;
+         if (vkCreateBuffer(dev.device, &bi, nullptr, &buffer) != VK_SUCCESS) return false;
++        oo_bind::observe([&](auto& ledger){ledger.object((uint64_t)(uintptr_t)buffer,bi.size);});
+         const VkDeviceMemory memory = dma_buf_memory(lo, hi - lo);
+         // Allocation alone does not make the buffer usable. A failed bind owns both resources,
+         // but must leave no partial import for the host-pointer fallback to publish.
+         if (!memory || vkBindBufferMemory(dev.device, buffer, memory, 0) != VK_SUCCESS) {
+             destroy_import_buffer(buffer);
+-            if (memory) vkFreeMemory(dev.device, memory, nullptr);
++            if (memory) free_import_memory(memory);
+             return false;
+         }
++        oo_bind::observe([&](auto& ledger){ledger.bind((uint64_t)(uintptr_t)buffer,(uint64_t)(uintptr_t)memory,0,bi.size,0);});
+         p.lo = lo, p.hi = hi, p.buffer = buffer, p.memory = memory;
+     }
+     VkBufferDeviceAddressInfo da{VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO};
+@@ -444,7 +465,9 @@ bool import_pool(uint64_t lo, uint64_t hi, Pool& p) {
+         import_remember_failure(lo, hi);
+         return false;
+     }
++    oo_bind::observe([&](auto& ledger){ledger.object((uint64_t)(uintptr_t)p.buffer,bi.size);});
+     t2 = clk::now();
++    oo_bind::ImportAttempt provenance(lo,bytes,"host_pointer_attempt");
+     VkImportMemoryHostPointerInfoEXT im{VK_STRUCTURE_TYPE_IMPORT_MEMORY_HOST_POINTER_INFO_EXT};
+     im.handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_HOST_ALLOCATION_BIT_EXT;
+     im.pHostPointer = ptr;
+@@ -456,16 +479,19 @@ bool import_pool(uint64_t lo, uint64_t hi, Pool& p) {
+     ai.allocationSize = bytes;
+     ai.memoryTypeIndex = type;
+     const VkResult allocated = vkAllocateMemory(dev.device, &ai, nullptr, &p.memory);
++    provenance.result=allocated;
++    if(allocated==VK_SUCCESS)provenance.commit((uint64_t)(uintptr_t)p.memory,bytes,"host-pointer");
+     t3 = clk::now();
+     const VkResult bound = allocated == VK_SUCCESS ? vkBindBufferMemory(dev.device, p.buffer, p.memory, 0) : allocated;
+     if (bound != VK_SUCCESS) {
+         import_result = bound;
+         destroy_import_buffer(p.buffer);
+-        if (allocated == VK_SUCCESS) vkFreeMemory(dev.device, p.memory, nullptr);
++        if (allocated == VK_SUCCESS) free_import_memory(p.memory);
+         p.buffer = VK_NULL_HANDLE, p.memory = VK_NULL_HANDLE;
+         import_remember_failure(lo, hi);
+         return false;
+     }
++    oo_bind::observe([&](auto& ledger){ledger.bind((uint64_t)(uintptr_t)p.buffer,(uint64_t)(uintptr_t)p.memory,0,bi.size,0);});
+     VkBufferDeviceAddressInfo da{VK_STRUCTURE_TYPE_BUFFER_DEVICE_ADDRESS_INFO};
+     da.buffer = p.buffer;
+     p.address = vkGetBufferDeviceAddress(dev.device, &da);
+@@ -495,6 +521,7 @@ struct OoPagePending {
+ };
+ OoPagePending oo_page_pending;
+ oo_dp::Capture oo_dispatch_pending;
++oo_bind::Snapshot oo_binding_pending;
+ oo_alloc::SelectionCounter oo_capture_selection;
+ std::mutex oo_page_mutex;
+ }
+@@ -2265,8 +2292,8 @@ void bg_drain() {
+         auto imp = imported.find(lo);
+         if (imp != imported.end() && imp->second.hi >= p.hi) {
+             destroy_import_buffer(p.buffer);
+-            vkFreeMemory(dev.device, p.memory, nullptr);
+-            for (VkDeviceMemory m : p.pieces) vkFreeMemory(dev.device, m, nullptr);
++            free_import_memory(p.memory);
++            for (VkDeviceMemory m : p.pieces) free_import_memory(m);
+             continue;
+         }
+         bool overlap = false;   // (amd-fix: a chunk imported ahead that an import made since covers in part: the pools stay disjoint)
+@@ -2283,8 +2310,8 @@ void bg_drain() {
+         if (overlap) {
+             st_prefetch_dropped++;
+             destroy_import_buffer(p.buffer);
+-            vkFreeMemory(dev.device, p.memory, nullptr);
+-            for (VkDeviceMemory m : p.pieces) vkFreeMemory(dev.device, m, nullptr);
++            free_import_memory(p.memory);
++            for (VkDeviceMemory m : p.pieces) free_import_memory(m);
+             continue;
+         }
+         if (imp != imported.end()) retire_pool(imp);
+@@ -3366,8 +3393,8 @@ void reap_mirrors() {   // (pools_mu held)
+     }
+     while (!dead_imports.empty() && dead_imports.front().value <= mem_completed && !oo_retained_buffers.count(dead_imports.front().buffer)) {
+         destroy_import_buffer(dead_imports.front().buffer);
+-        vkFreeMemory(dev.device, dead_imports.front().memory, nullptr);
+-        for (VkDeviceMemory m : dead_imports.front().pieces) vkFreeMemory(dev.device, m, nullptr);
++        free_import_memory(dead_imports.front().memory);
++        for (VkDeviceMemory m : dead_imports.front().pieces) free_import_memory(m);
+         st_retired_imports_freed++, st_retired_import_bytes_freed += dead_imports.front().bytes;
+         dead_import_bytes -= std::min(dead_import_bytes, dead_imports.front().bytes);
+         dead_imports.pop_front();
+@@ -3538,8 +3565,8 @@ void imports_give_back() {   // (pools_mu held)
+     while (!evicted_pools.empty() && evicted_pools.front().mapped().retired_value <= mem_completed && !oo_retained_buffers.count(evicted_pools.front().mapped().buffer)) {
+         Pool& p = evicted_pools.front().mapped();
+         destroy_import_buffer(p.buffer);
+-        vkFreeMemory(dev.device, p.memory, nullptr);
+-        for (VkDeviceMemory m : p.pieces) vkFreeMemory(dev.device, m, nullptr);   // (a pool imported as several dma-bufs)
++        free_import_memory(p.memory);
++        for (VkDeviceMemory m : p.pieces) free_import_memory(m);   // (a pool imported as several dma-bufs)
+         evicted_pools.pop_front();
+     }
+     // (hookshot) Off by default on Windows (device losses on Intel Arc and AMD right after imports went back, issues
+@@ -3667,8 +3694,8 @@ bool mirrors_trim() {   // (pools_mu held; true when one was trimmed: its parts
+         if (!import_pool(r.lo, r.hi, np)) {
+             for (Pool& m : made) {
+                 destroy_import_buffer(m.buffer);
+-                vkFreeMemory(dev.device, m.memory, nullptr);
+-                for (VkDeviceMemory piece : m.pieces) vkFreeMemory(dev.device, piece, nullptr);
++                free_import_memory(m.memory);
++                for (VkDeviceMemory piece : m.pieces) free_import_memory(piece);
+             }
+             pick->dead_since = mirror_epoch;   // (not again for a while)
+             return false;
+@@ -4772,6 +4799,15 @@ void oo_allocation_record(VkCommandBuffer cmd) { // oo_page_mutex held; no CPU g
+             state.failures.push_back("descriptor_range_unresolved");
+     }
+     oo_image_prepare(cmd);
++    oo_bind::observe([&](auto& ledger){
++        std::vector<oo_bind::Wanted> wanted;
++        for(size_t i=0;i<state.rows.size();++i)wanted.push_back({state.rows[i].buffer,i,"buffer"});
++        for(size_t i=0;i<state.image_rows.size();++i) {
++            const auto handle=state.image_rows[i].image.handle;
++            if(std::none_of(wanted.begin(),wanted.end(),[&](const auto& item){return item.kind=="image"&&item.handle==handle;}))wanted.push_back({handle,i,"image"});
++        }
++        oo_binding_pending=ledger.snapshot(wanted);
++    });
+     logf("vk: Open-Ocarina allocation catalog: %zu candidates, %llu source bytes, %llu required staging bytes, budget %llu (not replay)",
+         state.rows.size(),(unsigned long long)state.candidate_bytes,(unsigned long long)(state.candidate_bytes*2),(unsigned long long)oo_alloc::config().budget);
+     const bool bounded=state.candidate_bytes<=UINT64_MAX/2&&state.candidate_bytes*2<=oo_alloc::config().budget&&
+@@ -4809,6 +4845,7 @@ void oo_allocation_release() { // oo_page_mutex held; cancellation or exact comp
+     state.retained_images.clear();
+     for(auto buffer:state.retained_renderer_buffers)memory_allocation_release_buffer(buffer);
+     state.retained_renderer_buffers.clear();state.copies_by_row.clear();state.active=false;
++    oo_binding_pending={};
+ }
+ void oo_allocation_collect(const oo_pt::Request& request,uint64_t completed,bool table_ok,const uint8_t* table) {
+     auto& state=oo_alloc_pending;if(!state.active)return;
+@@ -4837,6 +4874,11 @@ void oo_allocation_collect(const oo_pt::Request& request,uint64_t completed,bool
+         logf("vk: Open-Ocarina allocation evidence %s: mapped %llu unresolved %llu ambiguous %llu partial %llu missing payload %llu (NOT full replay)",ok?"exported":"failed",
+             (unsigned long long)coverage.mapped,(unsigned long long)coverage.unresolved,(unsigned long long)coverage.ambiguous,(unsigned long long)coverage.partial,(unsigned long long)coverage.missing_payload);
+     }catch(const std::exception& error){logf("vk: Open-Ocarina allocation export failed: %s",error.what());}
++    if(oo_bind::enabled()) {
++        try {const bool ok=oo_bind::write_completed(oo_binding_pending,request,completed,oo_capture_selection.observed,oo_bind::ledger().healthy());
++            logf("vk: Open-Ocarina binding provenance %s (writer epoch and physical replay still unproven)",ok?"exported":"failed");
++        }catch(const std::exception& error){logf("vk: Open-Ocarina binding provenance export failed: %s",error.what());}
++    }
+     oo_allocation_release();
+ }
+ 
+diff --git a/gpu/vk/vk_vma.cpp b/gpu/vk/vk_vma.cpp
+index 386ab1e..a3f6d70 100644
+--- a/gpu/vk/vk_vma.cpp
++++ b/gpu/vk/vk_vma.cpp
+@@ -16,6 +16,7 @@
+ #endif
+ #include "vram_compact.h"
+ #include "image_capture.h"
++#include "binding_provenance.h"
+ #include <map>
+ #include <mutex>
+ #include "vk_work.h"   // (last: RX_VK_RECORDER=defer drains before the destructions and the invalidate below)
+@@ -24,10 +25,30 @@ namespace mkwvk {
+ 
+ VmaAllocator vma;
+ namespace {
++void oo_provenance_resource(uint64_t handle,const char* kind,uint64_t size,VmaAllocation allocation) {
++    oo_bind::observe([&](auto& ledger){VmaAllocationInfo info{};vmaGetAllocationInfo(vma,allocation,&info);
++        ledger.object(handle,size?size:info.size,kind,true);
++        ledger.bind(handle,(uint64_t)(uintptr_t)info.deviceMemory,0,size?size:info.size,info.offset,0,false,0,kind);});
++}
++void oo_destroy_vma_buffer(VkBuffer buffer,VmaAllocation allocation) {
++    oo_bind::observe([&](auto& ledger){ledger.destroy((uint64_t)(uintptr_t)buffer);});
++    vmaDestroyBuffer(vma,buffer,allocation);
++}
++void oo_destroy_vma_image(VkImage image,VmaAllocation allocation) {
++    oo_bind::observe([&](auto& ledger){ledger.destroy((uint64_t)(uintptr_t)image,"image");});
++    vmaDestroyImage(vma,image,allocation);
++}
++void VKAPI_PTR oo_vma_memory_created(VmaAllocator,uint32_t,VkDeviceMemory memory,VkDeviceSize size,void*) {
++    oo_bind::observe([&](auto& ledger){ledger.memory((uint64_t)(uintptr_t)memory,size,"vma");});
++}
++void VKAPI_PTR oo_vma_memory_freed(VmaAllocator,uint32_t,VkDeviceMemory memory,VkDeviceSize,void*) {
++    oo_bind::observe([&](auto& ledger){ledger.free_memory((uint64_t)(uintptr_t)memory);});
++}
+ struct OoOwnedBuffer { OoBufferOwner owner; uint32_t references=0; bool destroy_pending=false; };
+ std::map<VkBuffer,OoOwnedBuffer> oo_buffer_owners;
+ std::mutex oo_buffer_owners_mutex;
+ void oo_register_buffer(VkBuffer buffer,uint64_t size,VkBufferUsageFlags usage,VmaAllocation allocation) {
++    oo_provenance_resource((uint64_t)(uintptr_t)buffer,"buffer",size,allocation);
+     if(!oo_alloc::config().enabled)return;
+     std::lock_guard lock(oo_buffer_owners_mutex);
+     if(oo_buffer_owners.size()>=65536){logf("vk: Open-Ocarina VMA owner registry limit reached; further descriptor owners unresolved");return;}
+@@ -48,7 +69,7 @@ void memory_allocation_release_buffer(VkBuffer buffer) {
+         if(it==oo_buffer_owners.end()||!it->second.references)return;
+         if(!--it->second.references&&it->second.destroy_pending){destroy=it->second.owner.allocation;oo_buffer_owners.erase(it);}
+     }
+-    if(destroy)vmaDestroyBuffer(vma,buffer,destroy);
++    if(destroy)oo_destroy_vma_buffer(buffer,destroy);
+ }
+ 
+ namespace {
+@@ -58,6 +79,7 @@ std::map<VkImageView,oo_img::View> oo_views;
+ std::map<VkSampler,oo_img::Sampler> oo_samplers;
+ std::mutex oo_images_mutex;
+ void oo_image_created(VkImage image,VmaAllocation allocation,const VkImageCreateInfo& ci) {
++ oo_provenance_resource((uint64_t)(uintptr_t)image,"image",0,allocation);
+  if(!oo_img::config().enabled)return;
+  oo_img::Image value;value.handle=(uint64_t)(uintptr_t)image;value.flags=ci.flags;value.type=ci.imageType;value.format=ci.format;
+  value.width=ci.extent.width;value.height=ci.extent.height;value.depth=ci.extent.depth;value.mips=ci.mipLevels;value.layers=ci.arrayLayers;
+@@ -90,7 +112,7 @@ void memory_image_release(VkImage image) {
+  VmaAllocation destroy=nullptr;
+  {std::lock_guard lock(oo_images_mutex);const auto it=oo_images.find(image);if(it==oo_images.end()||!it->second.references)return;
+   if(!--it->second.references&&it->second.destroy_pending){destroy=it->second.allocation;oo_images.erase(it);}}
+- if(destroy)vmaDestroyImage(vma,image,destroy);
++ if(destroy)oo_destroy_vma_image(image,destroy);
+ }
+ VkResult memory_capture_create_view(VkDevice device,const VkImageViewCreateInfo* ci,const VkAllocationCallbacks* callbacks,VkImageView* view) {
+  const auto result=vkCreateImageView(device,ci,callbacks,view);
+@@ -155,6 +177,8 @@ bool vma_init(PFN_vkGetInstanceProcAddr gipa) {
+     ci.instance = dev.instance;
+     ci.vulkanApiVersion = VK_API_VERSION_1_3;
+     ci.pVulkanFunctions = &f;
++    static const VmaDeviceMemoryCallbacks callbacks{oo_vma_memory_created,oo_vma_memory_freed,nullptr};
++    if(oo_bind::enabled())ci.pDeviceMemoryCallbacks=&callbacks;
+     ci.preferredLargeHeapBlockSize = 64ull << 20;   // (64 MB blocks: Eglantine found 256 MB ones wasted VRAM)
+     return vmaCreateAllocator(&ci, &vma) == VK_SUCCESS;
+ }
+@@ -378,7 +402,7 @@ void destroy_image(VkImage image, VmaAllocation allocation) {
+         std::lock_guard lock(oo_images_mutex);const auto it=oo_images.find(image);
+         if(it!=oo_images.end()){if(it->second.references){it->second.destroy_pending=true;return;}oo_images.erase(it);}
+     }
+-    vmaDestroyImage(vma, image, allocation);
++    oo_destroy_vma_image(image,allocation);
+ }
+ uint64_t allocation_size(VmaAllocation allocation) {
+     VmaAllocationInfo info{};
+@@ -448,7 +472,7 @@ void destroy_buffer(VkBuffer buffer, VmaAllocation allocation) {
+             oo_buffer_owners.erase(it);
+         }
+     }
+-    vmaDestroyBuffer(vma, buffer, allocation);
++    oo_destroy_vma_buffer(buffer,allocation);
+ }
+ bool create_device_buffer(uint64_t size, VkBufferUsageFlags usage, VkBuffer& buffer, VmaAllocation& allocation, bool dedicated) {
+     VkBufferCreateInfo bi{VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO};

@@ -11,11 +11,18 @@ Upstream: <https://github.com/NotRexed/Hookshot/tree/4cf785a0b143bb34026506c9a3f
 The renderer capture series applies in order: `compute-identity.patch`,
 `page-table-snapshot.patch`, `allocation-capture.patch`,
 `occurrence-capture.patch`, `graphics-identity.patch`,
-`sampled-image-capture.patch`, then `dispatch-parameters.patch`. See
+`sampled-image-capture.patch`, `dispatch-parameters.patch`,
+`binding-provenance.patch`, then `mesh-input-capture.patch`. Before compiling
+the binding observer, apply the separate host `backing-lease.patch` so its ABI
+header is available. Build the host with that patch to export the opt-in ABI;
+the renderer includes declarations only. The independent input-isolation patch
+can be composed with that host build. See
 [GPU table capture](../../docs/page-table-snapshot.md) and
 [allocation payload capture](../../docs/allocation-capture.md),
 [sampled-image capture](../../docs/sampled-image-capture.md) and
-[dispatch parameters](../../docs/dispatch-parameters.md) for opt-in controls,
+[dispatch parameters](../../docs/dispatch-parameters.md),
+[binding provenance](../../docs/binding-provenance.md) and
+[mesh inputs](../../docs/mesh-input-capture.md) for opt-in controls,
 build/runtime evidence and remaining replay gaps. Each patch retains the upstream
 license. The independent [input-isolation patch](../../docs/input-isolation.md)
 changes host input routing and does not depend on the renderer series.

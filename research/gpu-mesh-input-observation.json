@@ -1,0 +1,336 @@
+{
+  "schema": "open-ocarina.sanitized-mesh-input-observation/v1",
+  "date": "2026-11-13",
+  "evidence_label": "runtime-mesh-input-02",
+  "scope": "Artifact integrity and association for one selected native d8 mesh input snapshot; no shader replay or output comparison",
+  "source_pin": "4cf785a0b143bb34026506c9a3fe4f4bb93c797d",
+  "renderer_sha256": "95547899341d4cbef866b8bd96a7576b1682df827c4422d2a9ff307dffa4c48d",
+  "host_sha256": "4eb32b56a91869b5d7ac1673f0ca1e3c0841e893a8a34f728ec85344a312cb30",
+  "patches_sha256": {
+    "patches/hookshot/compute-identity.patch": "2f14873edfdb47b1f915e75bc4bbe6683ef6632bc66fcbfa1d918aa1c176f018",
+    "patches/hookshot/page-table-snapshot.patch": "c236b96851bc95426202abec6447e672577fdda747fd8405cc435dae435834ab",
+    "patches/hookshot/allocation-capture.patch": "7d8f23d3824374002472bc4a65f3f078c3306d4c5cd395f97e2a1e083fe49aab",
+    "patches/hookshot/occurrence-capture.patch": "defdda2dced583678e39daea0dc7e671fcc8926df8374a62ad45fe675692b752",
+    "patches/hookshot/graphics-identity.patch": "d2572d167c7427c79ce5b600fdeef67a0738678e5e05cbe1ec21db89d8865e53",
+    "patches/hookshot/sampled-image-capture.patch": "45fd019c2670a0c5c4cb0bfba8decb3701531c8248ec205e2b95ba03969aa362",
+    "patches/hookshot/dispatch-parameters.patch": "ff86fe706725f2c70dc759a6e2d295ebedee12b5b93b4b6e2cf407c58a689d8e",
+    "patches/hookshot/binding-provenance.patch": "af88886fb027b91bea136db0c2bf05865cf510232c50fdcbdd9d238d930009b1",
+    "patches/hookshot/mesh-input-capture.patch": "eea7b1b3181751b6b09811a458626958799f2d9a8511a74fdb8bd49854462f5c"
+  },
+  "host_patches_sha256": {
+    "input-isolation.patch": "5664975cb661fe5f17a2d599e22420d461fddd5b3b56c67f7c6e4896e406f66b",
+    "backing-lease.patch": "26c2881cd64267f6ca7e4705e48e9067eafd87bf9532701e8fde9492fba91bad"
+  },
+  "source_sha256": {
+    "gpu/vk/mesh_input_capture.h": "e129b121f6a77673852780da3d0d4510f26672912d6dd5f96bf64376203022a6",
+    "gpu/vk/page_table_capture.h": "20675b760e9501993bd80bbb9307d1d2ea8cb4578d146b5364ed9a1de321067d",
+    "gpu/vk/vk_draw.cpp": "fe270e13876f651b01606a02969339b2d4787752ea07a62f0573d0161ce6a9d5",
+    "gpu/vk/vk_memory.cpp": "576887f247d5652cdeb9f2b8c8bfbe4580cd16eb8691eba765d2353eaeb5bb09",
+    "gpu/vk/vk_internal.h": "dbb441372922a65cca275b591021573bfa7dba56a9b104a41f54cef2c0c2c332",
+    "host/capture_backing.h": "04d09046d4b1175a19e68b0ef500421afc19f40b9b0568aca22463af20347e21"
+  },
+  "renderer_source_manifest_sha256": "1f1aa0efa0b20fd021e79ff0266fe56463e5ae70e75769b067b50e702112e66c",
+  "checker": {
+    "path": "patches/hookshot/check_mesh_input_capture.py",
+    "sha256": "ae991b5a097f529f2ef770d2010ba5f16471a8c8dfceb6a379ccb730181f89fe",
+    "result": "passed: exact slice and launch integrity, authoritative BEFORE payloads, submitted descriptor framing, same-recording manifests and observed resource lifetimes"
+  },
+  "capture_manifest_sha256": "57c8c80f2af4652a013f479c3e2165224ce57e2a0a04645023b6a9828092c980",
+  "associated_manifests_sha256": {
+    "manifest.json": "b6f3778da12e5cb6c72a75072256c8d73a80ca4562ef8b9b7768ec75ab4a1d82",
+    "allocations.json": "88e7926003dd2d621f2f6a5e13d9131f26329e1f3b9bd858e8f729aeec71a6a2",
+    "binding-provenance.json": "878992ddfa806102d6141a81405611105153ce7da1749ad321ac1a97d65d0cf6"
+  },
+  "event": {
+    "program": "d8e59341cf4f629c",
+    "variant": "0c8f08626a9d98a4",
+    "spirv_sha256": "835aa59799c6ecb621034d946e2fa4eadb1aa2407d293321ae3e3052882bc9b3",
+    "stage_index": 0,
+    "nvn_stage": 7,
+    "vk_stage": 128,
+    "recording_part": 9174,
+    "logical_value": 7554,
+    "recording_sequence": 9174,
+    "completed_recording_sequence": 9177,
+    "selected_occurrence": 64,
+    "actual_site_confirmed": true
+  },
+  "launch": {
+    "command": "vkCmdDrawMeshTasksIndirectEXT",
+    "converted": true,
+    "draw_count": 1,
+    "stride": 12,
+    "group_count": [
+      705,
+      1,
+      1
+    ],
+    "snapshot": {
+      "size": 12,
+      "sha256": "3a522d10d34ea086d887f93455c02d3f1143088a9bcc0fdaa8d57c12f408af44"
+    },
+    "zero_grid_no_execution": false,
+    "source": "actual GPU BEFORE payload at converted indirect argument-buffer offset; not CPU group metadata"
+  },
+  "subgroup_request": {
+    "required_size": 32,
+    "require_full_subgroups": false
+  },
+  "driver_selected_simd_width_observed": false,
+  "enabled_feature": {
+    "nullDescriptor": true
+  },
+  "descriptor_layout_required": [
+    {
+      "set": 0,
+      "binding": 0,
+      "type": 6,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 1,
+      "type": 6,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 2,
+      "type": 6,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 3,
+      "type": 6,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 4,
+      "type": 6,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 5,
+      "type": 7,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 6,
+      "type": 7,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 7,
+      "type": 7,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 8,
+      "type": 7,
+      "count": 3,
+      "stage_flags": 128
+    }
+  ],
+  "descriptor_positions": 11,
+  "nonnull_snapshot_count": 9,
+  "defined_null_count": 2,
+  "descriptor_payload_bytes": 172863616,
+  "launch_payload_bytes": 12,
+  "raw_mesh_payload_bytes": 172863628,
+  "payload_total_scope": "Nine descriptor-range snapshots plus launch bytes only; excludes metadata, full-buffer supersets and any later replay bundle framing",
+  "slots": [
+    {
+      "set": 0,
+      "binding": 0,
+      "element": 0,
+      "type": 6,
+      "null_descriptor": false,
+      "range_bytes": 2224,
+      "snapshot": {
+        "size": 2224,
+        "sha256": "61c1dd2f65b3850f427d6dbdf66c9e4dbd906e65c26eb59f95a1aeb883ca4fce"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 1,
+      "element": 0,
+      "type": 6,
+      "null_descriptor": false,
+      "range_bytes": 12352,
+      "snapshot": {
+        "size": 12352,
+        "sha256": "afa48ebb13b2e38cb2efa3059dfabb7b03a4842efabb83fa52e68ed4319dcb25"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 2,
+      "element": 0,
+      "type": 6,
+      "null_descriptor": false,
+      "range_bytes": 912,
+      "snapshot": {
+        "size": 912,
+        "sha256": "98ae1463519476f471cceaacecf2e911b91d278f14c4f28c0249040833bef8a3"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 3,
+      "element": 0,
+      "type": 6,
+      "null_descriptor": false,
+      "range_bytes": 41600,
+      "snapshot": {
+        "size": 41600,
+        "sha256": "c80f85780675f513dc7116ef5aa39eaacdeb930bee5fc7b90cab154b6e36dbec"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 4,
+      "element": 0,
+      "type": 6,
+      "null_descriptor": false,
+      "range_bytes": 16384,
+      "snapshot": {
+        "size": 16384,
+        "sha256": "3326d8722bfd6c70f1053c86f71657e5036a5d0f541c5309960418a9307721be"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 5,
+      "element": 0,
+      "type": 7,
+      "null_descriptor": false,
+      "range_bytes": 192,
+      "snapshot": {
+        "size": 192,
+        "sha256": "2590a3ecf27dbc0c7d5f48c6da943f015791b1fabceabe002732a577299aa4b0"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 6,
+      "element": 0,
+      "type": 7,
+      "null_descriptor": false,
+      "range_bytes": 64,
+      "snapshot": {
+        "size": 64,
+        "sha256": "4d08d9277bd1ae284ce6b07a01dd52fc3218e468faf46edbac0290e56c0b8f64"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 7,
+      "element": 0,
+      "type": 7,
+      "null_descriptor": false,
+      "range_bytes": 15937664,
+      "snapshot": {
+        "size": 15937664,
+        "sha256": "558f8613bfcba6775862fccb1622ecd872b86c205be8516da6c85a960c72748d"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 8,
+      "element": 0,
+      "type": 7,
+      "null_descriptor": false,
+      "range_bytes": 156852224,
+      "snapshot": {
+        "size": 156852224,
+        "sha256": "43031106c35d31ab6ed400aadd5b9f69a47284769ec9acacac271d2f0bfafdb3"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 8,
+      "element": 1,
+      "type": 7,
+      "null_descriptor": true,
+      "range_bytes": null,
+      "snapshot": null
+    },
+    {
+      "set": 0,
+      "binding": 8,
+      "element": 2,
+      "type": 7,
+      "null_descriptor": true,
+      "range_bytes": null,
+      "snapshot": null
+    }
+  ],
+  "legacy_allocation_capture": {
+    "candidate_count": 117,
+    "candidate_bytes": 2539651072,
+    "budget_bytes": 6442450944,
+    "after_recorded": false,
+    "complete_replay": false,
+    "scope": "whole-buffer BEFORE superset; no mesh AFTER capture or adoption of later compute AFTER"
+  },
+  "validation": {
+    "mesh_stage_inputs_present": true,
+    "artifact_integrity_verified": true,
+    "same_recording_associations_verified": true,
+    "actual_native_site_confirmed": true,
+    "independent_gpu_attestation": false,
+    "process_auto_stopped": true,
+    "stop_reason": "requested manifests committed",
+    "nonzero_grid_guard_passed": true,
+    "nonzero_grid_is_execution_authorization": false
+  },
+  "unresolved": [
+    "backing_generation_and_alias_normalization",
+    "cpu_writers_quiesced",
+    "draw_equivalent_input_proof",
+    "whole_graphics_resources_and_outputs"
+  ],
+  "claims": {
+    "historical_draw_inputs_proven": false,
+    "cpu_writers_quiesced": false,
+    "backing_generations_and_aliases_normalized": false,
+    "fragment_resources_complete": false,
+    "shader_replay_executed": false,
+    "shader_output_equivalence_established": false,
+    "whole_rendering_equivalence_established": false,
+    "optimization_or_fps_gain_established": false,
+    "replay_complete": false
+  },
+  "limits": [
+    "Exact digest-pinned d8 mesh stage only; fragment and raster resources excluded",
+    "One converted indirect draw, stride 12, selected occurrence 64; fresh descriptor writes required",
+    "Diagnostic rendering boundary split; no whole-scene equivalence claim",
+    "Defined null entries require actual enabled nullDescriptor and exact zero-handle/zero-offset/whole-range framing; no payload or owner is fabricated",
+    "At most one GiB exact raw slice output; bounded replay windows of at most 32 groups are a separate producer contract, not executed here",
+    "Resource lifetime observations and copied bytes do not prove historical CPU immutability or resolve canonical backing aliases",
+    "The previous nonnull-only revision remains an incomplete, separately archived capture; it is not relabeled with this revision"
+  ],
+  "previous_revision_distinction": {
+    "evidence_label": "runtime-mesh-input-01",
+    "result": "incomplete: two actual defined null storage descriptors were rejected as missing inputs",
+    "patch_sha256": "92f2834a7eae52f4c77d43bc71aacb785d7b7cbef54dac7dce7c4e2ee25bd673",
+    "renderer_sha256": "7c02f8c3d7e615312c8a4503a07ea117cd26f478a0125f68aecf8b1da903e69e",
+    "preserved_separately": true,
+    "included_in_this_observation": false
+  }
+}

@@ -1,6 +1,6 @@
 # Closing backing identity and CPU-writer uncertainty
 
-Read-only source and capture review, 2026-11-12. No renderer edits, builds or GPU work were performed for this note. The inspected source is Hookshot revision `4cf785a0b143bb34026506c9a3fe4f4bb93c797d` plus the project's capture patch chain. The selected occurrence-64 capture has independently checked GPU-table and buffer-descriptor **range/payload closure**, recorded in [the sanitized observation](gpu-buffer-closure-observation.json). That is not underlying backing identity, an atomic CPU/GPU snapshot, or complete replay. Images are a separate active capture requirement.
+Source and capture review, followed by a bounded host-observer implementation, 2026-11-13. No renderer edits, shared-checkout builds or GPU work were performed in this lane. The inspected source is Hookshot revision `4cf785a0b143bb34026506c9a3fe4f4bb93c797d` plus the project's capture patch chain. The selected occurrence-64 capture has independently checked GPU-table and buffer-descriptor **range/payload closure**, recorded in [the sanitized observation](gpu-buffer-closure-observation.json). That is not underlying backing identity, an atomic CPU/GPU snapshot, or complete replay. The later sampled-image, dispatch-parameter and binding-provenance captures are separate datasets; their results do not retroactively close this older capture.
 
 ## Findings grounded in the current producer
 
@@ -90,7 +90,39 @@ Keep separate fields for range/payload closure, backing provenance, writer-epoch
 - The reference shader may itself contain scheduling-sensitive accesses. Baseline repetitions must precede claims of a stable oracle; matching a frozen replay cannot establish that the unmodified live path was race-free.
 - Coalescing mirrors with imports by guest interval destroys intentionally independent versions. Synthetic tests must preserve their separate contents while resolving true overlapping external imports and sparse slices.
 
-Useful producer tests include failed import rollback, Vulkan handle reuse, overlapping exports of one backing, nonzero ordinary bind offsets, multi-piece sparse binds including short tails, discard during import publication, alias snapshot disagreement, CPU write-and-restore during the epoch, a native writer completing after a guest-thread barrier, timeout recovery and late allocations. No such new producer implementation or quiescence proof is claimed by this research note.
+Useful producer tests include failed import rollback, Vulkan handle reuse, overlapping exports of one backing, nonzero ordinary bind offsets, multi-piece sparse binds including short tails, discard during import publication, alias snapshot disagreement, CPU write-and-restore during the epoch, a native writer completing after a guest-thread barrier, timeout recovery and late allocations. The host observation helper below implements only the first provenance boundary. No renderer import/bind integration, writer quiescence or complete replay is claimed by this lane.
+
+## Implemented first boundary: optional host observer
+
+`patches/hookshot/backing-lease.patch` adds `host/capture_backing.h`, included by the host startup translation unit. It records successful original guest-window creation and wraps the existing guest discard syscall with observation-only bookkeeping. `HOS_OO_BACKING_LEASE=1` opts in; the default and explicitly disabled paths keep the original discard operation. Non-Linux and zero-based-memory builds expose disabled stubs.
+
+The original memfd is duplicated and retained by the registry so file-descriptor/inode reuse cannot merge distinct live objects. Mapping and lease IDs are monotonic lifetime tokens. Registered aliases of the same original file backing share a backing token and preserve their individual mapping/file offsets. Observed full replacements retire the old mapping identity. Partial or unsupported changes, capacity/history loss and uncertain failed operations make diagnostic provenance unknown instead of guessing a stable state.
+
+The optional C ABI uses `HOS_CAPTURE_BACKING_ABI=1` and exact output-structure sizes:
+
+- `hos_capture_backing_acquire(abi, guest, size, out, out_size)` registers an import-intent lease and returns backing/mapping IDs, original backing offset, extent, acquired/current backing generation and event tokens.
+- `hos_capture_backing_validate(abi, lease_id, out, out_size)` returns success only for a retained, noninvalidated diagnostic lease. Successful overlapping discards invalidate known aliases of that backing interval. A disjoint discard can advance the object's global generation while a lease remains valid; consumers must use validation status, not generation equality alone.
+- `hos_capture_backing_release(abi, lease_id)` retires a diagnostic lease after import rollback or actual Vulkan memory destruction. A released slot receives a new token when reused; stale IDs never resolve to a later lease.
+- `hos_capture_backing_events(abi, after, out, capacity, event_size, next_event)` supplies bounded committed mapping/discard event metadata. Missing event history fails provenance closed.
+
+Positive status one means success, zero means disabled, and negative values distinguish invalid arguments, unknown provenance, capacity rejection and stale leases. All snapshots and any raw backing details remain private.
+
+The observer serializes its metadata with the actual discard operation under a host-only mutex. It never calls Vulkan or acquires renderer pool locks. It **does not defer, reject, zero, remap or abort a game operation**: the original syscall executes and its result/errno are returned unchanged. A successful discard records a generation transition and invalidates overlapping diagnostic leases. A failed operation can have partial effects, so diagnostics become unknown rather than assuming rollback. This preserves game behavior while refusing a false capture certificate.
+
+The helper is not a general syscall interposer. Production hooks cover the inspected guest-window creation and guest-discard entry point; future alias/remap creation paths must commit their real mapping events to the registry. An unobserved external mapping operation is outside this proof. Renderer import acquisition, committed sparse-bind edges, retained token validation at GPU completion and release at every raw free/rollback are a separate composing patch.
+
+### Tests and frozen handoff
+
+The checker extracts and compiles the **exact added production helper** from the patch with `-O2 -DNDEBUG`, C11 and strict warnings. It does not compile an independent behavioral model. Thirteen fresh-process scenarios use real Linux memfd mappings, aliases and discard operations: enabled/default/disabled behavior, ABI/range validation, acquire/release rollback, original-backing alias identity, overlapping/disjoint discard, failure/errno preservation, mapping replacement, uncertain partial change, lease-slot reuse, event/serial loss, cross-thread invalidation and file-descriptor reuse. Four additional tests cover checker framing and the required export recipe; one verifies actual dynamic symbols in the optimized executable. All eighteen dedicated tests passed.
+
+The Linux standalone linker normally exports only the existing `hos_posix_*` prefix. The public backing patch therefore also adds `--export-dynamic-symbol=hos_capture_backing_*` to `nx2/build.py`'s actual Linux standalone link recipe. The checker confirms that branch through the applied Python AST, links the helper with the extracted public export flag and section garbage collection, then checks all four dynamic API names with Binutils `nm`. The symbols alone do not activate observation; the opt-in environment setting is still required. Linux, a C11 compiler and `nm` are needed for these production-helper checks.
+
+```sh
+python3 patches/hookshot/check_backing_lease.py --checkout local/hookshot-source
+python3 -m unittest discover -s tests -p 'test_backing_lease.py' -v
+```
+
+The optional checkout check applies the patch to a temporary index at the pinned revision and verifies the extracted helper. It leaves the shared source and real index unchanged. The frozen host patch SHA-256 is `26c2881cd64267f6ca7e4705e48e9067eafd87bf9532701e8fde9492fba91bad`. The earlier host-only patch lacked public linker wiring and is privately archived; its fingerprint must not label the revised recipe. The combined input-isolation/backing host subsequently built with the public export recipe. Its four dynamic ABI exports and default-disabled behavior passed an actual-header test. A fresh composed renderer/host run is recorded in [the binding-provenance observation](gpu-binding-provenance-observation.json); that evidence is separate from this host-only handoff. A later patch edit requires a new fingerprint and rerun.
 
 ## Source references
 

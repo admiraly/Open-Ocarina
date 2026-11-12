@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "date": "2026-11-13",
+  "timezone": "Europe/Zurich",
+  "stage": "actual selected-dispatch Vulkan import and binding provenance; replay incomplete",
+  "source_pin": "4cf785a0b143bb34026506c9a3fe4f4bb93c797d",
+  "host_sha256": "4eb32b56a91869b5d7ac1673f0ca1e3c0841e893a8a34f728ec85344a312cb30",
+  "renderer_sha256": "acad8a67eb543142b67440c0eab23b03755a0ca42692a515153c51c1d646dcc5",
+  "patches_sha256": {
+    "compute-identity.patch": "2f14873edfdb47b1f915e75bc4bbe6683ef6632bc66fcbfa1d918aa1c176f018",
+    "page-table-snapshot.patch": "c236b96851bc95426202abec6447e672577fdda747fd8405cc435dae435834ab",
+    "allocation-capture.patch": "7d8f23d3824374002472bc4a65f3f078c3306d4c5cd395f97e2a1e083fe49aab",
+    "occurrence-capture.patch": "defdda2dced583678e39daea0dc7e671fcc8926df8374a62ad45fe675692b752",
+    "graphics-identity.patch": "d2572d167c7427c79ce5b600fdeef67a0738678e5e05cbe1ec21db89d8865e53",
+    "sampled-image-capture.patch": "45fd019c2670a0c5c4cb0bfba8decb3701531c8248ec205e2b95ba03969aa362",
+    "dispatch-parameters.patch": "ff86fe706725f2c70dc759a6e2d295ebedee12b5b93b4b6e2cf407c58a689d8e",
+    "backing-lease.patch": "26c2881cd64267f6ca7e4705e48e9067eafd87bf9532701e8fde9492fba91bad",
+    "binding-provenance.patch": "af88886fb027b91bea136db0c2bf05865cf510232c50fdcbdd9d238d930009b1",
+    "input-isolation.patch": "5664975cb661fe5f17a2d599e22420d461fddd5b3b56c67f7c6e4896e406f66b"
+  },
+  "producer_binding_schema": "open-ocarina.binding-provenance/v1",
+  "capture_scope": "One isolated occurrence-64 compute diagnostic; selected buffer and image catalog, not all Vulkan objects.",
+  "pipeline": {
+    "program": "cc62764061c44f6a",
+    "variant": "095931037888515a",
+    "spirv_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b"
+  },
+  "selected_occurrence": 64,
+  "dispatch": {
+    "kind": "direct",
+    "group_count": [
+      2,
+      1,
+      1
+    ]
+  },
+  "submission": {
+    "recording_part": 7498,
+    "logical_value": 7134,
+    "recording_sequence": 7498,
+    "completed_recording_sequence": 7504
+  },
+  "table": {
+    "size_bytes": 25165824,
+    "mapped_pages": 283648,
+    "unresolved_pages": 0,
+    "ambiguous_pages": 0,
+    "partial_pages": 0,
+    "pages_missing_payloads": 0
+  },
+  "binding_catalog": {
+    "tracked_objects": 126,
+    "buffers": 122,
+    "images": 4,
+    "vulkan_memory_lifetimes": 87,
+    "dma_buf_memory_lifetimes": 64,
+    "vma_memory_lifetimes": 23,
+    "host_pointer_memory_lifetimes": 0,
+    "bind_edges": 132,
+    "ordinary_bind_edges": 122,
+    "sparse_bind_edges": 10,
+    "sparse_buffer_objects": 4,
+    "valid_original_host_leases": 64,
+    "original_host_backing_objects": 1,
+    "observer_events_through_selection": 4249,
+    "host_backing_events_through_export_endpoint": 3362,
+    "host_mapping_creation_events": 1,
+    "host_successful_discard_events": 3361,
+    "producer_backing_provenance_complete_for_catalog": true,
+    "host_event_history_complete": true,
+    "producer_gaps": []
+  },
+  "independent_canonical_interval_review": {
+    "canonical_groups": 24,
+    "original_host_backing_groups": 1,
+    "vma_memory_lifetime_groups": 23,
+    "segments": 132,
+    "segments_clipped_to_resource_extents": true,
+    "overlap_pairs": 0,
+    "payload_disagreements": 0,
+    "overlap_payload_comparisons": 0,
+    "method": "Map each bind edge through the recorded Vulkan memory lifetime and offset; external imports additionally map through the validated original host backing lease. Clip padded sparse tails to true resource extents. Preserve distinct VMA memory lifetimes and suballocation offsets.",
+    "generation_scope": "All 64 external leases validate successfully at a shared current backing generation. Complete recorded host events show no overlapping invalidation after acquisition. Disjoint generation advancement is accepted by status and interval history, not by equating guest addresses.",
+    "meaning": "No declared canonical segments overlap in this capture. Absence of overlap does not exercise overlapping-alias payload agreement or prove alias correctness for other captures."
+  },
+  "verification": {
+    "checker": "patches/hookshot/check_binding_provenance.py",
+    "checker_sha256": "53b54a68256feba6d60a4919c1f530d0d94fcc8bec004ec559e20099feca7d4a",
+    "current_stricter_checker_passed": true,
+    "same_capture_catalog_checked": true,
+    "selected_lifetimes_not_destroyed_or_freed_before_selection": true,
+    "creation_bind_selection_order_checked": true,
+    "sparse_queue_and_fence_success_checked": true,
+    "bind_offsets_and_native_host_mapping_extent_checked": true,
+    "host_lease_immutable_fields_and_invalidation_history_checked": true,
+    "table_and_buffer_descriptor_ranges_complete": true,
+    "sampled_image_inputs_complete": true,
+    "exact_pushed_dispatch_parameters_complete": true,
+    "independent_gpu_or_host_attestation": false
+  },
+  "capture_manifest_sha256": {
+    "binding-provenance.json": "a112d0c2599b0827b99d1d8379adfce5d70bbde1065ff985cf01630c594c914d",
+    "manifest.json": "5bc3bbc58bf753cada6654c475f89c9ed093284647e6da9e8416f87bf572bed2",
+    "allocations.json": "fb1b1256d5f9a54da768aec07e7422000f9ba1cd292679563c5eb5b5d6aa442d",
+    "images.json": "1fa187bbea59c984458875c9f02ec5c80ca77c27bae8853ef49b847df62da682",
+    "dispatch-parameters.json": "75b6d49a81a319df5369c95a49e5016e232a9af4a43bd8cef3f784dc0506dc1a"
+  },
+  "cpu_writers_quiesced": false,
+  "atomic_cpu_gpu_snapshot_established": false,
+  "historical_dispatch_reproduced": false,
+  "independent_shader_output_comparison": false,
+  "performance_run": false,
+  "replay_complete": false,
+  "limitations": [
+    "Successful binding and host-lease validation establish provenance only for the enumerated selected catalog at its recorded boundaries; they do not attest all Vulkan objects or all resource reachability.",
+    "The host registry observes mapping/discard changes and preserves discard behavior. Its generations and valid leases do not detect arbitrary CPU content writes or write-and-restore interference.",
+    "Per-lease validation and host-event collection are not an atomic content snapshot, writer barrier, or lock held through publication.",
+    "Zero overlapping canonical segments makes overlapping-alias payload comparison vacuous in this run. Mirrors and shadows retain independent memory identities.",
+    "Complete device feature and float-control state, temporal dependencies, submitted descriptor interpretation and independent output comparison remain separate gates.",
+    "No isolated shader-replay execution, frozen-input replay, historical full-dispatch replay, rendering equivalence or FPS improvement is established by this observation.",
+    "Older allocation/image manifests retain their original conservative component flags; this joined observation does not relabel them complete replay."
+  ]
+}

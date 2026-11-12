@@ -1,0 +1,265 @@
+--- a/host/hos_main.c
++++ b/host/hos_main.c
+@@ -42,2 +42,4 @@
+ #endif
++#define HOS_CAPTURE_BACKING_IMPLEMENTATION
++#include "capture_backing.h"
+ /* (linux) the separator of the paths the executable's folder is joined with */
+@@ -200,2 +202,6 @@
+                     hos_guest_memfd = fd;
++#ifdef __linux__
++                    const int provenance = oo_backing_mapping_committed(0, p, GUEST_SPACE, fd, 0);
++                    if (provenance < 0) hos_log("mem: diagnostic backing provenance unavailable (%d)", provenance);
++#endif
+                     hos_log("mem: the guest window is a memfd's (%d), shared with the GPU as dma-bufs", fd);
+@@ -212,2 +218,6 @@
+         return 0;
++#ifdef __linux__
++    const int provenance = oo_backing_mapping_committed(0, (void *)A64_HOST_BASE, GUEST_SPACE, -1, 0);
++    if (provenance < 0) hos_log("mem: diagnostic backing provenance unavailable (%d)", provenance);
++#endif
+     /* (issue 312) no transparent huge pages in the guest window: the renderer imports its pools as userptr memory, and every
+@@ -231,3 +241,7 @@
+ int hos_posix_guest_discard(void *p, size_t n) {
++#ifdef __linux__
++    return oo_backing_madvise(p, n, hos_guest_memfd >= 0 ? MADV_REMOVE : MADV_DONTNEED);
++#else
+     return madvise(p, n, hos_guest_memfd >= 0 ? MADV_REMOVE : MADV_DONTNEED);
++#endif
+ }
+--- /dev/null
++++ b/host/capture_backing.h
+@@ -0,0 +1,225 @@
++/* SPDX-License-Identifier: GPL-3.0-or-later
++ * Optional diagnostic provenance only. Leases never prevent writes or change discard behavior.
++ * Define HOS_CAPTURE_BACKING_IMPLEMENTATION in exactly one C translation unit.
++ */
++#ifndef HOS_CAPTURE_BACKING_H
++#define HOS_CAPTURE_BACKING_H
++#include <stddef.h>
++#include <stdint.h>
++#ifdef __cplusplus
++extern "C" {
++#endif
++#define HOS_CAPTURE_BACKING_ABI 1u
++enum { HOS_BACKING_DISABLED=0, HOS_BACKING_OK=1, HOS_BACKING_ARGUMENT=-1,
++       HOS_BACKING_UNKNOWN=-2, HOS_BACKING_CAPACITY=-3, HOS_BACKING_STALE=-4 };
++enum { HOS_BACKING_ANONYMOUS=1, HOS_BACKING_FILE=2 };
++enum { HOS_BACKING_VALID=0, HOS_BACKING_DISCARDED=1, HOS_BACKING_REMAPPED=2,
++       HOS_BACKING_UNCERTAIN=3, HOS_BACKING_LEDGER_LOST=4 };
++enum { HOS_BACKING_MAPPING_COMMIT=1, HOS_BACKING_DISCARD_COMMIT=2,
++       HOS_BACKING_DISCARD_UNCERTAIN=3, HOS_BACKING_MAPPING_REPLACE=4 };
++typedef struct HosCaptureBackingInfoV1 {
++    uint32_t abi_version,struct_size,kind,invalid_reason;
++    uint64_t lease_id,backing_id,mapping_id,backing_offset,size;
++    uint64_t acquired_generation,current_generation,acquired_event,invalidated_event;
++} HosCaptureBackingInfoV1;
++typedef struct HosCaptureBackingEventV1 {
++    uint32_t abi_version,struct_size,kind,result_errno;
++    uint64_t event_id,backing_id,mapping_id,backing_offset,size,generation;
++} HosCaptureBackingEventV1;
++int hos_capture_backing_acquire(uint32_t abi,uint64_t guest,uint64_t size,HosCaptureBackingInfoV1* out,uint32_t out_size);
++int hos_capture_backing_validate(uint32_t abi,uint64_t lease,HosCaptureBackingInfoV1* out,uint32_t out_size);
++int hos_capture_backing_release(uint32_t abi,uint64_t lease);
++/* Returns copied event count, or a negative error. next_event is the last copied ID, or after. */
++int hos_capture_backing_events(uint32_t abi,uint64_t after,HosCaptureBackingEventV1* out,uint32_t capacity,
++                               uint32_t event_size,uint64_t* next_event);
++#ifdef __cplusplus
++}
++#endif
++
++#ifdef HOS_CAPTURE_BACKING_IMPLEMENTATION
++#if defined(__linux__) && !defined(A64_MEM_ZERO)
++#include <errno.h>
++#include <pthread.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/mman.h>
++#include <sys/stat.h>
++#include <unistd.h>
++#ifndef HOS_BACKING_MAX_LEASES
++#define HOS_BACKING_MAX_LEASES 65536u
++#endif
++#ifndef HOS_BACKING_MAX_EVENTS
++#define HOS_BACKING_MAX_EVENTS 65536u
++#endif
++#define HOS_BACKING_MAX_MAPPINGS 128u
++typedef struct OoBackingObject {
++    uint64_t id,generation; dev_t device; ino_t inode; int fd; uint32_t kind;
++} OoBackingObject;
++typedef struct OoBackingMapping {
++    uint64_t id,guest,size,offset; uintptr_t host; unsigned backing; int active;
++} OoBackingMapping;
++typedef struct OoBackingLease { HosCaptureBackingInfoV1 info; unsigned backing; int used; } OoBackingLease;
++typedef struct OoBackingState {
++    OoBackingObject objects[HOS_BACKING_MAX_MAPPINGS];
++    OoBackingMapping mappings[HOS_BACKING_MAX_MAPPINGS];
++    OoBackingLease leases[HOS_BACKING_MAX_LEASES];
++    HosCaptureBackingEventV1 events[HOS_BACKING_MAX_EVENTS];
++    unsigned objects_n,mappings_n,leases_n,events_n; uint64_t serial; int unknown;
++} OoBackingState;
++static OoBackingState* oo_backing_state;
++static pthread_once_t oo_backing_once=PTHREAD_ONCE_INIT;
++static pthread_mutex_t oo_backing_mutex=PTHREAD_MUTEX_INITIALIZER;
++static int oo_backing_on;
++static void oo_backing_initialize(void) {
++    const char* e=getenv("HOS_OO_BACKING_LEASE");
++    oo_backing_on=e&&strcmp(e,"1")==0;
++    if(oo_backing_on)oo_backing_state=(OoBackingState*)calloc(1,sizeof(OoBackingState));
++}
++static int oo_backing_enabled(void) { pthread_once(&oo_backing_once,oo_backing_initialize);return oo_backing_on; }
++static int oo_backing_overlap(uint64_t a,uint64_t n,uint64_t b,uint64_t z) {
++    return n&&z&&a<=UINT64_MAX-n&&b<=UINT64_MAX-z&&a<b+z&&b<a+n;
++}
++/* Registry lock held. Any lost history disables future provenance instead of dropping events. */
++static void oo_backing_unknown(void) {
++    OoBackingState* s=oo_backing_state;if(!s)return;s->unknown=1;
++    for(unsigned i=0;i<s->leases_n;++i)if(s->leases[i].used&&!s->leases[i].info.invalid_reason)
++        s->leases[i].info.invalid_reason=HOS_BACKING_LEDGER_LOST;
++}
++static uint64_t oo_backing_event(unsigned kind,unsigned backing,uint64_t mapping,uint64_t off,uint64_t size,int error) {
++    OoBackingState* s=oo_backing_state;
++    if(s->events_n>=HOS_BACKING_MAX_EVENTS||s->serial==UINT64_MAX){oo_backing_unknown();return 0;}
++    OoBackingObject* b=&s->objects[backing];
++    HosCaptureBackingEventV1* e=&s->events[s->events_n++];
++    *e=(HosCaptureBackingEventV1){HOS_CAPTURE_BACKING_ABI,sizeof(*e),kind,(uint32_t)error,
++                                ++s->serial,b->id,mapping,off,size,b->generation};
++    return e->event_id;
++}
++static void oo_backing_invalidate(unsigned backing,uint64_t off,uint64_t size,unsigned reason,uint64_t event) {
++    OoBackingState* s=oo_backing_state;
++    for(unsigned i=0;i<s->leases_n;++i){OoBackingLease* l=&s->leases[i];
++        if(l->used&&l->backing==backing&&oo_backing_overlap(off,size,l->info.backing_offset,l->info.size)&&!l->info.invalid_reason)
++            l->info.invalid_reason=reason,l->info.invalidated_event=event;
++    }
++}
++/* Called only after a real mapping succeeds. No renderer/Vulkan/pool lock is acquired here.
++ * The original backing FD is duplicated so inode reuse cannot merge live objects.
++ * Unknown/partial replacement preserves game behavior but invalidates diagnostic provenance.
++ */
++static int oo_backing_mapping_committed(uint64_t guest,void* host,uint64_t size,int fd,uint64_t offset) {
++    if(!oo_backing_enabled())return HOS_BACKING_DISABLED;
++    pthread_mutex_lock(&oo_backing_mutex);OoBackingState* s=oo_backing_state;int result=HOS_BACKING_UNKNOWN;
++    if(!s)goto done;
++    if(s->unknown||s->serial>UINT64_MAX-4||!size||guest>UINT64_MAX-size||(uintptr_t)host>UINTPTR_MAX-size||offset>UINT64_MAX-size){oo_backing_unknown();goto done;}
++    unsigned backing=s->objects_n;struct stat st;memset(&st,0,sizeof(st));
++    if(fd>=0){
++        if(fstat(fd,&st)!=0||st.st_size<0||offset+size>(uint64_t)st.st_size){oo_backing_unknown();goto done;}
++        for(unsigned i=0;i<s->objects_n;++i)if(s->objects[i].kind==HOS_BACKING_FILE&&s->objects[i].device==st.st_dev&&s->objects[i].inode==st.st_ino){backing=i;break;}
++    }
++    if(backing==s->objects_n){
++        if(s->objects_n==HOS_BACKING_MAX_MAPPINGS){oo_backing_unknown();result=HOS_BACKING_CAPACITY;goto done;}
++        int held=fd<0?-1:dup(fd);if(fd>=0&&held<0){oo_backing_unknown();goto done;}
++        OoBackingObject* b=&s->objects[s->objects_n++];
++        *b=(OoBackingObject){++s->serial,1,st.st_dev,st.st_ino,held,fd<0?HOS_BACKING_ANONYMOUS:HOS_BACKING_FILE};
++    }
++    if(s->mappings_n==HOS_BACKING_MAX_MAPPINGS){oo_backing_unknown();result=HOS_BACKING_CAPACITY;goto done;}
++    for(unsigned i=0;i<s->mappings_n;++i){OoBackingMapping* m=&s->mappings[i];if(!m->active)continue;
++        const int guest_overlap=oo_backing_overlap(guest,size,m->guest,m->size);
++        const int host_overlap=oo_backing_overlap((uintptr_t)host,size,m->host,m->size);
++        if(!guest_overlap&&!host_overlap)continue;
++        if(guest!=m->guest||size!=m->size||(uintptr_t)host!=m->host){oo_backing_unknown();goto done;}
++        m->active=0;
++        uint64_t event=oo_backing_event(HOS_BACKING_MAPPING_REPLACE,m->backing,m->id,m->offset,m->size,0);
++        for(unsigned j=0;j<s->leases_n;++j)if(s->leases[j].used&&s->leases[j].info.mapping_id==m->id&&!s->leases[j].info.invalid_reason)
++            s->leases[j].info.invalid_reason=HOS_BACKING_REMAPPED,s->leases[j].info.invalidated_event=event;
++    }
++    OoBackingMapping* m=&s->mappings[s->mappings_n++];
++    *m=(OoBackingMapping){++s->serial,guest,size,offset,(uintptr_t)host,backing,1};
++    oo_backing_event(HOS_BACKING_MAPPING_COMMIT,backing,m->id,offset,size,0);
++    result=s->unknown?HOS_BACKING_UNKNOWN:HOS_BACKING_OK;
++done:pthread_mutex_unlock(&oo_backing_mutex);return result;
++}
++static int oo_backing_arguments(uint32_t abi,HosCaptureBackingInfoV1* out,uint32_t size) {
++    return abi==HOS_CAPTURE_BACKING_ABI&&out&&size==sizeof(*out);
++}
++int hos_capture_backing_acquire(uint32_t abi,uint64_t guest,uint64_t size,HosCaptureBackingInfoV1* out,uint32_t out_size) {
++    if(!oo_backing_arguments(abi,out,out_size)||!size||guest>UINT64_MAX-size)return HOS_BACKING_ARGUMENT;
++    if(!oo_backing_enabled())return HOS_BACKING_DISABLED;
++    pthread_mutex_lock(&oo_backing_mutex);OoBackingState* s=oo_backing_state;int result=HOS_BACKING_UNKNOWN;
++    if(!s||s->unknown)goto done;
++    if(s->serial==UINT64_MAX){oo_backing_unknown();goto done;}
++    OoBackingMapping* found=NULL;
++    for(unsigned i=0;i<s->mappings_n;++i){OoBackingMapping* m=&s->mappings[i];
++        if(m->active&&guest>=m->guest&&guest-m->guest<=m->size&&size<=m->size-(guest-m->guest)){
++            if(found){oo_backing_unknown();goto done;}found=m;}}
++    if(!found)goto done;
++    unsigned at=0;while(at<s->leases_n&&s->leases[at].used)++at;
++    if(at==HOS_BACKING_MAX_LEASES){result=HOS_BACKING_CAPACITY;goto done;}
++    if(at==s->leases_n)++s->leases_n;
++    OoBackingObject* b=&s->objects[found->backing];OoBackingLease* l=&s->leases[at];
++    l->used=1;l->backing=found->backing;const uint64_t id=++s->serial;
++    l->info=(HosCaptureBackingInfoV1){HOS_CAPTURE_BACKING_ABI,sizeof(l->info),b->kind,HOS_BACKING_VALID,
++        id,b->id,found->id,found->offset+(guest-found->guest),size,b->generation,b->generation,id,0};
++    *out=l->info;result=HOS_BACKING_OK;
++done:pthread_mutex_unlock(&oo_backing_mutex);return result;
++}
++int hos_capture_backing_validate(uint32_t abi,uint64_t lease,HosCaptureBackingInfoV1* out,uint32_t out_size) {
++    if(!oo_backing_arguments(abi,out,out_size)||!lease)return HOS_BACKING_ARGUMENT;
++    if(!oo_backing_enabled())return HOS_BACKING_DISABLED;
++    pthread_mutex_lock(&oo_backing_mutex);OoBackingState* s=oo_backing_state;int result=HOS_BACKING_UNKNOWN;
++    if(!s)goto done;
++    for(unsigned i=0;i<s->leases_n;++i)if(s->leases[i].used&&s->leases[i].info.lease_id==lease){
++        *out=s->leases[i].info;out->current_generation=s->objects[s->leases[i].backing].generation;
++        result=(s->unknown||out->invalid_reason)?HOS_BACKING_STALE:HOS_BACKING_OK;goto done;}
++done:pthread_mutex_unlock(&oo_backing_mutex);return result;
++}
++int hos_capture_backing_release(uint32_t abi,uint64_t lease) {
++    if(abi!=HOS_CAPTURE_BACKING_ABI||!lease)return HOS_BACKING_ARGUMENT;
++    if(!oo_backing_enabled())return HOS_BACKING_DISABLED;
++    pthread_mutex_lock(&oo_backing_mutex);OoBackingState* s=oo_backing_state;int result=HOS_BACKING_UNKNOWN;
++    if(s)for(unsigned i=0;i<s->leases_n;++i)if(s->leases[i].used&&s->leases[i].info.lease_id==lease){s->leases[i].used=0;result=HOS_BACKING_OK;break;}
++    pthread_mutex_unlock(&oo_backing_mutex);return result;
++}
++int hos_capture_backing_events(uint32_t abi,uint64_t after,HosCaptureBackingEventV1* out,uint32_t capacity,uint32_t event_size,uint64_t* next_event) {
++    if(abi!=HOS_CAPTURE_BACKING_ABI||!out||!capacity||!next_event||event_size!=sizeof(*out))return HOS_BACKING_ARGUMENT;
++    if(!oo_backing_enabled())return HOS_BACKING_DISABLED;
++    pthread_mutex_lock(&oo_backing_mutex);OoBackingState* s=oo_backing_state;int count=HOS_BACKING_UNKNOWN;
++    if(s&&!s->unknown){count=0;*next_event=after;
++        for(unsigned i=0;i<s->events_n&&(unsigned)count<capacity;++i)if(s->events[i].event_id>after){out[count++]=s->events[i];*next_event=s->events[i].event_id;}}
++    pthread_mutex_unlock(&oo_backing_mutex);return count;
++}
++/* Preserve the real operation/result/errno. This is an observer, not a write/discard gate.
++ * Failure can be partial on some operations, so it makes provenance unknown rather than claiming rollback.
++ */
++static int oo_backing_madvise(void* pointer,size_t size,int advice) {
++    if(!oo_backing_enabled())return madvise(pointer,size,advice);
++    pthread_mutex_lock(&oo_backing_mutex);OoBackingState* s=oo_backing_state;
++    OoBackingMapping* found=NULL;
++    if(s&&!s->unknown&&size&&(uintptr_t)pointer<=UINTPTR_MAX-size)
++        for(unsigned i=0;i<s->mappings_n;++i){OoBackingMapping* m=&s->mappings[i];
++            if(m->active&&(uintptr_t)pointer>=m->host&&(uintptr_t)pointer-m->host<=m->size&&size<=m->size-((uintptr_t)pointer-m->host)){
++                if(found){oo_backing_unknown();found=NULL;break;}found=m;}}
++    const int result=madvise(pointer,size,advice),saved=errno;
++    if(s){
++        if(!found||s->unknown)oo_backing_unknown();
++        else {
++            OoBackingObject* b=&s->objects[found->backing];uint64_t offset=found->offset+((uintptr_t)pointer-found->host);
++            if(result==0){
++                if(b->generation==UINT64_MAX)oo_backing_unknown();else ++b->generation;
++                uint64_t event=oo_backing_event(HOS_BACKING_DISCARD_COMMIT,found->backing,found->id,offset,size,0);
++                oo_backing_invalidate(found->backing,offset,size,HOS_BACKING_DISCARDED,event);
++            }else {
++                uint64_t event=oo_backing_event(HOS_BACKING_DISCARD_UNCERTAIN,found->backing,found->id,offset,size,saved);
++                oo_backing_invalidate(found->backing,offset,size,HOS_BACKING_UNCERTAIN,event);oo_backing_unknown();
++            }
++        }
++    }
++    pthread_mutex_unlock(&oo_backing_mutex);errno=saved;return result;
++}
++#else
++int hos_capture_backing_acquire(uint32_t a,uint64_t b,uint64_t c,HosCaptureBackingInfoV1*d,uint32_t e){(void)a;(void)b;(void)c;(void)d;(void)e;return HOS_BACKING_DISABLED;}
++int hos_capture_backing_validate(uint32_t a,uint64_t b,HosCaptureBackingInfoV1*c,uint32_t d){(void)a;(void)b;(void)c;(void)d;return HOS_BACKING_DISABLED;}
++int hos_capture_backing_release(uint32_t a,uint64_t b){(void)a;(void)b;return HOS_BACKING_DISABLED;}
++int hos_capture_backing_events(uint32_t a,uint64_t b,HosCaptureBackingEventV1*c,uint32_t d,uint32_t e,uint64_t*f){(void)a;(void)b;(void)c;(void)d;(void)e;(void)f;return HOS_BACKING_DISABLED;}
++#endif
++#endif
++#endif
+--- a/nx2/build.py
++++ b/nx2/build.py
+@@ -1339,3 +1339,4 @@
+         r = subprocess.run([cc] + target() + ["-fuse-ld=lld", "-o", exe] + linker("-Map=" + exe + ".map") +
+-                           ["-Wl,--gc-sections", "-Wl,--export-dynamic-symbol=hos_posix_*", "@" + rsp] + HOT_ORDER() +
++                           ["-Wl,--gc-sections", "-Wl,--export-dynamic-symbol=hos_posix_*",
++                            "-Wl,--export-dynamic-symbol=hos_capture_backing_*", "@" + rsp] + HOT_ORDER() +
+                            (["-fprofile-instr-generate"] if PGO == "gen" else []) +

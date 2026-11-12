@@ -1,0 +1,428 @@
+diff --git a/gpu/vk/mesh_input_capture.h b/gpu/vk/mesh_input_capture.h
+new file mode 100644
+index 0000000..3a48483
+--- /dev/null
++++ b/gpu/vk/mesh_input_capture.h
+@@ -0,0 +1,171 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Bounded shader-level native mesh inputs; never full graphics replay.
++#pragma once
++#include "allocation_capture.h"
++#include "graphics_identity.h"
++#include "dispatch_parameters.h"
++#include <mutex>
++#include <sstream>
++namespace mkwvk::oo_mesh {
++inline constexpr uint64_t kProgram=0xd8e59341cf4f629cull,kVariant=0x0c8f08626a9d98a4ull;
++inline constexpr const char* kDigest="835aa59799c6ecb621034d946e2fa4eadb1aa2407d293321ae3e3052882bc9b3";
++inline bool enabled() {
++    static const bool on=[] {
++        const char* flag=std::getenv("RX_VK_OO_MESH_INPUTS");
++        if(!flag||std::string(flag)!="1"||!oo_alloc::config().enabled||
++           !oo_identity::selected(kProgram,kVariant)||!oo_graphics_identity::selected(kProgram,kVariant)||oo_pt::config().digest!=kDigest)return false;
++        for(const char* name:{"mesh-inputs.json","mesh-inputs.json.part","mesh-indirect.bin","mesh-indirect.bin.part"})
++            if(oo_pt::present(std::filesystem::path(oo_pt::config().directory)/name))return false;
++        return true;
++    }();return on;
++}
++struct Binding {uint32_t binding=0,type=0,count=0,stages=0;};
++struct Layout {uint64_t handle=0;uint32_t flags=0;std::vector<Binding> bindings;};
++inline std::mutex layout_mutex;
++inline std::vector<Layout> layouts;
++inline void note_layout(Layout layout,uint64_t key,uint64_t variant) {
++    if(!enabled()||key!=kProgram||variant!=kVariant||!layout.handle||layout.bindings.size()>256)return;
++    std::lock_guard lock(layout_mutex);
++    for(auto& kept:layouts)if(kept.handle==layout.handle){kept=std::move(layout);return;}
++    if(layouts.size()<4)layouts.push_back(std::move(layout));
++}
++struct Event {
++    uint64_t command=0,key=0,variant=0,layout=0,part=0,logical=0,argument_buffer=0,argument_offset=0,counter=0;
++    uint32_t count=0,stride=0,required_size=0;
++    bool indirect=false,converted=false,rewritten=false,fresh_descriptors=false,safe_boundary=false,require_full=false;
++    uint32_t stage_index=0,nvn_stage=0,vk_stage=0,stage_count=0;
++    std::string digest;
++};
++inline bool identity(const Event& e) {return e.key==kProgram&&e.variant==kVariant&&e.digest==kDigest&&e.stage_index==0&&e.nvn_stage==7&&e.vk_stage==128&&e.stage_count==2;}
++inline thread_local Event candidate;
++inline void prepare(const Event& e) {if(enabled())candidate=e;}
++inline bool prepared(uint64_t command,uint64_t key,uint64_t variant,const char* digest) {
++    return enabled()&&identity(candidate)&&candidate.command==command&&candidate.key==key&&candidate.variant==variant&&digest&&candidate.digest==digest;
++}
++struct Capture {
++    bool selected=false,confirmed=false,layout_valid=false;
++    uint64_t occurrence=0;
++    Event before;
++    Layout layout;
++    std::vector<std::string> failures;
++};
++inline Capture select(uint64_t command,const oo_pt::Request& request,uint64_t occurrence) {
++    Capture c;
++    if(!enabled()||!identity(candidate)||candidate.command!=command||candidate.part!=request.recording_part||candidate.logical!=request.logical_value||
++       candidate.key!=request.key||candidate.variant!=request.variant||candidate.digest!=request.shader_digest)return c;
++    c.selected=true;c.before=std::move(candidate);candidate={};c.occurrence=occurrence;
++    const auto& e=c.before;
++    if(!e.indirect||!e.converted||e.rewritten||e.count!=1||e.stride!=12||e.counter||!e.argument_buffer||e.argument_offset>UINT64_MAX-12)
++        c.failures.push_back("unsupported_native_launch_shape");
++    if(!e.fresh_descriptors)c.failures.push_back("fresh_actual_descriptor_writes_missing");
++    if(!e.safe_boundary)c.failures.push_back("unsupported_boundary_or_debug_work");
++    std::lock_guard lock(layout_mutex);
++    for(const auto& layout:layouts)if(layout.handle==e.layout) {
++        c.layout=layout;c.layout_valid=layout.bindings.size()>=9;
++        for(uint32_t i=0;i<9&&c.layout_valid;++i) {
++            const auto& b=layout.bindings[i];
++            c.layout_valid=b.binding==i&&b.type==(i<5?6u:7u)&&b.count==(i==8?3u:1u)&&b.stages==128;
++        }
++    }
++    if(!c.layout_valid)c.failures.push_back("actual_mesh_descriptor_layout_missing_or_changed");
++    return c;
++}
++inline void confirm(Capture& c,const Event& actual) {
++    if(!c.selected)return;
++    const auto& e=c.before;
++    c.confirmed=identity(actual)&&actual.command==e.command&&actual.layout==e.layout&&actual.part==e.part&&actual.logical==e.logical&&
++      actual.argument_buffer==e.argument_buffer&&actual.argument_offset==e.argument_offset&&actual.count==e.count&&actual.stride==e.stride&&
++      actual.counter==e.counter&&actual.indirect==e.indirect&&actual.converted==e.converted&&actual.rewritten==e.rewritten&&
++      actual.required_size==e.required_size&&actual.require_full==e.require_full;
++}
++struct Payload {const uint8_t* bytes=nullptr;uint64_t size=0;bool invalidated=false;};
++struct Slice {bool null_descriptor=false;uint32_t binding=0,element=0,type=0;size_t row=0;uint64_t buffer=0,offset=0,size=0,descriptor_range=0;std::string artifact,digest;};
++inline bool slice(const oo_alloc::Row& row,const Payload& payload,uint64_t offset,uint64_t size,const std::string& name,std::string& digest) {
++    return payload.invalidated&&payload.bytes&&payload.size==row.size&&size&&offset<=row.size&&size<=row.size-offset&&
++           oo_alloc::save_payload(name,payload.bytes+offset,size,digest);
++}
++inline std::string hex(uint64_t value){char text[17];std::snprintf(text,sizeof text,"%016llx",(unsigned long long)value);return text;}
++inline bool write_completed(const Capture& c,const oo_pt::Request& request,uint64_t completed,
++                            const std::vector<oo_alloc::Row>& rows,const std::vector<Payload>& payloads,
++                            const std::vector<oo_alloc::Descriptor>& descriptors,const std::vector<std::pair<uint64_t,uint64_t>>& lifetimes={},bool null_descriptor_enabled=false) {
++    if(!enabled()||!c.selected||!request.submitted_sequence||completed<request.submitted_sequence||
++       request.key!=c.before.key||request.variant!=c.before.variant||request.shader_digest!=c.before.digest||
++       request.recording_part!=c.before.part||request.logical_value!=c.before.logical||rows.size()!=payloads.size())return false;
++    const auto directory=std::filesystem::path(oo_pt::config().directory),path=directory/"mesh-inputs.json",part=directory/"mesh-inputs.json.part";
++    if(oo_pt::present(path)||oo_pt::present(part))return false;
++    auto failures=c.failures;if(!c.confirmed)failures.push_back("actual_command_site_not_confirmed");
++    auto find=[&](uint64_t handle)->size_t {size_t result=rows.size();for(size_t i=0;i<rows.size();++i)if(rows[i].buffer==handle){if(result!=rows.size())return rows.size();result=i;}return result;};
++    std::string launch_sha;uint32_t grid[3]{};
++    if(failures.empty()) {
++        const size_t index=find(c.before.argument_buffer);
++        if(index==rows.size()||!slice(rows[index],payloads[index],c.before.argument_offset,12,"mesh-indirect.bin",launch_sha))
++            failures.push_back("exact_gpu_indirect_snapshot_missing");
++        else for(unsigned i=0;i<3;++i)for(unsigned j=0;j<4;++j)grid[i]|=uint32_t(payloads[index].bytes[c.before.argument_offset+4*i+j])<<(8*j);
++    }
++    std::vector<Slice> slices;
++    if(failures.empty())for(uint32_t binding=0;binding<9;++binding)for(uint32_t element=0;element<(binding==8?3u:1u);++element) {
++        const oo_alloc::Descriptor* found=nullptr;bool duplicate=false;
++        for(const auto& descriptor:descriptors)if(descriptor.binding==binding&&descriptor.element==element){if(found)duplicate=true;found=&descriptor;}
++        if(!found||duplicate||found->type!=(binding<5?6u:7u)){failures.push_back("required_mesh_descriptor_missing_or_changed");continue;}
++        if(!found->buffer) {
++            if(binding!=8||element==0) {failures.push_back("unsupported_null_mesh_descriptor_position");continue;}
++            if(!null_descriptor_enabled||found->offset!=0||found->range!=UINT64_MAX) {
++                failures.push_back("null_mesh_descriptor_feature_or_framing_invalid");continue;
++            }
++            Slice s;s.null_descriptor=true;s.binding=binding;s.element=element;s.type=found->type;s.descriptor_range=found->range;
++            slices.push_back(std::move(s));continue;
++        }
++        const size_t index=find(found->buffer);
++        if(index==rows.size()||found->offset>=rows[index].size){failures.push_back("required_mesh_descriptor_owner_unknown");continue;}
++        const uint64_t size=found->range==UINT64_MAX?rows[index].size-found->offset:found->range;
++        Slice s;s.binding=binding;s.element=element;s.type=found->type;s.buffer=found->buffer;s.offset=found->offset;s.size=size;s.row=index;s.descriptor_range=found->range;
++        s.artifact="mesh-binding-"+std::to_string(binding)+"-"+std::to_string(element)+".bin";
++        if(!payloads[index].invalidated||!payloads[index].bytes||!s.size||s.offset>rows[index].size||s.size>rows[index].size-s.offset)
++            failures.push_back("required_mesh_descriptor_payload_missing");
++        else slices.push_back(std::move(s));
++    }
++    uint64_t total=12;
++    for(const auto& s:slices) {if(s.size>(1ull<<30)||total>(1ull<<30)-s.size){failures.push_back("exact_mesh_slice_budget_exceeded");break;}total+=s.size;}
++    if(failures.empty())for(auto& s:slices)
++        if(!s.null_descriptor&&!slice(rows[s.row],payloads[s.row],s.offset,s.size,s.artifact,s.digest))failures.push_back("required_mesh_descriptor_export_failed");
++    const bool present=failures.empty()&&slices.size()==11&&!launch_sha.empty();
++    auto lifetime=[&](uint64_t buffer)->uint64_t {for(const auto& item:lifetimes)if(item.first==buffer)return item.second;return 0;};
++    std::ostringstream out;
++    out<<"{\"schema\":\"open-ocarina.mesh-logical-input/v1\",\"replay_complete\":false,\"mesh_stage_inputs_present\":"<<(present?"true":"false")
++       <<",\"event\":{\"program\":\""<<hex(c.before.key)<<"\",\"variant\":\""<<hex(c.before.variant)<<"\",\"spirv_sha256\":\""<<c.before.digest
++       <<"\",\"stage_index\":0,\"nvn_stage\":7,\"vk_stage\":128,\"recording_part\":"<<request.recording_part<<",\"logical_value\":"<<request.logical_value
++       <<",\"recording_sequence\":"<<request.submitted_sequence<<",\"completed_recording_sequence\":"<<completed<<",\"selected_occurrence\":"<<c.occurrence<<",\"actual_site_confirmed\":"<<(c.confirmed?"true":"false")
++       <<"},\"pipeline_layout_handle\":\""<<hex(c.before.layout)<<"\",\"descriptor_set_layout_flags\":"<<c.layout.flags
++       <<",\"launch\":{\"command\":";
++    if(!c.confirmed)out<<"null";else out<<"\""<<(c.before.indirect?(c.before.counter?"vkCmdDrawMeshTasksIndirectCountEXT":"vkCmdDrawMeshTasksIndirectEXT"):"vkCmdDrawMeshTasksEXT")<<"\"";
++    out<<",\"draw_count\":"<<c.before.count<<",\"stride\":"<<c.before.stride<<",\"converted\":"<<(c.before.converted?"true":"false")
++       <<",\"original_buffer\":\""<<hex(c.before.argument_buffer)<<"\",\"original_buffer_offset\":"<<c.before.argument_offset<<",\"snapshot\":";
++    if(launch_sha.empty())out<<"null";else out<<"{\"path\":\"mesh-indirect.bin\",\"size\":12,\"sha256\":\""<<launch_sha<<"\"}";
++    out<<",\"group_count\":";if(launch_sha.empty())out<<"null";else out<<"["<<grid[0]<<","<<grid[1]<<","<<grid[2]<<"]";
++    out<<",\"zero_grid_no_execution\":";
++    if(launch_sha.empty())out<<"null";else out<<((!grid[0]||!grid[1]||!grid[2])?"true":"false");
++    out<<"},\"descriptor_layout\":[";
++    for(size_t i=0;i<c.layout.bindings.size();++i){const auto& b=c.layout.bindings[i];out<<(i?",":"")<<"{\"set\":0,\"binding\":"<<b.binding<<",\"type\":"<<b.type<<",\"count\":"<<b.count<<",\"stage_flags\":"<<b.stages<<"}";}
++    out<<"],\"bindings\":[";
++    for(size_t i=0;i<slices.size();++i){const auto& s=slices[i];out<<(i?",":"")<<"{\"set\":0,\"binding\":"<<s.binding<<",\"element\":"<<s.element<<",\"type\":"<<s.type<<",\"null_descriptor\":"<<(s.null_descriptor?"true":"false")<<",\"range_bytes\":";
++       if(s.null_descriptor)out<<"null";else out<<s.size;
++       out<<",\"buffer_handle\":\""<<hex(s.buffer)<<"\",\"allocation_row\":";
++       if(s.null_descriptor)out<<"null";else out<<s.row;
++       out<<",\"descriptor_range\":"<<s.descriptor_range<<",\"original_buffer_offset\":"<<s.offset<<",\"buffer_lifetime\":";
++       if(!s.null_descriptor&&lifetime(s.buffer))out<<lifetime(s.buffer);else out<<"null";
++       out<<",\"backing_generation\":null,\"snapshot\":";
++       if(s.null_descriptor)out<<"null";else out<<"{\"path\":\""<<s.artifact<<"\",\"size\":"<<s.size<<",\"sha256\":\""<<s.digest<<"\"}";
++       out<<"}";}
++    out<<"],\"features\":{\"nullDescriptor\":"<<(null_descriptor_enabled?"true":"false")<<"},\"subgroup\":{\"required_size\":";if(c.before.required_size)out<<c.before.required_size;else out<<"null";
++    out<<",\"require_full_subgroups\":"<<(c.before.require_full?"true":"false")<<"},\"associations\":[";
++    const char* manifests[]{"manifest.json","allocations.json","binding-provenance.json"};
++    for(unsigned i=0;i<3;++i){const auto digest=oo_dp::artifact_digest(manifests[i]);out<<(i?",":"")<<"{\"path\":\""<<manifests[i]<<"\",\"sha256\":";if(digest.empty())out<<"null";else out<<"\""<<digest<<"\"";out<<"}";}
++    out<<"],\"push_constants_not_used\":true,\"exact_shader_contract\":\"digest-pinned d8 mesh: logical readonly descriptors, no image or physical-pointer access; no push constants\",\"failures\":[";
++    for(size_t i=0;i<failures.size();++i)out<<(i?",":"")<<"\""<<failures[i]<<"\"";
++    out<<"],\"coverage\":{\"cpu_writers_quiesced\":false,\"import_aliases_proven\":false,\"fragment_resources\":false,\"draw_equivalent_inputs_proven\":false,\"whole_rendering_equivalence\":false},\"capture_position\":\"selected outside-rendering BEFORE copy; actual command confirmation recorded separately in event\",\"launch_role\":\"extra launch input, not a descriptor binding\",\"bounded_replay\":{\"max_window_groups\":32,\"zero_native_dimension_forbids_execution\":true}}\n";
++    const auto text=out.str();FILE* file=std::fopen(part.string().c_str(),"wbx");if(!file)return false;
++    const bool written=std::fwrite(text.data(),1,text.size(),file)==text.size();const bool closed=std::fclose(file)==0;
++    if(!written||!closed){std::remove(part.string().c_str());return false;}
++    std::error_code error;std::filesystem::rename(part,path,error);return !error;
++}
++} // namespace mkwvk::oo_mesh
+diff --git a/gpu/vk/page_table_capture.h b/gpu/vk/page_table_capture.h
+index 72abbfb..ac02b48 100644
+--- a/gpu/vk/page_table_capture.h
++++ b/gpu/vk/page_table_capture.h
+@@ -47,7 +47,7 @@ struct Request {
+     uint64_t key=0,variant=0,root_address=0,recording_part=0,logical_value=0,submitted_sequence=0;
+     int64_t present=0;
+     uint32_t root_push_offset=0,x=0,y=0,z=0;
+-    bool indirect=false;
++    bool indirect=false,mesh=false;
+     std::string shader_digest;
+ };
+ inline bool write_completed(const Request& request,const uint8_t* bytes,size_t size,uint64_t completed_sequence) {
+@@ -76,7 +76,7 @@ inline bool write_completed(const Request& request,const uint8_t* bytes,size_t s
+       "{\"schema\":\"open-ocarina.gpu-page-table/v1\",\"producer\":{\"stage\":\"page-table-only\",\"replay_complete\":false},"
+       "\"pipeline\":{\"program\":\"%016llx\",\"variant\":\"%016llx\",\"spirv_sha256\":\"%s\"},"
+       "\"dispatch\":{\"kind\":\"%s\",\"group_count\":%s,\"present_observed\":%lld,\"identity_event_id\":null},"
+-      "\"command_position\":\"immediately before selected compute dispatch, after descriptor and push binding\","
++      "\"command_position\":\"%s\","
+       "\"submission\":{\"recording_part\":%llu,\"logical_value\":%llu,\"recording_sequence\":%llu,\"completed_recording_sequence\":%llu},"
+       "\"table\":{\"artifact\":\"page-table.bin\",\"size\":%llu,\"sha256\":\"%s\",\"entry_count\":%llu,\"entry_bytes\":8,\"byte_order\":\"little\","
+       "\"root_device_address\":\"%016llx\",\"root_push_offset\":%u,\"page_size\":4096,"
+@@ -87,7 +87,8 @@ inline bool write_completed(const Request& request,const uint8_t* bytes,size_t s
+       "\"limitations\":[\"No complete physical-memory capture or replay\",\"Table entries are device addresses, not copied allocation payloads\","
+       "\"Indirect dispatch counts remain unknown\",\"Recording sequence is completion evidence, not shader timing\"]}\n",
+       (unsigned long long)request.key,(unsigned long long)request.variant,request.shader_digest.c_str(),
+-      request.indirect?"indirect":"direct",grid,(long long)request.present,(unsigned long long)request.recording_part,
++      request.indirect?"indirect":"direct",grid,(long long)request.present,
++      request.mesh?"outside rendering before selected mesh preparation; actual command confirmation is separate":"immediately before selected compute dispatch, after descriptor and push binding",(unsigned long long)request.recording_part,
+       (unsigned long long)request.logical_value,(unsigned long long)request.submitted_sequence,(unsigned long long)completed_sequence,
+       (unsigned long long)size,digest.c_str(),(unsigned long long)kEntries,(unsigned long long)request.root_address,request.root_push_offset);
+     const bool manifest_closed=std::fclose(file)==0;
+diff --git a/gpu/vk/vk_draw.cpp b/gpu/vk/vk_draw.cpp
+index 9462dd3..9ec5d5a 100644
+--- a/gpu/vk/vk_draw.cpp
++++ b/gpu/vk/vk_draw.cpp
+@@ -50,6 +50,7 @@
+ #include "vk_shader.h"
+ #include "graphics_identity.h"
+ #include "dispatch_parameters.h"
++#include "mesh_input_capture.h"
+ #include "vk_texture.h"
+ #include "movie_upscale_policy.h"
+ #include "skip_code.h"
+@@ -708,6 +709,11 @@ void ensure_layout(Program& p) {
+             captured.bindings.push_back({0,binding.binding,(uint32_t)binding.descriptorType,binding.descriptorCount,binding.stageFlags});
+         oo_dp::note_layout(std::move(captured));
+     }
++    if (oo_mesh::enabled() && p.key==oo_mesh::kProgram && p.variant==oo_mesh::kVariant) {
++        oo_mesh::Layout capture;capture.handle=(uint64_t)(uintptr_t)layout;capture.flags=li.flags;
++        for(const auto& b:bindings)capture.bindings.push_back({b.binding,(uint32_t)b.descriptorType,b.descriptorCount,b.stageFlags});
++        oo_mesh::note_layout(std::move(capture),p.key,p.variant);
++    }
+     p.push_stages = stages;
+     for (const Stage& st : p.stages) p.uses_render_area |= st.info.uses_render_area;
+     p.uses_push = p.uses_render_area;
+@@ -6031,7 +6037,8 @@ bool mesh_indirect_convert(VkCommandBuffer cmd, const DrawArgs& d) {
+         std::lock_guard lk(mesh_ring_mu);
+         if (!mesh_ring) {
+             void* unused = nullptr;
+-            if (!create_buffer(kMeshRing, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT, false, mesh_ring,
++            if (!create_buffer(kMeshRing, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT |
++                               (oo_mesh::enabled()?VK_BUFFER_USAGE_TRANSFER_SRC_BIT:0), false, mesh_ring,
+                                mesh_ring_mem, &unused))
+                 return false;
+         }
+@@ -6681,6 +6688,24 @@ static bool fallback_list_held(uint64_t list) {
+     return false;
+ }
+ 
++// Only metadata; the GPU snapshot is prepared outside rendering and confirmed at the actual native call.
++oo_mesh::Event oo_mesh_event(VkCommandBuffer cmd,const Program& p,oo_graphics_identity::Command command,
++                              bool converted,bool rewritten,VkBuffer args,VkDeviceSize offset,uint32_t count,uint32_t stride,VkBuffer counter) {
++    oo_mesh::Event event;event.command=(uint64_t)(uintptr_t)cmd;event.key=p.key;event.variant=p.variant;
++    event.layout=(uint64_t)(uintptr_t)p.layout;event.stage_count=(uint32_t)p.stages.size();
++    memory_pt_recording_info(cmd,&event.part,&event.logical);
++    if(!p.stages.empty()) {
++        const auto& stage=p.stages[0];event.stage_index=0;event.nvn_stage=stage.nvn_stage;event.vk_stage=stage.vk_stage;
++        if(stage.oo_identity.valid)event.digest=oo_identity::hex(stage.oo_identity.digest);
++        VkPipelineShaderStageCreateInfo info{VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO};info.stage=stage.vk_stage;pin_subgroup(info);
++        if(info.pNext)event.required_size=static_cast<const VkPipelineShaderStageRequiredSubgroupSizeCreateInfo*>(info.pNext)->requiredSubgroupSize;
++        event.require_full=(info.flags&VK_PIPELINE_SHADER_STAGE_CREATE_REQUIRE_FULL_SUBGROUPS_BIT)!=0;
++    }
++    event.indirect=command!=oo_graphics_identity::Command::Direct;event.converted=converted;event.rewritten=rewritten;
++    event.argument_buffer=(uint64_t)(uintptr_t)args;event.argument_offset=offset;event.count=count;event.stride=stride;event.counter=(uint64_t)(uintptr_t)counter;
++    return event;
++}
++
+ // Open-Ocarina native mesh identity only: no resource reads, copies or policy changes.
+ void oo_graphics_identity_record(VkCommandBuffer cmd, const Program& p, const NvnState& s, const Targets& at,
+                                  VkPrimitiveTopology topology, const DrawArgs& d, oo_graphics_identity::Command command,
+@@ -6720,6 +6745,8 @@ void oo_graphics_identity_record(VkCommandBuffer cmd, const Program& p, const Nv
+     event.depth_test = (uint32_t)s.ds.dt; event.depth_write = (uint32_t)s.ds.dw; event.depth_compare = (uint32_t)s.ds.df;
+     event.depth_clamp = s.depth_clamp; event.alpha_to_coverage = s.ms.a2c != 0;
+     event.vendor = dev.props.vendorID; event.device = dev.props.deviceID; event.driver = dev.props.driverVersion;
++    if (oo_mesh::enabled())
++        memory_mesh_inputs_confirm(cmd,oo_mesh_event(cmd,p,command,converted,rewritten,arguments,argument_offset,count,stride,counter));
+     oo_graphics_identity::emit(event);
+ }
+ 
+@@ -7110,6 +7137,19 @@ void draw(VkCommandBuffer cmd, NvnState& s, const DrawArgs& d) {
+         SKIP_HERE();
+     }
+     if (fallback_role == FallbackRole::Colour) fallback_list_hold(d.indirect, false);
++    if (oo_mesh::enabled() && p.mesh && !p.fallback && p.key==oo_mesh::kProgram && p.variant==oo_mesh::kVariant) {
++        auto event=oo_mesh_event(cmd,p,d.indirect?oo_graphics_identity::Command::Indirect:oo_graphics_identity::Command::Direct,
++                                 mesh_conv_buf!=VK_NULL_HANDLE,mesh_rewrite,mesh_conv_buf,mesh_conv_off,
++                                 (uint32_t)std::clamp(d.max,1,4096),12,d.count_addr?(VkBuffer)(uintptr_t)1:VK_NULL_HANDLE);
++        event.fresh_descriptors=!same_desc&&dw().prog==&p;
++        event.safe_boundary=!at.has_block_images&&!dump_on()&&!probe_on()&&!gprof_on()&&!stats_frame_now()&&!env_on("RX_VK_GPU_DUMP");
++        if (memory_mesh_inputs_wanted(cmd,event)) {
++            end_pass(cmd); // transfers must be outside rendering and before this draw's StatsQuery begins
++            memory_allocation_descriptors(cmd,dw().writes);
++            memory_pt_snapshot_record(cmd,p.key,p.variant,event.digest.c_str(),0,0,0,1,texture_frame_no(),
++                                      Shader::Backend::SPIRV::GUEST_PAGES_PUSH_OFFSET);
++        }
++    }
+     {
+         FINE_SCOPE(FT_HAZARD);
+         begin_pass(cmd, at);
+diff --git a/gpu/vk/vk_internal.h b/gpu/vk/vk_internal.h
+index 14ad262..4a803a3 100644
+--- a/gpu/vk/vk_internal.h
++++ b/gpu/vk/vk_internal.h
+@@ -152,6 +152,9 @@ void memory_pt_snapshot_record(VkCommandBuffer cmd, uint64_t key, uint64_t varia
+                                uint32_t root_push_offset);
+ void memory_allocation_descriptors(VkCommandBuffer cmd,const std::vector<VkWriteDescriptorSet>& writes);
+ void memory_allocation_after(VkCommandBuffer cmd);
++namespace oo_mesh {struct Event;}
++bool memory_mesh_inputs_wanted(VkCommandBuffer cmd,const oo_mesh::Event& event);
++void memory_mesh_inputs_confirm(VkCommandBuffer cmd,const oo_mesh::Event& event);
+ void memory_pt_snapshot_submitted(VkCommandBuffer cmd, uint64_t part, uint64_t sequence, bool succeeded);
+ void memory_pt_snapshot_collect(uint64_t completed_recording_sequence);
+ void memory_pt_snapshot_discard(VkCommandBuffer cmd, uint64_t recording_part);
+diff --git a/gpu/vk/vk_memory.cpp b/gpu/vk/vk_memory.cpp
+index ba805fc..0d0a3ce 100644
+--- a/gpu/vk/vk_memory.cpp
++++ b/gpu/vk/vk_memory.cpp
+@@ -31,6 +31,7 @@
+ #include "binding_provenance.h"
+ #include "image_capture.h"
+ #include "dispatch_parameters.h"
++#include "mesh_input_capture.h"
+ #include <vk_mem_alloc.h>
+ #include "vk_texture.h"   // (upload_command_buffer)
+ #include "vk_gprof.h"      // (RX_VK_PASS_TIMING)
+@@ -521,6 +522,7 @@ struct OoPagePending {
+ };
+ OoPagePending oo_page_pending;
+ oo_dp::Capture oo_dispatch_pending;
++oo_mesh::Capture oo_mesh_pending;
+ oo_bind::Snapshot oo_binding_pending;
+ oo_alloc::SelectionCounter oo_capture_selection;
+ std::mutex oo_page_mutex;
+@@ -529,6 +531,18 @@ extern VmaAllocator vma;
+ void oo_allocation_record(VkCommandBuffer cmd);
+ void oo_allocation_release();
+ void oo_allocation_collect(const oo_pt::Request&,uint64_t,bool,const uint8_t*);
++bool memory_mesh_inputs_wanted(VkCommandBuffer cmd,const oo_mesh::Event& event) {
++    if(!oo_mesh::enabled()||!oo_mesh::identity(event)||!memory_pt_recording_supported())return false;
++    std::lock_guard lock(oo_page_mutex);
++    if(oo_page_pending.attempted||!cmd||!guest_pages_buffer||!guest_pages_address)return false;
++    if(!oo_capture_selection.observe(true,oo_alloc::selection_config()))return false;
++    oo_mesh::prepare(event);return true;
++}
++void memory_mesh_inputs_confirm(VkCommandBuffer cmd,const oo_mesh::Event& event) {
++    if(!oo_mesh::enabled())return;
++    std::lock_guard lock(oo_page_mutex);
++    if(oo_page_pending.active&&oo_page_pending.command==cmd)oo_mesh::confirm(oo_mesh_pending,event);
++}
+ bool memory_pt_snapshot_enabled() { return oo_pt::config().enabled; }
+ void memory_pt_snapshot_record(VkCommandBuffer cmd,uint64_t key,uint64_t variant,const char* digest,
+                                uint32_t x,uint32_t y,uint32_t z,uint64_t indirect,int64_t present,
+@@ -545,7 +559,8 @@ void memory_pt_snapshot_record(VkCommandBuffer cmd,uint64_t key,uint64_t variant
+     uint64_t recording_part=0,logical_value=0;
+     if(pending.attempted||!cmd||!guest_pages_buffer||!guest_pages_address||
+        !memory_pt_recording_info(cmd,&recording_part,&logical_value)) return;
+-    const bool selected=oo_capture_selection.observe(true,oo_alloc::selection_config());
++    const bool mesh_selected=oo_mesh::prepared((uint64_t)(uintptr_t)cmd,key,variant,digest);
++    const bool selected=mesh_selected||oo_capture_selection.observe(true,oo_alloc::selection_config());
+     if(oo_capture_selection.observed==1||selected)
+         logf("vk: Open-Ocarina exact capture filter %016llx:%016llx sha256 %s matched occurrence %llu; requested %llu",
+             (unsigned long long)key,(unsigned long long)variant,digest,(unsigned long long)oo_capture_selection.observed,
+@@ -563,6 +578,8 @@ void memory_pt_snapshot_record(VkCommandBuffer cmd,uint64_t key,uint64_t variant
+     pending.request.recording_part=recording_part;pending.request.logical_value=logical_value;
+     pending.request.x=x;pending.request.y=y;pending.request.z=z;pending.request.indirect=indirect!=0;pending.request.present=present;
+     pending.command=cmd;
++    pending.request.mesh=mesh_selected;
++    oo_mesh_pending=oo_mesh::select((uint64_t)(uintptr_t)cmd,pending.request,oo_capture_selection.observed);
+     oo_dispatch_pending=oo_dp::select((uint64_t)(uintptr_t)cmd,pending.request,oo_capture_selection.observed);
+     VkBufferMemoryBarrier2 before{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2};
+     before.srcStageMask=VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;before.srcAccessMask=VK_ACCESS_2_MEMORY_WRITE_BIT;
+@@ -4798,6 +4815,18 @@ void oo_allocation_record(VkCommandBuffer cmd) { // oo_page_mutex held; no CPU g
+         else if(descriptor.offset>=it->size||(descriptor.range!=VK_WHOLE_SIZE&&descriptor.range>it->size-descriptor.offset))
+             state.failures.push_back("descriptor_range_unresolved");
+     }
++    if(oo_mesh_pending.selected&&oo_mesh_pending.before.argument_buffer) {
++        const auto buffer=(VkBuffer)(uintptr_t)oo_mesh_pending.before.argument_buffer;
++        if(std::none_of(state.rows.begin(),state.rows.end(),[&](const auto& row){return row.buffer==(uint64_t)(uintptr_t)buffer;})) {
++            OoBufferOwner owner;
++            if(memory_allocation_retain_buffer(buffer,&owner)) {
++                const auto count=state.rows.size();
++                add(buffer,owner.allocation,VK_NULL_HANDLE,0,0,owner.usage,{},"mesh-launch-input",owner.size);
++                if(state.rows.size()>count)state.retained_renderer_buffers.push_back(buffer);
++                else memory_allocation_release_buffer(buffer);
++            } else state.failures.push_back("mesh_launch_owner_unknown");
++        }
++    }
+     oo_image_prepare(cmd);
+     oo_bind::observe([&](auto& ledger){
+         std::vector<oo_bind::Wanted> wanted;
+@@ -4831,7 +4860,7 @@ void oo_allocation_record(VkCommandBuffer cmd) { // oo_page_mutex held; no CPU g
+ void memory_allocation_after(VkCommandBuffer cmd) {
+     if(!oo_alloc::config().enabled)return;
+     std::lock_guard lock(oo_page_mutex);auto& state=oo_alloc_pending;
+-    if(!state.active||state.command!=cmd||state.after_recorded)return;
++    if(!state.active||state.command!=cmd||state.after_recorded||oo_page_pending.request.mesh)return; // mesh inputs are BEFORE-only; later computes cannot supply an AFTER
+     oo_allocation_copy_phase(cmd,true);state.after_recorded=true;
+ }
+ void oo_allocation_release() { // oo_page_mutex held; cancellation or exact completion only.
+@@ -4850,12 +4879,14 @@ void oo_allocation_release() { // oo_page_mutex held; cancellation or exact comp
+ void oo_allocation_collect(const oo_pt::Request& request,uint64_t completed,bool table_ok,const uint8_t* table) {
+     auto& state=oo_alloc_pending;if(!state.active)return;
+     bool invalidated=state.copies&&state.after_recorded;
++    std::vector<oo_mesh::Payload> mesh_payloads(state.rows.size());
+     oo_image_collect(request,completed);
+     try {
+         for(size_t i=0;i<state.copies_by_row.size();++i) {
+             auto& row=state.rows[i];const auto& copy=state.copies_by_row[i];
+             if(!copy.before)continue;
+             const bool before_ok=invalidate_mapped_checked(copy.before_alloc,row.size);
++            mesh_payloads[i]={static_cast<const uint8_t*>(copy.before_map),row.size,before_ok};
+             const bool after_ok=state.after_recorded&&invalidate_mapped_checked(copy.after_alloc,row.size);
+             invalidated&=before_ok&&after_ok;
+             if(before_ok&&!oo_alloc::save_payload("buffer-"+std::to_string(i)+"-before.bin",static_cast<const uint8_t*>(copy.before_map),row.size,row.before_sha))state.failures.push_back("before_payload_export_failed");
+@@ -4879,6 +4910,15 @@ void oo_allocation_collect(const oo_pt::Request& request,uint64_t completed,bool
+             logf("vk: Open-Ocarina binding provenance %s (writer epoch and physical replay still unproven)",ok?"exported":"failed");
+         }catch(const std::exception& error){logf("vk: Open-Ocarina binding provenance export failed: %s",error.what());}
+     }
++    if(oo_mesh_pending.selected) {
++        try {
++            std::vector<std::pair<uint64_t,uint64_t>> lifetimes;
++            for(const auto& object:oo_binding_pending.objects)if(object.known&&object.wanted.kind=="buffer")
++                lifetimes.push_back({object.wanted.handle,object.object.id});
++            const bool exported=oo_mesh::write_completed(oo_mesh_pending,request,completed,state.rows,mesh_payloads,state.descriptors,lifetimes,dev.null_descriptor);
++            logf("vk: Open-Ocarina mesh inputs %s (BEFORE-only, NOT full graphics replay)",exported?"exported":"failed");
++        }catch(const std::exception& error){logf("vk: Open-Ocarina mesh input export failed: %s",error.what());}
++    }
+     oo_allocation_release();
+ }
+ 
