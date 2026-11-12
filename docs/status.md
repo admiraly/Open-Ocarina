@@ -74,3 +74,16 @@ digests match the reviewed nightly modules, with task/mesh requesting 32 lanes
 and fragment unpinned. [Runtime metadata](../research/runtime-graphics-identity-observation.json)
 retains attachment formats and explicitly unknown indirect values/driver widths.
 This closes draw-site identity for that run; complete graphics replay remains open.
+
+The [paired runtime-policy compilation](graphics-runtime-policy.md) now controls
+the actual four recorded compiler overrides and observed attachment formats.
+Those settings materially change register allocation, so earlier cleared-policy
+statistics are retained as separate diagnostics. Conditional SIMD8 still has a
+substantial codegen pressure reduction; real shader equivalence and performance
+remain unverified.
+
+[Backing and CPU-writer analysis](../research/physical-replay-closure.md) identifies
+the next missing producer boundaries: original backing lifetimes/generations,
+committed sparse bind intervals and complete writer coverage. Guest interval
+equality cannot substitute for those identities, and frozen replay agreement
+must remain distinct from live snapshot atomicity.

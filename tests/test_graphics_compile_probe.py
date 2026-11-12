@@ -10,7 +10,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from tools.graphics_compile_probe import configuration, graphics_driver_identity, layout_text, reflect_stage, run, ROOT
+from tools.graphics_compile_probe import (configuration, controlled_driver_environment, graphics_driver_identity,
+                                         layout_text, reflect_stage, run, ROOT)
 from tests.test_compile_probe import instruction, uniform
 
 
@@ -137,6 +138,24 @@ class GraphicsCompileProbeTests(unittest.TestCase):
             self.assertNotIn(forbidden, source)
         self.assertIn("props[i].stages", source)
         self.assertNotIn("DISABLE_OPTIMIZATION", source)
+
+    def test_driver_profiles_override_poisoned_ambient_values(self):
+        ambient = {"HS_CS32_MAX_INSTS": "1", "HS_SPILL_BATCH": "0", "HS_PUSH_SHADOW": "7",
+                   "shader_spilling_rate": "999", "INTEL_DEBUG": "poison", "HS_SPILL_PCT": "99",
+                   "HS_RA_DEBUG": "1", "HS_FORCE_SIMD8": "1", "HS_LARGE_GRF": "1", "DISPLAY": ":0"}
+        diagnostic, cleared = controlled_driver_environment("diagnostic", ambient)
+        self.assertTrue(all(value is None for value in cleared["controlled_options"].values()))
+        self.assertEqual(diagnostic, {"DISPLAY": ":0"})
+        runtime, policy = controlled_driver_environment("runtime", ambient)
+        self.assertEqual({k: v for k, v in runtime.items() if k != "DISPLAY"}, {
+            "HS_CS32_MAX_INSTS": "100000", "HS_SPILL_BATCH": "1", "HS_PUSH_SHADOW": "1", "shader_spilling_rate": "1"})
+        self.assertEqual(policy["controlled_options"]["HS_SPILL_BATCH"], "1")
+        self.assertNotIn("INTEL_DEBUG", runtime)
+        self.assertEqual(ambient["shader_spilling_rate"], "999")
+
+    def test_unknown_driver_profile_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "Unknown"):
+            controlled_driver_environment("inherited", {})
 
 
 if __name__ == "__main__":

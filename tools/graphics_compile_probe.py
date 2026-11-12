@@ -25,6 +25,23 @@ ENABLED_FEATURES = ["robustBufferAccess", "robustBufferAccess2", "shaderInt16", 
                     "shaderStorageBufferArrayDynamicIndexing", "shaderImageGatherExtended",
                     "fragmentStoresAndAtomics", "uniformBufferStandardLayout", "bufferDeviceAddress",
                     "shaderFloat16", "shaderInt8", "subgroupSizeControl", "dynamicRendering", "meshShader"]
+CONTROLLED_DRIVER_OPTIONS = ("HS_CS32_MAX_INSTS", "HS_SPILL_BATCH", "HS_PUSH_SHADOW", "shader_spilling_rate",
+                             "INTEL_DEBUG", "HS_SPILL_PCT", "HS_RA_DEBUG", "HS_FORCE_SIMD8", "HS_LARGE_GRF")
+DRIVER_POLICIES = {"diagnostic": {}, "runtime": {"HS_CS32_MAX_INSTS": "100000", "HS_SPILL_BATCH": "1",
+                                               "HS_PUSH_SHADOW": "1", "shader_spilling_rate": "1"}}
+
+
+def controlled_driver_environment(name, ambient):
+    """Never inherit the selected compiler knobs, including unset diagnostic values."""
+    if name not in DRIVER_POLICIES:
+        raise ValueError("Unknown graphics driver policy")
+    environment = dict(ambient)
+    for key in CONTROLLED_DRIVER_OPTIONS:
+        environment.pop(key, None)
+    environment.update(DRIVER_POLICIES[name])
+    policy = {"name": name, "controlled_options": {key: environment.get(key) for key in CONTROLLED_DRIVER_OPTIONS},
+              "full_environment_snapshot": False}
+    return environment, policy
 
 
 def reflect_stage(data, stage):
@@ -169,6 +186,7 @@ def graphics_driver_identity(path, build):
 
 def run(args):
     config, modules = configuration(json.loads(args.manifest.read_text()), args.manifest.resolve().parent)
+    environment, driver_policy = controlled_driver_environment(getattr(args, "driver_policy", "diagnostic"), os.environ)
     if not 1 <= args.timeout <= 600 or not 0 <= args.device <= 255:
         raise ValueError("Invalid timeout or device index")
     output = private_output(args.output)
@@ -194,6 +212,7 @@ def run(args):
                     "-o", str(executable)], check=True, capture_output=True, text=True, timeout=60)
     report = {"schema": 1, "compile_only": True, "dispatch_executed": False, "render_executed": False,
               "device_opened": False, "configuration": config, "validation": validation,
+              "driver_policy": driver_policy,
               "validator": {"version": validator_version, "flags": ["--target-env", "vulkan1.3", "--uniform-buffer-standard-layout"]},
               "helper_build_flags": BUILD_FLAGS, "helper_sha256": hashlib.sha256(executable.read_bytes()).hexdigest(),
               "helper_source_sha256": hashlib.sha256((ROOT / "tools" / "vulkan_graphics_compile_probe.c").read_bytes()).hexdigest(),
@@ -207,9 +226,6 @@ def run(args):
         if args.driver is None:
             raise ValueError("Explicit driver JSON required for device compilation")
         report["driver_identity"] = graphics_driver_identity(args.driver, args.mesa_build)
-        environment = os.environ.copy()
-        for key in ("HS_CS32_MAX_INSTS", "HS_SPILL_BATCH", "HS_PUSH_SHADOW", "shader_spilling_rate", "INTEL_DEBUG"):
-            environment.pop(key, None)
         environment["VK_DRIVER_FILES"] = str(args.driver.resolve())
         environment["MESA_SHADER_CACHE_DIR"] = str(output / "driver-cache")
         command = [str(executable), str(layout), str(args.device), *[str(output / f"stage-{i}.spv") for i in range(len(modules))]]
@@ -230,6 +246,8 @@ def main():
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--prepare-only", action="store_true", help="Validate, reflect and build; never open Vulkan")
+    parser.add_argument("--driver-policy", choices=tuple(DRIVER_POLICIES), default="diagnostic",
+                        help="Controlled compiler overrides: prior cleared diagnostic profile, or established runtime values")
     parser.add_argument("--driver", type=Path)
     parser.add_argument("--mesa-build", type=Path)
     parser.add_argument("--device", type=int, default=0)
