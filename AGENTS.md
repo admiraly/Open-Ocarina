@@ -1,7 +1,7 @@
 # Open-Ocarina development rules
 
 ## Objective
-Build a verifiable source-reconstruction and native-porting workflow for Ocarina of Time's Switch 2 executable and GPU workloads. Target correct rendering and real 60 FPS on Arc A770 before claiming a performance port. Hardware targets are goals, not achieved results.
+Build a verifiable source-reconstruction and native-porting workflow for Ocarina of Time's Switch 2 executable and GPU workloads. The active goal in `docs/goal.md` is correct, stable native-feature/native-quality rendering and real 60 FPS on the user's Arc A770, including investigation of Link's hair/foliage aliasing. Do not disable native work or quality to claim success. Hardware targets are goals, not achieved results.
 
 ## Boundaries
 - This repository contains tools, independently authored source, metadata and appropriately licensed patches. Never add game executables, generated translations of game code, assets, shader binaries, screenshots, saves, keys, packages, SDKs, credentials or raw logs.

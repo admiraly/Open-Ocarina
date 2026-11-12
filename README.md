@@ -4,6 +4,8 @@ Source reconstruction and native PC porting research for **The Legend of Zelda: 
 
 The first performance target is correct rendering at a sustained, real **60 FPS on Intel Arc A770**, with a defined scene and settings. Higher quality follows a measured frame-time budget. Modern integrated GPUs are a later, device-specific target.
 
+[The active goal](docs/goal.md) requires native features and visual quality, stable gameplay, and explicit hair/foliage aliasing investigation. Turning off rendering work is not an accepted performance improvement.
+
 **Current state:** working analysis tools, bounded Ghidra decompilation, and the first independently authored leaf-function matching probes. There is no complete reconstructed game or validated performance gain yet. [Status](docs/status.md) records the evidence and limitations; [the roadmap](docs/roadmap.md) defines the next exit tests.
 
 **Development strategy:** [Arc-first targeted reconstruction](docs/strategy.md). Full CPU matching is a supporting long-term track, not a prerequisite for fixing the existing open renderer and shader translator.
