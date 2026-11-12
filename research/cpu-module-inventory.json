@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "modules": [
+    {
+      "module": "main",
+      "size": 81022676,
+      "sha256": "2591fb99008d0814f8056c3f36b36790048ed857ff0ae2bb3a4c1e37b960a4de",
+      "build_id": "e0f3ccfaf50065ae4ea01eb5aeb13b1a45da3348000000000000000000000000",
+      "sections": {
+        "text": {
+          "file_offset": 260,
+          "memory_offset": 0,
+          "memory_size": 63201744,
+          "stored_size": 63201744,
+          "compressed": false
+        },
+        "rodata": {
+          "file_offset": 63202004,
+          "memory_offset": 63205376,
+          "memory_size": 12603520,
+          "stored_size": 12603520,
+          "compressed": false
+        },
+        "data": {
+          "file_offset": 75805524,
+          "memory_offset": 75812864,
+          "memory_size": 5217152,
+          "stored_size": 5217152,
+          "compressed": false
+        }
+      }
+    },
+    {
+      "module": "sdk",
+      "size": 7833714,
+      "sha256": "3ae3cd4cf340d72bdaba9e6f66016a74c1eae13737a5f7299375ed6654b9b1c5",
+      "build_id": "1643a838814f9c10c696f930ed681e7fa3fb9af8000000000000000000000000",
+      "sections": {
+        "text": {
+          "file_offset": 262,
+          "memory_offset": 0,
+          "memory_size": 8906832,
+          "stored_size": 5150355,
+          "compressed": true
+        },
+        "rodata": {
+          "file_offset": 5150617,
+          "memory_offset": 8908800,
+          "memory_size": 6093948,
+          "stored_size": 2613933,
+          "compressed": true
+        },
+        "data": {
+          "file_offset": 7764550,
+          "memory_offset": 15003648,
+          "memory_size": 435448,
+          "stored_size": 69164,
+          "compressed": true
+        }
+      }
+    },
+    {
+      "module": "subsdk0",
+      "size": 533396,
+      "sha256": "0d32c4bdbcfcfa1c4110c37eff18eaf70061a55090b7fedc741a2e37224065ba",
+      "build_id": "b0110087a7b339ef74588d3bd0b4dd5d5c7abd0f000000000000000000000000",
+      "sections": {
+        "text": {
+          "file_offset": 262,
+          "memory_offset": 0,
+          "memory_size": 542576,
+          "stored_size": 394497,
+          "compressed": true
+        },
+        "rodata": {
+          "file_offset": 394759,
+          "memory_offset": 544768,
+          "memory_size": 234548,
+          "stored_size": 136659,
+          "compressed": true
+        },
+        "data": {
+          "file_offset": 531418,
+          "memory_offset": 782336,
+          "memory_size": 69648,
+          "stored_size": 1978,
+          "compressed": true
+        }
+      }
+    },
+    {
+      "module": "rtld",
+      "size": 10524,
+      "sha256": "219f25ef4a64a704e86dacfeb25d9e8977045f2145e629268b94baf34d5e0bbe",
+      "build_id": "8e213f228d12c7b0f8c21c3ce81b95e214417369000000000000000000000000",
+      "sections": {
+        "text": {
+          "file_offset": 263,
+          "memory_offset": 0,
+          "memory_size": 10048,
+          "stored_size": 8039,
+          "compressed": true
+        },
+        "rodata": {
+          "file_offset": 8302,
+          "memory_offset": 12288,
+          "memory_size": 2532,
+          "stored_size": 1779,
+          "compressed": true
+        },
+        "data": {
+          "file_offset": 10081,
+          "memory_offset": 16384,
+          "memory_size": 49160,
+          "stored_size": 443,
+          "compressed": true
+        }
+      }
+    }
+  ],
+  "matching_status": "not assessed; hashes and metadata do not establish source matching"
+}

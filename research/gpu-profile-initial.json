@@ -1,0 +1,461 @@
+{
+  "source_line": 1840,
+  "presents": 600,
+  "total_ms": 80.52,
+  "kinds": [
+    {
+      "queue": "m",
+      "kind": "pass",
+      "ms": 42.195,
+      "spans_per_frame": 175.3,
+      "items_per_frame": 2165.5,
+      "share_of_total_pct": 52.403
+    },
+    {
+      "queue": "m",
+      "kind": "dispatch",
+      "ms": 25.797,
+      "spans_per_frame": 161.0,
+      "items_per_frame": 161.0,
+      "share_of_total_pct": 32.038
+    },
+    {
+      "queue": "u",
+      "kind": "msync",
+      "ms": 4.902,
+      "spans_per_frame": 52.0,
+      "items_per_frame": 2166.3,
+      "share_of_total_pct": 6.088
+    },
+    {
+      "queue": "m",
+      "kind": "barrier",
+      "ms": 1.659,
+      "spans_per_frame": 366.8,
+      "items_per_frame": 366.8,
+      "share_of_total_pct": 2.06
+    },
+    {
+      "queue": "u",
+      "kind": "rbrefresh",
+      "ms": 1.222,
+      "spans_per_frame": 26.0,
+      "items_per_frame": 313.6,
+      "share_of_total_pct": 1.518
+    },
+    {
+      "queue": "m",
+      "kind": "wb",
+      "ms": 1.096,
+      "spans_per_frame": 9.6,
+      "items_per_frame": 176.5,
+      "share_of_total_pct": 1.361
+    },
+    {
+      "queue": "m",
+      "kind": "fsr3",
+      "ms": 0.911,
+      "spans_per_frame": 7.0,
+      "items_per_frame": 7.0,
+      "share_of_total_pct": 1.131
+    },
+    {
+      "queue": "m",
+      "kind": "ubupd",
+      "ms": 0.281,
+      "spans_per_frame": 4.3,
+      "items_per_frame": 80.0,
+      "share_of_total_pct": 0.349
+    },
+    {
+      "queue": "u",
+      "kind": "barrier",
+      "ms": 0.176,
+      "spans_per_frame": 59.4,
+      "items_per_frame": 59.4,
+      "share_of_total_pct": 0.219
+    },
+    {
+      "queue": "m",
+      "kind": "event",
+      "ms": 0.129,
+      "spans_per_frame": 19.0,
+      "items_per_frame": 19.0,
+      "share_of_total_pct": 0.16
+    },
+    {
+      "queue": "m",
+      "kind": "xfer",
+      "ms": 0.096,
+      "spans_per_frame": 6.8,
+      "items_per_frame": 6.8,
+      "share_of_total_pct": 0.119
+    },
+    {
+      "queue": "m",
+      "kind": "clear",
+      "ms": 0.017,
+      "spans_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "share_of_total_pct": 0.021
+    },
+    {
+      "queue": "u",
+      "kind": "mmake",
+      "ms": 0.003,
+      "spans_per_frame": 0.0,
+      "items_per_frame": 0.0,
+      "share_of_total_pct": 0.004
+    },
+    {
+      "queue": "u",
+      "kind": "ptable",
+      "ms": 0.0,
+      "spans_per_frame": 0.0,
+      "items_per_frame": 0.0,
+      "share_of_total_pct": 0.0
+    }
+  ],
+  "spans": [
+    {
+      "source_line": 1860,
+      "queue": "m",
+      "ms": 7.517,
+      "runs_per_frame": 6.0,
+      "items_per_frame": 6.0,
+      "mb_per_frame": 0.0,
+      "description": "dispatch  prog cc62764061c44f6a",
+      "program_hashes": [
+        "cc62764061c44f6a"
+      ],
+      "share_of_total_pct": 9.336
+    },
+    {
+      "source_line": 1861,
+      "queue": "m",
+      "ms": 6.336,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "pass 1536x864 f122 1c+d, 0-4 draws, first prog d8e59341cf4f629c, last prog d8e59341cf4f629c",
+      "program_hashes": [
+        "d8e59341cf4f629c",
+        "d8e59341cf4f629c"
+      ],
+      "share_of_total_pct": 7.869
+    },
+    {
+      "source_line": 1862,
+      "queue": "m",
+      "ms": 5.877,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "pass 1536x864 f122 1c+d, 0-4 draws, first prog 43ec86f35fd937b9, last prog 43ec86f35fd937b9",
+      "program_hashes": [
+        "43ec86f35fd937b9",
+        "43ec86f35fd937b9"
+      ],
+      "share_of_total_pct": 7.299
+    },
+    {
+      "source_line": 1863,
+      "queue": "u",
+      "ms": 4.902,
+      "runs_per_frame": 52.0,
+      "items_per_frame": 2166.3,
+      "mb_per_frame": 15.77,
+      "description": "msync copies (CPU pages from a capture -> mirror)",
+      "program_hashes": [],
+      "share_of_total_pct": 6.088
+    },
+    {
+      "source_line": 1864,
+      "queue": "m",
+      "ms": 3.508,
+      "runs_per_frame": 0.4,
+      "items_per_frame": 34.4,
+      "mb_per_frame": 0.0,
+      "description": "pass 1536x864 f122 1c+d, 33-256 draws, first prog ab82811383b384b5, last prog 7af4e4eb0e0f755c",
+      "program_hashes": [
+        "ab82811383b384b5",
+        "7af4e4eb0e0f755c"
+      ],
+      "share_of_total_pct": 4.357
+    },
+    {
+      "source_line": 1865,
+      "queue": "m",
+      "ms": 1.958,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "pass 1536x864 f122 1c+d, 0-4 draws, first prog 68642bb810ee3e7c, last prog 68642bb810ee3e7c",
+      "program_hashes": [
+        "68642bb810ee3e7c",
+        "68642bb810ee3e7c"
+      ],
+      "share_of_total_pct": 2.432
+    },
+    {
+      "source_line": 1866,
+      "queue": "m",
+      "ms": 1.867,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "pass 1536x864 f122 1c+d, 0-4 draws, first prog 3b8c07f2eb4bb7d9, last prog 3b8c07f2eb4bb7d9",
+      "program_hashes": [
+        "3b8c07f2eb4bb7d9",
+        "3b8c07f2eb4bb7d9"
+      ],
+      "share_of_total_pct": 2.319
+    },
+    {
+      "source_line": 1867,
+      "queue": "m",
+      "ms": 1.769,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "pass 1536x864 f122 1c+d, 0-4 draws, first prog 89ca750f9852b7ca, last prog 89ca750f9852b7ca",
+      "program_hashes": [
+        "89ca750f9852b7ca",
+        "89ca750f9852b7ca"
+      ],
+      "share_of_total_pct": 2.197
+    },
+    {
+      "source_line": 1868,
+      "queue": "m",
+      "ms": 1.758,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "pass 1536x864 f122 1c+d, 0-4 draws, first prog d4abbcb4c2140609, last prog d4abbcb4c2140609",
+      "program_hashes": [
+        "d4abbcb4c2140609",
+        "d4abbcb4c2140609"
+      ],
+      "share_of_total_pct": 2.183
+    },
+    {
+      "source_line": 1869,
+      "queue": "m",
+      "ms": 1.649,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "dispatch  prog 76b54f5bb0d7ce97",
+      "program_hashes": [
+        "76b54f5bb0d7ce97"
+      ],
+      "share_of_total_pct": 2.048
+    },
+    {
+      "source_line": 1870,
+      "queue": "m",
+      "ms": 1.507,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "pass 1536x864 f122 1c+d, 0-4 draws, first prog 51183fe750d5d0c8, last prog 51183fe750d5d0c8",
+      "program_hashes": [
+        "51183fe750d5d0c8",
+        "51183fe750d5d0c8"
+      ],
+      "share_of_total_pct": 1.872
+    },
+    {
+      "source_line": 1871,
+      "queue": "m",
+      "ms": 1.448,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "dispatch  prog ee7764a6b1ef459c",
+      "program_hashes": [
+        "ee7764a6b1ef459c"
+      ],
+      "share_of_total_pct": 1.798
+    },
+    {
+      "source_line": 1872,
+      "queue": "m",
+      "ms": 1.431,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "dispatch  prog 27ee9883e2a20323",
+      "program_hashes": [
+        "27ee9883e2a20323"
+      ],
+      "share_of_total_pct": 1.777
+    },
+    {
+      "source_line": 1873,
+      "queue": "m",
+      "ms": 1.254,
+      "runs_per_frame": 0.9,
+      "items_per_frame": 17.4,
+      "mb_per_frame": 0.0,
+      "description": "pass 1536x864 f122 1c+d, 5-32 draws, first prog 739acd678ae08655, last prog bbbc575ff0e57176",
+      "program_hashes": [
+        "739acd678ae08655",
+        "bbbc575ff0e57176"
+      ],
+      "share_of_total_pct": 1.557
+    },
+    {
+      "source_line": 1874,
+      "queue": "u",
+      "ms": 1.222,
+      "runs_per_frame": 26.0,
+      "items_per_frame": 313.6,
+      "mb_per_frame": 2.46,
+      "description": "rbrefresh copies (readback pages guest -> mirror)",
+      "program_hashes": [],
+      "share_of_total_pct": 1.518
+    },
+    {
+      "source_line": 1875,
+      "queue": "m",
+      "ms": 1.166,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "dispatch  prog 6935123dc8e37bca",
+      "program_hashes": [
+        "6935123dc8e37bca"
+      ],
+      "share_of_total_pct": 1.448
+    },
+    {
+      "source_line": 1876,
+      "queue": "m",
+      "ms": 1.163,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "pass 1536x864 f122 1c+d, 0-4 draws, first prog d905f52b7517c681, last prog d905f52b7517c681",
+      "program_hashes": [
+        "d905f52b7517c681",
+        "d905f52b7517c681"
+      ],
+      "share_of_total_pct": 1.444
+    },
+    {
+      "source_line": 1877,
+      "queue": "m",
+      "ms": 1.153,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "dispatch  prog 5b0baadba86c1489",
+      "program_hashes": [
+        "5b0baadba86c1489"
+      ],
+      "share_of_total_pct": 1.432
+    },
+    {
+      "source_line": 1878,
+      "queue": "m",
+      "ms": 1.096,
+      "runs_per_frame": 9.6,
+      "items_per_frame": 176.5,
+      "mb_per_frame": 67.62,
+      "description": "wb copies (mirror -> guest memory, with its two barriers)",
+      "program_hashes": [],
+      "share_of_total_pct": 1.361
+    },
+    {
+      "source_line": 1879,
+      "queue": "m",
+      "ms": 1.089,
+      "runs_per_frame": 3.0,
+      "items_per_frame": 3.0,
+      "mb_per_frame": 0.0,
+      "description": "pass 1600x1600 f124 0c+d, 0-4 draws, first prog 28dd2baa17ba10e1, last prog 28dd2baa17ba10e1",
+      "program_hashes": [
+        "28dd2baa17ba10e1",
+        "28dd2baa17ba10e1"
+      ],
+      "share_of_total_pct": 1.352
+    },
+    {
+      "source_line": 1880,
+      "queue": "m",
+      "ms": 1.034,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "dispatch  prog 4b03b3040d7cf076",
+      "program_hashes": [
+        "4b03b3040d7cf076"
+      ],
+      "share_of_total_pct": 1.284
+    },
+    {
+      "source_line": 1881,
+      "queue": "m",
+      "ms": 0.983,
+      "runs_per_frame": 1.0,
+      "items_per_frame": 1.0,
+      "mb_per_frame": 0.0,
+      "description": "dispatch indirect prog abccf81b45c5eb50",
+      "program_hashes": [
+        "abccf81b45c5eb50"
+      ],
+      "share_of_total_pct": 1.221
+    },
+    {
+      "source_line": 1882,
+      "queue": "m",
+      "ms": 0.814,
+      "runs_per_frame": 144.2,
+      "items_per_frame": 144.2,
+      "mb_per_frame": 0.0,
+      "description": "barrier (the game's nvnCommandBufferBarrier)",
+      "program_hashes": [],
+      "share_of_total_pct": 1.011
+    },
+    {
+      "source_line": 1883,
+      "queue": "m",
+      "ms": 0.791,
+      "runs_per_frame": 0.1,
+      "items_per_frame": 11.2,
+      "mb_per_frame": 0.0,
+      "description": "pass 1536x864 f122 1c+d, 33-256 draws, first prog ab82811383b384b5, last prog 92469b9a0371a32c",
+      "program_hashes": [
+        "ab82811383b384b5",
+        "92469b9a0371a32c"
+      ],
+      "share_of_total_pct": 0.982
+    },
+    {
+      "source_line": 1884,
+      "queue": "m",
+      "ms": 0.734,
+      "runs_per_frame": 0.1,
+      "items_per_frame": 8.2,
+      "mb_per_frame": 0.0,
+      "description": "pass 1536x864 f122 1c+d, 33-256 draws, first prog ab82811383b384b5, last prog a5ab9e9efb5f0553",
+      "program_hashes": [
+        "ab82811383b384b5",
+        "a5ab9e9efb5f0553"
+      ],
+      "share_of_total_pct": 0.912
+    }
+  ],
+  "expected_spans": 25,
+  "dispatches_per_frame": 161.0,
+  "interpretation": [
+    "GPU timestamps serialize preceding work; these spans are attribution, not normal frame latency.",
+    "Shares use combined recording and upload time; source per-queue percentages have different denominators.",
+    "Graphics first/last program hashes are endpoints; they do not identify every draw or its expensive stage.",
+    "Shader algorithms and allocator records cannot be identified from chronology alone.",
+    "Dispatch threshold is a configurable smoke check, not proof of a complete or equivalent scene."
+  ],
+  "source_sha256": "987cbbfd630bc756327cb8ea120bdadd32046281a209dabcbf775a50bc04a8ec"
+}

@@ -1,0 +1,12 @@
+--- a/src/util/register_allocate.c
++++ b/src/util/register_allocate.c
+@@ -528,3 +528,3 @@
+ {
+-   unsigned index = ra_get_adjacency_bit_index(n1, n2);
++   uint64_t index = ra_get_adjacency_bit_index(n1, n2);
+    BITSET_SET(g->adjacency, index);
+@@ -535,3 +535,3 @@
+ {
+-   unsigned index = ra_get_adjacency_bit_index(n1, n2);
++   uint64_t index = ra_get_adjacency_bit_index(n1, n2);
+    BITSET_CLEAR(g->adjacency, index);

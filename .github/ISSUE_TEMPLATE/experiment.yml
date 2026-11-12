@@ -1,0 +1,42 @@
+name: Reconstruction or performance experiment
+description: Propose a bounded change with reproducible evidence and a pass test.
+title: "Experiment: "
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Target and question
+      description: Name the function, shader program, verifier, or workload. Separate observations from hypotheses.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Current evidence
+      description: Include input hashes, public source references, tool versions and reviewed metadata. Keep game bytes, assets, generated translations, raw logs, credentials and private paths local.
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: Proposed change and scope
+      description: State which code will change, what remains unknown, and how the working install will be preserved.
+    validations:
+      required: true
+  - type: textarea
+    id: pass-test
+    attributes:
+      label: Pass test
+      description: Define the result that would validate the change and a negative case that must fail. A byte match, successful link, rendering check and FPS measurement are different claims.
+    validations:
+      required: true
+  - type: textarea
+    id: performance
+    attributes:
+      label: Performance controls, if applicable
+      description: Specify device, software versions, save and camera identity, scene state, input sequence, settings, compilation state, competing workloads, repetitions, sample duration and rendering checks.
+  - type: textarea
+    id: result
+    attributes:
+      label: Result and limitations
+      description: Fill this after the experiment. Record inconclusive or invalid comparisons explicitly. Publish reviewed metadata only.

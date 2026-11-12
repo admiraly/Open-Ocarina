@@ -1,0 +1,41 @@
+# Project status
+
+Updated 2026-11-12. This page distinguishes working tools, local observations, and unproven targets. It is not a completion percentage.
+
+## Implemented starting point
+
+- Module inventory reads NSO header metadata and computes SHA-256 hashes without exporting executable bytes.
+- GPU-profile analysis streams Hookshot timing tables, rejects incomplete captures, and ranks consumers using the combined recording/upload denominator.
+- Byte-range comparison requires a hash-pinned reference and explicit bounds. It reports mismatches without dumping original bytes.
+- The publication gate checks tracked/staged files for common private artifact types, binary content, credential-like strings, symlinks and machine-specific paths.
+
+These tools establish inputs and evidence. They do not reconstruct the game's source or prove a complete matching executable. The synthetic test suite is the CI entry point; optional external-tool probes are validated separately.
+
+Reviewed starting metadata is committed as [the module inventory](../research/cpu-module-inventory.json) and [the selected GPU profile](../research/gpu-profile-initial.json). The latter retains source-line references and interpretation limits. Original inputs and raw captures remain local.
+
+## Local observations
+
+The current investigation uses an Intel Arc A770 on Linux and an existing Hookshot installation.
+
+- The translated GPU programs assume 32-lane subgroup behavior. Forcing narrower execution previously changed rendering. Several large shaders at the required width compile with heavy register spilling.
+- A full-workload GPU-pass capture spread time across graphics, compute, and transfers. No single shader was shown to explain the entire frame. Timestamp instrumentation itself changes execution, so these spans are prioritization evidence rather than normal frame latency.
+- A newer Hookshot build enabled loop-based memory-table lookup and an optional native float atomic-add path. Exploratory runs remained in the low frame-rate range. Stable and nightly captures had different camera framing, so no controlled speedup claim follows from those runs.
+- A local Mesa adjacency-index regression test reproduced duplicate graph edges with the original index type and passed after widening two indices. The fixed driver built successfully. That establishes a compiler correctness fix; it does not establish a gameplay FPS improvement.
+
+## Progress measures
+
+| Measure | State | Required evidence |
+|---|---|---|
+| Input identity | Inventory tooling implemented | Reproducible module hashes and header validation |
+| Original toolchain reproduction | Unknown | Compiler fingerprints and a repeatable matching probe |
+| Authored source reconstruction | Not established | Reviewed source with provenance and bounded verification |
+| Byte matching | Comparator primitive implemented | Verified function identities, boundaries and reference revision |
+| Relocations and integration | Not established | Relocation-aware checks and an ordinary successful link |
+| Standalone playability | Not established by this repository | Startup, gameplay, save and load tests |
+| Rendering equivalence | Not established for a native rewrite | Reproducible replay and image/behavior checks |
+| Real 60 FPS on A770 | Target | Repeated equivalent-scene measurements with correct rendering |
+| Higher quality or integrated-GPU support | Future target | Device-specific measurements and an explicit quality budget |
+
+## Next work
+
+Follow the exit tests in [the roadmap](roadmap.md). Prioritize reproducible function and shader targets over broad setting sweeps. Keep private analysis outputs local and publish enough metadata to reproduce the procedure.
