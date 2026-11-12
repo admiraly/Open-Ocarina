@@ -1,0 +1,290 @@
+diff --git a/gpu/vk/vk_draw.cpp b/gpu/vk/vk_draw.cpp
+index c433404..7b8c043 100644
+--- a/gpu/vk/vk_draw.cpp
++++ b/gpu/vk/vk_draw.cpp
+@@ -9053,6 +9053,32 @@ void predicted_check() {
+     }).detach();
+ }
+
++// Open-Ocarina: identity at the actual recording point. No resources are read/copied,
++// no barriers or subgroup policies change, and this is explicitly NOT a replay capture.
++void oo_compute_identity(const Program& p, const NvnState& s, uint32_t x, uint32_t y, uint32_t z, uint64_t indirect) {
++    if (p.stages.empty()) return;
++    uint64_t fingerprint = 14695981039346656037ull;
++    for (const auto& b : s.ubo[5]) oo_identity::mix(fingerprint, b.addr), oo_identity::mix(fingerprint, b.size);
++    for (const auto& b : s.ssbo[5]) oo_identity::mix(fingerprint, b.addr), oo_identity::mix(fingerprint, b.size);
++    for (const auto value : s.tex[5]) oo_identity::mix(fingerprint, value);
++    for (const auto value : s.samp[5]) oo_identity::mix(fingerprint, value);
++    for (const auto value : s.img[5]) oo_identity::mix(fingerprint, value);
++    for (const auto value : p.binding_types) oo_identity::mix(fingerprint, uint64_t(value));
++    oo_identity::mix(fingerprint, s.bind_gen);
++    oo_identity::mix(fingerprint, registrations_generation());
++    oo_identity::mix(fingerprint, sampler_registrations_generation());
++    const auto ci = compute_pipeline_info(p, true);
++    uint32_t required = 0;
++    if (ci.stage.pNext) {
++        const auto* size = static_cast<const VkPipelineShaderStageRequiredSubgroupSizeCreateInfo*>(ci.stage.pNext);
++        if (size->sType == VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO) required = size->requiredSubgroupSize;
++    }
++    oo_identity::emit(p.stages[0].oo_identity, p.key, p.variant, program_cache_stamp(), p.workgroup,
++        x, y, z, indirect, fingerprint, presents_now, required,
++        (ci.stage.flags & VK_PIPELINE_SHADER_STAGE_CREATE_REQUIRE_FULL_SUBGROUPS_BIT) != 0,
++        dev.props.vendorID, dev.props.deviceID, dev.props.driverVersion);
++}
++
+ void dispatch(VkCommandBuffer cmd, NvnState& s, uint32_t x, uint32_t y, uint32_t z, uint64_t indirect) {
+     PROF(PROF_DISPATCH);
+     DispatchClock dclock;
+@@ -9387,8 +9413,10 @@ void dispatch(VkCommandBuffer cmd, NvnState& s, uint32_t x, uint32_t y, uint32_t
+                          (unsigned long long)indirect);
+                 dump_buffer(cmd, args.buffer, args.offset, 12, what);
+             }
++            if (oo_identity::selected(p.key, p.variant)) oo_compute_identity(p, s, x, y, z, indirect);
+             vkCmdDispatchIndirect(cmd, args.buffer, args.offset);
+         } else {
++            if (oo_identity::selected(p.key, p.variant)) oo_compute_identity(p, s, x, y, z, 0);
+             vkCmdDispatch(cmd, x, y, z);
+         }
+     }
+@@ -9629,6 +9657,9 @@ VkPipeline compute_pipeline_from_caches(const Program& p) {
+     return pl;
+ }
+ VkPipeline compute_pipeline_by_module_id(const Program& p, const uint8_t* id, uint32_t size) {
++    // Identity observations need the actual SPIR-V, not only an opaque driver identifier.
++    // Only the explicitly selected opt-in target takes the ordinary module path instead.
++    if (oo_identity::selected(p.key, p.variant)) return VK_NULL_HANDLE;
+     if (!dev.vk13.pipelineCreationCacheControl || !size) return VK_NULL_HANDLE;
+     VkComputePipelineCreateInfo ci = compute_pipeline_info(p, true);
+     // (VK_EXT_shader_module_identifier: no module, its identifier in the stage; only ever without compiling, which is all
+diff --git a/gpu/vk/vk_progcache.cpp b/gpu/vk/vk_progcache.cpp
+index 11ca449..6dcf098 100644
+--- a/gpu/vk/vk_progcache.cpp
++++ b/gpu/vk/vk_progcache.cpp
+@@ -369,7 +369,10 @@ void get_info(Reader& r, Shader::Info& i) {
+ void program_cache_save(const Program& p, const std::vector<std::vector<uint32_t>>& spirv) {
+     // (each stage's phis, for fallback_compute_pipelines: the SPIR-V is not kept after this. Before the program is published)
+     if (spirv.size() == p.stages.size())
+-        for (size_t k = 0; k < p.stages.size(); k++) p.stages[k].phis = fallback_size::spirv_phis(spirv[k].data(), spirv[k].size());
++        for (size_t k = 0; k < p.stages.size(); k++) {
++            p.stages[k].phis = fallback_size::spirv_phis(spirv[k].data(), spirv[k].size());
++            oo_identity::note_stage(p.key, p.variant, p.stages[k].oo_identity, spirv[k]);
++        }
+     disk_init();
+     if (!disk_on || spirv.size() != p.stages.size()) return;
+     std::vector<uint8_t> o;
+@@ -502,6 +505,7 @@ void program_cache_read(FILE* in, std::mutex* mu, uint64_t key, const std::vecto
+                 break;
+             }
+             st.module = make_module(spirv);
++            oo_identity::note_stage(p->key, p->variant, st.oo_identity, spirv);
+             st.phis = fallback_size::spirv_phis(spirv.data(), spirv.size());
+             ok = ok && st.module;
+         }
+@@ -619,6 +623,7 @@ bool complete_from(Program& p, FILE* in, std::mutex* mu) {
+         p.failed = true;
+         return false;
+     }
++    oo_identity::note_stage(p.key, p.variant, st.oo_identity, spirv);
+     st.phis = fallback_size::spirv_phis(spirv.data(), spirv.size());
+     module_id_learned(p.key, p.variant, st.module);   // (the next run's load makes its pipeline without this read: vk_programs.h)
+     return true;
+diff --git a/gpu/vk/vk_shader.h b/gpu/vk/vk_shader.h
+index 2ef5ef4..7a966c9 100644
+--- a/gpu/vk/vk_shader.h
++++ b/gpu/vk/vk_shader.h
+@@ -14,6 +14,7 @@
+
+ #include "vk_internal.h"
+ #include "vk_state.h"
++#include "compute_identity.h"
+
+ namespace mkwvk {
+
+@@ -27,6 +28,7 @@ struct Stage {
+     // program cache (vk_progcache.cpp), which every translated program passes. Not in vk_shader.cpp, whose bytes are part of
+     // the translator's stamp: a change there translates every player's programs again
+     mutable uint32_t phis = 0;
++    mutable oo_identity::Identity oo_identity; // opt-in, derived from SPIR-V; not serialized in the program cache
+ };
+
+ /// A texture handle the stage reads from a storage buffer: its handle program (Shader::Info::handle_programs, Eden's
+diff --git a/tests/program_cache_cleanup_test.cpp b/tests/program_cache_cleanup_test.cpp
+index f885cca..ccd48c1 100644
+--- a/tests/program_cache_cleanup_test.cpp
++++ b/tests/program_cache_cleanup_test.cpp
+@@ -17,6 +17,8 @@
+ #include <unordered_map>
+ #include <vector>
+
++#include "../gpu/vk/compute_identity.h"
++namespace oo_identity = mkwvk::oo_identity;
+ #include "../gpu/vk/fallback_size_policy.h"   // (program_cache_save and _read note each stage's phis)
+ #ifdef _WIN32
+ #include <io.h>
+diff --git a/tests/program_cache_one_variant_test.cpp b/tests/program_cache_one_variant_test.cpp
+index b7d8030..82d2dd2 100644
+--- a/tests/program_cache_one_variant_test.cpp
++++ b/tests/program_cache_one_variant_test.cpp
+@@ -16,6 +16,8 @@
+ #include <unordered_map>
+ #include <vector>
+
++#include "../gpu/vk/compute_identity.h"
++namespace oo_identity = mkwvk::oo_identity;
+ #include "../gpu/vk/fallback_size_policy.h"
+ #ifdef _WIN32
+ #include <io.h>
+diff --git a/tests/seed_variant_cleanup_test.cpp b/tests/seed_variant_cleanup_test.cpp
+index bba2421..a72a1c4 100644
+--- a/tests/seed_variant_cleanup_test.cpp
++++ b/tests/seed_variant_cleanup_test.cpp
+@@ -26,6 +26,8 @@ constexpr uintptr_t VK_NULL_HANDLE = 0;
+ constexpr uint32_t VK_SHADER_STAGE_VERTEX_BIT = 1;
+ constexpr uint32_t VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST = 3;
+ namespace Shader { struct Info {}; }
++#include "../gpu/vk/compute_identity.h"
++namespace oo_identity = mkwvk::oo_identity;
+ #include "seed_types.inc"
+
+ struct {
+diff --git a/gpu/vk/compute_identity.h b/gpu/vk/compute_identity.h
+new file mode 100644
+index 0000000..5779068
+--- /dev/null
++++ b/gpu/vk/compute_identity.h
+@@ -0,0 +1,135 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Open-Ocarina opt-in compute identity observations. Not a replay capture.
++#pragma once
++#include <array>
++#include <atomic>
++#include <chrono>
++#include <cstdint>
++#include <cstdio>
++#include <cstdlib>
++#include <cstring>
++#include <mutex>
++#include <string>
++#include <vector>
++
++namespace mkwvk::oo_identity {
++inline uint32_t rotate(uint32_t x, unsigned n) { return (x >> n) | (x << (32 - n)); }
++inline std::array<uint8_t, 32> sha256(const uint8_t* bytes, size_t size) {
++    static constexpr uint32_t k[64] = {
++        0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
++        0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
++        0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
++        0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
++        0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
++        0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
++        0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
++        0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2};
++    uint32_t h[8] = {0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19};
++    const size_t blocks = size / 64 + 1 + (size % 64 >= 56);
++    const uint64_t bits = uint64_t(size) * 8;
++    for (size_t b = 0; b < blocks; ++b) {
++        uint32_t w[64]{};
++        for (unsigned j = 0; j < 64; ++j) {
++            const size_t at = b * 64 + j;
++            uint8_t value = at < size ? bytes[at] : at == size ? 0x80 : 0;
++            if (b == blocks - 1 && j >= 56) value = uint8_t(bits >> (8 * (63 - j)));
++            w[j / 4] |= uint32_t(value) << (24 - 8 * (j % 4));
++        }
++        for (unsigned j = 16; j < 64; ++j) {
++            const uint32_t x = w[j-15], y = w[j-2];
++            w[j] = w[j-16] + (rotate(x,7)^rotate(x,18)^(x>>3)) + w[j-7] + (rotate(y,17)^rotate(y,19)^(y>>10));
++        }
++        uint32_t a=h[0],bb=h[1],c=h[2],d=h[3],e=h[4],f=h[5],g=h[6],hh=h[7];
++        for (unsigned j = 0; j < 64; ++j) {
++            const uint32_t t1=hh+(rotate(e,6)^rotate(e,11)^rotate(e,25))+((e&f)^(~e&g))+k[j]+w[j];
++            const uint32_t t2=(rotate(a,2)^rotate(a,13)^rotate(a,22))+((a&bb)^(a&c)^(bb&c));
++            hh=g;g=f;f=e;e=d+t1;d=c;c=bb;bb=a;a=t1+t2;
++        }
++        h[0]+=a;h[1]+=bb;h[2]+=c;h[3]+=d;h[4]+=e;h[5]+=f;h[6]+=g;h[7]+=hh;
++    }
++    std::array<uint8_t,32> result{};
++    for (unsigned j=0;j<32;++j) result[j]=uint8_t(h[j/4]>>(24-8*(j%4)));
++    return result;
++}
++inline std::string hex(const std::array<uint8_t,32>& bytes) {
++    static constexpr char digits[]="0123456789abcdef";
++    std::string result(64,'0');
++    for (size_t j=0;j<bytes.size();++j) result[2*j]=digits[bytes[j]>>4],result[2*j+1]=digits[bytes[j]&15];
++    return result;
++}
++inline bool hex64(const char* text, uint64_t& result) {
++    if (!text || std::strlen(text)!=16) return false;
++    result=0;
++    for (unsigned j=0;j<16;++j) {
++        const char c=text[j];
++        const int digit=c>='0'&&c<='9'?c-'0':c>='a'&&c<='f'?c-'a'+10:c>='A'&&c<='F'?c-'A'+10:-1;
++        if (digit<0) return false;
++        result=(result<<4)|unsigned(digit);
++    }
++    return true;
++}
++struct Config { bool enabled=false; std::string file; uint64_t key=0,variant=0,limit=256; };
++inline const Config& config() {
++    static const Config value=[] {
++        Config c;
++        const char* file=std::getenv("RX_VK_OO_IDENTITY_FILE");
++        if (!file || !*file) return c;
++        c.file=file;
++        const char* key=std::getenv("RX_VK_OO_IDENTITY_PROGRAM");
++        const char* variant=std::getenv("RX_VK_OO_IDENTITY_VARIANT");
++        if (!hex64(key?key:"cc62764061c44f6a",c.key) || !hex64(variant?variant:"095931037888515a",c.variant)) {
++            std::fprintf(stderr,"Open-Ocarina: identity filter requires full 16-digit hexadecimal key and variant; disabled\n");
++            return c;
++        }
++        c.enabled=true;
++        return c;
++    }();
++    return value;
++}
++inline bool selected(uint64_t key,uint64_t variant) { const auto& c=config();return c.enabled&&c.key==key&&c.variant==variant; }
++struct Identity { std::array<uint8_t,32> digest{}; size_t words=0; bool valid=false; };
++inline void note_stage(uint64_t key,uint64_t variant,Identity& identity,const std::vector<uint32_t>& words) {
++    if (!selected(key,variant) || words.empty()) return;
++    std::vector<uint8_t> canonical(words.size()*4);
++    for (size_t j=0;j<words.size();++j) for (unsigned b=0;b<4;++b) canonical[j*4+b]=uint8_t(words[j]>>(8*b));
++    identity.digest=sha256(canonical.data(),canonical.size());
++    identity.words=words.size();identity.valid=true;
++}
++inline void mix(uint64_t& h,uint64_t value) { for(unsigned j=0;j<8;++j) h=(h^uint8_t(value>>(8*j)))*1099511628211ull; }
++inline void emit(const Identity& identity,uint64_t key,uint64_t variant,uint64_t stamp,
++                 const std::array<uint32_t,3>& workgroup,uint32_t x,uint32_t y,uint32_t z,uint64_t indirect,
++                 uint64_t binding_fingerprint,int64_t observed_present,uint32_t required_size,bool full,
++                 uint32_t vendor,uint32_t device,uint32_t driver) {
++    if (!selected(key,variant)) return;
++    static std::mutex mutex;
++    static uint64_t ordinal=0;
++    static const uint64_t run=uint64_t(std::chrono::system_clock::now().time_since_epoch().count());
++    std::lock_guard lock(mutex);
++    if (ordinal>=config().limit) return;
++    const uint64_t current=ordinal++;
++    FILE* output=std::fopen(config().file.c_str(),"ab");
++    if (!output) { static bool told=false;if(!told)std::perror("Open-Ocarina identity output"),told=true;return; }
++    char grid[96],subgroup[32];
++    if(indirect) std::snprintf(grid,sizeof grid,"null");else std::snprintf(grid,sizeof grid,"[%u,%u,%u]",x,y,z);
++    if(required_size)std::snprintf(subgroup,sizeof subgroup,"%u",required_size);else std::snprintf(subgroup,sizeof subgroup,"null");
++    const std::string digest=identity.valid?"\""+hex(identity.digest)+"\"":"null";
++    const int wrote=std::fprintf(output,
++        "{\"schema\":\"open-ocarina.compute-identity/v1\",\"producer\":{\"stage\":\"identity-only\",\"replay_complete\":false},"
++        "\"event_id\":\"%016llx-%llu\",\"pipeline\":{\"program\":\"%016llx\",\"variant\":\"%016llx\","
++        "\"spirv\":{\"sha256\":%s,\"word_count\":%zu},\"entry_point\":\"main\",\"specialization\":[],\"local_size\":[%u,%u,%u],"
++        "\"cache_stamp\":\"%016llx\",\"subgroup\":{\"required_size\":%s,\"require_full_subgroups\":%s}},"
++        "\"dispatch\":{\"kind\":\"%s\",\"group_count\":%s,\"indirect_guest_address\":\"%016llx\","
++        "\"selected_recording_ordinal\":%llu,\"present_observed\":%lld,\"submission\":null},"
++        "\"binding_state_fingerprint_fnv1a64\":\"%016llx\",\"binding_fingerprint_scope\":\"NVN slots and registration generations only; not resolved Vulkan descriptors or resource contents\","
++        "\"device\":{\"vendor_id\":%u,\"device_id\":%u,\"driver_version\":%u},"
++        "\"coverage\":{\"resource_contents\":false,\"descriptor_contents\":false,\"physical_pointer_reachability\":false,"
++        "\"temporal_state\":false,\"gpu_outputs\":false},"
++        "\"ordinal_scope\":\"selected game compute dispatches at CPU recording point; not queue order\"}\n",
++        (unsigned long long)run,(unsigned long long)current,(unsigned long long)key,(unsigned long long)variant,
++        digest.c_str(),identity.words,workgroup[0],workgroup[1],workgroup[2],(unsigned long long)stamp,subgroup,full?"true":"false",
++        indirect?"indirect":"direct",grid,(unsigned long long)indirect,(unsigned long long)current,(long long)observed_present,
++        (unsigned long long)binding_fingerprint,vendor,device,driver);
++    const int closed=std::fclose(output);
++    if(wrote<0||closed)std::fprintf(stderr,"Open-Ocarina: identity record write failed; this output is incomplete\n");
++}
++} // namespace mkwvk::oo_identity

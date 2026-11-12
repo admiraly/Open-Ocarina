@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "date": "2026-11-12",
+  "observation": "isolated headless runtime identity only; game executed with default subgroup policy",
+  "upstream_commit": "4cf785a0b143bb34026506c9a3fe4f4bb93c797d",
+  "source_patch_sha256": "2f14873edfdb47b1f915e75bc4bbe6683ef6632bc66fcbfa1d918aa1c176f018",
+  "renderer_sha256": "eb637a1cebf98c7549ec6b7252c83689f24ca5b41865544aaad3e299262bd2f1",
+  "host_sha256": "48c0c727b5c4279bf1cabf7b07a427a4b90f1fbec5220bb06529462230c6ebd9",
+  "record_count": 256,
+  "record_cap_reached": true,
+  "pipeline": {
+    "program": "cc62764061c44f6a",
+    "variant": "095931037888515a",
+    "spirv": {
+      "sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+      "word_count": 64814
+    },
+    "entry_point": "main",
+    "specialization": [],
+    "local_size": [
+      64,
+      1,
+      1
+    ],
+    "cache_stamp": "d6c0514818a93a6e",
+    "subgroup": {
+      "required_size": 32,
+      "require_full_subgroups": true
+    }
+  },
+  "device": {
+    "vendor_id": 32902,
+    "device_id": 22176,
+    "driver_version": 109060100
+  },
+  "direct_grids": [
+    {
+      "group_count": [
+        2,
+        1,
+        1
+      ],
+      "records": 256
+    }
+  ],
+  "dispatch_kinds": {
+    "direct": 256
+  },
+  "coverage": {
+    "resource_contents": false,
+    "descriptor_contents": false,
+    "physical_pointer_reachability": false,
+    "temporal_state": false,
+    "gpu_outputs": false
+  },
+  "limitations": [
+    "No resource contents, resolved descriptor identities, physical reachable allocations, temporal state or GPU outputs captured.",
+    "Recording events are not queue completion or per-shader timing.",
+    "Current runtime variant is confirmed; this does not retrospectively identify the older profiler capture variant.",
+    "The 256-record bounded observation is not whole-game coverage or a performance test."
+  ],
+  "working_install_preserved": true,
+  "test_process_stopped_cleanly": true,
+  "upstream_test_summary": {
+    "passed": 501,
+    "failed": 1,
+    "skipped": 20,
+    "known_failure": "README missing Skip opening row; reproduced against pristine pinned files"
+  }
+}
