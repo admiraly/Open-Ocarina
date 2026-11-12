@@ -1,0 +1,178 @@
+diff --git a/host/control.c b/host/control.c
+index 2651c36..0c127a8 100644
+--- a/host/control.c
++++ b/host/control.c
+@@ -25,2 +25,3 @@
+ #include "control.h"
++#include "input_isolation.h"
+
+@@ -450,3 +451,22 @@ int hos_control_input(uint64_t *buttons, int32_t stick[4]) {
+         }
+-        if (in->exclusive && frame < end) exclusive = 1;
++        if (hos_control_exclusive_policy(in->used, in->exclusive, in->start, in->frames, frame)) exclusive = 1;
++    }
++    ctl_unlock(&G.mu);
++    return exclusive;
++}
++
++/* The native camera runs outside controller reads. Query the same lease without
++   calling hos_control_input: that function starts queued inputs and may service
++   guest-memory requests, neither of which belongs in a camera ownership check. */
++int hos_control_input_exclusive(void) {
++    if (!hos_control_on || !G.game || !G.game->frame) return 0;
++    const int64_t frame = G.game->frame();
++    int exclusive = 0;
++    ctl_lock(&G.mu);
++    for (int i = 0; i < CTL_INPUTS; i++) {
++        const Input *in = &G.inputs[i];
++        if (hos_control_exclusive_policy(in->used, in->exclusive, in->start, in->frames, frame)) {
++            exclusive = 1;
++            break;
++        }
+     }
+diff --git a/host/control.h b/host/control.h
+index 88b04eb..852ce84 100644
+--- a/host/control.h
++++ b/host/control.h
+@@ -16,2 +16,4 @@ void hos_control_start(const char *version);
+ int hos_control_input(uint64_t *buttons, int32_t stick[4]);
++/* Read-only lease query: never starts, consumes or advances an input sequence. */
++int hos_control_input_exclusive(void);
+ /* hos_thread.c, each log line: for the clients that subscribed to log lines */
+diff --git a/host/mouse_native.c b/host/mouse_native.c
+index 508707b..739a048 100644
+--- a/host/mouse_native.c
++++ b/host/mouse_native.c
+@@ -30,2 +30,3 @@
+ #include "hos.h"
++#include "input_isolation.h"
+ #include <math.h>
+@@ -112,2 +113,9 @@ void hos_mouse_native_stick(int held) { InterlockedExchange(&stick_held, held ?
+ void hos_mouse_camera(uint64_t cam) {
++    if (hos_input_player_exclusive()) {
++        int32_t dx, dy;
++        hos_mouse_take(&dx, &dy);  /* discard while the script/bridge owns input */
++        target_ok = 0;            /* release restarts from the game's current angles */
++        InterlockedExchange64(&last_hook_ns, 0);
++        return;
++    }
+     if (!cam || !native_on() || !looks_like_camera(cam)) return;
+@@ -172,2 +180,9 @@ void hos_mouse_camera(uint64_t cam) {
+ int hos_mouse_native(void) {
++    if (hos_input_player_exclusive()) {
++        int32_t dx, dy;
++        hos_mouse_take(&dx, &dy);
++        target_ok = 0;
++        InterlockedExchange64(&last_hook_ns, 0);
++        return 0;
++    }
+     static int said;
+diff --git a/host/nn_hid.c b/host/nn_hid.c
+index 47e521c..4848ebf 100644
+--- a/host/nn_hid.c
++++ b/host/nn_hid.c
+@@ -29,2 +29,3 @@
+ #include "control.h"
++#include "input_isolation.h"
+ #include <math.h>
+@@ -387,2 +388,22 @@ static void live_input(void) {
+
++/* Ownership query for out-of-band native mouse-camera consumers too.
++   The persistent mode is deliberately opt-in and still requires a parsed script. */
++int hos_input_player_exclusive(void) {
++    static int exclusive = -1, persistent = -1;
++    if (exclusive < 0) exclusive = env_on("HOS_INPUT_EXCLUSIVE");
++    if (persistent < 0) persistent = env_on("HOS_INPUT_EXCLUSIVE_PERSIST");
++    if (exclusive && npresses < 0) parse_script();
++    if (exclusive && hos_script_exclusive_policy(exclusive, persistent, npresses,
++                                                script_elapsed_ms(hos_now_ns()), script_end_ms)) return 1;
++    return hos_control_input_exclusive();
++}
++
++/* Consume motion while isolated, rather than allowing an accumulated jump when
++   the lease ends. Clear the old right-stick mouse deflection as well. */
++static void discard_player_mouse(void) {
++    int32_t dx, dy;
++    hos_mouse_take(&dx, &dy);
++    look_x = look_y = 0;
++}
++
+ static int parse_presses(const char *s, int64_t base_ms, int live) {
+@@ -959,4 +980,3 @@ static void read_input(uint64_t *buttons, int32_t stick[4]) {
+        player's devices out while it lasts */
+-    if (hos_control_input(buttons, stick)) return;
+-    oc_notes();   /* (marks the note rows' inputs consumed before the pads and keys below are read) */
++    if (hos_control_input(buttons, stick)) { discard_player_mouse(); return; }
+     /* A scripted run (a test) takes no input from the player's devices until 5 s after its last press (a variable
+@@ -967,6 +987,4 @@ static void read_input(uint64_t *buttons, int32_t stick[4]) {
+        the presses add to theirs. HOS_INPUT_EXCLUSIVE=1: the script alone until 5 s after its last press, as before */
+-    static int exclusive = -1;
+-    if (exclusive < 0) exclusive = env_on("HOS_INPUT_EXCLUSIVE");
+-    if (exclusive && npresses > 0 && script_elapsed_ms(hos_now_ns()) < script_end_ms + 5000)
+-        return;
++    if (hos_input_player_exclusive()) { discard_player_mouse(); return; }
++    oc_notes();   /* (marks the note rows' inputs consumed before the pads and keys below are read) */
+     /* (hookshot, issue 389) A scripted press (HOS_INPUT_SCRIPT, HOS_INPUT_LIVE) is the test's own, not the
+diff --git a/tests/test_input_background.py b/tests/test_input_background.py
+index ac87d2a..65a949d 100644
+--- a/tests/test_input_background.py
++++ b/tests/test_input_background.py
+@@ -23,2 +23,3 @@ from pathlib import Path
+ ENV_ON_H = str(Path(__file__).resolve().parents[1] / "gpu" / "vk" / "compat" / "hookshot_env.h")
++ISOLATION_H = str(Path(__file__).resolve().parents[1] / "host" / "input_isolation.h")
+
+@@ -87,2 +88,5 @@ void rx_option_set(int id, int value) { (void)id; (void)value; CHECK(!"unexpecte
+     host_spies = """
++static double look_x, look_y;
++int hos_control_input_exclusive(void) { return 0; }
++int hos_mouse_take(int32_t *dx, int32_t *dy) { *dx = *dy = 0; return 0; }
+ static void host_taps(void) {}
+@@ -121,3 +125,3 @@ static void player_used(void) {}
+         # Production's button table deliberately leaves its unused axis fields zero-initialized.
+-        run([a.cc, "-std=c11", "-include", ENV_ON_H, "-Wall", "-Wextra", "-Werror", "-Wno-missing-field-initializers",
++        run([a.cc, "-std=c11", "-include", ENV_ON_H, "-include", ISOLATION_H, "-Wall", "-Wextra", "-Werror", "-Wno-missing-field-initializers",
+              "-D_CRT_SECURE_NO_WARNINGS",
+diff --git a/tests/test_mouse_native.py b/tests/test_mouse_native.py
+index d7d6ee3..ec75e40 100644
+--- a/tests/test_mouse_native.py
++++ b/tests/test_mouse_native.py
+@@ -59,2 +59,3 @@ int hos_mouse_take(int32_t *dx, int32_t *dy) { *dx = move_x, *dy = move_y; move_
+ void hos_mouse_give_back(int32_t dx, int32_t dy) { move_x += dx, move_y += dy; }
++int hos_input_player_exclusive(void) { return 0; }   /* default nonexclusive fixture */
+ int hos_mouse_native(void);
+@@ -196,2 +197,3 @@ class MouseNativeTests(unittest.TestCase):
+             shutil.copy(ROOT / "host" / "mouse_native.c", tmp / "mouse_native.c")
++            shutil.copy(ROOT / "host" / "input_isolation.h", tmp / "input_isolation.h")
+             (tmp / "t.c").write_text(FIXTURE, encoding="utf-8")
+diff --git a/host/input_isolation.h b/host/input_isolation.h
+new file mode 100644
+--- /dev/null
++++ b/host/input_isolation.h
+@@ -0,0 +1,27 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Script/control input isolation policy; no game memory or device dependencies.
++#pragma once
++#include <stdint.h>
++
++static inline int hos_script_exclusive_policy(int enabled, int persistent, int presses,
++                                               int64_t elapsed_ms, int64_t end_ms) {
++    if (!enabled || presses <= 0 || end_ms < 0) return 0;
++    if (persistent) return 1;
++    if (elapsed_ms < end_ms) return 1;
++    return elapsed_ms - end_ms < 5000;
++}
++
++static inline int hos_control_exclusive_policy(int used, int exclusive, int64_t start,
++                                                int64_t frames, int64_t frame) {
++    if (!used || !exclusive || frames <= 0) return 0;
++    if (start < 0 || frame < start) return 1;
++    return frame - start < frames;
++}
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++int hos_input_player_exclusive(void);
++#ifdef __cplusplus
++}
++#endif

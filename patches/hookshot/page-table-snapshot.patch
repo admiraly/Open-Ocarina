@@ -1,0 +1,331 @@
+diff --git a/gpu/vk/vk_memory.cpp b/gpu/vk/vk_memory.cpp
+--- a/gpu/vk/vk_memory.cpp
++++ b/gpu/vk/vk_memory.cpp
+@@ -27,6 +27,7 @@
+ #include <windows.h>
+
+ #include "vk_internal.h"
++#include "page_table_capture.h"
+ #include "vk_texture.h"   // (upload_command_buffer)
+ #include "vk_gprof.h"      // (RX_VK_PASS_TIMING)
+ #include "import_hold.h"
+@@ -477,6 +478,101 @@
+ uint64_t* guest_pages = nullptr;
+ uint64_t guest_pages_address = 0;
+ VkBuffer guest_pages_buffer = VK_NULL_HANDLE;
++// One diagnostic allocation, retained until its exact recording completes. It never reads guest_pages[].
++namespace {
++struct OoPagePending {
++    bool attempted=false, active=false;
++    VkCommandBuffer command=VK_NULL_HANDLE;
++    VkBuffer buffer=VK_NULL_HANDLE;
++    VmaAllocation allocation=nullptr;
++    void* mapped=nullptr;
++    oo_pt::Request request;
++};
++OoPagePending oo_page_pending;
++std::mutex oo_page_mutex;
++}
++bool memory_pt_snapshot_enabled() { return oo_pt::config().enabled; }
++void memory_pt_snapshot_record(VkCommandBuffer cmd,uint64_t key,uint64_t variant,const char* digest,
++                               uint32_t x,uint32_t y,uint32_t z,uint64_t indirect,int64_t present,
++                               uint32_t root_push_offset) {
++    if(!oo_pt::config().enabled||!oo_identity::selected(key,variant)||!digest||oo_pt::config().digest!=digest) return;
++    if(!memory_pt_recording_supported()) {
++        static bool told=false;
++        if(!told)logf("vk: Open-Ocarina page snapshot requires serial non-batched replay and the recording timeline"),told=true;
++        return;
++    }
++    std::lock_guard lock(oo_page_mutex);
++    auto& pending=oo_page_pending;
++    uint64_t recording_part=0,logical_value=0;
++    if(pending.attempted||!cmd||!guest_pages_buffer||!guest_pages_address||
++       !memory_pt_recording_info(cmd,&recording_part,&logical_value)) return;
++    pending.attempted=true;
++    if(!create_buffer_cached(oo_pt::kTableBytes,VK_BUFFER_USAGE_TRANSFER_DST_BIT,pending.buffer,
++                             pending.allocation,&pending.mapped,true)||!pending.buffer||!pending.allocation||!pending.mapped) {
++        if(pending.buffer||pending.allocation)destroy_buffer(pending.buffer,pending.allocation);
++        pending.buffer=VK_NULL_HANDLE;pending.allocation=nullptr;
++        logf("vk: Open-Ocarina page snapshot staging allocation failed; no snapshot recorded");return;
++    }
++    pending.request.key=key;pending.request.variant=variant;pending.request.shader_digest=digest;
++    pending.request.root_address=guest_pages_address;pending.request.root_push_offset=root_push_offset;
++    pending.request.recording_part=recording_part;pending.request.logical_value=logical_value;
++    pending.request.x=x;pending.request.y=y;pending.request.z=z;pending.request.indirect=indirect!=0;pending.request.present=present;
++    pending.command=cmd;
++    VkBufferMemoryBarrier2 before{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2};
++    before.srcStageMask=VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;before.srcAccessMask=VK_ACCESS_2_MEMORY_WRITE_BIT;
++    before.dstStageMask=VK_PIPELINE_STAGE_2_COPY_BIT;before.dstAccessMask=VK_ACCESS_2_TRANSFER_READ_BIT;
++    before.srcQueueFamilyIndex=before.dstQueueFamilyIndex=VK_QUEUE_FAMILY_IGNORED;
++    before.buffer=guest_pages_buffer;before.size=oo_pt::kTableBytes;
++    VkDependencyInfo dependency{VK_STRUCTURE_TYPE_DEPENDENCY_INFO};dependency.bufferMemoryBarrierCount=1;dependency.pBufferMemoryBarriers=&before;
++    vkCmdPipelineBarrier2(cmd,&dependency);
++    const VkBufferCopy copy{0,0,oo_pt::kTableBytes};
++    vkCmdCopyBuffer(cmd,guest_pages_buffer,pending.buffer,1,&copy);
++    VkBufferMemoryBarrier2 after[2]{{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2},{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2}};
++    after[0].srcStageMask=VK_PIPELINE_STAGE_2_COPY_BIT;after[0].srcAccessMask=VK_ACCESS_2_TRANSFER_READ_BIT;
++    after[0].dstStageMask=VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;after[0].dstAccessMask=VK_ACCESS_2_MEMORY_READ_BIT|VK_ACCESS_2_MEMORY_WRITE_BIT;
++    after[0].buffer=guest_pages_buffer;after[0].size=oo_pt::kTableBytes;
++    after[1].srcStageMask=VK_PIPELINE_STAGE_2_COPY_BIT;after[1].srcAccessMask=VK_ACCESS_2_TRANSFER_WRITE_BIT;
++    after[1].dstStageMask=VK_PIPELINE_STAGE_2_HOST_BIT;after[1].dstAccessMask=VK_ACCESS_2_HOST_READ_BIT;
++    after[1].buffer=pending.buffer;after[1].size=oo_pt::kTableBytes;
++    for(auto& barrier:after)barrier.srcQueueFamilyIndex=barrier.dstQueueFamilyIndex=VK_QUEUE_FAMILY_IGNORED;
++    dependency.bufferMemoryBarrierCount=2;dependency.pBufferMemoryBarriers=after;vkCmdPipelineBarrier2(cmd,&dependency);
++    pending.active=true;
++    logf("vk: Open-Ocarina GPU page-table copy recorded for part %llu (not yet submitted/completed)",
++         (unsigned long long)pending.request.recording_part);
++}
++void memory_pt_snapshot_submitted(VkCommandBuffer cmd,uint64_t part,uint64_t sequence,bool succeeded) {
++    if(!oo_pt::config().enabled)return;
++    std::lock_guard lock(oo_page_mutex);auto& pending=oo_page_pending;
++    if(!pending.active||pending.command!=cmd||pending.request.recording_part!=part)return;
++    if(!succeeded) {
++        destroy_buffer(pending.buffer,pending.allocation);pending.buffer=VK_NULL_HANDLE;pending.allocation=nullptr;pending.mapped=nullptr;pending.active=false;
++        logf("vk: Open-Ocarina page snapshot submission failed; staging released without exporting a snapshot");return;
++    }
++    if(!sequence) {logf("vk: Open-Ocarina page snapshot has no completion sequence; no snapshot will be exported");return;}
++    pending.request.submitted_sequence=sequence;
++}
++void memory_pt_snapshot_discard(VkCommandBuffer cmd,uint64_t part) {
++    if(!oo_pt::config().enabled)return;
++    std::lock_guard lock(oo_page_mutex);auto& pending=oo_page_pending;
++    if(!pending.active||pending.command!=cmd||pending.request.recording_part!=part||pending.request.submitted_sequence)return;
++    // Called only after the slot's recording wait and immediately before its command-pool reset.
++    destroy_buffer(pending.buffer,pending.allocation);pending.buffer=VK_NULL_HANDLE;pending.allocation=nullptr;pending.mapped=nullptr;pending.active=false;
++    logf("vk: Open-Ocarina canceled unsubmitted page-table snapshot released at recording reset");
++}
++void memory_pt_snapshot_collect(uint64_t completed_sequence) {
++    if(!oo_pt::config().enabled)return;
++    std::lock_guard lock(oo_page_mutex);auto& pending=oo_page_pending;
++    if(!pending.active||!pending.request.submitted_sequence||completed_sequence<pending.request.submitted_sequence)return;
++    bool ok=false;
++    if(invalidate_mapped_checked(pending.allocation,oo_pt::kTableBytes)) {
++        try {ok=oo_pt::write_completed(pending.request,static_cast<const uint8_t*>(pending.mapped),oo_pt::kTableBytes,completed_sequence);}
++        catch(const std::exception& error){logf("vk: Open-Ocarina page snapshot export failed: %s",error.what());}
++    }
++    destroy_buffer(pending.buffer,pending.allocation);pending.buffer=VK_NULL_HANDLE;pending.allocation=nullptr;pending.mapped=nullptr;pending.active=false;
++    logf("vk: Open-Ocarina GPU page-table snapshot %s after recording sequence %llu completed (page-table-only; NOT replay)",
++         ok?"exported":"failed",(unsigned long long)pending.request.submitted_sequence);
++}
++
+ // (hookshot, 11-07) A change to the table made while a submission is recorded goes into that submission's upload commands, after
+ // the mirror copies it records there, instead of into the table at once: the table is read by the GPU, and work submitted
+ // before (still running, or queued) read the new entries early. A pool's range zeroed at its merge read as unmapped (zero
+@@ -555,7 +651,8 @@
+     VmaAllocation a = nullptr;
+     void* mapped = nullptr;
+     const uint64_t bytes = ((8ull << 30 >> 12) + (4ull << 30 >> 12)) * 8;
+-    if (!create_buffer(bytes, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
++    if (!create_buffer(bytes, VK_BUFFER_USAGE_STORAGE_BUFFER_BIT | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT |
++                       (memory_pt_snapshot_enabled() ? VK_BUFFER_USAGE_TRANSFER_SRC_BIT : 0),
+                        true, b, a, &mapped, true) || !mapped) {
+         logf("vk: no page table of guest memory: pointers in no bound buffer read as 0");
+         return 0;
+diff --git a/gpu/vk/vk_internal.h b/gpu/vk/vk_internal.h
+--- a/gpu/vk/vk_internal.h
++++ b/gpu/vk/vk_internal.h
+@@ -143,6 +143,16 @@
+ void memory_table_begin();                         // (hookshot: a recording's page table changes held back for its upload commands)
+ bool memory_table_flush();
+ uint64_t memory_guest_pages();                        // (hookshot: the device address of guest memory's page table, 0: none)
++// Open-Ocarina opt-in snapshot: serial, non-batched recordings only; no complete replay claim.
++bool memory_pt_snapshot_enabled();
++bool memory_pt_recording_supported();
++bool memory_pt_recording_info(VkCommandBuffer cmd, uint64_t* part, uint64_t* logical_value);
++void memory_pt_snapshot_record(VkCommandBuffer cmd, uint64_t key, uint64_t variant, const char* digest,
++                               uint32_t x, uint32_t y, uint32_t z, uint64_t indirect, int64_t present,
++                               uint32_t root_push_offset);
++void memory_pt_snapshot_submitted(VkCommandBuffer cmd, uint64_t part, uint64_t sequence, bool succeeded);
++void memory_pt_snapshot_collect(uint64_t completed_recording_sequence);
++void memory_pt_snapshot_discard(VkCommandBuffer cmd, uint64_t recording_part);
+ void memory_sync();                                   // (at each submit: pools the game made or let go)
+ extern std::atomic<int64_t> memsync_lock_wait_ns;     // (hookshot, diagnostics: time memory_sync waited for its two locks; the slow-submit line)
+ extern std::atomic<int64_t> memsync_part_ns[3];       // (hookshot, diagnostics: submit_memory_work's memory_sync, memory_take_capture, memory_collect_written)
+diff --git a/gpu/vk/vk_draw.cpp b/gpu/vk/vk_draw.cpp
+--- a/gpu/vk/vk_draw.cpp
++++ b/gpu/vk/vk_draw.cpp
+@@ -9055,8 +9055,13 @@
+
+ // Open-Ocarina: identity at the actual recording point. No resources are read/copied,
+ // no barriers or subgroup policies change, and this is explicitly NOT a replay capture.
+-void oo_compute_identity(const Program& p, const NvnState& s, uint32_t x, uint32_t y, uint32_t z, uint64_t indirect) {
++void oo_compute_identity(VkCommandBuffer cmd, const Program& p, const NvnState& s, uint32_t x, uint32_t y, uint32_t z, uint64_t indirect) {
+     if (p.stages.empty()) return;
++    if (p.stages[0].oo_identity.valid) {
++        const auto digest=oo_identity::hex(p.stages[0].oo_identity.digest);
++        memory_pt_snapshot_record(cmd, p.key, p.variant, digest.c_str(), x,y,z,indirect,presents_now,
++                                  Shader::Backend::SPIRV::GUEST_PAGES_PUSH_OFFSET);
++    }
+     uint64_t fingerprint = 14695981039346656037ull;
+     for (const auto& b : s.ubo[5]) oo_identity::mix(fingerprint, b.addr), oo_identity::mix(fingerprint, b.size);
+     for (const auto& b : s.ssbo[5]) oo_identity::mix(fingerprint, b.addr), oo_identity::mix(fingerprint, b.size);
+@@ -9413,10 +9418,10 @@
+                          (unsigned long long)indirect);
+                 dump_buffer(cmd, args.buffer, args.offset, 12, what);
+             }
+-            if (oo_identity::selected(p.key, p.variant)) oo_compute_identity(p, s, x, y, z, indirect);
++            if (oo_identity::selected(p.key, p.variant)) oo_compute_identity(cmd, p, s, x, y, z, indirect);
+             vkCmdDispatchIndirect(cmd, args.buffer, args.offset);
+         } else {
+-            if (oo_identity::selected(p.key, p.variant)) oo_compute_identity(p, s, x, y, z, 0);
++            if (oo_identity::selected(p.key, p.variant)) oo_compute_identity(cmd, p, s, x, y, z, 0);
+             vkCmdDispatch(cmd, x, y, z);
+         }
+     }
+diff --git a/gpu/vk/vk_replay.cpp b/gpu/vk/vk_replay.cpp
+--- a/gpu/vk/vk_replay.cpp
++++ b/gpu/vk/vk_replay.cpp
+@@ -293,6 +293,17 @@
+ bool wait_recorded(uint64_t f, uint64_t timeout_ns, int* ok);
+ } // namespace
+ uint64_t vk_timeline_completed() { return timeline ? completed() : 0; }
++bool memory_pt_recording_supported() {
++    return rec_timeline && !batch_on() && !par_active.load(std::memory_order_relaxed);
++}
++bool memory_pt_recording_info(VkCommandBuffer cmd,uint64_t* part,uint64_t* logical_value) {
++    if(!cmd||!part||!logical_value||!memory_pt_recording_supported())return false;
++    for(const auto& recording:recordings)if(recording.cmd==cmd&&recording.part&&recording.value) {
++        *part=recording.part;*logical_value=recording.value;return true;
++    }
++    return false;
++}
++
+ void vk_timeline_wait(uint64_t v) {   // (at most 250 ms: a submission held back behind the caller's thread goes on without it)
+     if (!timeline || completed() >= v) return;
+     // (a burst recording whose write-back stamped wb_pages with burst_value does not advance `timeline` while an older queue
+@@ -362,6 +373,10 @@
+
+ /// The next recording slot, begun, for the submission that will signal value
+ Recording& begin_recording(uint64_t value) {
++    if(memory_pt_snapshot_enabled()&&rec_timeline) {
++        uint64_t done=0;
++        if(vkGetSemaphoreCounterValue(dev.device,rec_timeline,&done)==VK_SUCCESS)memory_pt_snapshot_collect(done);
++    }
+     Recording& r = recordings[recording_index];
+     recording_index = (recording_index + 1) % kRecordings;
+     if (r.value) {
+@@ -372,6 +387,11 @@
+         gpu_time_collect(r);
+         gprof_collect(r.slot);
+     }
++    if(memory_pt_snapshot_enabled()&&rec_timeline) {
++        uint64_t done=0;
++        if(vkGetSemaphoreCounterValue(dev.device,rec_timeline,&done)==VK_SUCCESS)memory_pt_snapshot_collect(done);
++    }
++    memory_pt_snapshot_discard(r.cmd,r.part);
+     vkResetCommandPool(dev.device, r.pool, 0);
+     vkResetCommandPool(dev.device, r.upload_pool, 0);
+     VkCommandBufferBeginInfo bi{VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};
+@@ -468,6 +488,7 @@
+     si.pNext = reflex_submit_id(nullptr);   // (NVIDIA Reflex: the frame being made)
+     const VkResult res = vkQueueSubmit2(dev.queue, 1, &si, r.fence);
+     r.submitted = res == VK_SUCCESS;
++    memory_pt_snapshot_submitted(r.cmd,r.part,seq,res==VK_SUCCESS);
+     static int failures;
+     if (res != VK_SUCCESS && failures++ < 8) logf("vk: submit %llu failed (%d)", (unsigned long long)r.value, (int)res);
+     if (res == VK_ERROR_DEVICE_LOST) device_lost();
+diff --git a/gpu/vk/page_table_capture.h b/gpu/vk/page_table_capture.h
+new file mode 100644
+--- /dev/null
++++ b/gpu/vk/page_table_capture.h
+@@ -0,0 +1,100 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Opt-in, one-shot GPU-visible page-table snapshot. Not a complete replay.
++#pragma once
++#include "compute_identity.h"
++#include <filesystem>
++#include <system_error>
++
++namespace mkwvk::oo_pt {
++inline constexpr uint64_t kPageBytes=4096;
++inline constexpr uint64_t kEntries=((8ull<<30)/kPageBytes)+((4ull<<30)/kPageBytes);
++inline constexpr uint64_t kTableBytes=kEntries*8;
++struct Config { bool enabled=false; std::string directory,digest; };
++inline bool present(const std::filesystem::path& path) {
++    std::error_code error;
++    const auto status=std::filesystem::symlink_status(path,error);
++    return status.type()!=std::filesystem::file_type::not_found &&
++           status.type()!=std::filesystem::file_type::none;
++}
++inline const Config& config() {
++    static const Config result=[] {
++        Config c;
++        const char* directory=std::getenv("RX_VK_OO_PT_SNAPSHOT_DIR");
++        if(!directory||!*directory) return c;
++        c.directory=directory;
++        const char* digest=std::getenv("RX_VK_OO_PT_SNAPSHOT_SHA256");
++        c.digest=digest?digest:"b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b";
++        if(c.digest.size()!=64||!oo_identity::config().enabled) {
++            std::fprintf(stderr,"Open-Ocarina: page snapshot requires identity observation and full shader digest\n");return c;
++        }
++        for(char& value:c.digest) {
++            if(value>='A'&&value<='F') value=char(value-'A'+'a');
++            if(!((value>='0'&&value<='9')||(value>='a'&&value<='f'))) return c;
++        }
++        std::error_code error;
++        if(!std::filesystem::is_directory(c.directory,error)) return c;
++        for(const char* name:{"page-table.bin","page-table.bin.part","manifest.json","manifest.json.part"})
++            if(present(std::filesystem::path(c.directory)/name)) {
++                std::fprintf(stderr,"Open-Ocarina: page snapshot directory already contains capture artifacts; disabled\n");return c;
++            }
++        c.enabled=true;return c;
++    }();return result;
++}
++inline bool selected(uint64_t key,uint64_t variant,const oo_identity::Identity& identity) {
++    return config().enabled&&identity.valid&&oo_identity::selected(key,variant)&&oo_identity::hex(identity.digest)==config().digest;
++}
++struct Request {
++    uint64_t key=0,variant=0,root_address=0,recording_part=0,logical_value=0,submitted_sequence=0;
++    int64_t present=0;
++    uint32_t root_push_offset=0,x=0,y=0,z=0;
++    bool indirect=false;
++    std::string shader_digest;
++};
++inline bool write_completed(const Request& request,const uint8_t* bytes,size_t size,uint64_t completed_sequence) {
++    if(!config().enabled||!bytes||size!=kTableBytes||!request.submitted_sequence||
++       completed_sequence<request.submitted_sequence||!request.root_address) return false;
++    const std::filesystem::path directory=config().directory;
++    const auto binary=directory/"page-table.bin",part=directory/"page-table.bin.part";
++    const auto manifest=directory/"manifest.json",manifest_part=directory/"manifest.json.part";
++    if(present(binary)||present(manifest)) return false;
++    FILE* file=std::fopen(part.string().c_str(),"wbx");
++    if(!file) return false;
++    const bool written=std::fwrite(bytes,1,size,file)==size;
++    const bool closed=std::fclose(file)==0;
++    if(!written||!closed) {std::remove(part.string().c_str());return false;}
++    const auto digest=oo_identity::hex(oo_identity::sha256(bytes,size));
++    std::error_code error;
++    if(present(binary)) {std::remove(part.string().c_str());return false;}
++    std::filesystem::rename(part,binary,error);
++    if(error) {std::remove(part.string().c_str());return false;}
++    file=std::fopen(manifest_part.string().c_str(),"wbx");
++    if(!file) return false; // Binary alone is never a committed snapshot.
++    char grid[96];
++    if(request.indirect)std::snprintf(grid,sizeof grid,"null");
++    else std::snprintf(grid,sizeof grid,"[%u,%u,%u]",request.x,request.y,request.z);
++    const int count=std::fprintf(file,
++      "{\"schema\":\"open-ocarina.gpu-page-table/v1\",\"producer\":{\"stage\":\"page-table-only\",\"replay_complete\":false},"
++      "\"pipeline\":{\"program\":\"%016llx\",\"variant\":\"%016llx\",\"spirv_sha256\":\"%s\"},"
++      "\"dispatch\":{\"kind\":\"%s\",\"group_count\":%s,\"present_observed\":%lld,\"identity_event_id\":null},"
++      "\"command_position\":\"immediately before selected compute dispatch, after descriptor and push binding\","
++      "\"submission\":{\"recording_part\":%llu,\"logical_value\":%llu,\"recording_sequence\":%llu,\"completed_recording_sequence\":%llu},"
++      "\"table\":{\"artifact\":\"page-table.bin\",\"size\":%llu,\"sha256\":\"%s\",\"entry_count\":%llu,\"entry_bytes\":8,\"byte_order\":\"little\","
++      "\"root_device_address\":\"%016llx\",\"root_push_offset\":%u,\"page_size\":4096,"
++      "\"windows\":[{\"guest_base\":\"1000000000\",\"size\":8589934592,\"first_entry\":0},{\"guest_base\":\"7f00000000\",\"size\":4294967296,\"first_entry\":2097152}]},"
++      "\"synchronization\":{\"source\":\"actual GPU guest_pages_buffer\",\"prior_writes_to_copy_barrier\":true,\"copy_to_host_barrier\":true,\"mapped_memory_invalidated\":true,"
++      "\"successful_exact_recording_submission\":true,\"recording_timeline_completion_checked\":true},"
++      "\"coverage\":{\"gpu_page_table\":true,\"referenced_allocation_contents\":false,\"descriptor_contents\":false,\"gpu_outputs\":false,\"temporal_state\":false},"
++      "\"limitations\":[\"No complete physical-memory capture or replay\",\"Table entries are device addresses, not copied allocation payloads\","
++      "\"Indirect dispatch counts remain unknown\",\"Recording sequence is completion evidence, not shader timing\"]}\n",
++      (unsigned long long)request.key,(unsigned long long)request.variant,request.shader_digest.c_str(),
++      request.indirect?"indirect":"direct",grid,(long long)request.present,(unsigned long long)request.recording_part,
++      (unsigned long long)request.logical_value,(unsigned long long)request.submitted_sequence,(unsigned long long)completed_sequence,
++      (unsigned long long)size,digest.c_str(),(unsigned long long)kEntries,(unsigned long long)request.root_address,request.root_push_offset);
++    const bool manifest_closed=std::fclose(file)==0;
++    if(count<0||!manifest_closed) {std::remove(manifest_part.string().c_str());return false;}
++    if(present(manifest)) {std::remove(manifest_part.string().c_str());return false;}
++    error.clear();std::filesystem::rename(manifest_part,manifest,error);
++    if(error) {std::remove(manifest_part.string().c_str());return false;}
++    return true;
++}
++} // namespace mkwvk::oo_pt

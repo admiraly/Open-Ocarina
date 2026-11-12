@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "date": "2026-11-12",
+  "stage": "actual GPU page table snapshot; incomplete physical-memory capture",
+  "source_pin": "4cf785a0b143bb34026506c9a3fe4f4bb93c797d",
+  "identity_patch_sha256": "2f14873edfdb47b1f915e75bc4bbe6683ef6632bc66fcbfa1d918aa1c176f018",
+  "snapshot_patch_sha256": "c236b96851bc95426202abec6447e672577fdda747fd8405cc435dae435834ab",
+  "renderer_sha256": "075d6f25f80a8a5950a8fb2d0c045b159e996cef63c6c5ff50786d70c1f87724",
+  "pipeline": {
+    "program": "cc62764061c44f6a",
+    "variant": "095931037888515a",
+    "spirv_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b"
+  },
+  "dispatch": {
+    "kind": "direct",
+    "group_count": [
+      2,
+      1,
+      1
+    ]
+  },
+  "table": {
+    "size": 25165824,
+    "sha256": "889a1459a2700bc8b3c97064fe5839cb9faba4487cc2bdc5c6e2d3ec800824c6",
+    "entry_count": 3145728,
+    "entry_bytes": 8,
+    "root_push_offset": 48,
+    "mapped_entries": 266240,
+    "distinct_nonzero_page_addresses": 266240
+  },
+  "submission": {
+    "recording_part": 7267,
+    "logical_value": 7204,
+    "recording_sequence": 7267,
+    "completed_recording_sequence": 7268
+  },
+  "synchronization": {
+    "source": "actual GPU guest_pages_buffer",
+    "prior_writes_to_copy_barrier": true,
+    "copy_to_host_barrier": true,
+    "mapped_memory_invalidated": true,
+    "successful_exact_recording_submission": true,
+    "recording_timeline_completion_checked": true
+  },
+  "artifact_integrity_verified": true,
+  "independent_gpu_attestation": false,
+  "coverage": {
+    "gpu_page_table": true,
+    "referenced_allocation_contents": false,
+    "descriptor_contents": false,
+    "gpu_outputs": false,
+    "temporal_state": false
+  },
+  "replay_complete": false,
+  "default_subgroup_policy_preserved": true,
+  "test_process_stopped_cleanly": true,
+  "working_install_and_original_saves_preserved": true,
+  "limitations": [
+    "Table addresses are not allocation payloads; canonical allocation ownership and aliases remain to be captured.",
+    "Declared GPU command position is supported by source review and observed recording completion, not cryptographic GPU attestation.",
+    "No shader output comparison, optimized runtime dispatch, quality improvement or FPS gain is established.",
+    "This instrumented serial non-batched diagnostic is not a performance run."
+  ]
+}

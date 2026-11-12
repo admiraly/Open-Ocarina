@@ -16,3 +16,5 @@ Build a verifiable source-reconstruction and native-porting workflow for Ocarina
 Read README.md and docs/status.md when available. Work on the assigned issue; leave unrelated files alone. Keep changes small and reviewable. Run `python3 -m unittest discover -s tests -v` and `python3 tools/check_public_tree.py` before committing. The publication check examines Git's index, so stage only intended public files first.
 
 The user has authorized subagents. A child agent works its assigned scope itself; it must not delegate again without an explicit task instruction. State what changed, what was tested, what remains unknown, and any external tool/version dependencies. Do not publish or push from a child agent; the primary agent reviews and publishes.
+
+Source/build handoffs for runtime tests must include frozen patch and binary SHA-256 values. After a final handoff, coordinate any further edits or rebuilds before changing that artifact. Runtime evidence must identify the exact tested build; late fixes require a fresh run rather than relabeling an older observation.
