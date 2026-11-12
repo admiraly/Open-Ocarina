@@ -1,0 +1,349 @@
+{
+  "schema": 1,
+  "shader_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+  "layout": {
+    "entry_point": "main",
+    "workgroup": [
+      64,
+      1,
+      1
+    ],
+    "push_constant_bytes": 56,
+    "bindings": [
+      {
+        "set": 0,
+        "binding": 0,
+        "type": 6,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 1,
+        "type": 6,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 2,
+        "type": 7,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 3,
+        "type": 7,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 4,
+        "type": 7,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 5,
+        "type": 7,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 6,
+        "type": 7,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 7,
+        "type": 7,
+        "count": 3
+      },
+      {
+        "set": 0,
+        "binding": 8,
+        "type": 1,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 9,
+        "type": 1,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 10,
+        "type": 1,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 11,
+        "type": 1,
+        "count": 1
+      }
+    ]
+  },
+  "driver_overrides": {
+    "HS_CS32_MAX_INSTS": "100000",
+    "HS_SPILL_BATCH": "1",
+    "HS_PUSH_SHADOW": "1",
+    "shader_spilling_rate": "1"
+  },
+  "helper_build_flags": [
+    "-std=c11",
+    "-O2",
+    "-DNDEBUG",
+    "-Wall",
+    "-Wextra",
+    "-Werror"
+  ],
+  "driver_identity": {
+    "icd_sha256": "7b882d02f366202e532410da637178b53f549152ee1e8c174ed79a433c333d60",
+    "library_name": "libvulkan_intel.so",
+    "library_sha256": "5ea19ac96aa52d061ecf2b8e23df7ed3d7d3b36c7d2ae7fe62f01c5a9b610aaa",
+    "mesa_build_options": {
+      "buildtype": "debugoptimized",
+      "debug": true,
+      "optimization": "2",
+      "b_lto": false,
+      "b_ndebug": "true"
+    },
+    "compute_compiler_flags": [
+      "-DNDEBUG",
+      "-O2",
+      "-g"
+    ],
+    "build_library_digest_matches": true
+  },
+  "push_constant_range_bytes": 88,
+  "descriptor_mode": "push",
+  "compile_only": true,
+  "dispatch_executed": false,
+  "results": [
+    {
+      "schema": 1,
+      "compile_only": true,
+      "dispatch_executed": false,
+      "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "driver": "Intel open-source Mesa driver",
+      "driver_info": "Mesa 26.2.4",
+      "vendor_id": 32902,
+      "device_id": 22176,
+      "api_version": 4211042,
+      "policy": "pinned32",
+      "features": {
+        "robustBufferAccess": true,
+        "robustBufferAccess2": true,
+        "uniformBufferStandardLayout": true,
+        "bufferDeviceAddress": true,
+        "shaderInt16": true,
+        "shaderInt64": true,
+        "shaderStorageBufferArrayDynamicIndexing": true,
+        "shaderImageGatherExtended": true,
+        "subgroupSizeControl": true,
+        "computeFullSubgroups": true
+      },
+      "pipeline_optimization_disabled": false,
+      "null_descriptor_enabled": true,
+      "descriptor_mode": "push",
+      "push_constant_range_bytes": 88,
+      "pipeline_create_seconds": 19.2739239,
+      "executables": [
+        {
+          "name": "compute",
+          "subgroup_size": 32,
+          "statistics": [
+            {
+              "name": "Instructions",
+              "value": 144485
+            },
+            {
+              "name": "Code size",
+              "value": 2889872
+            },
+            {
+              "name": "SENDs",
+              "value": 1559
+            },
+            {
+              "name": "Loops",
+              "value": 72
+            },
+            {
+              "name": "Cycles",
+              "value": 3821821
+            },
+            {
+              "name": "Spills",
+              "value": 6690
+            },
+            {
+              "name": "Fills",
+              "value": 14943
+            },
+            {
+              "name": "Scratch Memory Size",
+              "value": 32768
+            },
+            {
+              "name": "GRF registers",
+              "value": 0
+            },
+            {
+              "name": "Push constant ranges",
+              "value": 0
+            },
+            {
+              "name": "Push constant registers",
+              "value": 0
+            },
+            {
+              "name": "Max dispatch width",
+              "value": 32
+            },
+            {
+              "name": "Max live registers",
+              "value": 560
+            },
+            {
+              "name": "Workgroup Memory Size",
+              "value": 0
+            },
+            {
+              "name": "Non SSA regs after NIR",
+              "value": 1372
+            },
+            {
+              "name": "Source hash",
+              "value": 14125175244154702039
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "schema": 1,
+      "compile_only": true,
+      "dispatch_executed": false,
+      "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "driver": "Intel open-source Mesa driver",
+      "driver_info": "Mesa 26.2.4",
+      "vendor_id": 32902,
+      "device_id": 22176,
+      "api_version": 4211042,
+      "policy": "unpinned",
+      "features": {
+        "robustBufferAccess": true,
+        "robustBufferAccess2": true,
+        "uniformBufferStandardLayout": true,
+        "bufferDeviceAddress": true,
+        "shaderInt16": true,
+        "shaderInt64": true,
+        "shaderStorageBufferArrayDynamicIndexing": true,
+        "shaderImageGatherExtended": true,
+        "subgroupSizeControl": true,
+        "computeFullSubgroups": true
+      },
+      "pipeline_optimization_disabled": false,
+      "null_descriptor_enabled": true,
+      "descriptor_mode": "push",
+      "push_constant_range_bytes": 88,
+      "pipeline_create_seconds": 3.469449506,
+      "executables": [
+        {
+          "name": "compute",
+          "subgroup_size": 8,
+          "statistics": [
+            {
+              "name": "Instructions",
+              "value": 48334
+            },
+            {
+              "name": "Code size",
+              "value": 951232
+            },
+            {
+              "name": "SENDs",
+              "value": 960
+            },
+            {
+              "name": "Loops",
+              "value": 72
+            },
+            {
+              "name": "Cycles",
+              "value": 1239620
+            },
+            {
+              "name": "Spills",
+              "value": 2388
+            },
+            {
+              "name": "Fills",
+              "value": 2349
+            },
+            {
+              "name": "Scratch Memory Size",
+              "value": 8192
+            },
+            {
+              "name": "GRF registers",
+              "value": 0
+            },
+            {
+              "name": "Push constant ranges",
+              "value": 0
+            },
+            {
+              "name": "Push constant registers",
+              "value": 0
+            },
+            {
+              "name": "Max dispatch width",
+              "value": 8
+            },
+            {
+              "name": "Max live registers",
+              "value": 159
+            },
+            {
+              "name": "Workgroup Memory Size",
+              "value": 0
+            },
+            {
+              "name": "Non SSA regs after NIR",
+              "value": 1201
+            },
+            {
+              "name": "Source hash",
+              "value": 14125175244154702039
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "No shader execution, resource comparison or rendering verification is performed.",
+    "Pipeline compilation metrics do not establish performance or semantic equivalence.",
+    "Different subgroup widths require different numbers of subgroups for the fixed64-invocation workgroup; executable instruction counts are not a workgroup-speed ratio.",
+    "Reported scratch is driver executable metadata; do not extrapolate a frame-rate gain or total workgroup memory saving.",
+    "The exact cached variant is identified, but the original profiler program key does not prove the timed variant.",
+    "Pipeline creation wall times are single cold-cache CPU observations, not a repeated benchmark; unrelated host load can affect them."
+  ],
+  "date": "2026-11-12",
+  "program": "cc62764061c44f6a",
+  "variant": "095931037888515a",
+  "recorded_from": "Compile-only Vulkan executable statistics; no queue submission or shader execution",
+  "validation": {
+    "passed": true,
+    "validator": "SPIRV-Tools v2026.1 unknown hash, 2026-02-16T00:00:00+00:00",
+    "flags": [
+      "--target-env",
+      "vulkan1.3",
+      "--uniform-buffer-standard-layout"
+    ],
+    "evidence": "Same explicitly pinned module revalidated by final wrapper before an unpinned compile smoke test."
+  }
+}

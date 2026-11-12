@@ -18,7 +18,8 @@ def audit(name, content, symlink=False):
     if symlink:
         errors.append("symlink")
     scoped_source = ((path.suffix == ".java" and path.parts[:2] == ("tools", "ghidra_scripts"))
-                     or (path.suffix == ".c" and path.parts[:2] == ("src", "probes")))
+                     or (path.suffix == ".c" and path.parts[:2] == ("src", "probes"))
+                     or name == "tools/vulkan_compile_probe.c")
     if set(path.parts) & PRIVATE_PARTS or (path.suffix not in ALLOWED and path.name not in NAMES and not scoped_source):
         errors.append("unapproved artifact path/type")
     if len(content) > 256 * 1024 or b"\0" in content:
