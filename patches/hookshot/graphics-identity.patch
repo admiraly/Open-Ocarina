@@ -1,0 +1,367 @@
+diff --git a/gpu/vk/graphics_identity.h b/gpu/vk/graphics_identity.h
+new file mode 100644
+index 0000000..cdd1469
+--- /dev/null
++++ b/gpu/vk/graphics_identity.h
+@@ -0,0 +1,166 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Opt-in native mesh command identity. No resource snapshots or subgroup changes.
++#pragma once
++#include "compute_identity.h"
++#include <cerrno>
++#include <limits>
++
++namespace mkwvk::oo_graphics_identity {
++struct Config {
++    bool enabled=false, filter_variant=false;
++    std::string file;
++    std::vector<uint64_t> programs;
++    uint64_t variant=0, limit=128;
++};
++inline const Config& config() {
++    static const Config value=[] {
++        Config c;
++        const char* file=std::getenv("RX_VK_OO_GRAPHICS_IDENTITY_FILE");
++        if(!file||!*file)return c;
++        c.file=file;
++        const char* asked=std::getenv("RX_VK_OO_GRAPHICS_PROGRAMS");
++        const std::string list=asked?asked:"d8e59341cf4f629c,43ec86f35fd937b9";
++        for(size_t start=0;start<list.size();) {
++            const size_t end=list.find(',',start);
++            const std::string token=list.substr(start,end==std::string::npos?list.size()-start:end-start);
++            uint64_t key=0;
++            if(c.programs.size()==16||!oo_identity::hex64(token.c_str(),key))return Config{};
++            c.programs.push_back(key);
++            if(end==std::string::npos)break;
++            start=end+1;
++            if(start==list.size())return Config{};
++        }
++        if(c.programs.empty())return Config{};
++        if(const char* variant=std::getenv("RX_VK_OO_GRAPHICS_VARIANT")) {
++            if(!oo_identity::hex64(variant,c.variant))return Config{};
++            c.filter_variant=true;
++        }
++        if(const char* limit=std::getenv("RX_VK_OO_GRAPHICS_LIMIT")) {
++            if(!*limit)return Config{};
++            for(const char* p=limit;*p;++p)if(*p<'0'||*p>'9')return Config{};
++            char* end=nullptr;errno=0;const auto n=std::strtoull(limit,&end,10);
++            if(errno||!end||*end||n<1||n>256)return Config{};
++            c.limit=n;
++        }
++        c.enabled=true;return c;
++    }();
++    return value;
++}
++inline bool selected(uint64_t key,uint64_t variant) {
++    const auto& c=config();
++    if(!c.enabled||(c.filter_variant&&variant!=c.variant))return false;
++    for(uint64_t allowed:c.programs)if(key==allowed)return true;
++    return false;
++}
++inline void note_stage(bool native_mesh,uint64_t key,uint64_t variant,oo_identity::Identity& identity,
++                       const std::vector<uint32_t>& words) {
++    if(!native_mesh||!selected(key,variant))return;
++    identity={};
++    if(words.size()<5||words[0]!=0x07230203u)return;
++    std::vector<uint8_t> canonical(words.size()*4);
++    for(size_t j=0;j<words.size();++j)for(unsigned b=0;b<4;++b)canonical[j*4+b]=uint8_t(words[j]>>(8*b));
++    identity.digest=oo_identity::sha256(canonical.data(),canonical.size());
++    identity.words=words.size();identity.valid=true;
++}
++struct Stage {
++    int32_t nvn_stage=-1;
++    uint32_t vk_stage=0,required_size=0;
++    bool require_full=false;
++    oo_identity::Identity identity;
++};
++enum class Command { Direct, Indirect, IndirectCount };
++struct Event {
++    uint64_t key=0,variant=0,cache_stamp=0,pipeline_key=0,frame=0;
++    bool recording_known=false;
++    uint64_t recording_part=0,logical_recording_value=0;
++    std::array<Stage,8> stages{};
++    uint32_t stage_count=0;
++    Command command=Command::Direct;
++    bool converted=false,rewritten=false;
++    uint32_t group_count[3]{},max_draw_count=0,stride=0,first_task=0;
++    uint64_t argument_buffer=0,argument_offset=0,count_buffer=0,count_offset=0;
++    uint32_t width=0,height=0,samples=0,color_count=0,color_formats[8]{},depth_format=0;
++    uint32_t polygon_mode=0,cull_mode=0,front_face=0,blend_enable=0,color_write_mask=0;
++    uint32_t depth_test=0,depth_write=0,depth_compare=0,topology=0;
++    bool depth_clamp=false,alpha_to_coverage=false;
++    uint32_t vendor=0,device=0,driver=0;
++};
++inline bool arguments_valid(const Event& e,uint64_t& bytes) {
++    bytes=0;
++    if(e.command!=Command::Direct&&e.command!=Command::Indirect&&e.command!=Command::IndirectCount)return false;
++    if(e.command==Command::Direct)return !e.argument_buffer&&!e.count_buffer;
++    if(!e.argument_buffer||e.stride<12||e.stride%4)return false;
++    bytes=e.max_draw_count?uint64_t(e.max_draw_count-1)*e.stride+12:0;
++    if(e.argument_offset>std::numeric_limits<uint64_t>::max()-bytes)return false;
++    if(e.command==Command::IndirectCount)
++        return e.count_buffer&&e.count_offset<=std::numeric_limits<uint64_t>::max()-4;
++    return !e.count_buffer;
++}
++inline bool emit(const Event& e) {
++    if(!selected(e.key,e.variant))return false;
++    uint64_t argument_bytes=0;
++    if(!e.stage_count||e.stage_count>8||e.color_count>8||!arguments_valid(e,argument_bytes)) {
++        std::fprintf(stderr,"Open-Ocarina: invalid bounded graphics identity metadata; event refused\n");return false;
++    }
++    bool complete=true,has_mesh=false;
++    for(uint32_t i=0;i<e.stage_count;++i) {
++        const auto& st=e.stages[i];
++        const bool graphics_stage=st.vk_stage==1||st.vk_stage==2||st.vk_stage==4||st.vk_stage==8||st.vk_stage==16||st.vk_stage==64||st.vk_stage==128;
++        complete=complete&&st.identity.valid&&st.identity.words>=5&&graphics_stage&&st.nvn_stage>=0&&st.nvn_stage<8;
++        has_mesh=has_mesh||st.vk_stage==128;
++    }
++    complete=complete&&has_mesh;
++    static std::mutex mutex;
++    static uint64_t ordinal=0;
++    static const uint64_t run=uint64_t(std::chrono::system_clock::now().time_since_epoch().count());
++    std::lock_guard lock(mutex);
++    if(ordinal>=config().limit)return false;
++    FILE* out=std::fopen(config().file.c_str(),"ab");
++    if(!out){std::perror("Open-Ocarina graphics identity output");return false;}
++    const uint64_t current=ordinal++;
++    std::fprintf(out,"{\"schema\":\"open-ocarina.graphics-identity/v1\",\"producer\":{\"stage\":\"identity-only\",\"replay_complete\":false},"
++        "\"event_id\":\"%016llx-%llu\",\"identity_complete\":%s,\"pipeline\":{\"program\":\"%016llx\",\"variant\":\"%016llx\","
++        "\"cache_stamp\":\"%016llx\",\"pipeline_key\":\"%016llx\",\"entry_point\":\"main\",\"specialization\":[],\"stages\":[",
++        (unsigned long long)run,(unsigned long long)current,complete?"true":"false",(unsigned long long)e.key,
++        (unsigned long long)e.variant,(unsigned long long)e.cache_stamp,(unsigned long long)e.pipeline_key);
++    for(uint32_t i=0;i<e.stage_count;++i) {
++        const auto& st=e.stages[i];
++        const std::string digest=st.identity.valid?"\""+oo_identity::hex(st.identity.digest)+"\"":"null";
++        char required[32];if(st.required_size)std::snprintf(required,sizeof required,"%u",st.required_size);else std::snprintf(required,sizeof required,"null");
++        std::fprintf(out,"%s{\"index\":%u,\"nvn_stage\":%d,\"vk_stage\":%u,\"spirv\":{\"sha256\":%s,\"word_count\":%zu},"
++            "\"subgroup_request\":{\"required_size\":%s,\"require_full_subgroups\":%s},\"driver_selected_simd_width\":null}",
++            i?",":"",i,st.nvn_stage,st.vk_stage,digest.c_str(),st.identity.words,required,st.require_full?"true":"false");
++    }
++    const char* command=e.command==Command::Direct?"vkCmdDrawMeshTasksEXT":e.command==Command::Indirect?"vkCmdDrawMeshTasksIndirectEXT":"vkCmdDrawMeshTasksIndirectCountEXT";
++    std::fprintf(out,"]},\"draw\":{\"command\":\"%s\",\"converted_arguments\":%s,\"rewritten_arguments\":%s,\"selected_recording_ordinal\":%llu,"
++        "\"native_frame_observed\":%llu,\"first_task_requested\":%u,\"group_count\":",command,e.converted?"true":"false",e.rewritten?"true":"false",
++        (unsigned long long)current,(unsigned long long)e.frame,e.first_task);
++    if(e.command==Command::Direct)std::fprintf(out,"[%u,%u,%u],\"arguments\":null,\"count_argument\":null",e.group_count[0],e.group_count[1],e.group_count[2]);
++    else {
++        std::fprintf(out,"null,\"arguments\":{\"buffer_handle\":\"%016llx\",\"offset\":%llu,\"byte_extent\":%llu,\"stride\":%u,\"max_draw_count\":%u,\"api_draw_count\":",
++            (unsigned long long)e.argument_buffer,(unsigned long long)e.argument_offset,(unsigned long long)argument_bytes,e.stride,e.max_draw_count);
++        if(e.command==Command::Indirect)std::fprintf(out,"%u",e.max_draw_count);else std::fprintf(out,"null");
++        std::fprintf(out,"},\"count_argument\":");
++        if(e.command==Command::IndirectCount)std::fprintf(out,"{\"buffer_handle\":\"%016llx\",\"offset\":%llu,\"byte_extent\":4,\"value\":null}",(unsigned long long)e.count_buffer,(unsigned long long)e.count_offset);
++        else std::fprintf(out,"null");
++    }
++    std::fprintf(out,",\"gpu_executed_draw_count\":null,\"recording_part\":");
++    if(e.recording_known)std::fprintf(out,"%llu,\"logical_recording_value\":%llu",(unsigned long long)e.recording_part,(unsigned long long)e.logical_recording_value);
++    else std::fprintf(out,"null,\"logical_recording_value\":null");
++    std::fprintf(out,",\"recording_sequence\":null,\"gpu_completion_value\":null},\"attachments\":{\"width\":%u,\"height\":%u,\"sample_count_flag\":%u,\"depth_format\":%u,\"color_formats\":[",e.width,e.height,e.samples,e.depth_format);
++    for(uint32_t i=0;i<e.color_count;++i)std::fprintf(out,"%s%u",i?",":"",e.color_formats[i]);
++    std::fprintf(out,"]},\"requested_state\":{\"scope\":\"retained NVN values and Vulkan pipeline topology; not full effective dynamic state\","
++        "\"topology\":%u,\"polygon_mode\":%u,\"cull_mode\":%u,\"front_face\":%u,\"blend_enable\":%u,\"color_write_mask\":%u,"
++        "\"depth_test\":%u,\"depth_write\":%u,\"depth_compare\":%u,\"depth_clamp\":%s,\"alpha_to_coverage\":%s},"
++        "\"device\":{\"vendor_id\":%u,\"device_id\":%u,\"driver_version\":%u},"
++        "\"coverage\":{\"resource_contents\":false,\"descriptor_contents\":false,\"indirect_gpu_values\":false,\"physical_pointer_reachability\":false,"
++        "\"temporal_state\":false,\"gpu_outputs\":false,\"effective_dynamic_state_complete\":false},"
++        "\"ordinal_scope\":\"selected native mesh commands at CPU recording point; not queue order or GPU completion\"}\n",
++        e.topology,e.polygon_mode,e.cull_mode,e.front_face,e.blend_enable,e.color_write_mask,e.depth_test,e.depth_write,e.depth_compare,
++        e.depth_clamp?"true":"false",e.alpha_to_coverage?"true":"false",e.vendor,e.device,e.driver);
++    const bool ok=!std::ferror(out);
++    const bool closed=std::fclose(out)==0;
++    if(!ok||!closed)std::fprintf(stderr,"Open-Ocarina: graphics identity write failed; output is incomplete\n");
++    return ok&&closed;
++}
++} // namespace mkwvk::oo_graphics_identity
+diff --git a/gpu/vk/vk_draw.cpp b/gpu/vk/vk_draw.cpp
+index aecbcfd..a873163 100644
+--- a/gpu/vk/vk_draw.cpp
++++ b/gpu/vk/vk_draw.cpp
+@@ -48,6 +48,7 @@
+ #include "vk_gprof.h"
+ #include "vk_jobs.h"
+ #include "vk_shader.h"
++#include "graphics_identity.h"
+ #include "vk_texture.h"
+ #include "movie_upscale_policy.h"
+ #include "skip_code.h"
+@@ -6662,6 +6663,48 @@ static bool fallback_list_held(uint64_t list) {
+     return false;
+ }
+ 
++// Open-Ocarina native mesh identity only: no resource reads, copies or policy changes.
++void oo_graphics_identity_record(VkCommandBuffer cmd, const Program& p, const NvnState& s, const Targets& at,
++                                 VkPrimitiveTopology topology, const DrawArgs& d, oo_graphics_identity::Command command,
++                                 bool converted, bool rewritten, VkBuffer arguments, VkDeviceSize argument_offset,
++                                 uint32_t count, uint32_t stride, VkBuffer counter, VkDeviceSize counter_offset) {
++    if (!p.mesh || p.fallback || !oo_graphics_identity::selected(p.key, p.variant)) return;
++    oo_graphics_identity::Event event;
++    event.key = p.key; event.variant = p.variant; event.cache_stamp = program_cache_stamp();
++    event.pipeline_key = pipeline_key(p, s, at, topology); event.frame = texture_frame_no();
++    event.recording_known = memory_pt_recording_info(cmd, &event.recording_part, &event.logical_recording_value);
++    event.stage_count = (uint32_t)p.stages.size();
++    for (size_t i = 0; i < p.stages.size() && i < event.stages.size(); ++i) {
++        const auto& source = p.stages[i]; auto& stage = event.stages[i];
++        stage.nvn_stage = source.nvn_stage; stage.vk_stage = (uint32_t)source.vk_stage; stage.identity = source.oo_identity;
++        VkPipelineShaderStageCreateInfo info{VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO};
++        info.stage = source.vk_stage; pin_subgroup(info);   // same request as build_graphics; not actual driver SIMD width
++        if (info.pNext) {
++            const auto* size = static_cast<const VkPipelineShaderStageRequiredSubgroupSizeCreateInfo*>(info.pNext);
++            if (size->sType == VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO)
++                stage.required_size = size->requiredSubgroupSize;
++        }
++        stage.require_full = (info.flags & VK_PIPELINE_SHADER_STAGE_CREATE_REQUIRE_FULL_SUBGROUPS_BIT) != 0;
++    }
++    event.command = command; event.converted = converted; event.rewritten = rewritten;
++    event.group_count[0] = (uint32_t)std::max(d.groups[0], 0);
++    event.group_count[1] = (uint32_t)std::max(d.groups[1], 1);
++    event.group_count[2] = (uint32_t)std::max(d.groups[2], 1);
++    event.argument_buffer = (uint64_t)(uintptr_t)arguments; event.argument_offset = argument_offset;
++    event.max_draw_count = count; event.stride = stride; event.first_task = d.first_task;
++    event.count_buffer = (uint64_t)(uintptr_t)counter; event.count_offset = counter_offset;
++    event.width = at.width; event.height = at.height; event.samples = (uint32_t)at.samples;
++    event.color_count = (uint32_t)at.n; event.depth_format = (uint32_t)at.depth_format;
++    for (int i = 0; i < at.n && i < 8; ++i) event.color_formats[i] = (uint32_t)at.color_format[i];
++    event.topology = (uint32_t)topology; event.polygon_mode = (uint32_t)s.poly.mode;
++    event.cull_mode = (uint32_t)s.poly.cull; event.front_face = (uint32_t)s.poly.front;
++    event.blend_enable = (uint32_t)s.color.blend_en; event.color_write_mask = s.chmask.mask;
++    event.depth_test = (uint32_t)s.ds.dt; event.depth_write = (uint32_t)s.ds.dw; event.depth_compare = (uint32_t)s.ds.df;
++    event.depth_clamp = s.depth_clamp; event.alpha_to_coverage = s.ms.a2c != 0;
++    event.vendor = dev.props.vendorID; event.device = dev.props.deviceID; event.driver = dev.props.driverVersion;
++    oo_graphics_identity::emit(event);
++}
++
+ void draw(VkCommandBuffer cmd, NvnState& s, const DrawArgs& d) {
+     PROF_HOT(PROF_DRAW);
+     FINE_N(FC_DRAWS, 1);
+@@ -7166,6 +7209,13 @@ void draw(VkCommandBuffer cmd, NvnState& s, const DrawArgs& d) {
+             st_draws++, pass().draws++;
+             return;
+         }
++        const auto oo_record_mesh = [&](oo_graphics_identity::Command command, bool converted, bool rewritten,
++                                         VkBuffer arguments, VkDeviceSize offset, uint32_t count, uint32_t stride,
++                                         VkBuffer counter = VK_NULL_HANDLE, VkDeviceSize counter_offset = 0) {
++            if (oo_graphics_identity::selected(p.key, p.variant))
++                oo_graphics_identity_record(cmd, p, s, at, topo, d, command, converted, rewritten,
++                                            arguments, offset, count, stride, counter, counter_offset);
++        };
+         {   // (amd-fix, diagnosis) RX_VK_LOG_MESH_PROGS=1: each mesh program's first draw and every 600th, with what its
+             // indirect arguments hold in guest memory (0 groups: the culling pass before it left nothing)
+             static const bool per_prog = env_on("RX_VK_LOG_MESH_PROGS");
+@@ -7222,10 +7272,14 @@ void draw(VkCommandBuffer cmd, NvnState& s, const DrawArgs& d) {
+             if (mesh_conv_buf) {   // (EvilOOT: the records as {count, 1, 1}, mesh_indirect_convert)
+                 // (hookshot: as many records as mesh_indirect_convert wrote, not the game's maximum)
+                 const uint32_t conv_n = (uint32_t)std::clamp(d.max, 1, 4096);
+-                if (cnt && vkCmdDrawMeshTasksIndirectCountEXT)
++                if (cnt && vkCmdDrawMeshTasksIndirectCountEXT) {
++                    oo_record_mesh(oo_graphics_identity::Command::IndirectCount, true, false,
++                                   mesh_conv_buf, mesh_conv_off, conv_n, 12, cnt.buffer, cnt.offset);
+                     vkCmdDrawMeshTasksIndirectCountEXT(cmd, mesh_conv_buf, mesh_conv_off, cnt.buffer, cnt.offset, conv_n, 12);
+-                else
++                } else {
++                    oo_record_mesh(oo_graphics_identity::Command::Indirect, true, false, mesh_conv_buf, mesh_conv_off, conv_n, 12);
+                     vkCmdDrawMeshTasksIndirectEXT(cmd, mesh_conv_buf, mesh_conv_off, conv_n, 12);
++                }
+                 mesh_conv_buf = VK_NULL_HANDLE;
+                 st_mesh++;
+                 st_draws++, pass().draws++;
+@@ -7241,10 +7295,16 @@ void draw(VkCommandBuffer cmd, NvnState& s, const DrawArgs& d) {
+                 const uint64_t firsts = mesh_args_address + mesh_args.offset + 12;
+                 vkCmdPushConstants(cmd, p.layout, p.push_stages, Shader::Backend::SPIRV::MESH_FIRST_PUSH_OFFSET, 8, &firsts);
+             }
+-            if (cnt && vkCmdDrawMeshTasksIndirectCountEXT)
++            const bool oo_rewritten = mesh_args.buffer == mesh_args_buffer && mesh_args_buffer;
++            if (cnt && vkCmdDrawMeshTasksIndirectCountEXT) {
++                oo_record_mesh(oo_graphics_identity::Command::IndirectCount, false, oo_rewritten,
++                               mesh_args.buffer, mesh_args.offset, (uint32_t)d.max, step, cnt.buffer, cnt.offset);
+                 vkCmdDrawMeshTasksIndirectCountEXT(cmd, mesh_args.buffer, mesh_args.offset, cnt.buffer, cnt.offset, d.max, step);
+-            else
++            } else {
++                oo_record_mesh(oo_graphics_identity::Command::Indirect, false, oo_rewritten,
++                               mesh_args.buffer, mesh_args.offset, (uint32_t)std::max(d.max, 1), step);
+                 vkCmdDrawMeshTasksIndirectEXT(cmd, mesh_args.buffer, mesh_args.offset, (uint32_t)std::max(d.max, 1), step);
++            }
+         } else {
+             if (mesh_args_ready()) {   // (a direct draw's first: in an entry of its own, or entry 0's 0)
+                 uint32_t at = 0;
+@@ -7255,6 +7315,7 @@ void draw(VkCommandBuffer cmd, NvnState& s, const DrawArgs& d) {
+                 const uint64_t firsts = mesh_args_address + (uint64_t)at * 16 + 12;
+                 vkCmdPushConstants(cmd, p.layout, p.push_stages, Shader::Backend::SPIRV::MESH_FIRST_PUSH_OFFSET, 8, &firsts);
+             }
++            oo_record_mesh(oo_graphics_identity::Command::Direct, false, false, VK_NULL_HANDLE, 0, 1, 0);
+             vkCmdDrawMeshTasksEXT(cmd, (uint32_t)std::max(d.groups[0], 0), (uint32_t)std::max(d.groups[1], 1),
+                                   (uint32_t)std::max(d.groups[2], 1));
+         }
+@@ -9667,7 +9728,7 @@ VkPipeline compute_pipeline_from_caches(const Program& p) {
+ VkPipeline compute_pipeline_by_module_id(const Program& p, const uint8_t* id, uint32_t size) {
+     // Identity observations need the actual SPIR-V, not only an opaque driver identifier.
+     // Only the explicitly selected opt-in target takes the ordinary module path instead.
+-    if (oo_identity::selected(p.key, p.variant)) return VK_NULL_HANDLE;
++    if (oo_identity::selected(p.key, p.variant) || oo_graphics_identity::selected(p.key, p.variant)) return VK_NULL_HANDLE;
+     if (!dev.vk13.pipelineCreationCacheControl || !size) return VK_NULL_HANDLE;
+     VkComputePipelineCreateInfo ci = compute_pipeline_info(p, true);
+     // (VK_EXT_shader_module_identifier: no module, its identifier in the stage; only ever without compiling, which is all
+diff --git a/gpu/vk/vk_progcache.cpp b/gpu/vk/vk_progcache.cpp
+index 6dcf098..ac35259 100644
+--- a/gpu/vk/vk_progcache.cpp
++++ b/gpu/vk/vk_progcache.cpp
+@@ -38,6 +38,7 @@
+ #include "fallback_size_policy.h"
+ #include "vk_paths.h"
+ #include "vk_internal.h"
++#include "graphics_identity.h"
+ #include "vk_progcache.h"
+ #include "vk_programs.h"
+ 
+@@ -372,6 +373,7 @@ void program_cache_save(const Program& p, const std::vector<std::vector<uint32_t
+         for (size_t k = 0; k < p.stages.size(); k++) {
+             p.stages[k].phis = fallback_size::spirv_phis(spirv[k].data(), spirv[k].size());
+             oo_identity::note_stage(p.key, p.variant, p.stages[k].oo_identity, spirv[k]);
++            oo_graphics_identity::note_stage(p.mesh && !p.fallback, p.key, p.variant, p.stages[k].oo_identity, spirv[k]);
+         }
+     disk_init();
+     if (!disk_on || spirv.size() != p.stages.size()) return;
+@@ -506,6 +508,7 @@ void program_cache_read(FILE* in, std::mutex* mu, uint64_t key, const std::vecto
+             }
+             st.module = make_module(spirv);
+             oo_identity::note_stage(p->key, p->variant, st.oo_identity, spirv);
++            oo_graphics_identity::note_stage(p->mesh && !p->fallback, p->key, p->variant, st.oo_identity, spirv);
+             st.phis = fallback_size::spirv_phis(spirv.data(), spirv.size());
+             ok = ok && st.module;
+         }
+diff --git a/tests/program_cache_cleanup_test.cpp b/tests/program_cache_cleanup_test.cpp
+index ccd48c1..375096b 100644
+--- a/tests/program_cache_cleanup_test.cpp
++++ b/tests/program_cache_cleanup_test.cpp
+@@ -19,6 +19,8 @@
+ 
+ #include "../gpu/vk/compute_identity.h"
+ namespace oo_identity = mkwvk::oo_identity;
++#include "../gpu/vk/graphics_identity.h"
++namespace oo_graphics_identity = mkwvk::oo_graphics_identity;
+ #include "../gpu/vk/fallback_size_policy.h"   // (program_cache_save and _read note each stage's phis)
+ #ifdef _WIN32
+ #include <io.h>
+diff --git a/tests/program_cache_one_variant_test.cpp b/tests/program_cache_one_variant_test.cpp
+index 82d2dd2..8ad5b55 100644
+--- a/tests/program_cache_one_variant_test.cpp
++++ b/tests/program_cache_one_variant_test.cpp
+@@ -18,6 +18,8 @@
+ 
+ #include "../gpu/vk/compute_identity.h"
+ namespace oo_identity = mkwvk::oo_identity;
++#include "../gpu/vk/graphics_identity.h"
++namespace oo_graphics_identity = mkwvk::oo_graphics_identity;
+ #include "../gpu/vk/fallback_size_policy.h"
+ #ifdef _WIN32
+ #include <io.h>
+diff --git a/tests/seed_variant_cleanup_test.cpp b/tests/seed_variant_cleanup_test.cpp
+index a72a1c4..bb851de 100644
+--- a/tests/seed_variant_cleanup_test.cpp
++++ b/tests/seed_variant_cleanup_test.cpp
+@@ -28,6 +28,8 @@ constexpr uint32_t VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST = 3;
+ namespace Shader { struct Info {}; }
+ #include "../gpu/vk/compute_identity.h"
+ namespace oo_identity = mkwvk::oo_identity;
++#include "../gpu/vk/graphics_identity.h"
++namespace oo_graphics_identity = mkwvk::oo_graphics_identity;
+ #include "seed_types.inc"
+ 
+ struct {

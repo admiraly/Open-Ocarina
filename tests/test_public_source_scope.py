@@ -10,6 +10,7 @@ class SourceScopeTests(unittest.TestCase):
         self.assertEqual(audit("tools/vulkan_compile_probe.c", b"int main(void) { return 0; }"), [])
         self.assertEqual(audit("tools/vulkan_execution_probe.c", b"int main(void) { return 0; }"), [])
         self.assertEqual(audit("tools/vulkan_graphics_compile_probe.c", b"int main(void) { return 0; }"), [])
+        self.assertEqual(audit("tools/vulkan_mesh_execution_probe.c", b"int main(void) { return 0; }"), [])
 
     def test_source_suffixes_do_not_allow_arbitrary_imports(self):
         self.assertTrue(audit("generated/leaf.c", b"int leaf(void) { return 0; }"))

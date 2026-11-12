@@ -51,3 +51,9 @@ python3 -m unittest discover -s tests -p test_mesh_warp32_transform.py -v
 ```
 
 The next safe use of this artifact is coordinated compile-only mesh-pipeline inspection, comparing register allocation/spilling/code size with the exact original and retaining all pipeline state/features. Before execution, establish a valid mesh lane mapping or a stronger guest-lane source contract, observe the original draw/pipeline subgroup policy, capture complete resources and fixed state, and perform real differential output/rendering validation. This prototype grants no blanket subgroup-policy change to this shader or any other graphics stage.
+
+Subsequent work has now observed the [live graphics stage identities and requests](../docs/graphics-identity.md)
+and separately tested [synthetic mesh invocation mapping](mesh-mapping-probe.md)
+on the pinned A770 configuration. The frozen prototype reports above retain their
+original flags; these later observations are separate evidence. Complete real
+shader output/resource equivalence and rendering validation remain necessary.

@@ -60,10 +60,17 @@ The subsequent [allocation-capture stage](allocation-capture.md) now exports act
 
 The [input-isolation patch](input-isolation.md) fixes script/control exclusivity in the out-of-band native mouse path and adds an explicit persistent test mode. Production-source mocks, syntax checks and upstream input tests pass. A separate optimized host executable now links the patch against verified cached translation objects and has reached the selected dispatch in an isolated game run. Live-device suppression was not independently injected/tested there. Input isolation alone is not a deterministic camera/workload producer.
 
-The [all-stage graphics catalog](../research/graphics-targets.md) now resolves both initial graphics targets to mesh/fragment or task/mesh/fragment stages in the examined caches. All ten privately extracted modules pass SPIR-V validation. Actual broadcasts from lanes 0 through 31 establish explicit 32-lane dependencies in one target; the simpler target has two ballots at a structurally reconverged location. These are candidates for verified logical-warp emulation, not evidence that narrower hardware execution is already correct. Actual draw-site identity, complete graphics resources and pipeline measurements remain open.
+The [all-stage graphics catalog](../research/graphics-targets.md) now resolves both initial graphics targets to mesh/fragment or task/mesh/fragment stages in the examined caches. All ten privately extracted modules pass SPIR-V validation. Actual broadcasts from lanes 0 through 31 establish explicit 32-lane dependencies in one target; the simpler target has two ballots at a structurally reconverged location. These are candidates for verified logical-warp emulation, not evidence that narrower hardware execution is already correct. Complete graphics resources and runtime pipeline measurements remain open.
 
 An independently authored [logical-warp prototype](../research/warp32-emulation.md) has now executed successfully on the A770. Shared-memory emulation preserves the tested synthetic ballot, broadcast, shuffle, vote and logical-lane outputs across verified hardware widths. Real mesh-stage lowering, lane mapping, uniform participation, resources and downstream output still require separate validation; no game performance or graphics-equivalence claim follows.
 
 [Complete graphics-pipeline compilation diagnostics](graphics-compile-probe.md) now retain task/mesh/fragment statistics and show substantial mesh register pressure. Conditional logical-warp candidates compile at narrower widths but have not been executed. Diagnostic fixed state and spill policy differ from the gameplay configuration; compiler statistics are not frame timings.
 
 The [bounded later-occurrence capture](occurrence-capture.md) closes buffer/table range coverage at explicitly selected occurrence 64. [Verified metadata](../research/gpu-buffer-closure-observation.json) records complete BEFORE/AFTER payload pairs, every nonzero submitted table entry and all live buffer descriptors. Earlier occurrence 2 still has a late-import gap. Images, samplers, imported-memory alias normalization, CPU mutation and temporal state prevent full replay; no shader output equivalence or performance gain is established.
+
+The [native mesh identity observer](graphics-identity.md) has now recorded both
+selected graphics programs in the live isolated diagnostic. All bounded stage
+digests match the reviewed nightly modules, with task/mesh requesting 32 lanes
+and fragment unpinned. [Runtime metadata](../research/runtime-graphics-identity-observation.json)
+retains attachment formats and explicitly unknown indirect values/driver widths.
+This closes draw-site identity for that run; complete graphics replay remains open.
