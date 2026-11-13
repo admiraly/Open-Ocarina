@@ -4,6 +4,12 @@ Updated 2026-11-13. This page distinguishes working tools, local observations, a
 
 ## Latest reviewed results
 
+A bounded [original-path native-network observation](ndve-live-metadata-observation.md)
+now records 47 real compiler queries, all 21 host-configuration fields at use,
+and a stable registered texture matching the native table. The existing
+network exclusion still occurs before SPIR-V emission. A sampled profile is
+not an actual emitter input, and the native network is not restored.
+
 The D8 graphics interval candidate now passes a separate
 [complete owned mesh-output comparison](grok-d8-interval-replay-observation.md)
 on the A770. All 89,984 bytes match two fresh originals and two earlier

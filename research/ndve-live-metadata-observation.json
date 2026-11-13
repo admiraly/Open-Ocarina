@@ -1,0 +1,145 @@
+{
+  "schema": "open-ocarina.ndve-live-metadata-observation/v1",
+  "date": "2026-11-13",
+  "program": "e409733c45530d75",
+  "native_control_code_sha256": "1d660217708e2a99339df4ac6814d2843c5ad83f9c20dd7b429cb529aee41afa",
+  "source_base_tree": "58ca709617448e06af382c3443dd88dac3ffcb8e",
+  "observer_patch_sha256": "732a2405446fb7ba8c3a2ae48476867ebf8ea689ab441f105f719b9216dc2ed9",
+  "observer_freeze_sha256": "4c030c2db4b9ea570dd71044bcf83df6db2b5398b871b58f2eb09b2f9eae8e4d",
+  "renderer_sha256": "2868ae6f25484ad82d953dab13b42dd71b34b67a38360010aa9a1953252002b5",
+  "renderer_build_receipt_sha256": "6a5c4be7def7f4a9eed23b27ade261452104cad17a345ea9405a18bb311593d7",
+  "runtime_plan_sha256": "17ff11557181c29a5a9a97de4a194a47376133fe1d6eb0db8a859a871bb6a705",
+  "runtime_result_sha256": "f64f83dda29d9874fce05dc75abd33f45875b9d8f97ad56b47cc645250d9255e",
+  "journal_sha256": "8e5c274e1fa8a16c0b6175dca377b91cbc5972634ef8aca146f4e833737addf9",
+  "checked_journal_sha256": "8b7fe347e7fe6dc01d5135e1818fe8516b9be9ab205cf3f1d80dff31cdf66648",
+  "host_sha256": "4eb32b56a91869b5d7ac1673f0ca1e3c0841e893a8a34f728ec85344a312cb30",
+  "driver_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+  "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+  "mapped_renderer_and_driver_attested": true,
+  "native_compilation_units": 207,
+  "compile_failures": 0,
+  "maximum_compile_jobs": 4,
+  "explicit_missing_baseline_header_overlay_sha256": "04d09046d4b1175a19e68b0ef500421afc19f40b9b0568aca22463af20347e21",
+  "native_safe_policy": {
+    "HS_SPILL_BATCH": "1",
+    "HS_PUSH_SHADOW": "1",
+    "shader_spilling_rate": "1",
+    "HS_CS32_MAX_INSTS": null
+  },
+  "observer_contexts": 4,
+  "journal_rows": 328,
+  "journal_bytes": 78034,
+  "actual_compiler_queries": 47,
+  "query_counts": {
+    "local_memory_size": 1,
+    "shared_memory_size": 1,
+    "hle_macro_state": 24,
+    "texture_bound_buffer": 19,
+    "cbuf": 1,
+    "texture_integer": 1
+  },
+  "unique_query_answers": {
+    "local_memory_size": [
+      0
+    ],
+    "shared_memory_size": [
+      3360
+    ],
+    "hle_macro_state": [
+      0
+    ],
+    "texture_bound_buffer": [
+      0
+    ],
+    "cbuf": [
+      281020472
+    ],
+    "texture_integer": [
+      0
+    ]
+  },
+  "compiler_context": {
+    "phase": "nonforced_translation",
+    "seed_control_active": false,
+    "state_has_program": true,
+    "forced_answers": false,
+    "replayed_answers": false,
+    "translation_failed_at_existing_network_exclusion": true,
+    "actual_host_info_fields_used": {
+      "min_ssbo_alignment": 16,
+      "max_per_stage_descriptor_sampled_images": 0,
+      "max_per_stage_resources": 0,
+      "max_descriptor_set_samplers": 0,
+      "max_descriptor_set_uniform_buffers": 0,
+      "max_descriptor_set_uniform_buffers_dynamic": 0,
+      "max_descriptor_set_storage_buffers": 0,
+      "max_descriptor_set_storage_buffers_dynamic": 0,
+      "max_descriptor_set_sampled_images": 0,
+      "max_descriptor_set_storage_images": 0,
+      "max_descriptor_set_input_attachements": 0,
+      "support_float64": 1,
+      "support_float16": 1,
+      "support_int64": 1,
+      "needs_demote_reorder": 0,
+      "support_snorm_render_buffer": 1,
+      "support_viewport_index_layer": 1,
+      "support_viewport_mask": 0,
+      "support_geometry_shader_passthrough": 0,
+      "support_conditional_barrier": 1,
+      "single_lane_geometry_subgroups": 0
+    },
+    "actual_spirv_profile_consumption_observed": false
+  },
+  "bound_sample": {
+    "count": 1,
+    "c0_byte88": 281020472,
+    "driver_word_matches_native_texture_table_slot": true,
+    "texture_type_response": 2,
+    "texture_integer_response": 0,
+    "texture": {
+      "known": 1,
+      "has_view": 0,
+      "effective_target": 1,
+      "effective_format": 37,
+      "width": 1920,
+      "height": 1080,
+      "depth": 1,
+      "levels": 1,
+      "generation_stable_during_sample": 1
+    },
+    "NVN_format_name": "RGBA8",
+    "underlying_Vulkan_format_mapping": "VK_FORMAT_R8G8B8A8_UNORM",
+    "sampled_profile_field_count": 77,
+    "sampled_host_info_matches_actual_host_use": true
+  },
+  "renderer_matrix_flags": {
+    "dev_native_mma": true,
+    "Ampere_native_matrix_multiply": true,
+    "SPIRV_mma_software": true,
+    "hardware_matrix_instruction_execution_proven": false
+  },
+  "process": {
+    "owned_child_stopped_and_reaped": true,
+    "live_owned_group_members_after": 0,
+    "forced_kill": false,
+    "exit_code": -15,
+    "source_and_binary_pins_unchanged": true,
+    "common_save_and_cache_seed_unchanged": true
+  },
+  "claims": {
+    "native_network_restored": false,
+    "actual_spirv_variant_selected": false,
+    "native_shader_executed": false,
+    "complete_replay_inputs": false,
+    "historical_payload_atomicity": false,
+    "native_quality": false,
+    "FPS_measured": false
+  },
+  "limitations": [
+    "This observes one original-path translation and one bound-state sample. It does not capture texture pixels or the complete descriptor/input graph.",
+    "The original network exclusion occurs before SPIR-V emission; the 77-field dispatch profile is a device-derived sample, not an actual emitter input.",
+    "dev.native_mma is a renderer policy flag; its true value alongside software matrix mode does not establish hardware matrix execution.",
+    "Registration generations agree around the CPU sample; concurrent GPU/CPU payload writes and imported-memory lifetime/aliasing are not certified.",
+    "The checker intentionally leaves its own loaded-binary field false; the separate parent runtime result supplies mapped host/renderer/driver proof."
+  ]
+}
