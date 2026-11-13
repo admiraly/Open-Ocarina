@@ -1,8 +1,10 @@
 # Open-Ocarina's downloadable builds, made without game data, from the Hookshot source snapshot on the
 # hookshot-upstream branch (GPL-3.0) with patches/hookshot/variant-name.patch and release-source.patch applied.
-#   linux:   the AppImage builder, as upstream's linux-appimage.yml and scripts/linux/appimage.sh make it.
-#   windows: open-ocarina_vk.dll (llvm-mingw) and the patched source a Windows PC builds the game from.
-#   publish: only when asked (inputs.publish): a prerelease with those files.
+#   linux:         the AppImage builder, as upstream's linux-appimage.yml and scripts/linux/appimage.sh make it.
+#   windows_dav1d: static libdav1d for Windows (scripts/windows/dav1d.sh with llvm-mingw).
+#   windows:       self-contained portable Open-Ocarina Windows Builder zip (HookshotBuilder.exe + Python + llvm-mingw +
+#                  Vulkan/SPIR-V/VMA headers + FFmpeg + dav1d + SDL2/SDL3 + pipeline states), open-ocarina_vk.dll, and source zip.
+#   publish:       only when asked (inputs.publish): a prerelease with those files.
 # No game file is read here and no game executable is made: that happens on the PC that owns the game.
 name: Release builds (game-free)
 
@@ -116,8 +118,39 @@ jobs:
         continue-on-error: true
         run: scripts/linux/check_player_build.sh
 
+  windows_dav1d:
+    name: Windows dav1d
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - name: Install build tools
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends meson ninja-build nasm xz-utils curl ca-certificates
+      - name: Check out the Hookshot snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: hookshot-upstream
+          persist-credentials: false
+      - name: Build static libdav1d for Windows
+        run: |
+          curl -fL --retry 5 --retry-delay 10 -o "$RUNNER_TEMP/llvm-mingw.tar.xz" \
+            "https://github.com/mstorsjo/llvm-mingw/releases/download/20261104/llvm-mingw-20261104-ucrt-ubuntu-22.04-x86_64.tar.xz"
+          mkdir -p "$RUNNER_TEMP/llvm"
+          tar -xf "$RUNNER_TEMP/llvm-mingw.tar.xz" -C "$RUNNER_TEMP/llvm"
+          HOOKSHOT_MINGW="$RUNNER_TEMP/llvm/llvm-mingw-20261104-ucrt-ubuntu-22.04-x86_64" \
+            scripts/windows/dav1d.sh "$RUNNER_TEMP/dav1d-cpm"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: open-ocarina-windows-dav1d
+          path: ${{ runner.temp }}/dav1d-cpm/dav1d/
+          if-no-files-found: error
+
   windows:
-    name: Windows back end and source package
+    name: Windows Builder and back end
+    needs: [windows_dav1d]
     runs-on: windows-2022
     timeout-minutes: 60
     steps:
@@ -161,14 +194,64 @@ jobs:
           ref: 1d8f600fd424278486eade7ed3e877c99f0846b1 # v3.3.0
           path: _deps/cpm/vulkanmemoryallocator/v3.3.0
           persist-credentials: false
+      - name: Download dav1d for Windows
+        uses: actions/download-artifact@v4
+        with:
+          name: open-ocarina-windows-dav1d
+          path: _deps/cpm/dav1d
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
       - name: llvm-mingw
         run: echo "HOOKSHOT_MINGW=$(python -I scripts/release_parts.py llvm-mingw "$RUNNER_TEMP/llvm")" >> "$GITHUB_ENV"
-      # (the back end alone, no lift, no game: as upstream's vulkan job builds it)
-      - name: open-ocarina_vk.dll
+      - name: Fetch FFmpeg (LGPL) and SDL2/SDL3 for Windows
+        run: |
+          python - <<'PY'
+          import io, os, urllib.request, zipfile
+
+          def fetch(url):
+              req = urllib.request.Request(url, headers={"User-Agent": "Open-Ocarina-CI"})
+              with urllib.request.urlopen(req, timeout=180) as r:
+                  return r.read()
+
+          # 1. Pinned LGPL shared FFmpeg for Windows (headers, .lib import libs, and .dll runtime)
+          ff_url = "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-11-13-12-43/ffmpeg-N-128889-g88c46fce27-win64-lgpl-shared.zip"
+          ff_out = os.path.join("_deps", "cpm", "ffmpeg", "N-128889-g88c46fce27")
+          with zipfile.ZipFile(io.BytesIO(fetch(ff_url))) as z:
+              for m in z.infolist():
+                  if m.is_dir():
+                      continue
+                  parts = m.filename.split("/", 1)
+                  if len(parts) < 2:
+                      continue
+                  rel = parts[1]
+                  if rel.startswith("include/") or (rel.startswith("lib/") and rel.endswith(".lib")) or (rel.startswith("bin/") and rel.endswith(".dll")) or rel == "LICENSE.txt":
+                      dst = os.path.join(ff_out, *rel.split("/"))
+                      os.makedirs(os.path.dirname(dst), exist_ok=True)
+                      with z.open(m) as src, open(dst, "wb") as out:
+                          out.write(src.read())
+
+          # 2. Pinned SDL2 (sdl2-compat 2.32.74) and SDL3 (3.4.20) matching third_party/sdl2/VERSION.txt
+          sdl_out = os.path.join("_deps", "sdl2")
+          os.makedirs(sdl_out, exist_ok=True)
+          for url, dll in [
+              ("https://github.com/libsdl-org/sdl2-compat/releases/download/release-2.32.74/sdl2-compat-2.32.74-win32-x64.zip", "SDL2.dll"),
+              ("https://github.com/libsdl-org/SDL/releases/download/release-3.4.20/SDL3-3.4.20-win32-x64.zip", "SDL3.dll"),
+          ]:
+              with zipfile.ZipFile(io.BytesIO(fetch(url))) as z:
+                  hit = [m for m in z.infolist() if not m.is_dir() and m.filename.rsplit("/", 1)[-1] == dll]
+                  assert hit, f"{dll} missing in {url}"
+                  with z.open(hit[0]) as src, open(os.path.join(sdl_out, dll), "wb") as out:
+                      out.write(src.read())
+          PY
+          ls -l _deps/sdl2 _deps/cpm/ffmpeg/N-128889-g88c46fce27/lib _deps/cpm/ffmpeg/N-128889-g88c46fce27/bin
+      # (the back end alone, no lift, no game: default + AMD FSR 4 compile check)
+      - name: open-ocarina_vk.dll (default and FSR 4 check)
         env:
           RX_VK_ONLY: '1'
           RX_RELEASE: '1'
@@ -176,15 +259,103 @@ jobs:
           OOT_WORK="$RUNNER_TEMP/vk-work" RX_CPM="$GITHUB_WORKSPACE/_deps/cpm" \
             python -I nx2/build.py --standalone --jobs "$NUMBER_OF_PROCESSORS"
           ls -l "$RUNNER_TEMP/vk-work/sa/build/open-ocarina_vk.dll"
-      # (the patched tree as git holds it: tracked source only, nothing from a game, no build output)
-      - name: Source package
+          HOOKSHOT_FSR=1 OOT_WORK="$RUNNER_TEMP/vk-fsr-work" RX_CPM="$GITHUB_WORKSPACE/_deps/cpm" \
+            python -I nx2/build.py --standalone --jobs "$NUMBER_OF_PROCESSORS"
+          ls -l "$RUNNER_TEMP/vk-fsr-work/sa/build/open-ocarina_vk.dll"
+      - name: Assemble portable Windows Builder package
+        run: |
+          pkg="$RUNNER_TEMP/package"
+          rm -rf "$pkg"
+          dotnet publish builder/HookshotBuilder/HookshotBuilder.csproj -c Release -p:NuGetAudit=false -o "$pkg"
+          tools="$pkg/tools"
+          mkdir -p "$tools"
+          python - <<'PY'
+          import importlib.util, io, os, shutil, subprocess, urllib.request, zipfile
+
+          pkg = os.path.join(os.environ["RUNNER_TEMP"], "package")
+          tools = os.path.join(pkg, "tools")
+
+          # 1. Tracked source trees
+          tracked = subprocess.check_output(["git", "ls-files", "-z", "--", "gpu", "host", "nx2", "scripts", "third_party"]).decode("utf-8").split("\0")
+          for rel in tracked:
+              if not rel:
+                  continue
+              dst = os.path.join(tools, *rel.split("/"))
+              os.makedirs(os.path.dirname(dst), exist_ok=True)
+              shutil.copyfile(rel, dst)
+
+          # 2. Pipeline state list (prevents white-screen stalls on first load)
+          spec = importlib.util.spec_from_file_location("release_parts", os.path.join("scripts", "release_parts.py"))
+          rp = importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(rp)
+          assert rp.state_list(tools) == 0
+
+          # 3. tools/version.txt, LICENSE, WINDOWS.md
+          with open(os.path.join(tools, "version.txt"), "w", encoding="utf-8", newline="\n") as f:
+              f.write(os.environ["TAG"] + "\n")
+          shutil.copyfile("LICENSE", os.path.join(pkg, "LICENSE"))
+          shutil.copyfile(os.path.join("_oo", "docs", "windows.md"), os.path.join(pkg, "WINDOWS.md"))
+
+          # 4. SDL2.dll, SDL3.dll, CPM dependencies, llvm-mingw
+          for dll in ("SDL2.dll", "SDL3.dll"):
+              shutil.copyfile(os.path.join("_deps", "sdl2", dll), os.path.join(tools, "third_party", "sdl2", dll))
+          shutil.copytree(os.path.join("_deps", "cpm"), os.path.join(tools, "cpm"))
+          shutil.copytree(os.environ["HOOKSHOT_MINGW"], os.path.join(tools, "llvm-mingw"))
+
+          # 5. Embeddable Python 3.12 + pinned packages
+          py_dir = os.path.join(tools, "python")
+          os.makedirs(py_dir, exist_ok=True)
+          py_url = "https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip"
+          with urllib.request.urlopen(urllib.request.Request(py_url, headers={"User-Agent": "Open-Ocarina-CI"}), timeout=180) as r:
+              with zipfile.ZipFile(io.BytesIO(r.read())) as z:
+                  z.extractall(py_dir)
+          with open(os.path.join(py_dir, "python312._pth"), "w", encoding="utf-8", newline="\n") as f:
+              f.write("python312.zip\n.\nLib/site-packages\nimport site\n")
+          PY
+          python -m pip install --no-deps --only-binary :all: --no-compile --no-cache-dir --disable-pip-version-check \
+            --platform win_amd64 --python-version 3.12 --implementation cp \
+            --target "$RUNNER_TEMP/package/tools/python/Lib/site-packages" -r requirements.txt
+      - name: Smoke-test Windows Builder tools (Python, dry-run, FFmpeg/dav1d/SDL compile)
+        run: |
+          tools="$RUNNER_TEMP/package/tools"
+          py="$tools/python/python.exe"
+          "$py" -I -B -c "import lz4, numpy, capstone, unicorn, zstandard, fontTools, PIL, astc_encoder, archspec, texture2ddecoder, urllib.request; print('Python OK')"
+          (cd "$tools" && "$py" -I -B nx2/pipeline_states.py check --dir assets/pipeline_states)
+          (cd "$tools" && "$py" -I -B nx2/make_game.py --help >/dev/null)
+          (cd "$tools" && env -u HOOKSHOT_MINGW -u RX_CPM "$py" -I -B -c "import sys; sys.path.insert(0, 'nx2'); import make_game; assert make_game.bundled_mingw(), 'bundled llvm-mingw missing'")
+          (cd "$tools" && env HOOKSHOT_MINGW="$tools/llvm-mingw" -u RX_CPM OOT_WORK="$RUNNER_TEMP/smoke-work" RX_RELEASE=1 "$py" -I -B nx2/build.py --standalone --jobs 1 --dry-run)
+          # Compile-check host/nn_video.c (FFmpeg + dav1d) and host/dav1d_av1.c and host/pad_sdl.c using only packaged tools
+          cc="$tools/llvm-mingw/bin/clang.exe"
+          ff_inc=$(ls -d "$tools/cpm/ffmpeg/"*/include | head -1)
+          dav_inc=$(ls -d "$tools/cpm/dav1d/"*/include | head -1)
+          "$cc" -c "$tools/host/nn_video.c" -o "$RUNNER_TEMP/nn_video.o" -O2 -Wno-everything -I"$tools/host" -I"$ff_inc" -I"$dav_inc" -DHOOKSHOT_DAV1D
+          "$cc" -c "$tools/host/dav1d_av1.c" -o "$RUNNER_TEMP/dav1d_av1.o" -O2 -Wno-everything -I"$tools/host" -I"$dav_inc" -DHOOKSHOT_DAV1D
+          "$cc" -c "$tools/host/pad_sdl.c" -o "$RUNNER_TEMP/pad_sdl.o" -O2 -Wno-everything -I"$tools/host"
+      - name: Package Windows artifacts
         run: |
           mkdir -p dist
-          name="Open-Ocarina-$TAG-windows-source"
-          git archive --format=zip --prefix="$name/" -o "dist/$name.zip" "$(git write-tree)"
+          src_name="Open-Ocarina-$TAG-windows-source"
+          git archive --format=zip --prefix="$src_name/" -o "dist/$src_name.zip" "$(git write-tree)"
           cp "$RUNNER_TEMP/vk-work/sa/build/open-ocarina_vk.dll" dist/
           cp _oo/docs/windows.md dist/WINDOWS.md
-          ls -l dist
+          python - <<'PY'
+          import os, zipfile
+
+          tag = os.environ["TAG"]
+          pkg = os.path.join(os.environ["RUNNER_TEMP"], "package")
+          prefix = f"Open-Ocarina-{tag}-windows-x64"
+          out_zip = os.path.join("dist", f"{prefix}.zip")
+          with zipfile.ZipFile(out_zip, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as z:
+              for root, dirs, files in os.walk(pkg):
+                  dirs.sort()
+                  for fn in sorted(files):
+                      if fn.endswith(".pyc"):
+                          continue
+                      full = os.path.join(root, fn)
+                      rel = os.path.relpath(full, pkg).replace("\\", "/")
+                      z.write(full, f"{prefix}/{rel}")
+          PY
+          ls -lh dist
       - uses: actions/upload-artifact@v4
         with:
           name: open-ocarina-windows

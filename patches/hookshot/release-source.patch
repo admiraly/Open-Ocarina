@@ -1,8 +1,101 @@
+diff --git a/builder/HookshotBuilder/BuilderHome.cs b/builder/HookshotBuilder/BuilderHome.cs
+index c809f97..5cadf4c 100644
+--- a/builder/HookshotBuilder/BuilderHome.cs
++++ b/builder/HookshotBuilder/BuilderHome.cs
+@@ -21,8 +21,8 @@ static class BuilderHome
+     public static string Base => Current.Value.Root;
+     public static bool Portable => Current.Value.Portable;
+     public static string DefaultGame => Portable
+-        ? Path.Combine(Directory.GetParent(Base)!.FullName, "Hookshot")
+-        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Games", "Hookshot");
++        ? Path.Combine(Directory.GetParent(Base)!.FullName, "Open-Ocarina")
++        : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Games", "Open-Ocarina");
+ 
+     internal static Home Resolve(string? requested, string appDirectory, string standard, bool portableRequested = false)
+     {
+diff --git a/builder/HookshotBuilder/Finder.cs b/builder/HookshotBuilder/Finder.cs
+index 61e4940..89ef256 100644
+--- a/builder/HookshotBuilder/Finder.cs
++++ b/builder/HookshotBuilder/Finder.cs
+@@ -73,8 +73,8 @@ static class Finder
+ 
+     // ---- shortcuts to the built game ----
+ 
+-    public static string DesktopLink => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Hookshot.lnk");
+-    public static string StartLink => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), "Hookshot.lnk");
++    public static string DesktopLink => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Open-Ocarina.lnk");
++    public static string StartLink => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Programs), "Open-Ocarina.lnk");
+ 
+     /// Made or removed as the two ticks say (Windows' own shell object writes the .lnk)
+     /// The shortcuts the player has, made again (onto the folder's launcher now that it has one); none made where there was none
+@@ -84,8 +84,11 @@ static class Finder
+     {
+         // (hookshot.exe: the game's launcher in a folder built since it came (Play, and Update when a newer release is out), else the
+         // game. The icon is the game's own: bin\hookshot.exe when it is there)
+-        var exe = Path.Combine(gameFolder, "hookshot.exe");
+-        var icon = File.Exists(Path.Combine(gameFolder, "bin", "hookshot.exe")) ? Path.Combine(gameFolder, "bin", "hookshot.exe") : exe;
++        var openOcarina = Path.Combine(gameFolder, "open-ocarina.exe");
++        var exe = File.Exists(openOcarina) ? openOcarina : Path.Combine(gameFolder, "hookshot.exe");
++        var binOpenOcarina = Path.Combine(gameFolder, "bin", "open-ocarina.exe");
++        var binHookshot = Path.Combine(gameFolder, "bin", "hookshot.exe");
++        var icon = File.Exists(binOpenOcarina) ? binOpenOcarina : File.Exists(binHookshot) ? binHookshot : exe;
+         foreach (var (link, want) in new[] { (DesktopLink, desktop), (StartLink, start) })
+         {
+             try
+@@ -102,7 +105,7 @@ static class Finder
+                 sl.SetPath(exe);
+                 sl.SetWorkingDirectory(gameFolder);
+                 sl.SetIconLocation(icon, 0);
+-                sl.SetDescription("The Legend of Zelda: Ocarina of Time, built by Hookshot");
++                sl.SetDescription("The Legend of Zelda: Ocarina of Time (Open-Ocarina)");
+                 Directory.CreateDirectory(Path.GetDirectoryName(link)!);
+                 ((System.Runtime.InteropServices.ComTypes.IPersistFile)sl).Save(link, true);
+             }
 diff --git a/builder/HookshotBuilder/MainWindow.xaml.cs b/builder/HookshotBuilder/MainWindow.xaml.cs
-index a37424e..497f6d4 100644
+index a37424e..0db88fe 100644
 --- a/builder/HookshotBuilder/MainWindow.xaml.cs
 +++ b/builder/HookshotBuilder/MainWindow.xaml.cs
-@@ -1370,7 +1370,7 @@ public partial class MainWindow : Window
+@@ -166,7 +166,10 @@ public partial class MainWindow : Window
+         {
+             if (!Directory.Exists(System.IO.Path.Combine(folder, ".hookshot_exefs")) || !Directory.Exists(System.IO.Path.Combine(folder, "romfs")))
+                 return null;
+-            foreach (var line in File.ReadAllLines(System.IO.Path.Combine(folder, "hookshot_version.txt")))
++            var vf = new[] { "open-ocarina_version.txt", "hookshot_version.txt" }
++                .Select(n => System.IO.Path.Combine(folder, n)).FirstOrDefault(File.Exists);
++            if (vf == null) return null;
++            foreach (var line in File.ReadAllLines(vf))
+                 if (line.StartsWith("version=")) return line[8..].Trim() is { Length: > 0 } v ? v : null;
+         }
+         catch (Exception) { }
+@@ -253,7 +256,10 @@ public partial class MainWindow : Window
+     {
+         try
+         {
+-            foreach (var line in File.ReadAllLines(System.IO.Path.Combine(folder, "hookshot_version.txt")))
++            var vf = new[] { "open-ocarina_version.txt", "hookshot_version.txt" }
++                .Select(n => System.IO.Path.Combine(folder, n)).FirstOrDefault(File.Exists);
++            if (vf == null) return null;
++            foreach (var line in File.ReadAllLines(vf))
+                 if (line.StartsWith("version=")) return line[8..].Trim() is { Length: > 0 } v ? v : null;
+         }
+         catch (Exception) { }
+@@ -263,8 +269,13 @@ public partial class MainWindow : Window
+     /// The game in a folder: bin\hookshot.exe below its launcher (hookshot.exe), or hookshot.exe in a folder built before the launcher
+     static string GameExe(string folder)
+     {
+-        var game = System.IO.Path.Combine(folder, "bin", "hookshot.exe");
+-        return File.Exists(game) ? game : System.IO.Path.Combine(folder, "hookshot.exe");
++        foreach (var rel in new[] { System.IO.Path.Combine("bin", "open-ocarina.exe"), "open-ocarina.exe",
++                                    System.IO.Path.Combine("bin", "hookshot.exe"), "hookshot.exe" })
++        {
++            var path = System.IO.Path.Combine(folder, rel);
++            if (File.Exists(path)) return path;
++        }
++        return System.IO.Path.Combine(folder, "open-ocarina.exe");
+     }
+ 
+     /// (the launcher already checked for updates: the game does not ask again)
+@@ -1370,7 +1381,7 @@ public partial class MainWindow : Window
              Application.Current.Shutdown();
              return;
          }
