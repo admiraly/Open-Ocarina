@@ -123,3 +123,11 @@ covering 160 distinct workgroups, including nonempty geometry, all attributes,
 indices and guards. These are bounded checks on fixed owned input graphs;
 other inputs and full rendering checks remain necessary. No optimization has
 yet been accepted into gameplay.
+
+An [opt-in native C++ lowering](native-mesh-warp32-integration.md) now builds and
+is observed at selected draw-command recording sites in isolated gameplay. Its
+native candidate compiles to the same GEN assembly text as the tested Python
+prototype on the audited driver. [Runtime metadata](../research/native-renderer-identity-pilot.json)
+records the narrow identity/image checks, the separate cold attempt and remaining
+cache-provenance, indirect-execution, omitted-network and image-comparison gaps.
+No gameplay optimization or native-feature/performance acceptance is claimed.

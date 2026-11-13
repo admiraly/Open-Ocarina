@@ -1,0 +1,993 @@
+diff --git a/gpu/vk/mesh_warp32_lowering.h b/gpu/vk/mesh_warp32_lowering.h
+new file mode 100644
+--- /dev/null
++++ b/gpu/vk/mesh_warp32_lowering.h
+@@ -0,0 +1,34 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Independently authored, bounded mesh-warp lowering. No shader bytes are
++// embedded.
++#pragma once
++#include <cstdint>
++#include <string>
++#include <vector>
++namespace mkwvk::oo_mesh_warp32 {
++inline constexpr uint64_t kProgram = 0xd8e59341cf4f629cull;
++inline constexpr uint64_t kVariant = 0x0c8f08626a9d98a4ull;
++inline constexpr uint32_t kRevision = 1;
++inline constexpr const char *kOriginal =
++    "835aa59799c6ecb621034d946e2fa4eadb1aa2407d293321ae3e3052882bc9b3";
++inline constexpr const char *kFragment =
++    "569b378a012388d711a115030bd1f41af66d38aebb645118baacd1e90a8f5a3a";
++// Native writer preserves the original unspecified generator ID (zero).
++inline constexpr const char *kCandidate =
++    "8754612a7395d1f804d4e56a7c18cb5a6f23ed2e02f01879cbc51bd108682de0";
++struct Result {
++  bool ok = false;
++  std::string reason;
++  std::vector<uint32_t> words;
++  uint32_t prefix_blocks = 0;
++};
++// Structural core is game-independent and tested with authored fixtures. The
++// host must also require exact program/variant/stage digests before calling
++// this core.
++Result rewrite(const std::vector<uint32_t> &words);
++bool identity_matches(uint64_t program, uint64_t variant, int mesh_nvn,
++                      uint32_t mesh_vk, int fragment_nvn, uint32_t fragment_vk,
++                      const std::string &mesh_sha,
++                      const std::string &fragment_sha);
++uint32_t parse_width(const char *value);
++} // namespace mkwvk::oo_mesh_warp32
+diff --git a/gpu/vk/mesh_warp32_lowering.cpp b/gpu/vk/mesh_warp32_lowering.cpp
+new file mode 100644
+--- /dev/null
++++ b/gpu/vk/mesh_warp32_lowering.cpp
+@@ -0,0 +1,664 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Independent port of the reviewed structural audit and logical-warp primitive.
++#define SPV_ENABLE_UTILITY_CODE
++#include "mesh_warp32_lowering.h"
++#include <algorithm>
++#include <array>
++#include <cstring>
++#include <map>
++#include <set>
++#include <spirv/unified1/spirv.hpp>
++#include <stdexcept>
++#include <utility>
++
++namespace mkwvk::oo_mesh_warp32 {
++uint32_t parse_width(const char *value) {
++  if (!value)
++    return 0;
++  if (!std::strcmp(value, "8"))
++    return 8;
++  if (!std::strcmp(value, "16"))
++    return 16;
++  return 0;
++}
++bool identity_matches(uint64_t p, uint64_t v, int mn, uint32_t mv, int fn,
++                      uint32_t fv, const std::string &ms,
++                      const std::string &fs) {
++  return p == kProgram && v == kVariant && mn == 7 && mv == 128 && fn == 1 &&
++         fv == 16 && ms == kOriginal && fs == kFragment;
++}
++namespace {
++using U = uint32_t;
++struct Ins {
++  spv::Op op;
++  std::vector<U> a;
++  U result = 0, type = 0, function = 0, block = 0;
++};
++size_t minimum_operands(spv::Op op, bool has_result, bool has_type) {
++  switch (op) {
++  case spv::OpCapability:
++  case spv::OpTypeVoid:
++  case spv::OpTypeBool:
++  case spv::OpTypeSampler:
++  case spv::OpLabel:
++  case spv::OpBranch:
++  case spv::OpReturnValue:
++    return 1;
++  case spv::OpMemoryModel:
++  case spv::OpDecorate:
++  case spv::OpExecutionMode:
++  case spv::OpExecutionModeId:
++  case spv::OpName:
++  case spv::OpExtInstImport:
++  case spv::OpString:
++  case spv::OpTypeFloat:
++  case spv::OpTypeSampledImage:
++  case spv::OpTypeRuntimeArray:
++  case spv::OpStore:
++  case spv::OpSelectionMerge:
++  case spv::OpFunctionParameter:
++  case spv::OpSetMeshOutputsEXT:
++    return 2;
++  case spv::OpEntryPoint:
++  case spv::OpMemberDecorate:
++  case spv::OpMemberName:
++  case spv::OpTypeInt:
++  case spv::OpTypeVector:
++  case spv::OpTypeMatrix:
++  case spv::OpTypeArray:
++  case spv::OpTypePointer:
++  case spv::OpVariable:
++  case spv::OpConstant:
++  case spv::OpLoad:
++  case spv::OpCopyObject:
++  case spv::OpBranchConditional:
++  case spv::OpLoopMerge:
++  case spv::OpControlBarrier:
++    return 3;
++  case spv::OpFunction:
++  case spv::OpCompositeExtract:
++  case spv::OpArrayLength:
++  case spv::OpGroupNonUniformBallot:
++    return 4;
++  case spv::OpTypeImage:
++    return 8;
++  case spv::OpVectorShuffle:
++  case spv::OpCompositeInsert:
++  case spv::OpExtInst:
++    return 5;
++  default:
++    return has_type ? 2 : has_result ? 1 : 0;
++  }
++}
++
++void need(bool condition, const char *reason) {
++  if (!condition)
++    throw std::runtime_error(reason);
++}
++bool has(const std::vector<U> &a, U id) {
++  return std::find(a.begin(), a.end(), id) != a.end();
++}
++// ID operand classification excludes literal values and debug strings. Unknown
++// result-less instructions are rejected, not guessed to have no pointer uses.
++std::vector<U> ids(const Ins &i) {
++  const auto &a = i.a;
++  std::vector<U> out;
++  auto add = [&](size_t n) {
++    need(n < a.size(), "Short instruction operand list");
++    out.push_back(a.at(n));
++  };
++  auto from = [&](size_t n) {
++    for (; n < a.size(); ++n)
++      out.push_back(a.at(n));
++  };
++  switch (i.op) {
++  case spv::OpName:
++  case spv::OpMemberName:
++  case spv::OpDecorate:
++  case spv::OpMemberDecorate:
++  case spv::OpExecutionMode:
++  case spv::OpExecutionModeId:
++    add(0);
++    break;
++  case spv::OpEntryPoint: {
++    add(1);
++    size_t n = 2;
++    bool done = false;
++    for (; n < a.size() && !done; ++n)
++      for (unsigned b = 0; b < 4; ++b)
++        if (!((a.at(n) >> (8 * b)) & 255u)) {
++          done = true;
++          break;
++        }
++    need(done, "Unterminated entry name");
++    from(n);
++    break;
++  }
++  case spv::OpSource:
++    if (a.size() > 2)
++      add(2);
++    break;
++  case spv::OpLine:
++    add(0);
++    break;
++  case spv::OpTypeVector:
++  case spv::OpTypeMatrix:
++  case spv::OpTypeImage:
++  case spv::OpTypeSampledImage:
++  case spv::OpTypeRuntimeArray:
++    add(1);
++    break;
++  case spv::OpTypeArray:
++    add(1);
++    add(2);
++    break;
++  case spv::OpTypePointer:
++    add(2);
++    break;
++  case spv::OpTypeStruct:
++  case spv::OpTypeFunction:
++    from(1);
++    break;
++  case spv::OpVariable:
++    add(0);
++    if (a.size() > 3)
++      add(3);
++    break;
++  case spv::OpConstant:
++  case spv::OpConstantTrue:
++  case spv::OpConstantFalse:
++  case spv::OpConstantNull:
++  case spv::OpSpecConstant:
++  case spv::OpUndef:
++    add(0);
++    break;
++  case spv::OpFunction:
++    add(0);
++    add(3);
++    break;
++  case spv::OpFunctionParameter:
++    add(0);
++    break;
++  case spv::OpLoad:
++    add(0);
++    add(2);
++    need(a.size() == 3 || (a.size() == 5 && a.at(3) == 2),
++         "Unsupported load memory operands");
++    break;
++  case spv::OpStore:
++    add(0);
++    add(1);
++    need(a.size() == 2 || (a.size() == 4 && a.at(2) == 2),
++         "Unsupported store memory operands");
++    break;
++  case spv::OpArrayLength:
++    add(0);
++    add(2);
++    break;
++  case spv::OpCompositeExtract:
++    add(0);
++    add(2);
++    break;
++  case spv::OpCompositeInsert:
++    add(0);
++    add(2);
++    add(3);
++    break;
++  case spv::OpVectorShuffle:
++    add(0);
++    add(2);
++    add(3);
++    break;
++  case spv::OpExtInst:
++    add(0);
++    add(2);
++    for (size_t n = 4; n < a.size(); ++n)
++      add(n);
++    break;
++  case spv::OpLoopMerge:
++    add(0);
++    add(1);
++    break;
++  case spv::OpSelectionMerge:
++    add(0);
++    break;
++  case spv::OpBranch:
++  case spv::OpReturnValue:
++    from(0);
++    break;
++  case spv::OpBranchConditional:
++    add(0);
++    add(1);
++    add(2);
++    break;
++  case spv::OpControlBarrier:
++  case spv::OpMemoryBarrier:
++  case spv::OpSetMeshOutputsEXT:
++    from(0);
++    break;
++  case spv::OpSwitch:
++    throw std::runtime_error("Switch is outside audited core");
++  case spv::OpCapability:
++  case spv::OpExtension:
++  case spv::OpMemoryModel:
++  case spv::OpExtInstImport:
++  case spv::OpString:
++  case spv::OpSourceExtension:
++  case spv::OpSourceContinued:
++  case spv::OpModuleProcessed:
++  case spv::OpNoLine:
++  case spv::OpTypeVoid:
++  case spv::OpTypeBool:
++  case spv::OpTypeInt:
++  case spv::OpTypeFloat:
++  case spv::OpTypeSampler:
++  case spv::OpTypeOpaque:
++  case spv::OpLabel:
++  case spv::OpFunctionEnd:
++  case spv::OpReturn:
++  case spv::OpUnreachable:
++  case spv::OpNop:
++    break;
++  default:
++    need(i.type != 0, "Unsupported result-less instruction");
++    add(0);
++    from(2);
++    break;
++  }
++  return out;
++}
++void append(std::vector<U> &out, spv::Op op, const std::vector<U> &a) {
++  need(a.size() < 65535, "Instruction too long");
++  out.push_back((U(a.size() + 1) << 16) | U(op));
++  out.insert(out.end(), a.begin(), a.end());
++}
++} // namespace
++Result rewrite(const std::vector<U> &words) {
++  Result result;
++  try {
++    need(words.size() >= 5 && words.size() <= 524288 &&
++             words[0] == 0x07230203 && words[1] == 0x00010600 && words[3] > 0 &&
++             words[3] <= 1000000,
++         "Unsupported module header/extent");
++    std::vector<Ins> ins;
++    std::map<U, size_t> defs;
++    U function = 0, block = 0;
++    std::map<U, std::vector<size_t>> functions;
++    for (size_t at = 5; at < words.size();) {
++      U n = words[at] >> 16;
++      auto op = spv::Op(words[at] & 65535u);
++      need(n && n <= words.size() - at, "Truncated instruction");
++      need(std::string(spv::OpToString(op)).rfind("Op", 0) == 0,
++           "Unknown opcode");
++      Ins i{op, std::vector<U>(words.begin() + at + 1, words.begin() + at + n)};
++      bool hr = false, ht = false;
++      spv::HasResultAndType(op, &hr, &ht);
++      need(i.a.size() >= minimum_operands(op, hr, ht),
++           "Short recognized opcode");
++      if (hr) {
++        need(i.a.size() > (ht ? 1u : 0u), "Missing result ID");
++        i.result = i.a.at(ht ? 1 : 0);
++        need(i.result && i.result < words[3] && !defs.count(i.result),
++             "Invalid/duplicate result ID");
++        defs[i.result] = ins.size();
++      }
++      if (ht)
++        i.type = i.a.at(0);
++      if (op == spv::OpFunction) {
++        need(!function, "Nested function");
++        function = i.result;
++      }
++      if (op == spv::OpLabel) {
++        need(function != 0, "Label outside function");
++        block = i.result;
++      }
++      i.function = function;
++      i.block = block;
++      if (function)
++        functions[function].push_back(ins.size());
++      ins.push_back(std::move(i));
++      if (op == spv::OpFunctionEnd) {
++        need(function != 0, "Unexpected function end");
++        function = block = 0;
++      }
++      at += n;
++    }
++    need(!function, "Truncated function");
++    auto def = [&](U id) -> const Ins & {
++      need(defs.count(id), "Missing ID definition");
++      return ins[defs.at(id)];
++    };
++    std::vector<size_t> entries, ballots;
++    std::map<U, U> builtins;
++    unsigned models = 0, locals = 0;
++    U main = 0;
++    for (size_t n = 0; n < ins.size(); ++n) {
++      const auto &i = ins[n];
++      const auto &a = i.a;
++      if (i.op == spv::OpEntryPoint) {
++        need(a.size() >= 4 && a.at(0) == U(spv::ExecutionModelMeshEXT) &&
++                 a.at(2) == 0x6e69616d && a.at(3) == 0,
++             "One MeshEXT main required");
++        entries.push_back(n);
++        main = a.at(1);
++      }
++      if (i.op == spv::OpMemoryModel) {
++        need(a == std::vector<U>{0, 1}, "Logical GLSL450 required");
++        ++models;
++      }
++      if (i.op == spv::OpMemberDecorate && a.size() >= 3)
++        need(a.at(2) != U(spv::DecorationBuiltIn),
++             "Member builtin unsupported");
++      if (i.op == spv::OpDecorate && a.size() >= 2 &&
++          a.at(1) == U(spv::DecorationBuiltIn)) {
++        need(a.size() == 3 && !builtins.count(a.at(0)),
++             "Duplicate/malformed builtin");
++        builtins[a.at(0)] = a.at(2);
++      }
++      const std::string name = spv::OpToString(i.op);
++      if (name.rfind("OpGroup", 0) == 0 ||
++          name.find("Subgroup") != std::string::npos) {
++        need(i.op == spv::OpGroupNonUniformBallot, "Extra subgroup operation");
++        ballots.push_back(n);
++      }
++    }
++    need(entries.size() == 1 && models == 1 && functions.count(main) &&
++             ballots.size() == 2,
++         "Entry/memory/group inventory mismatch");
++    for (const auto &i : ins)
++      if ((i.op == spv::OpExecutionMode || i.op == spv::OpExecutionModeId) &&
++          i.a.size() > 1 &&
++          (i.a.at(1) == U(spv::ExecutionModeLocalSize) ||
++           i.a.at(1) == U(spv::ExecutionModeLocalSizeId))) {
++        need(i.op == spv::OpExecutionMode &&
++                 i.a == std::vector<U>{main, 17, 32, 1, 1},
++             "Literal32x1x1 required");
++        ++locals;
++      }
++    need(locals == 1, "Unique local size required");
++    std::map<U, U> subgroup;
++    U local = 0;
++    std::set<U> sgvalues;
++    for (auto [id, b] : builtins) {
++      std::string name = spv::BuiltInToString(spv::BuiltIn(b));
++      if (name.find("Subgroup") != std::string::npos) {
++        subgroup[id] = b;
++        sgvalues.insert(b);
++      }
++      if (b == U(spv::BuiltInLocalInvocationId)) {
++        need(!local, "Duplicate local invocation builtin");
++        local = id;
++      }
++    }
++    need(subgroup.size() == 6 &&
++             sgvalues == std::set<U>{U(spv::BuiltInSubgroupLocalInvocationId),
++                                     U(spv::BuiltInSubgroupEqMask),
++                                     U(spv::BuiltInSubgroupLtMask),
++                                     U(spv::BuiltInSubgroupLeMask),
++                                     U(spv::BuiltInSubgroupGtMask),
++                                     U(spv::BuiltInSubgroupGeMask)} &&
++             local,
++         "Unexpected subgroup builtin inventory");
++    auto pointee = [&](U id) -> U {
++      const auto &v = def(id);
++      need(v.op == spv::OpVariable && v.a.size() == 3 && v.a.at(2) == 1,
++           "Plain Input builtin required");
++      const auto &p = def(v.type);
++      need(p.op == spv::OpTypePointer && p.a.size() == 3 && p.a.at(1) == 1,
++           "Input pointer required");
++      return p.a.at(2);
++    };
++    U v3 = pointee(local);
++    const auto &vt = def(v3);
++    need(vt.op == spv::OpTypeVector && vt.a.size() == 3 && vt.a.at(2) == 3,
++         "Local ID uint3 required");
++    U uint = vt.a.at(1);
++    need(def(uint).op == spv::OpTypeInt &&
++             def(uint).a == std::vector<U>{uint, 32, 0},
++         "uint32 lane required");
++    U v4 = 0;
++    const auto &entry = ins[entries[0]];
++    need(std::find(entry.a.begin() + 4, entry.a.end(), local) != entry.a.end(),
++         "Local ID absent from entry interface");
++    for (auto [id, b] : subgroup) {
++      U t = pointee(id);
++      if (b == U(spv::BuiltInSubgroupLocalInvocationId))
++        need(t == uint, "Lane type mismatch");
++      else {
++        if (!v4)
++          v4 = t;
++        need(t == v4 && def(t).op == spv::OpTypeVector &&
++                 def(t).a == std::vector<U>{t, uint, 4},
++             "Mask uint4 required");
++      }
++      need(std::find(entry.a.begin() + 4, entry.a.end(), id) != entry.a.end(),
++           "Subgroup builtin absent from interface");
++      for (const auto &i : ins)
++        if (has(ids(i), id)) {
++          if (i.op == spv::OpName || i.op == spv::OpEntryPoint)
++            continue;
++          if (i.op == spv::OpDecorate &&
++              i.a == std::vector<U>{id, U(spv::DecorationBuiltIn), b})
++            continue;
++          need(i.op == spv::OpLoad && i.a == std::vector<U>{t, i.result, id},
++               "Aliased/unsupported builtin use");
++        }
++    }
++    for (size_t n : ballots) {
++      const auto &i = ins[n];
++      need(i.function == main && i.a.size() == 4 && i.type == v4,
++           "Ballots must be main uint4 operations");
++      const auto &scope = def(i.a.at(2));
++      need(scope.op == spv::OpConstant &&
++               scope.a == std::vector<U>{uint, scope.result, 3},
++           "Ballot subgroup scope required");
++      need(def(def(i.a.at(3)).type).op == spv::OpTypeBool,
++           "Bool ballot predicate required");
++      unsigned uses = 0;
++      for (const auto &use : ins)
++        if (has(ids(use), i.result)) {
++          ++uses;
++          need(use.op == spv::OpCompositeExtract &&
++                   use.a == std::vector<U>{uint, use.result, i.result, 0},
++               "Ballot has unsupported consumer");
++        }
++      need(uses == 1, "Unique component-zero consumer required");
++    }
++    std::map<U, std::vector<size_t>> blocks;
++    std::vector<U> order;
++    for (size_t n : functions[main]) {
++      const auto &i = ins[n];
++      if (i.op == spv::OpLabel) {
++        blocks[i.result] = {};
++        order.push_back(i.result);
++      } else if (i.block && i.op != spv::OpFunctionEnd)
++        blocks[i.block].push_back(n);
++    }
++    need(!order.empty(), "Main blocks missing");
++    U target = ins[ballots[0]].block;
++    need(target && target == ins[ballots[1]].block,
++         "Ballots must share a block");
++    std::map<U, std::vector<U>> edges;
++    for (auto &[b, body] : blocks) {
++      need(!body.empty(), "Empty block");
++      const auto &t = ins[body.back()];
++      if (t.op == spv::OpBranch) {
++        need(t.a.size() == 1, "Branch extent");
++        edges[b] = t.a;
++      } else if (t.op == spv::OpBranchConditional) {
++        need(t.a.size() == 3, "Branch condition extent");
++        edges[b] = {t.a.at(1), t.a.at(2)};
++      } else {
++        need(t.op == spv::OpReturn || t.op == spv::OpReturnValue ||
++                 t.op == spv::OpUnreachable,
++             "Unsupported terminator");
++        edges[b] = {};
++      }
++      for (U dest : edges[b])
++        need(blocks.count(dest), "Undefined branch target");
++    }
++    auto forbidden = [&](const Ins &i) {
++      return i.op == spv::OpFunctionCall || i.op == spv::OpKill ||
++             i.op == spv::OpTerminateInvocation ||
++             i.op == spv::OpDemoteToHelperInvocation ||
++             i.op == spv::OpEmitMeshTasksEXT;
++    };
++    std::map<U, unsigned> color;
++    std::vector<std::pair<U, bool>> pending{{order.front(), false}};
++    while (!pending.empty()) {
++      auto [b, finish] = pending.back();
++      pending.pop_back();
++      if (b == target)
++        continue;
++      if (finish) {
++        color[b] = 2;
++        continue;
++      }
++      need(color[b] != 1, "Cycle before ballots");
++      if (color[b] == 2)
++        continue;
++      color[b] = 1;
++      need(!edges[b].empty(), "Entry path exits before ballots");
++      for (size_t n : blocks[b])
++        need(!forbidden(ins[n]) && ins[n].op != spv::OpLoopMerge,
++             "Call/loop/termination before ballots");
++      pending.push_back({b, true});
++      for (auto it = edges[b].rbegin(); it != edges[b].rend(); ++it)
++        pending.push_back({*it, false});
++    }
++    result.prefix_blocks = U(color.size());
++    std::set<U> visited;
++    std::vector<U> suffix = edges[target];
++    while (!suffix.empty()) {
++      U b = suffix.back();
++      suffix.pop_back();
++      need(b != target, "Ballot block can be revisited");
++      if (!visited.insert(b).second)
++        continue;
++      for (U next : edges[b])
++        suffix.push_back(next);
++    }
++    for (size_t n : blocks[target]) {
++      if (n > ballots[1])
++        break;
++      need(!forbidden(ins[n]), "Call/termination between ballots");
++    }
++    // Preserve all original IDs. Allocate fresh symbolic IDs the same way as
++    // spirv-as --preserve-numeric-ids: reserve retained results, then use the
++    // smallest unused ID in first-reference order (scratch interface first).
++    std::set<U> reserved;
++    for (auto [id, n] : defs)
++      if (!subgroup.count(id))
++        reserved.insert(id);
++    U next = 1;
++    auto fresh = [&]() -> U {
++      while (reserved.count(next))
++        ++next;
++      need(next < 1000000, "ID budget exceeded");
++      U id = next++;
++      reserved.insert(id);
++      return id;
++    };
++    U scratch[2] = {fresh(), fresh()};
++    std::array<U, 33> c{};
++    for (U &id : c)
++      id = fresh();
++    U sem = fresh(), array = fresh(), pa = fresh(), pu = fresh();
++    std::vector<U> globals;
++    for (U n = 0; n < 33; ++n)
++      append(globals, spv::OpConstant, {uint, c[n], n});
++    append(globals, spv::OpConstant, {uint, sem, 264});
++    append(globals, spv::OpTypeArray, {array, uint, c[32]});
++    append(globals, spv::OpTypePointer, {pa, 4, array});
++    append(globals, spv::OpTypePointer, {pu, 4, uint});
++    for (U id : scratch)
++      append(globals, spv::OpVariable, {pa, id, 4});
++    result.words.assign(words.begin(), words.begin() + 5);
++    bool declared = false;
++    auto emit = [&](spv::Op op, std::initializer_list<U> a) {
++      append(result.words, op, std::vector<U>(a));
++    };
++    auto lane = [&]() {
++      U value = fresh(), id = fresh();
++      emit(spv::OpLoad, {v3, value, local});
++      emit(spv::OpCompositeExtract, {uint, id, value, 0});
++      return id;
++    };
++    for (size_t n = 0; n < ins.size(); ++n) {
++      const auto &i = ins[n];
++      const auto &a = i.a;
++      if (i.op == spv::OpFunction && !declared) {
++        result.words.insert(result.words.end(), globals.begin(), globals.end());
++        declared = true;
++      }
++      if (i.op == spv::OpCapability && a.size() == 1 &&
++          std::string(spv::CapabilityToString(spv::Capability(a.at(0))))
++                  .rfind("GroupNonUniform", 0) == 0)
++        continue;
++      if (subgroup.count(i.result) ||
++          ((i.op == spv::OpDecorate || i.op == spv::OpName) && !a.empty() &&
++           subgroup.count(a.at(0))))
++        continue;
++      if (i.op == spv::OpEntryPoint) {
++        std::vector<U> changed(a.begin(), a.begin() + 4);
++        for (size_t k = 4; k < a.size(); ++k)
++          if (!subgroup.count(a.at(k)))
++            changed.push_back(a.at(k));
++        changed.push_back(scratch[0]);
++        changed.push_back(scratch[1]);
++        append(result.words, i.op, changed);
++      } else if (i.op == spv::OpLoad && a.size() == 3 &&
++                 subgroup.count(a.at(2))) {
++        U l = lane();
++        U kind = subgroup.at(a.at(2));
++        if (kind == U(spv::BuiltInSubgroupLocalInvocationId))
++          emit(spv::OpCopyObject, {uint, i.result, l});
++        else {
++          U eq = fresh(), lt = fresh(), le = fresh(), gt = fresh(),
++            ge = fresh();
++          emit(spv::OpShiftLeftLogical, {uint, eq, c[1], l});
++          emit(spv::OpISub, {uint, lt, eq, c[1]});
++          emit(spv::OpBitwiseOr, {uint, le, eq, lt});
++          emit(spv::OpNot, {uint, gt, le});
++          emit(spv::OpNot, {uint, ge, lt});
++          U mask = kind == U(spv::BuiltInSubgroupEqMask)   ? eq
++                   : kind == U(spv::BuiltInSubgroupLtMask) ? lt
++                   : kind == U(spv::BuiltInSubgroupLeMask) ? le
++                   : kind == U(spv::BuiltInSubgroupGtMask) ? gt
++                                                           : ge;
++          emit(spv::OpCompositeConstruct,
++               {v4, i.result, mask, c[0], c[0], c[0]});
++        }
++      } else if (i.op == spv::OpGroupNonUniformBallot) {
++        U index = n == ballots[0] ? 0 : 1;
++        U l = lane(), bit = fresh(), value = fresh(), pointer = fresh();
++        emit(spv::OpShiftLeftLogical, {uint, bit, c[1], l});
++        emit(spv::OpSelect, {uint, value, a.at(3), bit, c[0]});
++        emit(spv::OpAccessChain, {pu, pointer, scratch[index], l});
++        emit(spv::OpStore, {pointer, value});
++        emit(spv::OpControlBarrier, {c[2], c[2], sem});
++        U previous = c[0];
++        for (U k = 0; k < 32; ++k) {
++          U p = fresh(), v = fresh(), combined = fresh();
++          emit(spv::OpAccessChain, {pu, p, scratch[index], c[k]});
++          emit(spv::OpLoad, {uint, v, p});
++          emit(spv::OpBitwiseOr, {uint, combined, previous, v});
++          previous = combined;
++        }
++        emit(spv::OpCompositeConstruct,
++             {v4, i.result, previous, c[0], c[0], c[0]});
++      } else
++        append(result.words, i.op, a);
++    }
++    need(declared, "No functions emitted");
++    result.words[3] = *reserved.rbegin() + 1;
++    need(result.words.size() <= 524288, "Output exceeds bound");
++    result.ok = true;
++  } catch (const std::exception &e) {
++    result.ok = false;
++    result.reason = e.what();
++    result.words.clear();
++  }
++  return result;
++}
++} // namespace mkwvk::oo_mesh_warp32
+diff --git a/gpu/vk/vk_shader.h b/gpu/vk/vk_shader.h
+--- a/gpu/vk/vk_shader.h
++++ b/gpu/vk/vk_shader.h
+@@ -29,6 +29,7 @@
+     // the translator's stamp: a change there translates every player's programs again
+     mutable uint32_t phis = 0;
+     mutable oo_identity::Identity oo_identity; // opt-in, derived from SPIR-V; not serialized in the program cache
++    uint32_t mesh_warp32_width = 0; // independently derived before ready; never serialized or changed during play
+ };
+ 
+ /// A texture handle the stage reads from a storage buffer: its handle program (Shader::Info::handle_programs, Eden's
+@@ -87,6 +88,10 @@
+     int64_t code_at = 0;
+     uint64_t code_words = 0;
+ };
++
++// Opt-in reviewed native-mesh lowering; original disk-cache words remain canonical.
++uint32_t mesh_warp32_requested_width();
++void mesh_warp32_apply(Program& p, const std::vector<std::vector<uint32_t>>& original);
+ 
+ enum class ProgramKind { Graphics, Compute, Mesh };
+ 
+diff --git a/gpu/vk/vk_shader.cpp b/gpu/vk/vk_shader.cpp
+--- a/gpu/vk/vk_shader.cpp
++++ b/gpu/vk/vk_shader.cpp
+@@ -56,6 +56,8 @@
+ #include "vk_draw.h"
+ #include "vk_progcache.h"
+ #include "vk_menu.h"
++#include "mesh_warp32_lowering.h"
++#include "graphics_identity.h"
+ 
+ // (EvilOOT, RX_VK_PTR_DIAG) the pointer pass's counts for this thread's translations
+ // (global_memory_to_storage_buffer_pass.cpp, declared by hand so no Eden header changes)
+@@ -689,6 +691,103 @@
+ }
+ 
+ /// A word of a stage's constant bank: c0 / c2 the driver's banks, c1 its own constants, c3.. its uniform buffers
++uint32_t mesh_warp32_requested_width() {
++    // Immutable for the process: a Program/pipeline is never hot-swapped.
++    static const uint32_t width = oo_mesh_warp32::parse_width(std::getenv("RX_VK_OO_MESH_WARP32"));
++    return width;
++}
++
++namespace {
++bool mesh_warp32_runtime_policy() {
++    if (env_on("RX_VK_NOOPT")) return false;
++    const std::pair<const char*, const char*> required[] = {
++        {"HS_CS32_MAX_INSTS", "100000"}, {"HS_SPILL_BATCH", "1"},
++        {"HS_PUSH_SHADOW", "1"}, {"shader_spilling_rate", "1"}};
++    for (const auto& item : required) {
++        const char* value = std::getenv(item.first);
++        if (!value || std::strcmp(value, item.second)) return false;
++    }
++    for (const char* key : {"INTEL_DEBUG", "HS_SPILL_PCT", "HS_RA_DEBUG", "HS_FORCE_SIMD8", "HS_LARGE_GRF", "RX_VK_WARP64"})
++        if (std::getenv(key)) return false;
++    return true;
++}
++
++bool mesh_warp32_device(uint32_t width) {
++    // Deliberately a reviewed A770/Mesa configuration, not a portable lane rule.
++    if (!dev.physical || !dev.device || !dev.mesh_shader || !dev.vk13.subgroupSizeControl ||
++        dev.props.vendorID != 0x8086 || dev.props.deviceID != 0x56a0 ||
++        dev.driver_id != VK_DRIVER_ID_INTEL_OPEN_SOURCE_MESA || dev.props.driverVersion != 0x06802004 ||
++        !(dev.sg32_stages & VK_SHADER_STAGE_MESH_BIT_EXT)) return false;
++    VkPhysicalDeviceMeshShaderPropertiesEXT mesh{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_PROPERTIES_EXT};
++    VkPhysicalDeviceSubgroupSizeControlProperties subgroup{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_SUBGROUP_SIZE_CONTROL_PROPERTIES};
++    subgroup.pNext = &mesh;
++    VkPhysicalDeviceProperties2 properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
++    properties.pNext = &subgroup;
++    vkGetPhysicalDeviceProperties2(dev.physical, &properties);
++    return (subgroup.requiredSubgroupSizeStages & VK_SHADER_STAGE_MESH_BIT_EXT) &&
++           subgroup.minSubgroupSize <= width && subgroup.maxSubgroupSize >= width &&
++           mesh.maxMeshWorkGroupInvocations >= 32 && mesh.maxMeshWorkGroupSize[0] >= 32 &&
++           mesh.maxMeshOutputVertices >= 128 && mesh.maxMeshOutputPrimitives >= 128 &&
++           mesh.maxMeshSharedMemorySize >= 14612 && mesh.maxMeshPayloadAndSharedMemorySize >= 14740;
++}
++
++std::string mesh_warp32_digest(const std::vector<uint32_t>& words) {
++    std::vector<uint8_t> bytes(words.size() * 4);
++    for (size_t i = 0; i < words.size(); ++i)
++        for (unsigned b = 0; b < 4; ++b) bytes[i * 4 + b] = uint8_t(words[i] >> (b * 8));
++    return oo_identity::hex(oo_identity::sha256(bytes.data(), bytes.size()));
++}
++} // namespace
++
++void mesh_warp32_apply(Program& p, const std::vector<std::vector<uint32_t>>& original) {
++    const uint32_t width = mesh_warp32_requested_width();
++    if (!width || p.key != oo_mesh_warp32::kProgram) return;
++    const auto refused = [&](const char* reason) {
++        static std::atomic<unsigned> told{0};
++        if (told.fetch_add(1) < 32)
++            logf("vk: OO mesh-warp32 baseline retained: %s (requested %u, vendor %#x device %#x driver %#x)",
++                 reason, width, dev.props.vendorID, dev.props.deviceID, dev.props.driverVersion);
++    };
++    // Before ready publication only. No cache fields or descriptor metadata change.
++    if (!p.mesh || p.fallback || p.variant != oo_mesh_warp32::kVariant || p.stages.size() != 2 || original.size() != 2) {
++        refused("program/variant/stage shape"); return;
++    }
++    Stage& stage = p.stages[0];
++    if (stage.mesh_warp32_width) return;
++    if (!mesh_warp32_runtime_policy() || !mesh_warp32_device(width)) {
++        refused("unreviewed compiler policy/device/capabilities"); return;
++    }
++    try {
++        if (!oo_mesh_warp32::identity_matches(p.key, p.variant, stage.nvn_stage, (uint32_t)stage.vk_stage,
++                p.stages[1].nvn_stage, (uint32_t)p.stages[1].vk_stage,
++                mesh_warp32_digest(original[0]), mesh_warp32_digest(original[1]))) {
++            refused("exact original stage identities"); return;
++        }
++        const auto candidate = oo_mesh_warp32::rewrite(original[0]);
++        if (!candidate.ok) { refused(candidate.reason.c_str()); return; }
++        if (mesh_warp32_digest(candidate.words) != oo_mesh_warp32::kCandidate) {
++            refused("candidate digest differs from reviewed native writer"); return;
++        }
++        // Finish every allocating CPU step before committing a new module.
++        auto actual_identity = stage.oo_identity;
++        oo_identity::note_stage(p.key, p.variant, actual_identity, candidate.words);
++        oo_graphics_identity::note_stage(true, p.key, p.variant, actual_identity, candidate.words);
++        const VkShaderModule module = make_module(candidate.words);
++        if (!module) { refused("candidate module creation failed"); return; }
++        const VkShaderModule baseline = stage.module;
++        stage.module = module;
++        stage.mesh_warp32_width = width;
++        stage.oo_identity = actual_identity; // disk cache deliberately retains original words
++        if (baseline) vkDestroyShaderModule(dev.device, baseline, nullptr);
++        logf("vk: OO mesh-warp32 applied rev %u prog %016llx variant %016llx required %u shared 14612 source %s actual %s; runtime compiler policy pinned; pipeline failures have no baseline recovery",
++             oo_mesh_warp32::kRevision, (unsigned long long)p.key, (unsigned long long)p.variant,
++             width, oo_mesh_warp32::kOriginal, oo_mesh_warp32::kCandidate);
++    } catch (const std::exception& error) {
++        refused(error.what());
++    }
++}
++
++
+ uint32_t stage_cbuf_word(const NvnState& s, const Stage& st, uint32_t index, uint32_t offset) {
+     if (index == 1) {
+         uint32_t v = 0;
+@@ -1158,6 +1257,8 @@
+     // lost it)
+     const uint64_t translator = HOOKSHOT_SHADER_STAMP;
+     add(&translator, sizeof translator);
++    const uint32_t oo_mesh_policy[] = {oo_mesh_warp32::kRevision, mesh_warp32_requested_width()};
++    add(oo_mesh_policy, sizeof oo_mesh_policy);
+     const uint32_t depth = host->depth_minus_w() != 0;   // (d3zessete's PR 54: programs made in either depth mode are kept apart)
+     add(&depth, sizeof depth);
+     // (and a GPU's mesh shaders: a file of native task and mesh programs is no use to the compute fallback, nor its to one)
+@@ -1627,6 +1728,7 @@
+         for (const Stage& st : p.stages)
+             if (!st.module) throw Shader::LogicError("vkCreateShaderModule failed");
+         record_answers(p, s);   // (task questions not counted: kept conservative)
++        mesh_warp32_apply(p, kept); // after full identities, before cache save and ready publication
+         (void)questions;
+         ptr_diag_log(p.key, task ? "task+mesh" : "mesh");
+         program_cache_save(p, kept);
+diff --git a/gpu/vk/vk_progcache.cpp b/gpu/vk/vk_progcache.cpp
+--- a/gpu/vk/vk_progcache.cpp
++++ b/gpu/vk/vk_progcache.cpp
+@@ -372,8 +372,10 @@
+     if (spirv.size() == p.stages.size())
+         for (size_t k = 0; k < p.stages.size(); k++) {
+             p.stages[k].phis = fallback_size::spirv_phis(spirv[k].data(), spirv[k].size());
++            if (!p.stages[k].mesh_warp32_width) { // canonical cache words may differ from selected native module
+             oo_identity::note_stage(p.key, p.variant, p.stages[k].oo_identity, spirv[k]);
+             oo_graphics_identity::note_stage(p.mesh && !p.fallback, p.key, p.variant, p.stages[k].oo_identity, spirv[k]);
++            }
+         }
+     disk_init();
+     if (!disk_on || spirv.size() != p.stages.size()) return;
+@@ -493,6 +495,9 @@
+         p->variant = answers_hash(*p);
+         const uint64_t n = r.count(1);
+         bool ok = !r.bad && n <= 8;   // (a program has at most a few stages)
++        std::vector<std::vector<uint32_t>> oo_original;
++        const bool oo_mesh = mesh_warp32_requested_width() && p->mesh && !p->fallback && p->key == 0xd8e59341cf4f629cull;
++        if (oo_mesh) oo_original.reserve((size_t)n);
+         for (uint64_t k = 0; ok && k < n; k++) {
+             p->stages.emplace_back();
+             Stage& st = p->stages.back();
+@@ -511,6 +516,7 @@
+             oo_graphics_identity::note_stage(p->mesh && !p->fallback, p->key, p->variant, st.oo_identity, spirv);
+             st.phis = fallback_size::spirv_phis(spirv.data(), spirv.size());
+             ok = ok && st.module;
++            if (oo_mesh) oo_original.push_back(std::move(spirv));
+         }
+         ok = ok && answers_fit(*p, p->answers);   // (hookshot: an answer past the stages or their slots: not this record)
+         if (!ok) {
+@@ -527,6 +533,7 @@
+                      (unsigned long long)key, (long long)d.at, d.size);
+             continue;
+         }
++        if (oo_mesh) mesh_warp32_apply(*p, oo_original); // same guards/rewriter as JIT and seed preparation
+         p->ready.store(true, std::memory_order_release);
+         variants.push_back(std::move(p));
+         st_cache_hits++;
+diff --git a/gpu/vk/vk_draw.cpp b/gpu/vk/vk_draw.cpp
+--- a/gpu/vk/vk_draw.cpp
++++ b/gpu/vk/vk_draw.cpp
+@@ -194,6 +194,29 @@
+     st.pNext = &size;
+     if (workgroup_x && !(workgroup_x % 32) && dev.vk13.computeFullSubgroups)
+         st.flags |= VK_PIPELINE_SHADER_STAGE_CREATE_REQUIRE_FULL_SUBGROUPS_BIT;
++}
++
++
++// Apply the immutable selected-module policy to every graphics build/observer.
++void pin_program_stage(VkPipelineShaderStageCreateInfo& info, const Stage& source) {
++    const uint32_t width = source.mesh_warp32_width;
++    if ((width == 8 || width == 16) && info.stage == source.vk_stage &&
++        source.nvn_stage == 7 && source.vk_stage == VK_SHADER_STAGE_MESH_BIT_EXT) {
++        static const VkPipelineShaderStageRequiredSubgroupSizeCreateInfo size8{
++            VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO, nullptr, 8};
++        static const VkPipelineShaderStageRequiredSubgroupSizeCreateInfo size16{
++            VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO, nullptr, 16};
++        info.pNext = width == 8 ? &size8 : &size16;
++        info.flags &= ~VK_PIPELINE_SHADER_STAGE_CREATE_REQUIRE_FULL_SUBGROUPS_BIT;
++        return;
++    }
++    pin_subgroup(info);
++}
++
++uint64_t mesh_warp32_pipeline_tag(const Program& p) {
++    for (const Stage& stage : p.stages)
++        if (stage.mesh_warp32_width) return 0x4f4f573332010000ull | stage.mesh_warp32_width;
++    return 0;
+ }
+ 
+ inline uint64_t mix(uint64_t h, uint64_t v) {
+@@ -2077,7 +2100,8 @@
+ /// cold: the keys of the pre-rasterization and fragment libraries this call found cold (0: not)
+ VkPipeline gpl_link(const Program& p, const NvnState& s, const Targets& at, VkPrimitiveTopology topo, uint64_t cold[2]) {
+     if (at.n < 0 || at.n > 8) return VK_NULL_HANDLE;   // (hookshot: at most 8 colour targets)
+-    const uint64_t program = mix(p.key, p.variant);
++    uint64_t program = mix(p.key, p.variant);
++    if (const uint64_t tag = mesh_warp32_pipeline_tag(p)) program = mix(program, tag);
+     uint64_t input = (uint64_t)topology_class(topo) + 1;
+     if (!p.mesh && !p.fallback) {
+         const Shader::Info& vs = p.stages[0].info;
+@@ -2146,6 +2170,7 @@
+ uint64_t pipeline_key(const Program& p, const NvnState& s, const Targets& at, VkPrimitiveTopology topo) {
+     if (at.n < 0 || at.n > 8) return 0;   // (hookshot: at most 8 colour targets)
+     uint64_t key = mix(mix(p.key, p.variant), (uint64_t)topology_class(topo) << 8 | (uint64_t)at.samples);
++    if (const uint64_t tag = mesh_warp32_pipeline_tag(p)) key = mix(key, tag);
+     const Shader::Info& vs = *vertex_info(p);
+     if (!p.mesh && !p.fallback) {
+         for (int i = 0; i < 16; i++)
+@@ -2300,7 +2325,7 @@
+         si.stage = st.vk_stage;
+         si.module = st.module;
+         si.pName = "main";
+-        pin_subgroup(si);
++        pin_program_stage(si, st);
+         stages.push_back(si);
+     }
+     // vertex input: the attributes the vertex stage reads; those without a stream read zeros (binding 15)
+@@ -6697,7 +6722,7 @@
+     if(!p.stages.empty()) {
+         const auto& stage=p.stages[0];event.stage_index=0;event.nvn_stage=stage.nvn_stage;event.vk_stage=stage.vk_stage;
+         if(stage.oo_identity.valid)event.digest=oo_identity::hex(stage.oo_identity.digest);
+-        VkPipelineShaderStageCreateInfo info{VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO};info.stage=stage.vk_stage;pin_subgroup(info);
++        VkPipelineShaderStageCreateInfo info{VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO};info.stage=stage.vk_stage;pin_program_stage(info,stage);
+         if(info.pNext)event.required_size=static_cast<const VkPipelineShaderStageRequiredSubgroupSizeCreateInfo*>(info.pNext)->requiredSubgroupSize;
+         event.require_full=(info.flags&VK_PIPELINE_SHADER_STAGE_CREATE_REQUIRE_FULL_SUBGROUPS_BIT)!=0;
+     }
+@@ -6721,7 +6746,7 @@
+         const auto& source = p.stages[i]; auto& stage = event.stages[i];
+         stage.nvn_stage = source.nvn_stage; stage.vk_stage = (uint32_t)source.vk_stage; stage.identity = source.oo_identity;
+         VkPipelineShaderStageCreateInfo info{VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO};
+-        info.stage = source.vk_stage; pin_subgroup(info);   // same request as build_graphics; not actual driver SIMD width
++        info.stage = source.vk_stage; pin_program_stage(info, source); // same selected-module request as build_graphics
+         if (info.pNext) {
+             const auto* size = static_cast<const VkPipelineShaderStageRequiredSubgroupSizeCreateInfo*>(info.pNext);
+             if (size->sType == VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_REQUIRED_SUBGROUP_SIZE_CREATE_INFO)
+diff --git a/nx2/build.py b/nx2/build.py
+--- a/nx2/build.py
++++ b/nx2/build.py
+@@ -1173,7 +1173,7 @@
+         # keeps them)
+         stamp = hashlib.sha1(usedforsecurity=False)
+         translator = [os.path.join(d, f) for top in ("eden", "sirit", "compat") for d, _, fs in os.walk(os.path.join(vk, top)) for f in fs]
+-        for f in sorted(translator) + [os.path.join(vk, n) for n in ("vk_shader.cpp", "vk_bank.cpp", "vk_state.h", "vk_api.h")]:
++        for f in sorted(translator) + [os.path.join(vk, n) for n in ("vk_shader.cpp", "vk_bank.cpp", "vk_state.h", "vk_api.h", "mesh_warp32_lowering.h", "mesh_warp32_lowering.cpp")]:
+             with open(f, "rb") as src:
+                 stamp.update(os.path.relpath(f, vk).replace("\\", "/").encode() + src.read().replace(bytes((13, 10)), bytes((10,))))
+         shader_stamp = "-DHOOKSHOT_SHADER_STAMP=0x%sull" % stamp.hexdigest()[:16]

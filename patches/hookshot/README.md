@@ -27,6 +27,12 @@ build/runtime evidence and remaining replay gaps. Each patch retains the upstrea
 license. The independent [input-isolation patch](../../docs/input-isolation.md)
 changes host input routing and does not depend on the renderer series.
 
+The optional tenth overlay, `mesh-warp32-lowering.patch`, adds the disabled-by-default
+[guarded native mesh experiment](../../docs/native-mesh-warp32-integration.md)
+after that nine-patch capture chain. It changes only the exact reviewed program
+on the recorded A770/driver/compiler configuration; it is not a generic subgroup
+policy or a validated gameplay-performance release.
+
 ## Purpose
 
 The profiler records a program key, but that does not prove which texture-answer variant or SPIR-V module was actually recorded. This patch observes one explicitly selected compute key and variant immediately before the native Vulkan dispatch command. It records a canonical little-endian SPIR-V SHA-256, workgroup size, requested subgroup policy, cache stamp, direct launch dimensions or an explicitly unresolved indirect address, and a fingerprint of the NVN binding slots and registration generations.
