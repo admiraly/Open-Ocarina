@@ -150,7 +150,7 @@ index 1244ef2..f9ac6b6 100644
                        Content="NVIDIA DLSS (downloads NVIDIA's SDK under NVIDIA's license)"/>
              <TextBlock Style="{StaticResource Note}" FontSize="12" Margin="26,4,0,0" TextWrapping="Wrap"
 diff --git a/builder/HookshotBuilder/MainWindow.xaml.cs b/builder/HookshotBuilder/MainWindow.xaml.cs
-index a37424e..ee6ac00 100644
+index a37424e..f2e1eaf 100644
 --- a/builder/HookshotBuilder/MainWindow.xaml.cs
 +++ b/builder/HookshotBuilder/MainWindow.xaml.cs
 @@ -43,6 +43,8 @@ public partial class MainWindow : Window
@@ -393,7 +393,7 @@ index a37424e..ee6ac00 100644
 +                    si.ArgumentList.Add(a);
 +            si.ArgumentList.Add("-I");
 +            si.ArgumentList.Add("-B");
-+            si.ArgumentList.Add(Path.Combine(tools.Root, "nx2", "make_game.py"));
++            si.ArgumentList.Add(System.IO.Path.Combine(tools.Root, "nx2", "make_game.py"));
 +            si.ArgumentList.Add("--probe-system");
 +            using var p = Process.Start(si);
 +            if (p == null) return null;
