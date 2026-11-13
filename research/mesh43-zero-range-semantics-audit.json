@@ -1,0 +1,237 @@
+{
+  "schema": "open-ocarina.mesh43-zero-range-semantics-audit/v1",
+  "observed_date": "2026-11-13",
+  "status": "CPU-only; unsigned control matches original ISA; valid-game zero-range domain unresolved",
+  "identity": {
+    "program": "43ec86f35fd937b9",
+    "variant": "bc2d248909cf8b40",
+    "task_cached_SPIRV_sha256": "5e7d8f02e2dbd5ae1cd625d42366bc532dcdf7d71bb56ac3bc303b5e9655d086",
+    "task_stage_index": 0,
+    "NVN_stage": 6,
+    "Vulkan_stage": 64,
+    "whole_shader_seed_sha256": "413cc8fb8b438419bfc3aac98bdac7fe351af2243926c5805d69e46f58b864a3",
+    "seed_program_index": 1650,
+    "seed_task_index": 1360,
+    "native_task_code_key": "8fb3abacd57f1ee6",
+    "native_mesh_code_key": "8d46218ca9ecd4f9",
+    "native_fragment_code_key": "7d1fd77e4a67127b",
+    "recomputed_linked_program_key": "43ec86f35fd937b9",
+    "written_color_types_all_zero": true,
+    "hash_recipe": "FNV1a(control216+end-sized code), then mesh_key chaining and written types",
+    "native_control_plus_end_code_sha256": "4d6d916a9d6043cb3aa48c0be961334abf63f59f9dbc3f7ff55856f642101095",
+    "native_instructions_with_padding_sha256": "a5d9fc77dd3a93e87984ccf3b49e68ce9af4490fb0e85f40b6faf48c235ee35e",
+    "captured627native_instructions_sha256": "c35ae0a28743fbda3110f6c65c59071f33fe716b5055c304154805d265a69867",
+    "captured_native_bytes": 10032,
+    "task_threads": 32,
+    "task_payload_bytes": 3200
+  },
+  "audited_source_hashes": {
+    "gpu/vk/vk_shader.cpp": "057ee93cc7f2d5db9a51dd1806b1f094ccf223e8d1b444833d10b44a4d170028",
+    "gpu/vk/eden/shader_recompiler/frontend/ampere/lower_to_maxwell.h": "188615c7a48748de84cc0e1847691b443885a3277e8fdc85abd0486120c4ebc4",
+    "gpu/vk/eden/shader_recompiler/frontend/ampere/program_capture.h": "63fe3be6c8a3e90a4b7f5ecf61b2a779e51dc3be01951583c0e40faf49f06a1b",
+    "gpu/vk/eden/shader_recompiler/frontend/maxwell/translate/impl/integer_set_predicate.cpp": "865619d0ac0563df38cbe212fe5cedc904d9e86d37d320e6b161e59b471845e7",
+    "gpu/vk/eden/shader_recompiler/backend/spirv/emit_spirv.cpp": "83bfa7c02ec09861c57cd2ca4ee0900b04bc0dbae2348c06f5e5ae8ad1fb3aa4",
+    "gpu/vk/compat/common/settings.h": "0f5c3233f58e39e5555f2859243e0fab1433f1871aff1b4d32c3300e64db6368"
+  },
+  "encoding_crosscheck": {
+    "source": "Mesa26.2.4 src/nouveau/compiler/nak/sm70_encode.rs",
+    "sha256": "a6691b6b66e4c38b6eeeec8d44af99d89e80c7a1fd16a6ae13bda5cd2d9393a3",
+    "ISetP": "bit73:0U32,1I32; compare76..78",
+    "Shf": "bits73..74:type3U32, bit76right, bit80highword"
+  },
+  "private_artifact_hashes": {
+    "seed_mesh_index.cpp": {
+      "sha256": "bcfe2db9f03336d6c6706e8eaf73e2ee5a397b836d9e45425bd7450e53db394c",
+      "bytes": 2187
+    },
+    "seed-mesh-index": {
+      "sha256": "b94b077f68c163d70d10ed82fa48067de4cef6222e65b46c198cfc17ad80e387",
+      "bytes": 23672
+    },
+    "seed-index.stdout": {
+      "sha256": "624bf9bae5ee00e57f66f9dc5deec446bc0663b4bd771bfaf1b1a6f4bbad4b7f",
+      "bytes": 267
+    },
+    "task-control.bin": {
+      "sha256": "16e7c4594623b85a38ec2284acae243775b1c733f4e6c73d05e2a1024917ec91",
+      "bytes": 216
+    },
+    "task-code-area.bin": {
+      "sha256": "c316b2c49985dfafcebe85119742cb656b22bc2a06d79bf6eaa607cf3d4d1e32",
+      "bytes": 10496
+    },
+    "task-native-instructions.bin": {
+      "sha256": "a5d9fc77dd3a93e87984ccf3b49e68ce9af4490fb0e85f40b6faf48c235ee35e",
+      "bytes": 10240
+    },
+    "task-captured-native.bin": {
+      "sha256": "c35ae0a28743fbda3110f6c65c59071f33fe716b5055c304154805d265a69867",
+      "bytes": 10032
+    },
+    "native-control-decode.json": {
+      "sha256": "c19d963525b16bce3c7ad5be3c5910cb8dfb4a21837202d68507dc34f12655d9",
+      "bytes": 36247
+    },
+    "lower_trace.cpp": {
+      "sha256": "a476409763ba3de0c8db7692469084716c205083552cbf6cd900b0e7a2b2877d",
+      "bytes": 1549
+    },
+    "lower-trace": {
+      "sha256": "6fae5010e80657ecc95e863763cb987e49642a91ee2f81457e76a330ba11b68c",
+      "bytes": 189744
+    },
+    "lower-trace.stdout": {
+      "sha256": "d1b91b9646c12607fc3394701c509201302f37242ee261e2de37b883ac001516",
+      "bytes": 932
+    },
+    "zero-control-model.json": {
+      "sha256": "29e629f7f0153ef62cedaa0f86db71b579e09b5e147b06d343e80a89d6aa8848",
+      "bytes": 977
+    }
+  },
+  "zero_path": {
+    "delta": "Unsigned pre-cull range end-minus-begin clamped to256; distinct from post-cull accepted-item count N",
+    "limit": "U=((min(delta,256)-1) mod2^32)>>5",
+    "entry": "WG.x<=4095; unsignedU>=0 adds no positive-range guard",
+    "delta0": "U=134217727; every lane skips per-item body, loop-limit break stays false, injected private guard cuts after8193batch visits under stable defined inputs",
+    "positive_delta": "Visitsceil(delta/32),1..8 for delta1..256 even if all items are culled and acceptedN=0",
+    "reduced_control_model": [
+      {
+        "workgroup_x": 0,
+        "pre_cull_delta": 0,
+        "post_cull_accepted_N": 0,
+        "unsigned_limit": 134217727,
+        "translated_control_model_body_visits": 8193
+      },
+      {
+        "workgroup_x": 0,
+        "pre_cull_delta": 1,
+        "post_cull_accepted_N": 0,
+        "unsigned_limit": 0,
+        "translated_control_model_body_visits": 1
+      },
+      {
+        "workgroup_x": 0,
+        "pre_cull_delta": 32,
+        "post_cull_accepted_N": 0,
+        "unsigned_limit": 0,
+        "translated_control_model_body_visits": 1
+      },
+      {
+        "workgroup_x": 0,
+        "pre_cull_delta": 33,
+        "post_cull_accepted_N": 0,
+        "unsigned_limit": 1,
+        "translated_control_model_body_visits": 2
+      },
+      {
+        "workgroup_x": 0,
+        "pre_cull_delta": 256,
+        "post_cull_accepted_N": 0,
+        "unsigned_limit": 7,
+        "translated_control_model_body_visits": 8
+      },
+      {
+        "workgroup_x": 4096,
+        "pre_cull_delta": 0,
+        "post_cull_accepted_N": 0,
+        "unsigned_limit": 134217727,
+        "translated_control_model_body_visits": 0
+      }
+    ],
+    "measured_GPU_execution_or_cost": false
+  },
+  "original_ISA_sites": [
+    {
+      "offset": "0x130",
+      "class": "IMNMX.U32 clamp",
+      "finding": "Original unsigned min matches cached UMin"
+    },
+    {
+      "offset": "0x140",
+      "class": "add minus1",
+      "finding": "Zero underflows before shift"
+    },
+    {
+      "offset": "0x150",
+      "class": "SHF right/high U32 by5",
+      "type_bits73_74": 3,
+      "finding": "Audited lowerer emits logical SHR, matching cached logical shift"
+    },
+    {
+      "offset": "0x160",
+      "class": "ISETP.GE.U32 versus RZ",
+      "signed_bit73": 0,
+      "comparison_code": 6,
+      "finding": "Unsigned original entry test; no signed bit lost here"
+    },
+    {
+      "offset": "0x2a0",
+      "class": "ISETP.GT.U32 next-iteration versus bound",
+      "signed_bit73": 0,
+      "comparison_code": 4
+    },
+    {
+      "offset": "0x2b0",
+      "class": "P2R mask2",
+      "finding": "Preserves limit predicate P1; not an unconditional MOV2"
+    },
+    {
+      "offset": "0x2610",
+      "class": "ISETP.NE preserved register versus zero",
+      "signed_bit73": 1,
+      "finding": "Signedness immaterial for nonzero/equality"
+    },
+    {
+      "offset": "0x2640",
+      "class": "Predicated CALL.NOINC jump",
+      "finding": "Exits to0x2660 when preserved limit predicate true; lowerer emits matching predicated branch"
+    },
+    {
+      "offset": "0x2650",
+      "class": "Unconditional backward BRA",
+      "finding": "Returns to0x260 otherwise; no extra zero exclusion found"
+    }
+  ],
+  "injected_guard": {
+    "emitter": "emit_spirv.cpp Repeat case",
+    "default": "disable_shader_loop_safety_checks=false",
+    "mechanism": "Private0x2000, decrement1, signed>=0 combined with repeat condition",
+    "origin": "Generic emulator safety injection, not an original native8192counter",
+    "raw_captured_immediate8192_occurrences": 0
+  },
+  "baseline_candidate": {
+    "baseline_catalog_sha256": "1ec255d135850e5b54718626e6d8671c9e1d769deb447c6625ddd9d8a4148d30",
+    "candidate_catalog_sha256": "6dd55c3d245fc2bc89ea2abee00242ee69dc5350d129b8e4e1eb249efccdc1f4",
+    "both_task_SHA256": "5e7d8f02e2dbd5ae1cd625d42366bc532dcdf7d71bb56ac3bc303b5e9655d086",
+    "candidate_only_count_control_change": false
+  },
+  "applicability": {
+    "other_shader_dominant_positive_range_guard_found": false,
+    "stage_control_positive_range_contract_found": false,
+    "API_shape_can_represent_equal_endpoints": true,
+    "valid_game_zero_range_proven": false,
+    "actual_live_zero_range_observed": false,
+    "actual_application_positive_range_invariant_established": false,
+    "explanation": "Stage control specifies code, threads and payload rather than valid worklist values. Original native shader also uses unsigned control. Actual command/worklist construction has not been proved or captured; API allowance is not evidence of valid game input."
+  },
+  "strongest_counterarguments": [
+    "The game may guarantee strictly positive pre-cull ranges; zero may be outside the shader valid-input domain.",
+    "Ordinary all-items-culled acceptedN0 with positive delta is normal1..8iterations, not the8193case.",
+    "WG.x>4095 skips all work; invalid/stale/inconsistent buffers could manufacture delta0 and point to a separate provenance/input issue.",
+    "Semantic visits are not measured GPU instructions/time; compiler optimization and live input distribution are unknown.",
+    "Native fields/current decoder/cached control agree, but a full native-to-exact-cached-variant recompilation was not performed. No original ISA was executed."
+  ],
+  "next_evidence": "Establish actual submitted task grid/worklist end/start positive-range invariant, or a stable valid-game delta0 occurrence. No signedness or work-skip patch is justified.",
+  "claims": {
+    "GPU_or_Vulkan_calls": false,
+    "vendor_or_frozen_source_modified": false,
+    "new_lowering_or_work_skip": false,
+    "signedness_translation_bug_established": false,
+    "candidate_precedence_bug_established": false,
+    "valid_game_zero_range_established": false,
+    "measured_wasted_GPU_work": false,
+    "visual_fault_cause_established": false,
+    "performance_or_FPS_gain": false
+  }
+}
