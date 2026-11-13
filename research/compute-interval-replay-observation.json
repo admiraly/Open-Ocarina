@@ -1,0 +1,214 @@
+{
+  "schema": "open-ocarina.compute-interval-runtime-observation/v1",
+  "scope": "One fixed owned compute graph; two original baseline invocations and one interval-candidate invocation. No measured GPU timings, normal-frame FPS, live-renderer integration, historical atomicity or general-equivalence claim.",
+  "identity": {
+    "adapter_sha256": "9a5e3835c251047f51ba23e9042ac9b821c9e6543adc9f979186d10afcdecb85",
+    "native_source_sha256": "9b67fbdec5487cd5138395455b58c7148114ee902f7bfa643bebc30cb741e55f",
+    "native_binary_sha256": "6bbf44eeb4f1521bc052d3a6473d5b2ba0656f986d091c9a19f97d39fb0c87dd",
+    "native_diff_sha256": "099830dadaa5d49e90e85dca0a6ca3c6b238771032e512483bec35859c5045aa",
+    "profile_sha256": "384a4064fc0aa593e4f9984122fe3f93dfaf089dfed608ee8fb0bacbace658e7",
+    "baseline_plan_sha256": "bc1e6c3a2788190bd16d922c6e5a33b038d6774af02df3325408c0c9d43c26a4",
+    "candidate_plan_sha256": "2f29fb6fc6104eccbd52137591119d2ecdbd6856ab3b4a4cd8d7732118e139c9",
+    "handoff_sha256": "62378982b88cffa02eddcc6b3a9b265329699f0567aa21c52f4f91cbac40ec8b",
+    "driver_library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+    "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+    "original_manifest_sha256": "4c4b5fcaf73318b8edc08406a58e39a2702544f86183e7d894455e7d363206b9",
+    "record_payload_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770"
+  },
+  "execution_contract": {
+    "device": "Intel Arc A770",
+    "vendor_id": 32902,
+    "device_id": 22176,
+    "grid": [
+      2,
+      1,
+      1
+    ],
+    "local_size": [
+      64,
+      1,
+      1
+    ],
+    "required_and_actual_subgroup_size": 32,
+    "require_full_subgroups": true,
+    "original_owned_buffers": 59,
+    "original_buffer_bytes": 1163919360,
+    "sampled_images": 4,
+    "push_bytes": 88,
+    "physical_root_offset": 48,
+    "record_owner_bytes": 8784,
+    "readonly_record_payload_bytes": 592,
+    "fence_seconds": 2,
+    "per_process_seconds": 90,
+    "fresh_process_resources_and_cache_each_case": true,
+    "pipeline_disable_optimization": false,
+    "environment": {
+      "HS_SPILL_BATCH": "1",
+      "shader_spilling_rate": "1",
+      "HS_PUSH_SHADOW": null,
+      "HS_CS32_MAX_INSTS": null,
+      "unsafe_overrides": "absent"
+    }
+  },
+  "cases": [
+    {
+      "case": "baseline32-compile-01",
+      "result_sha256": "8f8705557edd1efdc455bfe46ec6f3ebc2b974aae735173900aa66ef8d5d02e0",
+      "terminal_sha256": "1813d7bdc6bcb3589e2cb456fc730403e9e29a59849e504a2e315bc0c6ff7f9f",
+      "module_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+      "actual_subgroup_size": 32,
+      "compile_only": true,
+      "dispatches": 0,
+      "terminal_exit": 0
+    },
+    {
+      "case": "candidate32-compile-01",
+      "result_sha256": "1be4e3578d0e056774d98800dd6ccf146ac4aa38a6aa1853ea17a91a2621e21d",
+      "terminal_sha256": "cfee23bd80648751528e0c1fa408db4766b0fe74f0cbddd1529258878eb53891",
+      "module_sha256": "d5148342b4517882b25a48e63700cbfb8695454cc05d131da718509ac2563dc0",
+      "actual_subgroup_size": 32,
+      "compile_only": true,
+      "dispatches": 0,
+      "terminal_exit": 0
+    },
+    {
+      "case": "baseline32-dispatch-01",
+      "result_sha256": "077895e5db733accf85bb5b97ff7996bdc2a15a112478696a82f94a53451aa47",
+      "terminal_sha256": "ecb4eccd036c3299df55c770ac308cd881d58490f4c5848c41ac90c6fe870419",
+      "module_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+      "actual_subgroup_size": 32,
+      "compile_only": false,
+      "dispatches": 1,
+      "terminal_exit": 0
+    },
+    {
+      "case": "baseline32-dispatch-02",
+      "result_sha256": "077895e5db733accf85bb5b97ff7996bdc2a15a112478696a82f94a53451aa47",
+      "terminal_sha256": "04423ce531014360b1915173c227692fe6cb065ae759a95d6010bc760babba07",
+      "module_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+      "actual_subgroup_size": 32,
+      "compile_only": false,
+      "dispatches": 1,
+      "terminal_exit": 0
+    },
+    {
+      "case": "candidate32-dispatch-01",
+      "result_sha256": "610dd078d5a0bfc76b3bfa51d8301349f7ccc0b0913e62332a81103b1205ce2b",
+      "terminal_sha256": "6784c8754e2f3fada40091d7c451d016968b1ac5319f8995229c44b23642df8d",
+      "module_sha256": "d5148342b4517882b25a48e63700cbfb8695454cc05d131da718509ac2563dc0",
+      "actual_subgroup_size": 32,
+      "compile_only": false,
+      "dispatches": 1,
+      "terminal_exit": 0
+    }
+  ],
+  "full_comparisons": [
+    {
+      "case": "baseline-repeat-comparison",
+      "evidence_sha256": "5c9f0f3728d9d58e7e11714478a6d0dd93482103f40a6302cf5487302e31038d",
+      "all_bytes_match": true,
+      "complete_original_allocations": 59,
+      "original_bytes": 1163919360,
+      "record_and_guard_bytes": 8784
+    },
+    {
+      "case": "candidate-vs-baseline01-comparison",
+      "evidence_sha256": "bc4a639c2e7f7892921512d54c0edcdacdd07a512ad9a2b796589cc67ab84baa",
+      "all_bytes_match": true,
+      "complete_original_allocations": 59,
+      "original_bytes": 1163919360,
+      "record_and_guard_bytes": 8784
+    },
+    {
+      "case": "candidate-vs-baseline02-comparison",
+      "evidence_sha256": "bc4a639c2e7f7892921512d54c0edcdacdd07a512ad9a2b796589cc67ab84baa",
+      "all_bytes_match": true,
+      "complete_original_allocations": 59,
+      "original_bytes": 1163919360,
+      "record_and_guard_bytes": 8784
+    }
+  ],
+  "writable_owner": {
+    "index": 7,
+    "bytes": 4194304,
+    "sha256": "323334824a3f64ff80ba0cb8f8602c8f6dd7be3384a32353bbd8e1eb0628c7c2",
+    "matches_preserved_earlier_E5_original_reference": true
+  },
+  "record_payload_and_guards_unchanged": true,
+  "guarded_record_sha256": "0ae9e410ac93d40b4ec73073a303fdcb5fa0921dbc01c81ff1e38a349f82c393",
+  "compiler_statistics": {
+    "Code size": {
+      "baseline": 2889872,
+      "candidate": 2557616
+    },
+    "Cycles": {
+      "baseline": 3821821,
+      "candidate": 2900285
+    },
+    "Fills": {
+      "baseline": 14943,
+      "candidate": 10178
+    },
+    "GRF registers": {
+      "baseline": 0,
+      "candidate": 0
+    },
+    "Instructions": {
+      "baseline": 144485,
+      "candidate": 128800
+    },
+    "Loops": {
+      "baseline": 72,
+      "candidate": 72
+    },
+    "Max dispatch width": {
+      "baseline": 32,
+      "candidate": 32
+    },
+    "Max live registers": {
+      "baseline": 560,
+      "candidate": 557
+    },
+    "Non SSA regs after NIR": {
+      "baseline": 1372,
+      "candidate": 1168
+    },
+    "Push constant ranges": {
+      "baseline": 0,
+      "candidate": 0
+    },
+    "Push constant registers": {
+      "baseline": 0,
+      "candidate": 0
+    },
+    "SENDs": {
+      "baseline": 1559,
+      "candidate": 1981
+    },
+    "Scratch Memory Size": {
+      "baseline": 32768,
+      "candidate": 32768
+    },
+    "Source hash": {
+      "baseline": 14125175244154702039,
+      "candidate": 1873164481611099883
+    },
+    "Spills": {
+      "baseline": 6690,
+      "candidate": 9257
+    },
+    "Workgroup Memory Size": {
+      "baseline": 0,
+      "candidate": 0
+    }
+  },
+  "compiler_statistics_evidence_sha256": "5c8448647b90221fc01ab4d6e871f9e5070889d62e61aebce2781ad00a5df86c",
+  "compiler_statistics_interpretation": "Mixed: fewer instructions, fills and estimated cycles; more SENDs and spills; same scratch. Cycles are compiler estimates, not GPU duration. Driver-reported GRF registers zero does not establish zero physical register usage.",
+  "limitations": [
+    "All 60 complete buffer allocations were compared, including record guards; this is not a rendered-image comparison.",
+    "The live selector producer and whole-renderer correctness are separate.",
+    "Captured historical CPU atomicity and complete original device/float-state equivalence remain unknown.",
+    "No execution timing or speed ratio was measured.",
+    "Independent 02 evidence remains frozen; a later timing profile must use a separate ABI/helper/plan."
+  ]
+}

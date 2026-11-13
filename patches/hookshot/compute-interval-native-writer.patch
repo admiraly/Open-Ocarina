@@ -1,0 +1,1093 @@
+diff --git a/gpu/vk/compute_interval_spirv_writer.h b/gpu/vk/compute_interval_spirv_writer.h
+new file mode 100644
+--- /dev/null
++++ b/gpu/vk/compute_interval_spirv_writer.h
+@@ -0,0 +1,1088 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Independently authored CPU-only structural compute-load writer. No shader
++// instruction arrays, runtime controls, Vulkan calls or live integration.
++#pragma once
++#ifndef SPV_ENABLE_UTILITY_CODE
++#define SPV_ENABLE_UTILITY_CODE
++#endif
++#include "compute_identity.h"
++#include <algorithm>
++#include <array>
++#include <map>
++#include <set>
++#include <spirv/unified1/spirv.hpp>
++#include <stdexcept>
++#include <vector>
++
++namespace open_ocarina::interval_spirv {
++using U = uint32_t;
++using Words = std::vector<U>;
++inline constexpr const char *kOriginal =
++    "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b";
++// Preserves the original unspecified generator word (zero). Normalizing that
++// provenance word to SPIRV-Tools' generator reproduces the reviewed d514...
++// form.
++inline constexpr const char *kNativeCandidate =
++    "4c0b19efdac3bb721636a9ce1bbeeba83b09b557cf722df10526d76246041629";
++inline void need(bool yes, const char *reason) {
++  if (!yes)
++    throw std::runtime_error(reason);
++}
++inline void append(Words &out, spv::Op op, const Words &a) {
++  need(a.size() < 65535, "Oversized emitted instruction");
++  out.push_back((U(a.size() + 1) << 16) | U(op));
++  out.insert(out.end(), a.begin(), a.end());
++}
++struct Ins {
++  spv::Op op;
++  Words full, a;
++  U result = 0, type = 0, function = 0, block = 0;
++  size_t at = 0, count = 0;
++};
++inline size_t string_end(const Words &a, size_t at) {
++  for (; at < a.size(); ++at)
++    for (unsigned byte = 0; byte < 4; ++byte) {
++      if (((a[at] >> (byte * 8)) & 255) == 0) {
++        need(byte == 3 || (a[at] >> ((byte + 1) * 8)) == 0,
++             "Nonzero string padding");
++        return at + 1;
++      }
++    }
++  throw std::runtime_error("Unterminated literal string");
++}
++// Operand classification is deliberately limited to the reviewed source and
++// emitted subset. Unknown opcodes/classes are refused, never guessed as IDs.
++inline Words references(const Ins &i) {
++  using namespace spv;
++  const auto &a = i.full;
++  Words ids;
++  auto exact = [&](size_t n) {
++    need(a.size() == n, "Incorrect fixed operand count");
++  };
++  auto minimum = [&](size_t n) {
++    need(a.size() >= n, "Short recognized opcode");
++  };
++  auto add = [&](size_t n) {
++    need(n < a.size(), "Missing ID operand");
++    ids.push_back(a[n]);
++  };
++  auto tail = [&](size_t n) {
++    minimum(n);
++    for (; n < a.size(); ++n)
++      add(n);
++  };
++  switch (i.op) {
++  case OpName:
++    minimum(2);
++    add(0);
++    need(string_end(a, 1) == a.size(), "Trailing name operands");
++    break;
++  case OpMemberName:
++    minimum(3);
++    add(0);
++    need(string_end(a, 2) == a.size(), "Trailing member name operands");
++    break;
++  case OpExtension:
++    minimum(1);
++    need(string_end(a, 0) == a.size(), "Trailing extension operands");
++    break;
++  case OpExtInstImport:
++    minimum(2);
++    need(string_end(a, 1) == a.size(), "Trailing import operands");
++    break;
++  case OpMemoryModel:
++    exact(2);
++    break;
++  case OpEntryPoint:
++    minimum(4);
++    add(1);
++    tail(string_end(a, 2));
++    break;
++  case OpExecutionMode:
++    minimum(2);
++    need((a.size() == 5 && a[1] == 17) ||
++             (a.size() == 3 && a[1] == 4461 && a[2] == 32),
++         "Unsupported execution mode");
++    add(0);
++    break;
++  case OpCapability:
++    exact(1);
++    break;
++  case OpTypeVoid:
++  case OpTypeBool:
++    exact(1);
++    break;
++  case OpTypeInt:
++    exact(3);
++    break;
++  case OpTypeFloat:
++    exact(2);
++    break;
++  case OpTypeVector:
++    exact(3);
++    add(1);
++    break;
++  case OpTypeImage:
++    need(a.size() == 8 || a.size() == 9, "Incorrect image type operands");
++    add(1);
++    break;
++  case OpTypeSampledImage:
++  case OpTypeRuntimeArray:
++    exact(2);
++    add(1);
++    break;
++  case OpTypeArray:
++    exact(3);
++    add(1);
++    add(2);
++    break;
++  case OpTypeStruct:
++  case OpTypeFunction:
++    minimum(i.op == OpTypeStruct ? 1 : 2);
++    tail(1);
++    break;
++  case OpTypePointer:
++    exact(3);
++    add(2);
++    break;
++  case OpConstantTrue:
++  case OpConstantFalse:
++  case OpConstantNull:
++    exact(2);
++    add(0);
++    break;
++  case OpConstant:
++    need(a.size() == 3 || a.size() == 4, "Unsupported constant width");
++    add(0);
++    break;
++  case OpConstantComposite:
++    minimum(3);
++    add(0);
++    tail(2);
++    break;
++  case OpFunction:
++    exact(4);
++    add(0);
++    add(3);
++    break;
++  case OpFunctionParameter:
++    exact(2);
++    add(0);
++    break;
++  case OpFunctionEnd:
++  case OpReturn:
++    exact(0);
++    break;
++  case OpFunctionCall:
++    minimum(3);
++    add(0);
++    tail(2);
++    break;
++  case OpVariable:
++    need(a.size() == 3 || a.size() == 4, "Unsupported variable operands");
++    add(0);
++    if (a.size() == 4)
++      add(3);
++    break;
++  case OpLoad:
++    need(a.size() == 3 || (a.size() == 5 && a[3] == 2),
++         "Unsupported load memory operands");
++    if (a.size() == 5)
++      need(a[4] && !(a[4] & (a[4] - 1)), "Invalid load alignment literal");
++    add(0);
++    add(2);
++    break;
++  case OpStore:
++    need(a.size() == 2 || (a.size() == 4 && a[2] == 2),
++         "Unsupported store memory operands");
++    if (a.size() == 4)
++      need(a[3] && !(a[3] & (a[3] - 1)), "Invalid store alignment literal");
++    add(0);
++    add(1);
++    break;
++  case OpAccessChain:
++    minimum(3);
++    add(0);
++    tail(2);
++    break;
++  case OpArrayLength:
++    exact(4);
++    add(0);
++    add(2);
++    break;
++  case OpDecorate:
++    minimum(2);
++    add(0);
++    need(a[1] == 2 || a[1] == 4 || a[1] == 5 || a[1] == 6 || a[1] == 11 ||
++             a[1] == 19 || a[1] == 20 || a[1] == 21 || a[1] == 23 ||
++             a[1] == 24 || a[1] == 25 || a[1] == 33 || a[1] == 34 ||
++             a[1] == 35 || a[1] == 42 || a[1] == 5355 || a[1] == 5356,
++         "Unsupported decoration operands");
++    need(a.size() ==
++             (a[1] == 6 || a[1] == 11 || a[1] == 33 || a[1] == 34 || a[1] == 35
++                  ? 3u
++                  : 2u),
++         "Incorrect decoration arity");
++    break;
++  case OpMemberDecorate:
++    minimum(3);
++    add(0);
++    need(a[2] == 35 || a[2] == 24 || a[2] == 25,
++         "Unsupported member decoration");
++    need(a.size() == (a[2] == 35 ? 4u : 3u),
++         "Incorrect member decoration arity");
++    break;
++  case OpCompositeConstruct:
++    minimum(3);
++    add(0);
++    tail(2);
++    break;
++  case OpCompositeExtract:
++    minimum(4);
++    add(0);
++    add(2);
++    break;
++  case OpExtInst:
++    minimum(5);
++    add(0);
++    add(2);
++    tail(4);
++    break;
++  case OpImageSampleExplicitLod:
++  case OpImageFetch:
++    minimum(4);
++    add(0);
++    add(2);
++    add(3);
++    if (a.size() > 4) {
++      // Reviewed image operands: Bias/Lod/Grad/ConstOffset/Offset/Sample.
++      const U mask = a[4];
++      need(!(mask & ~U(0x5f)), "Unsupported image operand mask");
++      size_t parameters = 0;
++      for (U bit = 1; bit <= 64; bit <<= 1)
++        if (mask & bit)
++          parameters += bit == 4 ? 2 : 1;
++      need(a.size() == 5 + parameters, "Image operand mask/extent mismatch");
++      tail(5);
++    } else
++      need(i.op == OpImageFetch, "Missing explicit image operands");
++    break;
++  case OpImage:
++  case OpImageQueryLevels:
++  case OpConvertFToU:
++  case OpConvertFToS:
++  case OpConvertSToF:
++  case OpConvertUToF:
++  case OpUConvert:
++  case OpConvertUToPtr:
++  case OpBitcast:
++  case OpSNegate:
++  case OpAll:
++  case OpIsNan:
++  case OpLogicalNot:
++  case OpNot:
++    exact(3);
++    add(0);
++    add(2);
++    break;
++  case OpImageQuerySizeLod:
++  case OpIAdd:
++  case OpFAdd:
++  case OpISub:
++  case OpIMul:
++  case OpFMul:
++  case OpFDiv:
++  case OpIAddCarry:
++  case OpLogicalOr:
++  case OpLogicalAnd:
++  case OpIEqual:
++  case OpINotEqual:
++  case OpUGreaterThan:
++  case OpUGreaterThanEqual:
++  case OpULessThan:
++  case OpULessThanEqual:
++  case OpFOrdEqual:
++  case OpFUnordNotEqual:
++  case OpFOrdLessThan:
++  case OpFUnordLessThan:
++  case OpFOrdGreaterThan:
++  case OpFUnordGreaterThan:
++  case OpFOrdLessThanEqual:
++  case OpFOrdGreaterThanEqual:
++  case OpFUnordGreaterThanEqual:
++  case OpShiftRightLogical:
++  case OpShiftLeftLogical:
++  case OpBitwiseOr:
++  case OpBitwiseXor:
++  case OpBitwiseAnd:
++    exact(4);
++    add(0);
++    tail(2);
++    break;
++  case OpSelect:
++  case OpBitFieldUExtract:
++    exact(5);
++    add(0);
++    tail(2);
++    break;
++  case OpBitFieldInsert:
++    exact(6);
++    add(0);
++    tail(2);
++    break;
++  case OpPhi:
++    minimum(4);
++    need(a.size() % 2 == 0, "Odd Phi operands");
++    add(0);
++    tail(2);
++    break;
++  case OpLoopMerge:
++    exact(3);
++    add(0);
++    add(1);
++    break;
++  case OpSelectionMerge:
++    exact(2);
++    add(0);
++    break;
++  case OpLabel:
++    exact(1);
++    break;
++  case OpBranch:
++  case OpReturnValue:
++    exact(1);
++    add(0);
++    break;
++  case OpBranchConditional:
++    need(a.size() == 3 || a.size() == 5, "Incorrect branch operands");
++    add(0);
++    add(1);
++    add(2);
++    break;
++  case OpSwitch:
++    minimum(2);
++    need(a.size() % 2 == 0, "Odd switch operands");
++    add(0);
++    add(1);
++    for (size_t n = 3; n < a.size(); n += 2)
++      add(n);
++    break;
++  default:
++    throw std::runtime_error("Opcode outside reviewed compute subset");
++  }
++  return ids;
++}
++
++struct Module {
++  Words words;
++  std::vector<Ins> ins;
++  std::map<U, size_t> defs;
++  std::map<U, std::vector<size_t>> functions;
++  std::map<U, std::map<U, U>> decos;
++  explicit Module(const Words &w) : words(w) {
++    need(w.size() >= 5 && w.size() <= 524288 && w[0] == 0x07230203 &&
++             w[1] == 0x00010600 && w[3] > 0 && w[3] <= 1000000 && w[4] == 0,
++         "Unsupported SPIR-V header/extent");
++    U function = 0, block = 0;
++    bool seen_function = false;
++    for (size_t at = 5; at < w.size();) {
++      const U n = w[at] >> 16;
++      need(n && n <= w.size() - at, "Truncated instruction framing");
++      const auto op = spv::Op(w[at] & 65535);
++      need(std::string(spv::OpToString(op)).rfind("Op", 0) == 0,
++           "Unknown SPIR-V opcode");
++      Ins i{
++          op, Words(w.begin() + at + 1, w.begin() + at + n), {}, 0, 0, 0, 0, at,
++          n};
++      bool hr = false, ht = false;
++      spv::HasResultAndType(op, &hr, &ht);
++      need(!hr || i.full.size() > (ht ? 1u : 0u), "Missing result operand");
++      i.a = i.full;
++      if (hr) {
++        i.result = i.full[ht ? 1 : 0];
++        need(i.result && i.result < w[3] && !defs.count(i.result),
++             "Invalid/duplicate result ID");
++        defs[i.result] = ins.size();
++        i.a.erase(i.a.begin() + (ht ? 1 : 0));
++      }
++      if (ht) {
++        need(!i.full.empty(), "Missing result type");
++        i.type = i.full[0];
++      }
++      try {
++        references(i);
++      } catch (const std::exception &e) {
++        throw std::runtime_error(std::string(spv::OpToString(op)) + ": " +
++                                 e.what());
++      } // Validate arities before any direct operands below.
++      if (op == spv::OpFunction) {
++        need(!function, "Nested function");
++        function = i.result;
++        seen_function = true;
++      } else
++        need(!seen_function || function || op == spv::OpFunctionEnd,
++             "Global after function section");
++      if (op == spv::OpLabel) {
++        need(function != 0, "Label outside function");
++        block = i.result;
++      }
++      i.function = function;
++      i.block = block;
++      if (function)
++        functions[function].push_back(ins.size());
++      ins.push_back(std::move(i));
++      if (op == spv::OpFunctionEnd) {
++        need(function != 0, "Unexpected function end");
++        function = block = 0;
++      }
++      at += n;
++    }
++    need(!function, "Unterminated function");
++    need(!defs.empty() && defs.rbegin()->first + 1 == w[3],
++         "Noncanonical original ID bound");
++    for (const auto &i : ins)
++      for (U id : references(i)) {
++        need(id && id < w[3] && defs.count(id),
++             "Undefined/out-of-bound ID operand");
++        const auto &used = def(id);
++        need(!i.function || !used.function || used.op == spv::OpFunction ||
++                 used.function == i.function,
++             "Function-local ID escapes its function");
++      }
++    std::set<std::array<U, 3>> decoration_keys;
++    for (const auto &i : ins) {
++      if (i.op == spv::OpDecorate)
++        need(decoration_keys.insert({i.a[0], ~U(0), i.a[1]}).second,
++             "Duplicate decoration");
++      if (i.op == spv::OpMemberDecorate)
++        need(decoration_keys.insert({i.a[0], i.a[1], i.a[2]}).second,
++             "Duplicate member decoration");
++      if (i.op == spv::OpDecorate && i.a.size() == 3) {
++        need(!decos[i.a[0]].count(i.a[1]), "Duplicate valued decoration");
++        decos[i.a[0]][i.a[1]] = i.a[2];
++      }
++      if (i.op == spv::OpBranch || i.op == spv::OpBranchConditional ||
++          i.op == spv::OpLoopMerge || i.op == spv::OpSelectionMerge ||
++          i.op == spv::OpSwitch) {
++        auto targets = references(i);
++        if (i.op == spv::OpBranchConditional || i.op == spv::OpSwitch)
++          targets.erase(targets.begin());
++        for (U id : targets)
++          need(def(id).op == spv::OpLabel && def(id).function == i.function,
++               "Control-flow target leaves its function");
++      }
++    }
++  }
++  const Ins &def(U id) const {
++    auto p = defs.find(id);
++    need(p != defs.end(), "Missing definition");
++    return ins[p->second];
++  }
++  const Words &args(U id, spv::Op op) const {
++    const auto &i = def(id);
++    need(i.op == op, "Unexpected dataflow opcode");
++    return i.a;
++  }
++  uint64_t constant(U id) const {
++    const auto &a = args(id, spv::OpConstant);
++    const auto &type = args(a.at(0), spv::OpTypeInt);
++    need(type.size() == 2 && type[1] == 0 && (type[0] == 32 || type[0] == 64),
++         "Unsupported integer constant type");
++    need(a.size() == (type[0] == 64 ? 3u : 2u),
++         "Incorrect integer constant width");
++    return uint64_t(a[1]) | (type[0] == 64 ? uint64_t(a[2]) << 32 : 0);
++  }
++  U decoration(U id, U kind) const {
++    auto p = decos.find(id);
++    need(p != decos.end() && p->second.count(kind), "Missing decoration");
++    return p->second.at(kind);
++  }
++  U binding(U id) const {
++    need(decoration(id, 34) == 0, "Unexpected descriptor set");
++    return decoration(id, 33);
++  }
++  bool member_zero(U structure) const {
++    return std::any_of(ins.begin(), ins.end(), [structure](const Ins &i) {
++      return i.op == spv::OpMemberDecorate && i.a == Words{structure, 0, 35, 0};
++    });
++  }
++  void uniform(U variable, U stride) const {
++    const auto &v = args(variable, spv::OpVariable);
++    const auto &p = args(v.at(0), spv::OpTypePointer);
++    need(v.size() == 2 && p.size() == 2 && v[1] == 2 && p[0] == 2,
++         "Nonuniform selector storage class");
++    const auto &members = args(p[1], spv::OpTypeStruct);
++    need(members.size() == 1 && member_zero(p[1]),
++         "Unexpected uniform member layout");
++    const auto &a = args(members[0], spv::OpTypeArray);
++    need(a.size() == 2 && a[0] == (stride == 8 ? 8u : 7u) &&
++             decoration(members[0], 6) == stride,
++         "Unexpected uniform array type/stride");
++  }
++};
++
++struct Root {
++  U binding, variable, pointer, selector;
++  bool table;
++};
++struct Helper {
++  U function = 0, parameter = 0, entry = 0, type = 0, width = 0, miss = 0,
++    counter = 0;
++  size_t start = 0, end = 0, miss_at = 0;
++  std::vector<Root> roots;
++};
++inline std::vector<Helper> discover(const Module &m) {
++  using namespace spv;
++  need(m.args(2, OpTypeBool).empty() && m.args(7, OpTypeInt) == Words{32, 0} &&
++           m.args(23, OpTypeInt) == Words{64, 0} &&
++           m.args(8, OpTypeVector) == Words{7, 2} &&
++           m.args(10, OpTypeVector) == Words{7, 4},
++       "Reviewed integer/vector types differ");
++  need(m.args(54, OpTypePointer) == Words{12, 7} &&
++           m.args(110, OpTypePointer) == Words{7, 7},
++       "Reviewed element/private pointer types differ");
++  const std::set<U> expected_functions{107, 332, 491, 691, 850, 1050, 1209};
++  std::set<U> actual_functions;
++  for (const auto &f : m.functions)
++    actual_functions.insert(f.first);
++  need(actual_functions == expected_functions,
++       "Expected exact seven-function inventory");
++  std::vector<Helper> helpers;
++  unsigned entrypoints = 0;
++  for (const auto &i : m.ins) {
++    if (i.op == OpEntryPoint) {
++      ++entrypoints;
++      need(i.a.size() >= 4 && i.a[0] == 5 && i.a[1] == 1209 &&
++               i.a[2] == 0x6e69616d && i.a[3] == 0,
++           "Unexpected compute entry");
++    }
++    if (i.op == OpDecorate && i.a.size() == 3 && i.a[1] == 33)
++      need(i.a[2] != 12, "Record binding is already occupied");
++  }
++  need(entrypoints == 1, "One compute entry required");
++  for (const auto &pair : m.functions) {
++    const auto &indices = pair.second;
++    bool physical = false;
++    std::vector<U> parameters;
++    for (size_t n : indices) {
++      const auto &i = m.ins[n];
++      physical |= i.op == OpConvertUToPtr;
++      if (i.op == OpFunctionParameter)
++        parameters.push_back(i.result);
++    }
++    const auto type = m.ins[indices.front()].type;
++    if (!physical || parameters.size() != 1 || (type != 7 && type != 10))
++      continue;
++    Helper h;
++    h.function = pair.first;
++    h.parameter = parameters[0];
++    h.type = type;
++    h.width = type == 7 ? 4 : 16;
++    h.start = indices.front();
++    h.end = indices.back() + 1;
++    std::vector<const Ins *> loops;
++    for (size_t n : indices) {
++      const auto &i = m.ins[n];
++      if (i.op == OpLabel && !h.entry)
++        h.entry = i.result;
++      if (i.op == OpLoopMerge)
++        loops.push_back(&i);
++      if (i.op != OpReturnValue)
++        continue;
++      const auto &loaded = m.def(i.a[0]);
++      if (loaded.op != OpLoad)
++        continue;
++      const auto &access = m.def(loaded.a.at(1));
++      if (access.op != OpAccessChain)
++        continue;
++      const auto &pointer = access.a;
++      const U variable = pointer.at(1);
++      if (m.def(variable).op != OpVariable)
++        continue;
++      const U binding = m.binding(variable);
++      const bool table = binding == 7;
++      need(loaded.type == h.type &&
++               m.args(pointer[0], OpTypePointer) == Words{12, h.type},
++           "Typed hit pointer/load type differs");
++      const auto &v = m.args(variable, OpVariable);
++      const auto &p = m.args(v.at(0), OpTypePointer);
++      need(v.size() == 2 && p.size() == 2 && v[1] == 12 && p[0] == 12,
++           "Hit is not StorageBuffer");
++      U structure = p[1];
++      if (table) {
++        const auto &array = m.args(structure, OpTypeArray);
++        need(array.size() == 2 && m.constant(array[1]) == 3,
++             "Table count differs");
++        structure = array[0];
++      }
++      const auto &members = m.args(structure, OpTypeStruct);
++      need(members.size() == 1 && m.member_zero(structure) &&
++               m.args(members[0], OpTypeRuntimeArray) == Words{type} &&
++               m.decoration(members[0], 6) == h.width,
++           "Typed storage array layout differs");
++      const auto &index = m.args(pointer.back(), OpShiftRightLogical);
++      need(index.size() == 3 && index[0] == 7 &&
++               m.constant(index[2]) == (h.width == 4 ? 2u : 4u),
++           "Typed index shift differs");
++      const auto &converted = m.args(index[1], OpUConvert);
++      const auto &delta = m.args(converted.at(1), OpISub);
++      need(converted.size() == 2 && converted[0] == 7 &&
++               delta == Words{23, h.parameter, delta.at(2)},
++           "Typed index does not truncate address delta");
++      const auto &base = m.args(delta[2], OpBitwiseAnd);
++      need(base.size() == 3 && m.constant(base[2]) == ~uint64_t(15),
++           "Storage alignment differs");
++      const auto &cast = m.args(base[1], OpBitcast);
++      const auto &address = m.args(cast.at(1), OpLoad);
++      const auto &ua = m.args(address.at(1), OpAccessChain);
++      need(cast[0] == 23 && address[0] == 8 && ua.size() == 4,
++           "Unexpected address selector type/shape");
++      m.uniform(ua[1], 8);
++      need(m.binding(ua[1]) == 0 && m.constant(ua[2]) == 0,
++           "Selector is not UBO0 member0");
++      U selector = 0, counter = 0, element = 0;
++      if (table) {
++        const auto &word = m.args(ua.back(), OpIAdd);
++        need(word.size() == 3 && word[0] == 7,
++             "Table selector addition differs");
++        selector = U(m.constant(word[1]) * 8);
++        const auto &stride = m.args(word[2], OpShiftLeftLogical);
++        need(stride.size() == 3 && stride[0] == 7 &&
++                 m.constant(stride[2]) == 1 && pointer.size() == 5,
++             "Table selector stride differs");
++        element = pointer[2];
++        counter = m.args(element, OpLoad).at(1);
++        h.counter = counter;
++        need(m.args(stride[1], OpLoad).at(1) == counter,
++             "Table selectors use different counters");
++      } else {
++        need(pointer.size() == 4 && m.constant(pointer[2]) == 0,
++             "Single typed-root shape differs");
++        selector = U(m.constant(ua.back()) * 8);
++      }
++      U hit = i.block;
++      std::vector<const Ins *> incoming;
++      for (size_t n2 : indices) {
++        const auto &b = m.ins[n2];
++        if (b.op == OpBranchConditional && b.a[1] == hit)
++          incoming.push_back(&b);
++      }
++      need(incoming.size() == 1, "Hit lacks unique range condition");
++      const auto &both = m.args(incoming[0]->a[0], OpLogicalAnd);
++      const auto &lower = m.args(both.at(1), OpUGreaterThanEqual);
++      const auto &upper = m.args(both.at(2), OpULessThan);
++      need(lower == Words{2, h.parameter, delta[2]} && upper.size() == 3 &&
++               upper[0] == 2 && upper[1] == h.parameter,
++           "Hit range predicate differs");
++      U endpoint = upper[2], bound_endpoint = 0, zero_size = 0;
++      if (table) {
++        const auto &s = m.args(endpoint, OpSelect);
++        const auto &z = m.args(s.at(1), OpIEqual);
++        need(s.size() == 4 && s[0] == 23 && z.size() == 3 && z[0] == 2 &&
++                 m.constant(z[2]) == 0,
++             "Table zero-size select differs");
++        zero_size = z[1];
++        bound_endpoint = s[2];
++        endpoint = s[3];
++      }
++      const auto &minimum = m.args(endpoint, OpSelect);
++      const auto &compare = m.args(minimum.at(1), OpULessThan);
++      need(minimum.size() == 4 && minimum[0] == 23 &&
++               compare == Words{2, minimum[2], minimum[3]},
++           "Endpoint is not source min");
++      const U bound = minimum[2], native = minimum[3];
++      if (table)
++        need(bound_endpoint == bound, "Zero table does not use typed bound");
++      const auto &add = m.args(bound, OpIAdd);
++      need(add.size() == 3 && add[0] == 23 && add[1] == delta[2],
++           "Typed bound uses different base");
++      const auto &wide = m.args(add[2], OpUConvert);
++      const auto &shift = m.args(wide.at(1), OpShiftLeftLogical);
++      need(wide.size() == 2 && wide[0] == 23 && shift.size() == 3 &&
++               shift[0] == 7 &&
++               m.constant(shift[2]) == (h.width == 4 ? 2u : 4u),
++           "ArrayLength shift is not U32");
++      const auto &length = m.args(shift[1], OpArrayLength);
++      need(length.size() == 3 && length[0] == 7 && length[2] == 0,
++           "ArrayLength member/type differs");
++      if (table)
++        need(m.args(length[1], OpAccessChain) ==
++                 Words{m.args(length[1], OpAccessChain).at(0), variable,
++                       element},
++             "Table length element differs");
++      else
++        need(length[1] == variable, "Single length root differs");
++      const auto &na = m.args(native, OpIAdd);
++      need(na.size() == 3 && na[0] == 23 && na[1] == base[1],
++           "NVN end base differs");
++      const auto &size_wide = m.args(na[2], OpUConvert);
++      need(size_wide.size() == 2 && size_wide[0] == 23,
++           "NVN size extension differs");
++      U size32 = size_wide[1];
++      if (table) {
++        const auto &extract = m.args(size32, OpCompositeExtract);
++        need(extract.size() == 3 && extract[0] == 7 && extract[2] == 0 &&
++                 zero_size == size32,
++             "Table size component differs");
++        const auto &sl = m.args(extract[1], OpLoad);
++        const auto &sa = m.args(sl.at(1), OpAccessChain);
++        m.uniform(sa.at(1), 8);
++        const auto &word = m.args(sa.back(), OpIAdd);
++        need(sa[1] == ua[1] && word.size() == 3 && word[0] == 7 &&
++                 word[1] == ua.back() && m.constant(word[2]) == 1,
++             "Table size is not adjacent pair");
++      } else {
++        const auto &sl = m.args(size32, OpLoad);
++        const auto &sa = m.args(sl.at(1), OpAccessChain);
++        m.uniform(sa.at(1), 4);
++        need(sl[0] == 7 && m.binding(sa[1]) == 0 &&
++                 m.constant(sa.back()) * 4 == uint64_t(selector) + 8,
++             "Single size is not adjacent word");
++      }
++      h.roots.push_back({binding, variable, pointer[0], selector, table});
++    }
++    need(h.roots.size() == 6 && loops.size() == 1,
++         "Expected five singles and one table loop");
++    constexpr std::array<U, 6> expected{{192, 208, 256, 272, 352, 2176}};
++    for (size_t r = 0; r < 6; ++r)
++      need(h.roots[r].binding == r + 2 && h.roots[r].selector == expected[r] &&
++               h.roots[r].table == (r == 5),
++           "Root priority/selector classification differs");
++    h.miss = loops[0]->a[0];
++    need(m.def(h.miss).op == OpLabel && m.def(h.miss).function == h.function,
++         "Missing physical MISS merge");
++    h.miss_at = m.defs.at(h.miss);
++    need(h.miss_at > h.start && h.miss_at < h.end, "MISS merge outside helper");
++    need(std::none_of(m.ins.begin() + h.start, m.ins.begin() + h.miss_at,
++                      [](const Ins &x) { return x.op == OpConvertUToPtr; }),
++         "Physical operation precedes retained MISS suffix");
++    need(m.ins[h.start + 1].op == OpFunctionParameter &&
++             m.ins[h.start + 1].result == h.parameter &&
++             m.ins[h.start + 2].op == OpLabel &&
++             m.ins[h.start + 2].result == h.entry,
++         "Unexpected helper entry layout");
++    need(m.args(h.counter, OpVariable) == Words{110, 7},
++         "Table counter is not private U32");
++    std::vector<const Ins *> stores, tests;
++    for (size_t n : indices) {
++      const auto &x = m.ins[n];
++      if (x.op == OpStore && x.a[0] == h.counter)
++        stores.push_back(&x);
++      if (x.op == OpBranchConditional && x.a[2] == h.miss)
++        tests.push_back(&x);
++    }
++    need(stores.size() == 2 && m.constant(stores[0]->a[1]) == 0 &&
++             tests.size() == 1,
++         "Table initialization/exit differs");
++    const auto &increment = m.args(stores[1]->a[1], OpIAdd);
++    const auto &previous = m.args(increment[1], OpLoad);
++    need(increment[0] == 7 && m.constant(increment[2]) == 1 &&
++             previous == Words{7, h.counter} &&
++             stores[1]->block == loops[0]->a[1],
++         "Table counter lacks unit-progress continuation");
++    const auto &test = m.args(tests[0]->a[0], OpULessThan);
++    need(test[0] == 2 && m.args(test[1], OpLoad) == Words{7, h.counter} &&
++             m.constant(test[2]) == 3,
++         "Table counter bound differs");
++    helpers.push_back(h);
++  }
++  std::sort(helpers.begin(), helpers.end(),
++            [](const Helper &a, const Helper &b) { return a.width < b.width; });
++  need(helpers.size() == 2 && helpers[0].width == 4 && helpers[1].width == 16,
++       "Reviewed load-helper set differs");
++  for (size_t r = 0; r < 6; ++r)
++    need(helpers[0].roots[r].selector == helpers[1].roots[r].selector,
++         "Typed selector disagreement");
++  return helpers;
++}
++
++class Writer {
++  U next_;
++  std::map<U, U> constants_;
++
++public:
++  Words annotations, globals;
++  U variable = 0, wide_pointer = 0;
++  explicit Writer(U next) : next_(next) {}
++  U fresh() {
++    need(next_ < 1000000, "New ID bound exceeds reviewed capacity");
++    return next_++;
++  }
++  U bound() const { return next_; }
++  U constant(U value) {
++    auto p = constants_.find(value);
++    if (p != constants_.end())
++      return p->second;
++    U id = fresh();
++    constants_[value] = id;
++    append(globals, spv::OpConstant, {7, id, value});
++    return id;
++  }
++  void layout() {
++    using namespace spv;
++    const U row = fresh(), array = fresh(), block = fresh(), pointer = fresh();
++    variable = fresh();
++    wide_pointer = fresh();
++    append(globals, OpTypeStruct, {row, 23, 23, 23, 7, 7, 7, 7, 7, 7});
++    append(globals, OpTypeRuntimeArray, {array, row});
++    append(globals, OpTypeStruct, {block, 7, 7, 7, 7, array});
++    append(globals, OpTypePointer, {pointer, 12, block});
++    append(globals, OpTypePointer, {wide_pointer, 12, 23});
++    append(globals, OpVariable, {pointer, variable, 12});
++    append(annotations, OpDecorate, {array, 6, 48});
++    append(annotations, OpDecorate, {block, 2});
++    append(annotations, OpDecorate, {variable, 34, 0});
++    append(annotations, OpDecorate, {variable, 33, 12});
++    append(annotations, OpDecorate, {variable, 24});
++    const std::array<U, 9> offsets{{0, 8, 16, 24, 28, 32, 36, 40, 44}};
++    for (U i = 0; i < offsets.size(); ++i)
++      append(annotations, OpMemberDecorate, {row, i, 35, offsets[i]});
++    for (U i = 0; i < 5; ++i)
++      append(annotations, OpMemberDecorate, {block, i, 35, i * 4});
++  }
++  Words helper(const Module &m, const Helper &h) {
++    using namespace spv;
++    Words out;
++    auto raw = [&](size_t n) {
++      const auto &i = m.ins[n];
++      out.insert(out.end(), m.words.begin() + i.at,
++                 m.words.begin() + i.at + i.count);
++    };
++    raw(h.start);
++    raw(h.start + 1);
++    append(out, OpLabel, {h.entry});
++    auto op = [&](spv::Op code, Words a) {
++      const U id = fresh();
++      a.insert(a.begin() + 1, id);
++      append(out, code, a);
++      return id;
++    };
++    const U zero = constant(0), one = constant(1), lower = fresh(),
++            upper = fresh(), found = fresh();
++    for (U v : {lower, upper, found})
++      append(out, OpVariable, {110, v, 7});
++    auto header = [&](U index) {
++      const U p = op(OpAccessChain, {54, variable, constant(index)});
++      return op(OpLoad, {7, p});
++    };
++    const U width_index = h.width == 4 ? 0 : 1, count = header(width_index),
++            start = header(width_index + 2);
++    append(out, OpStore, {lower, zero});
++    append(out, OpStore, {upper, count});
++    append(out, OpStore, {found, constant(~U(0))});
++    const U loop = fresh(), check = fresh(), body = fresh(), left = fresh(),
++            right_test = fresh(), right = fresh(), hit = fresh(),
++            continuation = fresh(), done = fresh();
++    append(out, OpBranch, {loop});
++    append(out, OpLabel, {loop});
++    append(out, OpLoopMerge, {done, continuation, 2});
++    append(out, OpBranch, {check});
++    append(out, OpLabel, {check});
++    const U lo = op(OpLoad, {7, lower}), hi = op(OpLoad, {7, upper}),
++            active = op(OpULessThan, {2, lo, hi});
++    append(out, OpBranchConditional, {active, body, done});
++    append(out, OpLabel, {body});
++    const U distance = op(OpISub, {7, hi, lo}),
++            half = op(OpShiftRightLogical, {7, distance, one}),
++            middle = op(OpIAdd, {7, lo, half}),
++            row_index = op(OpIAdd, {7, start, middle});
++    auto field = [&](U index, U row, bool wide) {
++      const U p = op(OpAccessChain, {wide ? wide_pointer : 54, variable,
++                                     constant(4), row, constant(index)});
++      return op(OpLoad, {wide ? 23u : 7u, p});
++    };
++    const U low = field(0, row_index, true), high = field(1, row_index, true),
++            below = op(OpULessThan, {2, h.parameter, low}),
++            decide_merge = fresh();
++    append(out, OpSelectionMerge, {decide_merge, 0});
++    append(out, OpBranchConditional, {below, left, right_test});
++    append(out, OpLabel, {left});
++    append(out, OpStore, {upper, middle});
++    append(out, OpBranch, {decide_merge});
++    append(out, OpLabel, {right_test});
++    const U beyond = op(OpUGreaterThanEqual, {2, h.parameter, high}),
++            right_merge = fresh();
++    append(out, OpSelectionMerge, {right_merge, 0});
++    append(out, OpBranchConditional, {beyond, right, hit});
++    append(out, OpLabel, {right});
++    const U after = op(OpIAdd, {7, middle, one});
++    append(out, OpStore, {lower, after});
++    append(out, OpBranch, {right_merge});
++    append(out, OpLabel, {hit});
++    append(out, OpStore, {found, row_index});
++    append(out, OpBranch, {done});
++    append(out, OpLabel, {right_merge});
++    append(out, OpBranch, {decide_merge});
++    append(out, OpLabel, {decide_merge});
++    append(out, OpBranch, {continuation});
++    append(out, OpLabel, {continuation});
++    append(out, OpBranch, {loop});
++    append(out, OpLabel, {done});
++    const U chosen = op(OpLoad, {7, found}),
++            exists = op(OpINotEqual, {2, chosen, constant(~U(0))}),
++            route_block = fresh(), lookup_merge = fresh(),
++            route_merge = fresh();
++    append(out, OpSelectionMerge, {lookup_merge, 0});
++    append(out, OpBranchConditional, {exists, route_block, lookup_merge});
++    append(out, OpLabel, {route_block});
++    const U base = field(2, chosen, true), selected = field(6, chosen, false),
++            delta = op(OpISub, {23, h.parameter, base}),
++            truncated = op(OpUConvert, {7, delta}),
++            index = op(OpShiftRightLogical,
++                       {7, truncated, constant(h.width == 4 ? 2 : 4)});
++    std::array<U, 8> cases{};
++    for (U &c : cases)
++      c = fresh();
++    append(out, OpSelectionMerge, {route_merge, 0});
++    Words operands{selected, route_merge};
++    for (U i = 0; i < 8; ++i) {
++      operands.push_back(i);
++      operands.push_back(cases[i]);
++    }
++    append(out, OpSwitch, operands);
++    for (U i = 0; i < 8; ++i) {
++      const auto &root = h.roots[i < 5 ? i : 5];
++      append(out, OpLabel, {cases[i]});
++      Words a{root.pointer, root.variable};
++      if (i >= 5)
++        a.push_back(constant(i - 5));
++      a.push_back(zero);
++      a.push_back(index);
++      const U p = op(OpAccessChain, a), value = op(OpLoad, {h.type, p});
++      append(out, OpReturnValue, {value});
++    }
++    append(out, OpLabel, {route_merge});
++    append(out, OpBranch, {lookup_merge});
++    append(out, OpLabel, {lookup_merge});
++    append(out, OpBranch, {h.miss});
++    for (size_t n = h.miss_at; n < h.end; ++n)
++      raw(n);
++    return out;
++  }
++};
++
++struct Result {
++  Words words;
++  std::vector<Helper> helpers;
++};
++inline std::vector<uint8_t> bytes(const Words &w) {
++  std::vector<uint8_t> out;
++  out.reserve(w.size() * 4);
++  for (U x : w)
++    for (unsigned b = 0; b < 4; ++b)
++      out.push_back(uint8_t(x >> (8 * b)));
++  return out;
++}
++inline std::string digest(const Words &w) {
++  const auto data = bytes(w);
++  return mkwvk::oo_identity::hex(
++      mkwvk::oo_identity::sha256(data.data(), data.size()));
++}
++class Transformer {
++  static Result structural_write(const Words &words) {
++    const Module m(words);
++    const auto helpers = discover(m);
++    Writer w(m.defs.rbegin()->first + 1);
++    w.layout();
++    std::map<size_t, Words> replacements;
++    std::map<size_t, size_t> ends;
++    std::set<U> removed;
++    for (const auto &h : helpers) {
++      replacements[h.start] = w.helper(m, h);
++      ends[h.start] = h.end;
++      for (size_t n = h.start; n < h.miss_at; ++n) {
++        U id = m.ins[n].result;
++        if (id && id != h.function && id != h.parameter && id != h.entry)
++          removed.insert(id);
++      }
++    }
++    size_t annotation = m.ins.size(), global = m.ins.size();
++    for (size_t n = 0; n < m.ins.size(); ++n) {
++      if (annotation == m.ins.size() && m.ins[n].op >= spv::OpTypeVoid &&
++          m.ins[n].op <= spv::OpTypeForwardPointer)
++        annotation = n;
++      if (m.ins[n].op == spv::OpFunction) {
++        global = n;
++        break;
++      }
++    }
++    need(annotation < global, "Missing global insertion points");
++    Words output(words.begin(), words.begin() + 5);
++    output[3] = w.bound();
++    for (size_t n = 0; n < m.ins.size();) {
++      if (n == annotation)
++        output.insert(output.end(), w.annotations.begin(), w.annotations.end());
++      if (n == global)
++        output.insert(output.end(), w.globals.begin(), w.globals.end());
++      auto p = replacements.find(n);
++      if (p != replacements.end()) {
++        output.insert(output.end(), p->second.begin(), p->second.end());
++        n = ends.at(n);
++        continue;
++      }
++      const auto &i = m.ins[n];
++      bool escapes = false;
++      for (U id : references(i))
++        escapes |= removed.count(id) != 0;
++      if (escapes)
++        need(i.op == spv::OpName || i.op == spv::OpDecorate,
++             "Removed helper definition escapes prefix");
++      else if (i.op == spv::OpEntryPoint) {
++        auto a = i.full;
++        a.push_back(w.variable);
++        append(output, i.op, a);
++      } else
++        output.insert(output.end(), words.begin() + i.at,
++                      words.begin() + i.at + i.count);
++      ++n;
++    }
++    // Re-parse every emitted ID, framing and branch target before returning.
++    const Module candidate(output);
++    need(candidate.functions.size() == m.functions.size(),
++         "Function inventory changed");
++    for (const auto &f : m.functions) {
++      const auto h =
++          std::find_if(helpers.begin(), helpers.end(),
++                       [&](const Helper &x) { return x.function == f.first; });
++      Words old_words, new_words;
++      for (size_t n : f.second)
++        if (h == helpers.end() || n >= h->miss_at) {
++          const auto &i = m.ins[n];
++          old_words.insert(old_words.end(), words.begin() + i.at,
++                           words.begin() + i.at + i.count);
++        }
++      bool suffix = h == helpers.end();
++      for (size_t n : candidate.functions.at(f.first)) {
++        const auto &i = candidate.ins[n];
++        if (h != helpers.end() && i.op == spv::OpLabel && i.result == h->miss)
++          suffix = true;
++        if (suffix)
++          new_words.insert(new_words.end(), output.begin() + i.at,
++                           output.begin() + i.at + i.count);
++      }
++      need(old_words == new_words,
++           "Untouched function or physical MISS words changed");
++    }
++    return {std::move(output), helpers};
++  }
++
++public:
++  static Result target(const Words &w) {
++    need(w.size() >= 5 && w.size() <= 524288, "Unsupported original extent");
++    need(digest(w) == kOriginal, "Original target SHA-256 differs");
++    auto result = structural_write(w);
++    need(digest(result.words) == kNativeCandidate,
++         "Native candidate SHA-256 differs");
++    return result;
++  }
++#ifdef OPEN_OCARINA_INTERVAL_WRITER_TESTING
++  static Result fixture(const Words &w) { return structural_write(w); }
++#endif
++};
++inline Result write_target(const Words &w) { return Transformer::target(w); }
++#ifdef OPEN_OCARINA_INTERVAL_WRITER_TESTING
++inline Result write_authored_fixture(const Words &w) {
++  return Transformer::fixture(w);
++}
++#endif
++} // namespace open_ocarina::interval_spirv

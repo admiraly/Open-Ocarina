@@ -1,0 +1,186 @@
+{
+  "schema": "open-ocarina.mesh43-task-broadcast-participation/v1",
+  "observed_date": "2026-11-13",
+  "status": "conditional-structural-participation-proof-and-independent-CPU-fixtures-only",
+  "prominent_unclosed_live_gate": "No immutable owner/alias/order certificate exists for actual task inputs. Uniform addresses and shader-readonly loads do not prove lanes observe equal values while external/atomic writes may alias them. This family has known mesh device-atomic writes.",
+  "conditions": [
+    "Exact task source5e7d8f02e2dbd5ae1cd625d42366bc532dcdf7d71bb56ac3bc303b5e9655d086 with32original invocations.",
+    "Task descriptor values/ranges and all backing bytes used by the limit cone/read helper remain equal and stable across32lanes for the proof interval, with owner/alias/order evidence excluding external and atomic writers.",
+    "All source operations execute with defined memory/value behavior; finite control does not prove all memory accesses or inter-stage writes valid."
+  ],
+  "source_identity": {
+    "program": "43ec86f35fd937b9",
+    "variant": "bc2d248909cf8b40",
+    "stage": "TaskEXT",
+    "stage_index": 0,
+    "NVN_stage": 6,
+    "Vulkan_stage": 64,
+    "task_source_sha256": "5e7d8f02e2dbd5ae1cd625d42366bc532dcdf7d71bb56ac3bc303b5e9655d086",
+    "task_words": 21739,
+    "initial_audit_metadata": "research/mesh43-subgroup-participation-audit.json",
+    "initial_audit_sha256": "b7ec9990efee20d11de52df8afb573d4ef61a7cfa06923c716dd035ca65d5c5a",
+    "private_proof_sha256": "49ba3ab6c307d05eec3ac79fc756a5f78d3b090e44d5c2f7e4b373ceaa18de2f",
+    "source_assembly_sha256": "e3389748b42ae526e9efeb372f6750b74886be72be3578ae39e175e7c7dd8025"
+  },
+  "structural_proof": {
+    "schema": "open-ocarina.mesh43-task-broadcast-participation-private/v1",
+    "task_sha256": "5e7d8f02e2dbd5ae1cd625d42366bc532dcdf7d71bb56ac3bc303b5e9655d086",
+    "batch_block": "%1336",
+    "per_item_prefix_to_batch_blocks": 680,
+    "prefix_has_cycles_or_termination": false,
+    "uniform_limit_cone_instruction_count": 106,
+    "uniform_limit_roots": [
+      "%27",
+      "%46",
+      "%59",
+      "%66",
+      "%75"
+    ],
+    "uniform_limit_builtin_roots": {
+      "%27": "WorkgroupId"
+    },
+    "uniform_limit_helper_calls": [
+      "%1390",
+      "%1438",
+      "%1441"
+    ],
+    "helper_function": "%90",
+    "helper_is_readonly_except_function_local_counter": true,
+    "loop_iteration_recurrence": "t0=0; t_next=t+1",
+    "loop_input_limit": "U=(min(readonly_delta,256)-1) >>5; loop-invariant",
+    "break": "(t+1)>U; uniform",
+    "private_guard": "8192 initial; decrement once per uniform continuation; signed>=0, max8193bodyvisits",
+    "participation": "Under defined stable readonly external inputs and original32invocation execution, every dynamic batch has all32callers or entireworkgroup uniformlyskipsloop",
+    "mapping_proven": false,
+    "GPU_calls": false,
+    "uniform_outer_guard": "WorkgroupId.x<=4095; otherwise wholeworkgroup skipsloop",
+    "second_loop_entry_condition": "UnsignedU>=0 is tautologicallytrue",
+    "iteration_increment_no_wrap": "Atmost8193bodyvisits, t begins0, increments1; no u32wrap",
+    "all_main_calls_target_same_readonly_helper": true
+  },
+  "uniformity_derivation": {
+    "outer_guard": "WorkgroupId.x<=4095 is workgroup-uniform; false skips the entire loop for every lane.",
+    "second_entry_condition": "UnsignedU>=0 is tautologicallytrue.",
+    "loop_limit_cone": "106SSAdefinitions; roots onlyWorkgroupId and uniform-address external descriptor loads, with3readonly-helper calls. No subgroup-lane/local-ID/mask roots. Equal/stable loaded values are an external condition.",
+    "readonly_helper": "Function90 has bounded3-element descriptor walk and no external stores/atomics; Function-local counter writes only. Equal output requires equal immutable external bytes/ranges.",
+    "counter_induction": "t starts0; each continue sets t_next=t+1; U is loop-invariant. t+1>U is uniform and independent of per-item results or lane.",
+    "private_guard_induction": "Each invocation initializes8192; all take same post-batchcontinue, decrement once and apply same signed>=0 test. Atmost8193bodyvisits; t+1 cannot wrap.",
+    "divergent_per_item_region": "All680prefixblocks from block656 reconverge at batch1336; no main cycle/return/emission beforebatch. Calls target bounded readonly helper. Rejected-item lanes still reachbatch.",
+    "batch": "32fixed-source broadcasts0..31 of common u32 operand in block1336, all32callers per dynamicbatch under conditions. Operand values may vary per lane; full participation, not equal values, is required.",
+    "exit": "Uniform t-limit break or uniformPrivateguard break goes to common loopmerge; no additional per-lane exit identified."
+  },
+  "independent_fixture": {
+    "tool": "tools/task_broadcast_batch_fixture.py",
+    "tool_sha256": "fdcfafa7538d1edd21491ef00a201a24519285087fb64a37f7948cdbb533a110",
+    "tests": "tests/test_task_broadcast_batch_fixture.py",
+    "tests_sha256": "2cc3776d680e0a4ab051602537bab63aae96fb246fd5a8fd27f127c4d1a35614",
+    "private_report_sha256": "92bd8021ac4b0a67f066dcc6bbc79a147babcedbc1cf3de1f4af9bdce3f871d8",
+    "report": {
+      "schema": "open-ocarina.task-broadcast-batch-fixture/v1",
+      "prepare_only": true,
+      "GPU_calls": false,
+      "only_independently_authored_sources": true,
+      "tool_sha256": "fdcfafa7538d1edd21491ef00a201a24519285087fb64a37f7948cdbb533a110",
+      "artifacts": {
+        "native32": {
+          "assembly_sha256": "9ed0f19255f1d5aa5fd120b625f95adb740a49b0e2eaa7239bf9f169389d0d45",
+          "module_sha256": "e87b4938db885f8c0897f6d7ca87ee65c4fb3c7a14c4b17ccc3f0208a526c4e6",
+          "module_bytes": 3772,
+          "SPIRV_validation_passed": true
+        },
+        "shared32": {
+          "assembly_sha256": "57c832b0bda1a6ed625844db1a96ab898dd8fb2e178084936dfb63e1e694fac6",
+          "module_sha256": "b3a879dcf54adc2dc5de3c4b2ed4012fe524d7101cdc3ef4f215e06b631e2d26",
+          "module_bytes": 4140,
+          "SPIRV_validation_passed": true
+        }
+      },
+      "task_local_size": [
+        32,
+        1,
+        1
+      ],
+      "output_descriptor": {
+        "set": 0,
+        "binding": 0,
+        "type": "storage_buffer",
+        "bytes": 4096
+      },
+      "words_per_lane": 32,
+      "golden_formula": "row[lane][source] = 3 + 17*source",
+      "expected_sha256": "c180b72977336b00658e8861e6612685c56e6d5231b59cf7973dbd33de0a243b",
+      "control_barriers": 2,
+      "task_mesh_groups_emitted": [
+        0,
+        1,
+        1
+      ],
+      "native_required_width_for_future_test": 32,
+      "shared_future_widths": [
+        8,
+        16,
+        32
+      ],
+      "lane_mapping_condition": "Native required32 subgroup source-lane index must correspond to LocalInvocationId.x; physical TaskEXT mapping remains unproved",
+      "limits": {
+        "workgroups": 1,
+        "invocations": 32,
+        "broadcasts_per_native_invocation": 32,
+        "shared_bytes": 128,
+        "output_bytes": 4096,
+        "loops": 0,
+        "divergent_branches": 0
+      },
+      "claims": {
+        "runtime_execution_authorized": false,
+        "target_shader_lowering_emitted": false,
+        "TaskEXT_physical_lane_mapping_proven": false,
+        "shader_equivalence_proven": false,
+        "rendering_equivalence": false,
+        "FPS_gain": false
+      }
+    },
+    "compiled_properties": {
+      "native32": {
+        "ControlBarrier": 2,
+        "EmitMeshTasksEXT": 1,
+        "conditional_branches": 0,
+        "loops": 0,
+        "GroupNonUniformBroadcast": 32,
+        "fresh_disassembly_sha256": "0aa541de812a509bd605b35266a9b5723407b851ddb3db2fdea8cd699a64a3fe"
+      },
+      "shared32": {
+        "ControlBarrier": 2,
+        "EmitMeshTasksEXT": 1,
+        "conditional_branches": 0,
+        "loops": 0,
+        "GroupNonUniformBroadcast": 0,
+        "fresh_disassembly_sha256": "e4da0c6166b0ec1bc0918d0e4b3da35fc21e507b0ed8acd2fb5db0f05ccad999"
+      }
+    },
+    "golden_output_bytes": 4096,
+    "golden_output_sha256": "c180b72977336b00658e8861e6612685c56e6d5231b59cf7973dbd33de0a243b",
+    "inputs": "No external input descriptors, task payload, images, assets or game shader source. One fresh outputSSBO and128bytes workgroup scratch.",
+    "native_mapping_condition": "Native required32 source-lane index must equal LocalInvocationId.x for the stated CPU golden correspondence. Actual physical TaskEXT mapping is not established.",
+    "no_target_shader_transformation": true
+  },
+  "next_proofs": [
+    "Close actual task input owner/alias/order/immutability against known mesh atomic writers; same uniform addresses are insufficient.",
+    "Prove or independently diagnose physical TaskEXT original32 mapping on exact pinned Mesa/A770 configuration before target scratch indexing.",
+    "Only after source review and explicit GPU grant, test authoredTask fixture using separate bounded stage-correct executor; no helper or runtimeABI introduced here.",
+    "Whole43ec mesh lowering still requires active-mask scheduling, writable atomic/image/live-payload capture and full output/state comparisons."
+  ],
+  "claims": {
+    "conditional_structural_participation_supported": true,
+    "live_task_uniformity_proven": false,
+    "input_immutability_alias_order_certificate_available": false,
+    "TaskEXT_physical_mapping_proven": false,
+    "GPU_or_Vulkan_device_calls": false,
+    "actual43ec_shader_transformed": false,
+    "runtime_admission_expanded": false,
+    "general_race_freedom_proven": false,
+    "historical_draw_reproduced": false,
+    "rendering_equivalence": false,
+    "FPS_gain": false
+  }
+}

@@ -46,6 +46,10 @@ fixtures, while its rounding diagnostic changes negative zeros to positive zeros
 These establish isolated arithmetic and layout cases, without restoring an original network. The
 [CPU observer primitives](benchmark-observer.md) still need real producer adapters;
 they do not certify a benchmark.
+The [bounded native-record adapter](benchmark-replay-adapter.md) now decodes a
+reviewed direct-command subset and checks proposed present/completion events.
+Actual native event hooks, primary-camera association and complete workload
+coverage remain unimplemented.
 
 ## Implemented starting point
 
@@ -91,14 +95,26 @@ The current investigation uses an Intel Arc A770 on Linux and an existing Hooksh
 
 ## Next work
 
+The [conditional TaskEXT participation proof](../research/mesh43-task-broadcast-participation.md)
+identifies a possible broadcast-batch extension. Live input immutability against
+atomic writers and physical task-stage mapping remain unproved. A
+[pinned full-frame capture-tool assessment](../research/vulkan-frame-capture-feasibility.md)
+also identifies imported-host writes and device-address replay as unresolved gates
+before using a general Vulkan trace for controlled whole-frame comparisons.
+
 The [typed descriptor-array executor](descriptor-array-runtime.md) now passes
 all four synthetic value/pointer and follow-stores configurations, including
 changed writes, shared buffer aliases and complete allocation guards. The
 [actual compute interval prototype](../research/compute-interval-lowering.md)
-preserves typed storage-buffer hits and the original physical miss instructions;
-its complete frozen-input root partition is checked on the CPU. It has not yet
-been compiled or dispatched. The [live selector audit](../research/live-selector-inputs.md)
+preserves typed storage-buffer hits and the original physical miss instructions.
+Its [owned replay](compute-interval-replay.md) now matches two original runs
+across all 59 complete buffers and the guarded record at actual width 32.
+Compiler statistics are mixed; measured execution time remains unknown.
+The [live selector audit](../research/live-selector-inputs.md)
 identifies the owned upload and final descriptor generation needed for integration.
+A [native C++ writer](compute-interval-native-writer.md) now emits the same
+candidate instruction words, retaining distinct generator provenance. That CPU
+component still needs live extraction, record binding and device integration.
 
 Follow [the Arc-first decision](strategy.md) and the exit tests in [the roadmap](roadmap.md). Prioritize complete shader capture and contract validation, using targeted CPU reconstruction where it resolves an unknown. Keep private analysis outputs local and publish enough metadata to reproduce the procedure.
 

@@ -1,0 +1,78 @@
+{
+  "schema": "open-ocarina.compute-interval-native-writer-observation/v1",
+  "status": "CPU-only structural native writer; no renderer integration or execution admission",
+  "source": {
+    "patch": "patches/hookshot/compute-interval-native-writer.patch",
+    "patch_sha256": "c907f5a671a2f66f95448e49dfac4d803e32a34135dd591b1c1899fdb7a0beb8",
+    "added_file": "gpu/vk/compute_interval_spirv_writer.h",
+    "added_file_sha256": "831d964341723adec64e27fa4cd74f4357ae4f82e8c8d78df1a591b032ed8d09",
+    "tests": "tests/test_compute_interval_native_writer.py",
+    "tests_sha256": "bb1afbb3dac7e49de37417581143d7363b0c60d009e5bcae1843ccf08d98ae5a",
+    "license": "GPL-3.0-or-later",
+    "language": "C++17"
+  },
+  "dependencies": {
+    "identity_patch_sha256": "2f14873edfdb47b1f915e75bc4bbe6683ef6632bc66fcbfa1d918aa1c176f018",
+    "identity_header_sha256": "70cf662ba8300be8612be3ae75459dacb638d83d4cc600675985a92bf60476e4",
+    "spirv_headers_sha256": "2d117943804fa4e2b9e902d18b115ce8496c8608114cdb54a5110ddb95fe1191",
+    "new_crypto_implementation": false
+  },
+  "target": {
+    "program": "cc62764061c44f6a",
+    "variant": "095931037888515a",
+    "original_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+    "native_candidate_sha256": "4c0b19efdac3bb721636a9ce1bbeeba83b09b557cf722df10526d76246041629",
+    "native_candidate_bytes": 256432,
+    "frozen_python_candidate_sha256": "d5148342b4517882b25a48e63700cbfb8695454cc05d131da718509ac2563dc0",
+    "canonical_match": "Every instruction word and numeric ID identical; normalize only generator provenance",
+    "generator": {"native": 0, "frozen_python": 458752},
+    "id_bound": {"original": 11181, "candidate": 11330},
+    "native_production_api_checks_input_and_output_sha256": true,
+    "unchanged_record_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770"
+  },
+  "preservation": {
+    "original_function_count": 7,
+    "modified_load_helpers": [107, 850],
+    "unchanged_function_ids": [332, 491, 691, 1050, 1209],
+    "unchanged_miss_suffix_words_per_width": {"4": 166, "16": 166},
+    "original_globals_unchanged_except_appended_entry_interface": true,
+    "new_readonly_record_binding": 12,
+    "new_push_bytes": 0,
+    "new_device_features": [],
+    "physical_miss_and_follow_store_policy_changed": false
+  },
+  "cpu_validation": {
+    "gcc": "16.2.1",
+    "clang_ubsan": "22.1.8",
+    "spirv_tools": "v2026.1",
+    "gcc_production_binary_sha256": "616422c90fd3be1ead2be3a9cdc526c3942ee34d2046d532701a90585510f9e2",
+    "clang_ubsan_production_binary_sha256": "114981f36c0861a54d856f13c5a835bf2b550ead8588258fea204b9d1d3cad7a",
+    "clang_ubsan_fixture_binary_sha256": "2fc6f4cd4775acd79998824cf1169fcd04ec8dccd63e346cde2ae9911e16148b",
+    "test_transport_sha256": "d8d5721763b321871bdab8a5b6088cc6c0ff1425de6ef352e82c20c32b40184e",
+    "new_tests": 11,
+    "ubsan_tests": 11,
+    "ubsan_failures": 0,
+    "sha_padding_multiblock_cases": 18,
+    "actual_target_spirv_val_passed": true,
+    "authored_original_and_candidate_spirv_val_passed": true,
+    "authored_native_python_instruction_equality": true,
+    "authored_api_absent_in_default_production_build": true,
+    "patch_check_and_fresh_apply_passed": true,
+    "full_suite_tests": 779,
+    "full_suite_optional_skips": 5,
+    "full_suite_passed": true
+  },
+  "limits": [
+    "Supported production source and native result are exact hash-pinned modules",
+    "Opcode/dataflow inspection is a bounded structural decoder; independent SPIR-V type/dominance validation remains required evidence",
+    "No embedded original or candidate shader instruction arrays",
+    "No live selector/descriptor producer, record binding, renderer source/build mutation or pipeline policy admission",
+    "CPU writer equality and validation do not establish shader runtime performance, whole-shader equivalence, or historical capture atomicity"
+  ],
+  "gpu_calls": false,
+  "gpu_pipeline_compiled": false,
+  "gpu_executed": false,
+  "vendor_source_changed": false,
+  "production_feature_enabled": false,
+  "execution_admitted": false
+}
