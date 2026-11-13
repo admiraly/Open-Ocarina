@@ -1,0 +1,78 @@
+{
+  "schema": "open-ocarina.grok-mirror-plan-cpu-observation/v2",
+  "scope": "Authored source and CPU validation only; default-off renderer optimization, no runtime or FPS acceptance",
+  "base_source_tree": "58ca709617448e06af382c3443dd88dac3ffcb8e",
+  "original_memory_cpp_sha256": "798c732c88ac9413cb762c5aa32d814c76774527600123da3cf13bde2f9f9ec7",
+  "files": {
+    "patches/hookshot/grok-memory-mirror-plan.patch": "1e29ade29028e5577152261937d1636785eb69f5cd0673e0d6694aa8c009e200",
+    "src/probes/grok_memory_mirror_plan.h": "3b8af0db2176f3200475715eac832e752a2380e6c8bace3658316a15548211d3",
+    "tests/test_grok_memory_mirror_plan.py": "9edaebe5645f80d69099efc63e4df73789bfabf2e3264e5a0c3bb38acf53aee7"
+  },
+  "fixes": {
+    "defaultoff_control": "RX_VK_GROK_MIRROR_PLAN=1",
+    "notes": "Atomic fixed per-region words, release OR before release chunk/region stamps; generation acquired before note snapshot; no lazy pointer publication",
+    "region_generation": "All actual source reads/writes use atomic_ref acquire/release",
+    "generation_wrap": "A noted retained capture matching the current full-region generation is classified even when its chunk is lower",
+    "page_counts": "Count absolute guest pages across clipped merged intervals"
+  },
+  "tests": {
+    "focused": 14,
+    "independent_source_operation_steps": 4000,
+    "copy_order_slots_extents_and_bytes_match_page_walk": true,
+    "wrapped_capture_regression": true,
+    "concurrent_atomic_notes_and_release_acquire_handoff": true,
+    "clipped_counter_regression": true,
+    "protected_and_gpu_page_paths": "Keep original walker",
+    "fallback": "No partial plan published before fallback"
+  },
+  "build": {
+    "compiler": "Clang22.1.8",
+    "flags": [
+      "-std=c++20",
+      "-O2",
+      "-g0",
+      "-DNDEBUG",
+      "-march=x86-64-v3",
+      "-ffp-contract=off",
+      "-fPIC",
+      "VK_NO_PROTOTYPES",
+      "MKWVK_BUILDING",
+      "HOOKSHOT_RELEASE",
+      "MKWVK_INCLUDES=2"
+    ],
+    "actual_memory_TU_compile": true,
+    "source_sha256": "bbca03ef9e0cc29002ba3af75139e5db0b3ded1eb1c73f1f8b500d7b921e7c3b",
+    "header_sha256": "3b8af0db2176f3200475715eac832e752a2380e6c8bace3658316a15548211d3",
+    "optimized_link": true,
+    "linked_objects": 207,
+    "other_object_rebuilds": false,
+    "includes_replay_patch_sha256": "4e75658e02dd6f6e96722386b7d7d44f26085920ce4332ce56afbafc6d5fe224",
+    "linked_binary_sha256": "3daf50221cfc2a33065e725e0c4de5b3731724525b9c384797cda1ea0bfecb55",
+    "all_objects_unchanged_after": true,
+    "private_receipt_sha256": "60e0838543cf63ec9e20749adfa8f621cc587955f2895bedf792f56e232826bf",
+    "library_loaded": false,
+    "compiled_memory_patch_sha256": "5170b4fa81174e453375bfbab2e394f0b2e897e03e3c426ff91f7c0fb5b1c72d"
+  },
+  "storage": {
+    "enabled_note_bytes": 16777216,
+    "allocated_only_when_enabled": true,
+    "notes_cleared_or_evicted": false
+  },
+  "limits": [
+    "No GPU/device/game run or image/output equivalence has been performed on this binary",
+    "Existing gen_now and chunk-lifetime synchronization assumptions remain renderer preconditions; this is not a general race-freedom proof",
+    "Concurrent note probe is not a thread-sanitizer proof",
+    "Dense regions can retain 512 note/chunk visits and extra cap checks; performance is unmeasured",
+    "Generation wrap retains old numeric-generation semantics rather than fixing the original renderer recycling policy",
+    "New and inherited pool paths, protection, GPU-page diagnostics and workload are preserved; only mirror_sync planning is changed"
+  ],
+  "runtime_admitted": false,
+  "native_quality_or_60_FPS_accepted": false,
+  "gpu_calls": false,
+  "publication_patch_normalization": {
+    "empty_context_lines_only": true,
+    "zero_fuzz_reapply_source_and_header_hashes_match_compiled": true,
+    "compiled_replay_patch_sha256": "4e75658e02dd6f6e96722386b7d7d44f26085920ce4332ce56afbafc6d5fe224",
+    "published_replay_patch_sha256": "5dc00bd452adb7a4f91b9fa843bd35a8e1be00e9056a096fccc5bbeda77013aa"
+  }
+}

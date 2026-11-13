@@ -1,0 +1,352 @@
+diff --git a/gpu/vk/grok_memory_mirror_plan.h b/gpu/vk/grok_memory_mirror_plan.h
+new file mode 100644
+--- /dev/null
++++ b/gpu/vk/grok_memory_mirror_plan.h
+@@ -0,0 +1,181 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Mirror-sync interval planner. The copies match a page-by-page walk: a capture
++// whose generation is still the page generation stays on that slot, a protected
++// page is omitted, and every other dirty page is copied from guest memory.
++// A CPU stamp of a whole 2 MB region becomes one live run. Sparse stamps visit
++// only pages that stamp_page has noted. Missing notes fall back to the scan.
++// Live gaps are not examined for protection or captures. Callers may use them
++// only when protection and GPU-page tracking are off, and only for pages whose
++// own chunk generation is below the region stamp. Every capture page must have
++// a note. Noted pages are classified even if a wrapped chunk is below that stamp.
++#pragma once
++
++#include <atomic>
++#include <stddef.h>
++#include <stdint.h>
++#include <vector>
++
++namespace open_ocarina {
++namespace grok_memory {
++
++enum GrokCopyKind { kGrokLive = 0, kGrokCapture = 1 };
++
++struct GrokCopy {
++    int kind;
++    uint32_t buffer;
++    uint64_t dst;
++    uint64_t src;
++    uint64_t size;
++};
++
++struct GrokCap {
++    int kept;
++    uint32_t gen;
++    uint32_t slot;
++    uint32_t buffer;
++};
++
++enum GrokPlan { kGrokEmpty = 0, kGrokPlanned = 1, kGrokFallback = 2 };
++
++inline void grok_append_copy(std::vector<GrokCopy>& out, const GrokCopy& next) {
++    if (!next.size) return;
++    if (!out.empty()) {
++        GrokCopy& last = out.back();
++        const int adjacent = last.dst + last.size == next.dst && last.size <= ~uint64_t(0) - next.size;
++        const int live = next.kind == kGrokLive && last.kind == kGrokLive;
++        const int same_capture = next.kind == kGrokCapture && last.kind == kGrokCapture &&
++                                 next.buffer == last.buffer && last.src + last.size == next.src;
++        if (adjacent && (live || same_capture)) {
++            last.size += next.size;
++            return;
++        }
++    }
++    out.push_back(next);
++}
++
++inline uint32_t grok_page_generation(uint32_t chunk_gen, uint32_t region_full) {
++    return chunk_gen > region_full ? chunk_gen : region_full;
++}
++
++inline GrokCopy grok_page_copy(uint64_t pool_lo, uint64_t pool_hi, uint64_t page, uint32_t page_gen,
++                               uint32_t synced, int sync_live, int protect, GrokCap cap) {
++    GrokCopy c{};
++    if (protect || page_gen <= synced) return c;
++    const uint64_t start = page << 12;
++    const uint64_t ga = start < pool_lo ? pool_lo : start;
++    const uint64_t gb = start + 4096 < pool_hi ? start + 4096 : pool_hi;
++    if (gb <= ga) return c;
++    if (!sync_live && cap.kept && cap.gen && cap.gen == page_gen) {
++        c.kind = kGrokCapture;
++        c.buffer = cap.buffer;
++        c.dst = ga - pool_lo;
++        c.src = (uint64_t)cap.slot * 4096u + (ga - start);
++        c.size = gb - ga;
++        return c;
++    }
++    c.kind = kGrokLive;
++    c.dst = ga - pool_lo;
++    c.src = c.dst;
++    c.size = gb - ga;
++    return c;
++}
++
++// Fixed region storage avoids racing lazy ownership/publication. Publish the
++// note before the corresponding release-store of region generation; a planner
++// first acquires that generation, then snapshots these words.
++struct GrokRegionNotes {
++    std::atomic<uint64_t> words[8]{};
++    void note(uint64_t page) {
++        const unsigned local = unsigned(page & 511u);
++        words[local >> 6].fetch_or(1ull << (local & 63u), std::memory_order_release);
++    }
++    void snapshot(uint64_t (&bits)[8]) const {
++        for (unsigned i=0;i<8;++i) bits[i]=words[i].load(std::memory_order_acquire);
++    }
++};
++
++inline uint64_t grok_copy_pages(uint64_t pool_lo, uint64_t dst, uint64_t size) {
++    if (!size) return 0;
++    const uint64_t begin=pool_lo+dst, last=begin+size-1;
++    return (last >> 12)-(begin >> 12)+1;
++}
++
++inline void grok_note_page(uint64_t* bits, uint64_t page) {
++    const unsigned local = (unsigned)(page & 511u);
++    bits[local >> 6] |= 1ull << (local & 63u);
++}
++
++// bits is eight words for this region, or null when no page in it was noted.
++// A null bitset with full > synced is a pure region stamp. A null bitset with
++// only a raised region generation cannot name the dirty pages, so the caller
++// scans. chunk_gen(page) is the page's own stamp, not maxed with region_full.
++template <class ChunkGen, class CapFn, class ProtectFn>
++GrokPlan grok_plan_region(uint64_t pool_lo, uint64_t pool_hi, uint64_t page0, uint64_t page1,
++                          uint32_t synced, uint32_t region_gen, uint32_t full, const uint64_t* bits,
++                          int sync_live, ChunkGen chunk_gen, CapFn cap_fn, ProtectFn protect_fn,
++                          std::vector<GrokCopy>& out) {
++    if (page0 >= page1 || region_gen <= synced) return kGrokEmpty;
++    if (!(full > synced) && !bits) return kGrokFallback;
++
++    auto emit_page = [&](uint64_t page, uint32_t page_gen) {
++        grok_append_copy(out, grok_page_copy(pool_lo, pool_hi, page, page_gen, synced, sync_live,
++                                              protect_fn(page) ? 1 : 0, cap_fn(page)));
++    };
++    auto emit_live_gap = [&](uint64_t from, uint64_t to) {
++        if (from >= to) return;
++        const uint64_t start = from << 12;
++        const uint64_t stop = to << 12;
++        const uint64_t ga = start < pool_lo ? pool_lo : start;
++        const uint64_t gb = stop < pool_hi ? stop : pool_hi;
++        if (gb <= ga) return;
++        GrokCopy c{};
++        c.kind = kGrokLive;
++        c.dst = ga - pool_lo;
++        c.src = c.dst;
++        c.size = gb - ga;
++        grok_append_copy(out, c);
++    };
++
++    if (full > synced) {
++        uint64_t cursor = page0;
++        if (bits) {
++            for (unsigned word = 0; word < 8; ++word) {
++                uint64_t mask = bits[word];
++                while (mask) {
++                    const unsigned bit = (unsigned)__builtin_ctzll(mask);
++                    mask &= mask - 1;
++                    const uint64_t page = (page0 & ~uint64_t(511)) + (uint64_t)word * 64u + bit;
++                    if (page < page0 || page >= page1) continue;
++                    const uint32_t chunk = chunk_gen(page);
++                    // A uint32 generation can wrap. A retained capture may
++                    // then equal full despite a smaller chunk. Its old note
++                    // remains set, so classify it rather than assuming stale.
++                    if (chunk < full) {
++                        const GrokCap cap=cap_fn(page);
++                        if (sync_live || !cap.kept || !cap.gen || cap.gen!=full) continue;
++                    }
++                    emit_live_gap(cursor, page);
++                    emit_page(page, grok_page_generation(chunk, full));
++                    cursor = page + 1;
++                }
++            }
++        }
++        emit_live_gap(cursor, page1);
++        return kGrokPlanned;
++    }
++
++    for (unsigned word = 0; word < 8; ++word) {
++        uint64_t mask = bits[word];
++        while (mask) {
++            const unsigned bit = (unsigned)__builtin_ctzll(mask);
++            mask &= mask - 1;
++            const uint64_t page = (page0 & ~uint64_t(511)) + (uint64_t)word * 64u + bit;
++            if (page < page0 || page >= page1) continue;
++            emit_page(page, grok_page_generation(chunk_gen(page), full));
++        }
++    }
++    return kGrokPlanned;
++}
++
++} // namespace grok_memory
++} // namespace open_ocarina
+diff --git a/gpu/vk/vk_memory.cpp b/gpu/vk/vk_memory.cpp
+--- a/gpu/vk/vk_memory.cpp
++++ b/gpu/vk/vk_memory.cpp
+@@ -27,6 +27,7 @@
+ #include <windows.h>
+
+ #include "vk_internal.h"
++#include "grok_memory_mirror_plan.h"
+ #include "page_table_capture.h"
+ #include "binding_provenance.h"
+ #include "image_capture.h"
+@@ -828,6 +829,14 @@
+ // (and the generation every page of a region was written at, at least: a large stamp (a storage buffer a dispatch may
+ // write, hundreds of MB) marks whole regions, not 512 pages each; it took dispatches 8-150 ms)
+ std::vector<uint32_t> region_full(kPages / kRegionPages);
++bool grok_mirror_plan_on() {
++    static const bool enabled=env_on("RX_VK_GROK_MIRROR_PLAN");
++    return enabled;
++}
++auto& grok_region_notes() {
++    static std::vector<open_ocarina::grok_memory::GrokRegionNotes> notes(kPages / kRegionPages);
++    return notes;
++}
+ inline uint32_t load_u32(uint32_t& x) {
+     return std::atomic_ref<uint32_t>(x).load(std::memory_order_acquire);
+ }
+@@ -848,8 +857,9 @@
+         c.reset(new uint32_t[kChunkPages]);
+         std::fill(c.get(), c.get() + kChunkPages, 0u);
+     }
++    if (grok_mirror_plan_on()) grok_region_notes()[p / kRegionPages].note(p);
+     store_u32(c[p % kChunkPages], g);
+-    region_gen[p / kRegionPages] = g;
++    store_u32(region_gen[p / kRegionPages], g);
+ }
+ } // namespace
+
+@@ -894,7 +904,7 @@
+     if (!size) return false;
+     const uint64_t p0 = guest >> kPageShift, p1 = std::min((guest + size - 1) >> kPageShift, kPages - 1);
+     for (uint64_t r = p0 / kRegionPages; r <= p1 / kRegionPages; r++) {
+-        if (region_gen[r] <= gen) continue;
++        if (load_u32(region_gen[r]) <= gen) continue;
+         if (load_u32(region_full[r]) > gen) return true;
+         const uint64_t a = std::max(p0, r * kRegionPages), b = std::min(p1, r * kRegionPages + kRegionPages - 1);
+         for (uint64_t p = a; p <= b; p++)
+@@ -906,7 +916,7 @@
+     if (!size) return;
+     const uint64_t p0 = guest >> kPageShift, p1 = std::min((guest + size - 1) >> kPageShift, kPages - 1);
+     for (uint64_t r = p0 / kRegionPages; r <= p1 / kRegionPages; r++) {
+-        if (region_gen[r] <= gen) continue;
++        if (load_u32(region_gen[r]) <= gen) continue;
+         const uint64_t a = std::max(p0, r * kRegionPages), b = std::min(p1, r * kRegionPages + kRegionPages - 1);
+         for (uint64_t p = a; p <= b; p++) {
+             if (page_gen(p) <= gen) continue;
+@@ -990,7 +1000,7 @@
+     for (uint64_t p = p0; p <= p1;) {
+         if (p % kRegionPages == 0 && p + kRegionPages - 1 <= p1) {   // (a whole region)
+             store_u32(region_full[p / kRegionPages], g);
+-            region_gen[p / kRegionPages] = g;
++            store_u32(region_gen[p / kRegionPages], g);
+             p += kRegionPages;
+             continue;
+         }
+@@ -2815,6 +2825,80 @@
+     runs.push_back(next);
+ }
+
++
++uint32_t grok_chunk_gen(uint64_t page) {
++    const auto& chunk = gen_chunks[page / kChunkPages];
++    return chunk ? load_u32(chunk[page % kChunkPages]) : 0u;
++}
++
++// Sparse dirty pages, or one live run for a whole-region CPU stamp. A missing
++// note falls back to the page walk below, which stays the path when protection
++// or GPU-page tracking is on. Copies, capture slots and write notes match that walk.
++bool grok_mirror_plan(Pool& p, bool note_writes, std::vector<VkBufferCopy>& runs,
++                      std::map<VkBuffer, std::vector<VkBufferCopy>>& cap_runs) {
++    using open_ocarina::grok_memory::GrokCap;
++    using open_ocarina::grok_memory::GrokCopy;
++    using open_ocarina::grok_memory::GrokPlan;
++    using open_ocarina::grok_memory::kGrokCapture;
++    using open_ocarina::grok_memory::kGrokFallback;
++    std::vector<GrokCopy> planned;
++    struct Held { VkBuffer buffer; uint32_t gen; };
++    std::vector<Held> held;
++    const uint64_t begin = p.lo >> kPageShift;
++    const uint64_t end = (p.hi + 4095) >> kPageShift;
++    const int live = sync_live() ? 1 : 0;
++    for (uint64_t page = begin; page < end;) {
++        const uint64_t region = page / kRegionPages;
++        const uint64_t next = std::min(end, (region + 1) * kRegionPages);
++        const uint32_t generation = load_u32(region_gen[region]);
++        const uint32_t full = load_u32(region_full[region]);
++        uint64_t bits[8];
++        grok_region_notes()[region].snapshot(bits);
++        auto cap_of = [&](uint64_t pg) {
++            GrokCap cap{};
++            if (live) return cap;
++            const CapEntry entry = cap_entry(pg);
++            if (!entry.gen) return cap;
++            auto found = cap_bufs.find(entry.gen);
++            if (found == cap_bufs.end()) return cap;
++            uint32_t id = 0;
++            for (; id < held.size(); ++id)
++                if (held[id].gen == entry.gen) break;
++            if (id == held.size()) held.push_back({found->second.buffer, entry.gen});
++            cap.kept = 1;
++            cap.gen = entry.gen;
++            cap.slot = entry.slot;
++            cap.buffer = id;
++            return cap;
++        };
++        const GrokPlan plan = open_ocarina::grok_memory::grok_plan_region(
++            p.lo, p.hi, page, next, p.synced_gen, generation, full, bits, live, grok_chunk_gen, cap_of,
++            [](uint64_t) { return 0; }, planned);
++        if (plan == kGrokFallback) return false;
++        page = next;
++    }
++    for (const GrokCopy& copy : planned) {
++        const uint64_t pages = open_ocarina::grok_memory::grok_copy_pages(p.lo, copy.dst, copy.size);
++        if (copy.kind == kGrokCapture) {
++            const Held& h = held[copy.buffer];
++            append_capture_copy(cap_runs[h.buffer], {copy.src, copy.dst, copy.size});
++            auto found = cap_bufs.find(h.gen);
++            if (found != cap_bufs.end()) found->second.last_use = std::max(found->second.last_use, cur_cap_value);
++            (h.gen == cur_cap_gen ? st_sync_cap_pages : st_sync_old_pages) += (int64_t)pages;
++        } else {
++            runs.push_back({copy.dst, copy.dst, copy.size});
++            st_sync_live_pages += (int64_t)pages;
++            live_by_pool[p.lo] += (int64_t)pages;
++        }
++        if (note_writes) {
++            const uint64_t stop = p.lo + copy.dst + copy.size;
++            for (uint64_t at = p.lo + copy.dst; at < stop; at = ((at >> kPageShift) + 1) << kPageShift)
++                memory_note_cpu_access(at & ~uint64_t(4095), 1ull << kPageShift, true);
++        }
++    }
++    return true;
++}
++
+ /// The pages of the pool the CPU wrote since its mirror's sync, copied in (the upload command buffer)
+ void mirror_sync(Pool& p) {
+     p.synced_epoch = mirror_epoch;
+@@ -2825,8 +2909,9 @@
+     uint64_t run_lo = 0, run_hi = 0;
+     const uint64_t end_page = (p.hi + 4095) >> kPageShift;
+     const bool note_writes = memory_wb_followed(p.lo, p.hi);   // (wb_learn.h: once a pool, not a page)
+-    for (uint64_t page = p.lo >> kPageShift; page < end_page;) {
+-        if (region_gen[page / kRegionPages] <= p.synced_gen) {   // (a clean 2 MB region, or its rest when the pool starts in it)
++    const bool grok_planned = grok_mirror_plan_on() && !protect_bare_on() && !gpu_pages_on() && grok_mirror_plan(p, note_writes, runs, cap_runs);
++    for (uint64_t page = p.lo >> kPageShift; !grok_planned && page < end_page;) {
++        if (load_u32(region_gen[page / kRegionPages]) <= p.synced_gen) {   // (a clean 2 MB region, or its rest when the pool starts in it)
+             page = std::min(end_page, (page / kRegionPages + 1) * kRegionPages);
+             continue;
+         }
+@@ -3916,7 +4001,7 @@
+                     parts.push_back({a - r.lo, a - p->lo, b - a});
+                 else
+                     from_guest = mirror_inherit::runs(a, b, r.lo, p->lo, kPageShift, kRegionPages,
+-                                                      [&](uint64_t region) { return region_gen[region] <= synced; },
++                                                      [&](uint64_t region) { return load_u32(region_gen[region]) <= synced; },
+                                                       [&](uint64_t page) {
+                                                           return page_gen(page) <= synced ||
+                                                                  (protect_bare_on() && prot_page_since(page, synced));

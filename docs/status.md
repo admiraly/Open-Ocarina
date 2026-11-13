@@ -78,6 +78,14 @@ reviewed direct-command subset and checks proposed present/completion events.
 Actual native event hooks, primary-camera association and complete workload
 coverage remain unimplemented.
 
+Two default-off CPU candidates now have real optimized source builds:
+[narrow vertex binding and full-push elision](grok-replay-vertex-bind.md), and
+a [mirror-copy planner](grok-memory-mirror-plan.md). The planner preserves
+retained capture slots and repairs atomic note publication, clipped page
+counts and generation-wrap behavior. Source-backed tests and a separate
+page-walk oracle pass. Neither candidate has been enabled in a game run,
+so no rendering or gameplay performance gain is accepted.
+
 ## Implemented starting point
 
 - Module inventory reads NSO header metadata and computes SHA-256 hashes without exporting executable bytes.

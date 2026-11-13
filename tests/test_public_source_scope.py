@@ -20,6 +20,21 @@ class SourceScopeTests(unittest.TestCase):
         self.assertTrue(audit("tools/arbitrary_blob.c", b"int main(void) { return 0; }"))
         self.assertTrue(audit("src/probes/leaf.c", b"\x00\x01"))
 
+    def test_reviewed_replay_sources_are_exact_path_allowances(self):
+        source=b"// Independently authored CPU fixture\n"
+        names=("src/probes/grok_memory_mirror_plan.h",
+               "tests/grok_replay_vertex_bind_harness.cpp")
+        for name in names:
+            self.assertEqual(audit(name,source),[])
+            self.assertIn("symlink",audit(name,source,symlink=True))
+            self.assertIn("large or binary content",audit(name,source+b"\0"))
+            self.assertIn("credential-like content",audit(name,b"ghp_"+b"x"*24))
+        for other in ("src/probes/other.h", "src/probes/grok_memory_mirror_plan.hpp",
+                      "imports/grok_memory_mirror_plan.h", "tests/other.cpp",
+                      "imports/grok_replay_vertex_bind_harness.cpp",
+                      "tests/subdir/grok_replay_vertex_bind_harness.cpp"):
+            self.assertIn("unapproved artifact path/type",audit(other,source))
+
     def test_reviewed_interval_header_is_an_exact_path_allowance(self):
         source = b"// Authored C++ record builder\n#pragma once\n"
         names = ("src/probes/compute_interval_records.h", "src/probes/compute_selector_extract.h")

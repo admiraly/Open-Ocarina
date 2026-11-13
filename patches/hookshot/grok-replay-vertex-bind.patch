@@ -1,0 +1,298 @@
+diff --git a/gpu/vk/grok-replay-bind.h b/gpu/vk/grok-replay-bind.h
+new file mode 100644
+--- /dev/null
++++ b/gpu/vk/grok-replay-bind.h
+@@ -0,0 +1,127 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Independently authored Open-Ocarina replay helper. No game code.
++//
++// Serial command-buffer state for the draw hot path. Both switches are opt-in
++// and default off (unset or "0" disables, "1" enables):
++//   RX_VK_GROK_REPLAY_BIND  dirty vertex ranges, at most 3 runs, else one
++//                           vkCmdBindVertexBuffers2 of all 16 slots
++//   RX_VK_GROK_REPLAY_PUSH  skip vkCmdPushConstants only for an unchanged
++//                           full-range payload on the same command buffer,
++//                           pipeline-layout handle and stage mask
++//
++// Push-constant compatibility is by layout handle, stage mask and the full
++// byte range. A different layout, a different stage mask, a subrange update
++// (mesh firsts, clears, compute helpers) or a new recording makes the cached
++// full payload unusable. Incompatible ranges overlap offset 0 at a different
++// size, so Vulkan leaves those bytes undefined; the next full push must be
++// issued. This helper does not merge partial ranges and does not drop draws,
++// barriers, descriptor writes or observer notes.
++
++#pragma once
++
++#include <cstddef>
++#include <cstdint>
++#include <cstring>
++
++namespace grok_replay {
++
++struct VertexSlot {
++    uint64_t buffer = 0;
++    uint64_t offset = 0;
++    uint64_t size = 0;
++    uint64_t stride = 0;
++};
++
++inline bool vertex_slot_eq(const VertexSlot& a, const VertexSlot& b) {
++    return a.buffer == b.buffer && a.offset == b.offset && a.size == b.size && a.stride == b.stride;
++}
++
++// Returns the number of vkCmdBindVertexBuffers2 ranges, or -1 when the caller
++// must bind [0, n) in one call. Ranges are in increasing binding order.
++inline int vertex_bind_runs(bool valid, const VertexSlot* next, const VertexSlot* prev, int n,
++                            int* first, int* count, int max_runs) {
++    if (n <= 0 || !next || !first || !count || max_runs <= 0) return 0;
++    if (!valid || !prev) {
++        first[0] = 0;
++        count[0] = n;
++        return 1;
++    }
++    int runs = 0;
++    for (int i = 0; i < n;) {
++        if (vertex_slot_eq(next[i], prev[i])) {
++            ++i;
++            continue;
++        }
++        int j = i + 1;
++        while (j < n && !vertex_slot_eq(next[j], prev[j])) ++j;
++        if (runs >= max_runs) return -1;
++        first[runs] = i;
++        count[runs] = j - i;
++        ++runs;
++        i = j;
++    }
++    return runs;
++}
++
++inline bool push_unchanged(bool valid, uint64_t cmd, uint64_t layout, uint32_t stages,
++                           const uint8_t* data, uint32_t size, uint64_t cached_cmd, uint64_t cached_layout,
++                           uint32_t cached_stages, const uint8_t* cached, uint32_t cached_size) {
++    if (!valid || !data || !cached || !size || size != cached_size) return false;
++    if (cmd != cached_cmd || layout != cached_layout || stages != cached_stages) return false;
++    return std::memcmp(data, cached, size) == 0;
++}
++
++// Full-range payload remembered for one command buffer. 256 bytes covers the
++// renderer's kPushSize (MESH_FALLBACK_PUSH_END); a larger payload is not cached.
++struct PushRecord {
++    uint64_t cmd = 0;
++    uint64_t layout = 0;
++    uint32_t stages = 0;
++    uint32_t size = 0;
++    bool valid = false;
++    uint8_t bytes[256]{};
++};
++
++inline void push_invalidate(PushRecord& rec) { rec.valid = false; }
++
++// True when the caller must submit vkCmdPushConstants. False only when `enabled`
++// and the full payload is already on this command buffer. The observer is the
++// caller's responsibility and must run on both results.
++inline bool push_should_issue(PushRecord& rec, bool enabled, uint64_t cmd, uint64_t layout, uint32_t stages,
++                              const uint8_t* data, uint32_t size) {
++    if (enabled && push_unchanged(rec.valid, cmd, layout, stages, data, size, rec.cmd, rec.layout, rec.stages,
++                                  rec.bytes, rec.size))
++        return false;
++    if (!data || size == 0 || size > sizeof rec.bytes) {
++        rec.valid = false;
++        return true;
++    }
++    rec.cmd = cmd;
++    rec.layout = layout;
++    rec.stages = stages;
++    rec.size = size;
++    rec.valid = true;
++    std::memcpy(rec.bytes, data, size);
++    return true;
++}
++
++// Emits dirty binding ranges. `narrow` false, a new command buffer, or more
++// than three dirty runs emits one [0, 16) bind. Returns the run count, or -1
++// when the full bind was emitted.
++template <class Emit>
++inline int issue_vertex_ranges(bool narrow, bool last_valid, const VertexSlot* next, const VertexSlot* prev, Emit&& emit) {
++    int first[3], count[3];
++    if (!(narrow && last_valid && prev && next)) {
++        emit(0, 16);
++        return -1;
++    }
++    const int runs = vertex_bind_runs(true, next, prev, 16, first, count, 3);
++    if (runs <= 0) {
++        emit(0, 16);
++        return -1;
++    }
++    for (int r = 0; r < runs; ++r) emit(first[r], count[r]);
++    return runs;
++}
++
++}  // namespace grok_replay
+--- a/gpu/vk/vk_draw.cpp
++++ b/gpu/vk/vk_draw.cpp
+@@ -34,6 +34,7 @@
+ #include "shader_recompiler/backend/spirv/emit_spirv.h"
+
+ #include "vk_paths.h"
++#include "grok-replay-bind.h"
+ #include "vk_draw.h"
+ #include "vk_menu.h"          // (opts.anisotropy: the Anisotropic filtering row; resolution_scale)
+ #include "upscaler_rows.h"    // (upscale_lod_bias: which upscalers draw the 3D smaller)
+@@ -3947,6 +3948,12 @@
+ thread_local uint64_t fallback_payload_address = 0, fallback_records_address = 0;   // (the draw's fallback buffers)
+ thread_local uint64_t fallback_indirect_input = 0;
+
++thread_local grok_replay::PushRecord grok_push;
++bool grok_replay_push_enabled() {
++    static const bool on = env_on("RX_VK_GROK_REPLAY_PUSH");
++    return on;
++}
++void grok_replay_push_invalidate() { grok_replay::push_invalidate(grok_push); }
+ void push_constants(VkCommandBuffer cmd, const Program& p, const Targets* at, uint32_t fallback_first = 0) {
+     oo_dp::invalidate_push();
+     checkpoint(cmd, p, at ? 'd' : 'c');
+@@ -3978,13 +3985,22 @@
+         const float ra[4] = {(float)at->width, (float)at->height, 0.0f, 0.0f};
+         std::memcpy(data + Shader::Backend::SPIRV::RENDERAREA_LAYOUT_OFFSET, ra, sizeof ra);
+     }
+-    vkCmdPushConstants(cmd, p.layout, p.push_stages, 0, kPushSize, data);
++    static_assert(kPushSize <= sizeof grok_push.bytes, "push cache holds one full payload");
++    // GROK_REPLAY_PUSH_SITE
++    const bool grok_issue = grok_replay::push_should_issue(
++        grok_push, grok_replay_push_enabled(), (uint64_t)(uintptr_t)cmd, (uint64_t)(uintptr_t)p.layout,
++        (uint32_t)p.push_stages, data, kPushSize);
++    if (grok_issue)
++        vkCmdPushConstants(cmd, p.layout, p.push_stages, 0, kPushSize, data);
++    // The selected-dispatch observer records this payload even when the Vulkan
++    // call is elided. invalidate_push() above already cleared the shadow.
+     if (oo_dp::enabled() && oo_identity::selected(p.key, p.variant)) {
+         uint64_t part=0,logical=0;
+         if (memory_pt_recording_info(cmd,&part,&logical))
+             oo_dp::note_push((uint64_t)(uintptr_t)cmd,p.key,p.variant,(uint64_t)(uintptr_t)p.layout,part,logical,
+                              p.push_stages,0,kPushSize,data, Shader::Backend::SPIRV::GUEST_PAGES_PUSH_OFFSET);
+     }
++    // GROK_REPLAY_PUSH_SITE_END
+ }
+
+ } // namespace
+@@ -4903,6 +4919,7 @@
+     vkCmdSetViewport(cmd, 0, 1, &v);
+     vkCmdSetScissor(cmd, 0, 1, &rect);
+     vkCmdPushConstants(cmd, clear_layout, VK_SHADER_STAGE_FRAGMENT_BIT, 0, 16, rgba);
++    grok_replay_push_invalidate();
+     vkCmdDraw(cmd, 3, 1, 0, 0);
+ }
+
+@@ -4994,6 +5011,7 @@
+     pass() = Pass{};
+     work_since_barrier = false;
+     last_dyn_valid = false, last_desc_valid = false, last_vb_valid = false, last_pipeline = VK_NULL_HANDLE;
++    grok_replay_push_invalidate();
+     vertex_set.on = false, last_ib.on = false;
+     descriptors_disturbed();
+     static thread_local uint64_t hits_value = ~0ull;   // (resolved targets last a submission, through its parts: no CPU write is
+@@ -6665,10 +6683,12 @@
+     vkCmdPushDescriptorSetKHR(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, layout, 0, 3, wr);
+     descriptors_disturbed();   // (what bind_descriptors remembers pushing is not what is bound now: the next dispatch pushes all again; unmarked, a dispatch of the same layout kept these bindings and read our images: the device lost)
+     vkCmdPushConstants(cmd, layout, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof pc, &pc);
++    grok_replay_push_invalidate();
+     vkCmdDispatch(cmd, (w + 7) / 8, (h + 7) / 8, 1);
+     full_barrier(cmd);
+     pc.mode = 1;
+     vkCmdPushConstants(cmd, layout, VK_SHADER_STAGE_COMPUTE_BIT, 0, sizeof pc, &pc);
++    grok_replay_push_invalidate();
+     vkCmdDispatch(cmd, (w + 7) / 8, (h + 7) / 8, 1);
+     full_barrier(cmd);   // (before the next pass reads or draws the mask)
+     static std::atomic<int> told{0};
+@@ -7399,6 +7419,7 @@
+             if (mesh_args.buffer == mesh_args_buffer && mesh_args_buffer) {   // (the task programs' firsts: this draw's entries)
+                 const uint64_t firsts = mesh_args_address + mesh_args.offset + 12;
+                 vkCmdPushConstants(cmd, p.layout, p.push_stages, Shader::Backend::SPIRV::MESH_FIRST_PUSH_OFFSET, 8, &firsts);
++                grok_replay_push_invalidate();
+             }
+             const bool oo_rewritten = mesh_args.buffer == mesh_args_buffer && mesh_args_buffer;
+             if (cnt && vkCmdDrawMeshTasksIndirectCountEXT) {
+@@ -7419,6 +7440,7 @@
+                 }
+                 const uint64_t firsts = mesh_args_address + (uint64_t)at * 16 + 12;
+                 vkCmdPushConstants(cmd, p.layout, p.push_stages, Shader::Backend::SPIRV::MESH_FIRST_PUSH_OFFSET, 8, &firsts);
++                grok_replay_push_invalidate();
+             }
+             oo_record_mesh(oo_graphics_identity::Command::Direct, false, false, VK_NULL_HANDLE, 0, 1, 0);
+             vkCmdDrawMeshTasksEXT(cmd, (uint32_t)std::max(d.groups[0], 0), (uint32_t)std::max(d.groups[1], 1),
+@@ -7465,10 +7487,24 @@
+             vbufs[b] = r.buffer, voffs[b] = r.offset, vsizes[b] = s.vbuf[b].size ? s.vbuf[b].size : VK_WHOLE_SIZE;
+             vstrides[b] = s.vstream[b].stride;
+         }
+-        if (!last_vb_valid || std::memcmp(vbufs, last_vb.b, sizeof vbufs) || std::memcmp(voffs, last_vb.o, sizeof voffs) ||
+-            std::memcmp(vsizes, last_vb.z, sizeof vsizes) || std::memcmp(vstrides, last_vb.s, sizeof vstrides)) {
++        const bool vb_changed = !last_vb_valid || std::memcmp(vbufs, last_vb.b, sizeof vbufs) ||
++                                std::memcmp(voffs, last_vb.o, sizeof voffs) || std::memcmp(vsizes, last_vb.z, sizeof vsizes) ||
++                                std::memcmp(vstrides, last_vb.s, sizeof vstrides);
++        if (vb_changed) {
+             FINE_N(FC_VBIND, 1);
+-            vkCmdBindVertexBuffers2(cmd, 0, 16, vbufs, voffs, vsizes, vstrides);
++            static const bool narrow = env_on("RX_VK_GROK_REPLAY_BIND");
++            // GROK_REPLAY_VB_SITE
++            grok_replay::VertexSlot next[16], prev[16];
++            for (int i = 0; i < 16; i++) {
++                next[i] = {(uint64_t)(uintptr_t)vbufs[i], (uint64_t)voffs[i], (uint64_t)vsizes[i], (uint64_t)vstrides[i]};
++                prev[i] = {(uint64_t)(uintptr_t)last_vb.b[i], (uint64_t)last_vb.o[i], (uint64_t)last_vb.z[i],
++                           (uint64_t)last_vb.s[i]};
++            }
++            grok_replay::issue_vertex_ranges(narrow, last_vb_valid, next, prev, [&](int first, int count) {
++                vkCmdBindVertexBuffers2(cmd, (uint32_t)first, (uint32_t)count, vbufs + first, voffs + first,
++                                        vsizes + first, vstrides + first);
++            });
++            // GROK_REPLAY_VB_SITE_END
+             std::memcpy(last_vb.b, vbufs, sizeof vbufs), std::memcpy(last_vb.o, voffs, sizeof voffs);
+             std::memcpy(last_vb.z, vsizes, sizeof vsizes), std::memcpy(last_vb.s, vstrides, sizeof vstrides);
+             last_vb_valid = true;
+@@ -7640,6 +7676,7 @@
+     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, pipe);
+     vkCmdPushDescriptorSetKHR(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, layout, 0, 2, w);
+     vkCmdPushConstants(cmd, layout, VK_SHADER_STAGE_COMPUTE_BIT, 0, 8, size);
++    grok_replay_push_invalidate();
+     vkCmdDispatch(cmd, (size[0] + 7) / 8, (size[1] + 7) / 8, 1);
+     descriptors_disturbed();
+     return true;
+@@ -7939,6 +7976,7 @@
+     vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, pipe);
+     vkCmdPushDescriptorSetKHR(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, layout, 0, 3, w);
+     vkCmdPushConstants(cmd, layout, VK_SHADER_STAGE_COMPUTE_BIT, 0, 12, size);
++    grok_replay_push_invalidate();
+     vkCmdDispatch(cmd, (size[0] + 7) / 8, (size[1] + 7) / 8, 1);
+     descriptors_disturbed();   // (the program's own pushes are gone from the bind point)
+     if (temporal) probe_image(cmd, out, level, 0, key, 't');
+@@ -7964,7 +8002,12 @@
+     uint32_t level = 0;
+     const uint32_t out_handle = handle_of(s, st, od, 0);
+     if (out_handle) texture_view_of(out_handle, VK_IMAGE_VIEW_TYPE_2D, ViewUse::Storage, image_format(od.format), &out, &level);
+-    return fsr3_upscale(cmd, p.key, gameplay_network(p.key), in, dw().imgs[0].imageView, out, dw().imgs[ntex].imageView, level);
++    // fsr3_upscale / vk_fsr3_inputs push on this draw command buffer under foreign
++    // compute layouts (ranges shorter than kPushSize). Returning their result
++    // directly left the full-push cache valid. False returns can push too.
++    const bool done = fsr3_upscale(cmd, p.key, gameplay_network(p.key), in, dw().imgs[0].imageView, out, dw().imgs[ntex].imageView, level);
++    grok_replay_push_invalidate();
++    return done;
+ }
+ /// (hookshot) A temporal upscaler (NVIDIA DLSS, AMD FSR 4: vk_temporal.cpp) in place of the gameplay upscale network, when
+ /// one is on and its inputs are as expected: the network's input as it samples it, its output's storage view
+@@ -7993,6 +8036,7 @@
+     const bool done = temporal_upscale(cmd, p.key, gameplay_network(p.key), in, dw().imgs[0].imageView, out, dw().imgs[ntex].imageView, level);
+     // (its actor motion may have drawn with a pipeline, viewport and descriptors of its own: the next draw sets all of its again)
+     last_dyn_valid = false, last_desc_valid = false, last_vb_valid = false, last_pipeline = VK_NULL_HANDLE;
++    grok_replay_push_invalidate();
+     vertex_set.on = false, last_ib.on = false;
+     return done;
+ }
+@@ -8020,6 +8064,7 @@
+     const bool fsr3 = fsr3_upscale(cmd, key, false, src, in_view, dst, out_view, 0);
+     const bool done = fsr3 || ((temporal_wanted() || temporal_off()) && temporal_upscale(cmd, key, false, src, in_view, dst, out_view, 0));
+     last_dyn_valid = false, last_desc_valid = false, last_vb_valid = false, last_pipeline = VK_NULL_HANDLE;
++    grok_replay_push_invalidate();
+     vertex_set.on = false, last_ib.on = false;
+     if (!done) return false;
+     full_barrier(cmd);
