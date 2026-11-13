@@ -4,6 +4,13 @@ Updated 2026-11-13. This page distinguishes working tools, local observations, a
 
 ## Latest reviewed results
 
+The [startup-continuous selector capture](selector-live-acquisition-observation.md)
+now acquires the exact compute target's owned C0 and current descriptors and
+observes its selected recording complete. Exact pipeline warmup preserves all
+startup observer history and the existing event limit. The live record
+calculation still refuses preparation on unknown writers; no record is bound
+and no shader replacement is admitted.
+
 A bounded [original-path native-network observation](ndve-live-metadata-observation.md)
 now records 47 real compiler queries, all 21 host-configuration fields at use,
 and a stable registered texture matching the native table. The existing
