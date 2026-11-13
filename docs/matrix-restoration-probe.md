@@ -39,7 +39,7 @@ The first module uses advertised KHR M8 N8 K16, FP16 A/B and FP32 C/result. The 
 
 Single-term padding is another diagnostic candidate: 16 K1 steps padded to K16, with FP32 accumulation between steps and half checkpoints only after K8/K16. It requires 32 M8 calls per logical M16 product, sixteen times the two-call full-K geometry, and performs many artificial zero products. Padding can still affect zero signs and exceptional values; implementation-dependent precision and addition order remain. Neither padded approach is currently an exact replacement. A finite-domain fast path with explicit fallback would need a justified input domain, complete replay comparisons and downstream rendering checks before use.
 
-The modules were compiled by glslang 16.2.0 with `-V --target-env vulkan1.3 -Os` and validated by SPIRV-Tools 2026.1. SPIR-V validity does not prove that E5 compiles a cooperative matrix at required subgroup width 8, 16 or 32. That remains a question for each bounded native pipeline compile.
+The modules were compiled by glslang 16.2.0 with `-V --target-env vulkan1.3 -Os` and validated by SPIRV-Tools 2026.1. SPIR-V validity alone does not establish native pipeline support. The separately authorized observation below confirms both synthetic pipelines at actual subgroup width 32; widths 8 and 16 remain untested.
 
 ## Native helper and review boundary
 
@@ -65,3 +65,20 @@ python3 -m unittest tests.test_matrix_restore_probe tests.test_matrix_restore_na
 ```
 
 Runtime requires the parent agent's separate review and GPU grant. The [sanitized receipt](../research/matrix-restoration-preparation.json) pins sources, helper, modules and the private plan. No runtime phase was executed for that receipt.
+
+## Authorized subgroup-32 observation
+
+The separate [runtime observation receipt](../research/matrix-restoration-observation.json) records one E5 physical-device query, two compile-only processes and four synthetic dispatch processes under the unchanged frozen plan and helper. The query confirmed the nonsaturating subgroup M8 N8 K16 FP16-input/FP32-accumulator shape and all required feature gates, with subgroup default 32 and advertised range 8–32. Pipeline-executable properties confirmed actual compute width 32 for both modules before dispatch.
+
+| Safe synthetic case | Complete output words | Exact CPU-reference match |
+| --- | ---: | --- |
+| Base identity | 64 | Yes |
+| Base layout | 64 | Yes |
+| Padded-checkpoint identity | 128 | Yes |
+| Padded-checkpoint layout | 128 | Yes |
+
+All 384 words, totaling 1,536 bytes, matched their CPU reference buffers and SHA-256 values. Each process submitted one `[1,1,1]` dispatch with local size `[32,1,1]`; all input payload bytes and all four buffers' 256-byte prefix/suffix guards remained unchanged. Every owned process reached a terminal success and each exclusive lease was released. The receipt pins all seven structured reports, the two modules, four input bundles, six source dependencies, helper source/binary and exact E5/native-safe policy. No frozen source or preparation metadata changed for this observation.
+
+The inspected Mesa `brw_nir_lower_cooperative_matrix.c` lowers `cmat_muladd` through `nir_dpas_intel`. This supports an inference that Intel's native matrix route is available; no machine IR or disassembly was captured for these pipelines, so actual DPAS instructions are not established by this observation. Process completion times are not shader GPU timings and are excluded from performance evidence.
+
+These safe integer identity/layout fixtures establish a narrow execution and memory-layout result. They do not establish adversarial rounding, nonfinite behavior, original logical warp32 integration, native-network restoration, native quality, hair antialiasing or FPS improvement. No narrower subgroup, adversarial input or original-game module ran in these grants. The existing midpoint, signed-zero and operation-order counterexamples still apply.

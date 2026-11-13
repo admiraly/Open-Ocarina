@@ -1,0 +1,437 @@
+{
+  "schema": "open-ocarina.native-renderer-v2-e5-pilot/v1",
+  "date": "2026-11-13",
+  "scope": "Bounded integrated revision-2 renderer identity and full-size control-image diagnostics on the cache-safe E5 driver; incomplete rendering validation",
+  "integration_revision": 2,
+  "successful_harness_revision": 3,
+  "source_pin": "4cf785a0b143bb34026506c9a3fe4f4bb93c797d",
+  "integration_patch_sha256": "8d0cc053103ccf90b51e6c55c6e7ee39292636f03b85e16d74bd8d8d1221854b",
+  "renderer_sha256": "d2b60ba14de991bf335f5b46d3c64a0749489a390c3fbb2db11f162fdb7b3340",
+  "host_sha256": "4eb32b56a91869b5d7ac1673f0ca1e3c0841e893a8a34f728ec85344a312cb30",
+  "renderer_build_freeze_sha256": "067ad822f389181f7e825c83dfabc1e4901a67e9b62d7a4eca403b3d77058265",
+  "driver_library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+  "driver_icd_json_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+  "driver_cache_policy": "native-safe-v2; controlled E5-only snapshot; separate fresh per-process copies",
+  "driver_attestation": "Actual process mappings match expected file device/inode and SHA-pinned library; no deleted or unexpected renderer/Intel ICD images; hashes unchanged after owned stop",
+  "preparation_freeze_sha256": "b64db84697a3203c49ac31a12f37e4f061af307dec5a93e8e43471ae28100aec",
+  "plan_sha256": "c064ab4a7a31ff8af0177750f82049266e58a65515b49434bb81f5d11e4e7c47",
+  "private_launcher_sha256": "79bb9d9fbd141d7af6c58961d14a3bc42dcfaa6aa87781d706310bda1c5beb6a",
+  "configured_compiler_policy": {
+    "required": {
+      "HS_SPILL_BATCH": "1",
+      "HS_PUSH_SHADOW": "1",
+      "shader_spilling_rate": "1"
+    },
+    "forbidden_presence": [
+      "HS_CS32_MAX_INSTS",
+      "HS_FORCE_SIMD8",
+      "HS_SUBGROUP8",
+      "HS_SPILL_PCT",
+      "HS_LARGE_GRF",
+      "HS_LARGE_GRF_BIT",
+      "HS_RA_DEBUG",
+      "INTEL_DEBUG",
+      "RX_VK_WARP64"
+    ],
+    "RX_VK_NOOPT": "absent",
+    "MAX_absent_even_empty_or_zero": true
+  },
+  "case_preparation": {
+    "identical_initial_settings_sha256": "88438c44dd1043247aedf25e517e281608f4b2c82109fcbb006260d22356a5bd",
+    "same_initial_userdata_and_E5_cache_content": true,
+    "source": "Reviewed immutable common seed snapshot, copied into fresh independent cases; no mutable runtime cache used for later preparation",
+    "seed_content_manifest_sha256": {
+      "mesa-cache": "557035a1681edb9f06d44ed18812a14a70e2c5e38e4cced2a904e84b6bbcbb79",
+      "userdata": "d14225eaaa2e9d5a21b49eab6b6c433cc3b3b33fcb674527a520adcf9c0d8c96"
+    },
+    "seed_manifest_file_sha256": "d09eb40cb246f8a9a3f3f37234e65e926a086b02ef4276614c720c242aa42ddc",
+    "legacy_hookshot_compiled_pipeline_caches_copied": false,
+    "same_frozen_host_renderer_driver_for_all_cases": true,
+    "experimental_control": "Only opt-in mesh mode differs; per-case private filesystem paths necessarily differ"
+  },
+  "observed_device": {
+    "vendor_id": 32902,
+    "device_id": 22176,
+    "driver_version": 109060100
+  },
+  "actual_settings": {
+    "selected_values_identical_across_cases": true,
+    "game_speed": {
+      "value": 0,
+      "meaning": "Per frame"
+    },
+    "frame_rate_cap": {
+      "value": 0,
+      "meaning": "Console default cap"
+    },
+    "frame_generation": {
+      "value": 0,
+      "meaning": "Off"
+    },
+    "output_resolution_text": "2048x1152 (game's)",
+    "profile": "Docked",
+    "upscaler": "AMD FSR 3.1",
+    "render_resolution": "Auto (dynamic)",
+    "motion_controls": "On (no controller)",
+    "mesh_shaders": "Automatic",
+    "all_raw_option_replies_retained_privately": true
+  },
+  "script_observation": {
+    "script": "4:A,6:A,8:A,10:A,12:A,14:A,16:A",
+    "script_time_units": "Scripted seconds measured by the pinned native-present frame clock; not numeric frame indices",
+    "parsed_press_count": 7,
+    "parser_and_frame_clock_logs_observed_in_all_completed_cases": true,
+    "last_hold_window_elapsed_before_capture": true,
+    "configured_exclusive_and_persistent_modes": true,
+    "control_status_exclusive_field_meaning": "Queued control-bridge inputs only; not HOS_INPUT_SCRIPT isolation",
+    "individual_applied_step_logs_available": false,
+    "independently_injected_live_input_isolation": null,
+    "benchmark_eligible": false
+  },
+  "harness_failures": [
+    {
+      "harness_revision": 1,
+      "classification": "harness_admission_failure",
+      "reason": "Launcher treated control-bridge status.input.exclusive as HOS_INPUT_SCRIPT isolation; that field only observes queued control-bridge inputs.",
+      "game_or_pipeline_creation_failure_established_by_rejection": false,
+      "owned_process_stopped_and_reaped": true,
+      "preserved_result_sha256": "fed4b91e9737be2067ac592623f3216cef58d12cff3f97e5bce8830f49178b20",
+      "preserved_terminal_receipt_sha256": "5c9e5aec6a8893291ade540d5300c97b787b4d0dbd319417b05b3b2b9ae82526"
+    },
+    {
+      "harness_revision": 2,
+      "classification": "harness_admission_failure",
+      "reason": "Generic pipeline.*failed regex crossed unrelated pipeline and failed-program counters on an aggregate statistics line.",
+      "game_or_pipeline_creation_failure_established_by_rejection": false,
+      "owned_process_stopped_and_reaped": true,
+      "preserved_result_sha256": "09e364c69ccb61342a67884311b51e5af2b95a63ab7479d74fe8882f59c0e0b1",
+      "preserved_terminal_receipt_sha256": "0eb16cde2e4f09299e1c610a253e3c42dd7cf80786ae7955743ca8ec9d1854bd"
+    }
+  ],
+  "cases": [
+    {
+      "mode": "baseline0",
+      "integration_revision": 2,
+      "opt_in_value": "0",
+      "diagnostic_completed": true,
+      "identity_scope": "CPU command recording and selected modules; not GPU indirect-value or executable-width observation",
+      "recorded_draw_events": 32,
+      "program": "d8e59341cf4f629c",
+      "variant": "0c8f08626a9d98a4",
+      "selected_stages": [
+        {
+          "index": 0,
+          "nvn_stage": 7,
+          "vulkan_stage": 128,
+          "spirv_sha256": "835aa59799c6ecb621034d946e2fa4eadb1aa2407d293321ae3e3052882bc9b3",
+          "spirv_word_count": 42939,
+          "required_subgroup_size": 32,
+          "require_full_subgroups": false,
+          "live_executable_simd_width": null
+        },
+        {
+          "index": 1,
+          "nvn_stage": 1,
+          "vulkan_stage": 16,
+          "spirv_sha256": "569b378a012388d711a115030bd1f41af66d38aebb645118baacd1e90a8f5a3a",
+          "spirv_word_count": 29766,
+          "required_subgroup_size": null,
+          "require_full_subgroups": false,
+          "live_executable_simd_width": null
+        }
+      ],
+      "all_selected_identities_match": true,
+      "application_revision_receipt": null,
+      "application_width_receipt": null,
+      "safe_three_MAX_absent_application_receipt": null,
+      "live_indirect_grid": null,
+      "gpu_executed_draw_count": null,
+      "gpu_mesh_outputs_independently_captured": false,
+      "observed_attachments": {
+        "width": 1536,
+        "height": 864,
+        "sample_count_flag": 1,
+        "depth_format": 126,
+        "color_formats": [
+          122
+        ]
+      },
+      "final_observed_state": "play",
+      "observed_map": "KokiriForest_Child",
+      "observed_game": {
+        "age": "child",
+        "event": false,
+        "loading": false
+      },
+      "control_status_native_frame": 1088,
+      "control_shot_reply_native_frame": 1090,
+      "control_shot_reply_present": 1089,
+      "observed_offscreen_surface": [
+        1920,
+        1080
+      ],
+      "control_png_dimensions": [
+        2048,
+        1152
+      ],
+      "control_png_sha256": "16ecda8ea03ede5f863f85d871d2e9d743f09fca2f6657e5899adaff141b5bf6",
+      "image_capture_completed": true,
+      "single_image_parent_review": {
+        "broad_world_player_and_foliage_visible": true,
+        "HUD_hearts_minimap_and_move_hint_visible": false,
+        "review_is_not_rendering_acceptance": true
+      },
+      "all_frozen_file_identity_and_hash_checks_match_before_after": true,
+      "actual_process_map_device_inode_and_library_hashes_attested": true,
+      "initial_exec_environment_matched_controlled_plan": true,
+      "controlled_environment_files_unchanged_after": true,
+      "immutable_common_seeds_unchanged_after": true,
+      "no_source_matched_pipeline_or_background_job_error_observed": true,
+      "known_startup_network_policy_omission_count": 10,
+      "owned_process_stopped_and_reaped": true,
+      "private_artifact_sha256": {
+        "runtime_result": "fc862c4230ebeb221390e70289d9f818cde520da83078e1505bb2756a419077d",
+        "terminal_receipt": "671527e9b54bc28dc302803ed6b4317946876c6e3b79dc0f46960aca7e0689cd",
+        "command_identity": "43c563ce1545a2d7c29b14a93b3b7a6773c7f0d748259d556b2da4e340e6d989",
+        "actual_options": "125cf1f69b52bd315d72ed9dd7ebf18912c77a95150f594d9406df4e66c8a5c6",
+        "initial_process_maps": "b72a4f1171f7453c8b186c3392f13471ab58edb25ff8d531135c87b7472d3528",
+        "final_process_maps": "271d2c728c46f61907b18e61e93839eaace4282f1ea8b9aae3d900de0121cb27",
+        "raw_log": "bfab8dd143b89fd0bda5bf1f547c144f4af9089c1f6ccd19b17d7448b10cbe8f"
+      },
+      "native_feature_validation_established": false,
+      "pixel_equivalence_established": false,
+      "benchmark_eligible": false
+    },
+    {
+      "mode": "candidate8",
+      "integration_revision": 2,
+      "opt_in_value": "8",
+      "diagnostic_completed": true,
+      "identity_scope": "CPU command recording and selected modules; not GPU indirect-value or executable-width observation",
+      "recorded_draw_events": 32,
+      "program": "d8e59341cf4f629c",
+      "variant": "0c8f08626a9d98a4",
+      "selected_stages": [
+        {
+          "index": 0,
+          "nvn_stage": 7,
+          "vulkan_stage": 128,
+          "spirv_sha256": "8754612a7395d1f804d4e56a7c18cb5a6f23ed2e02f01879cbc51bd108682de0",
+          "spirv_word_count": 44043,
+          "required_subgroup_size": 8,
+          "require_full_subgroups": false,
+          "live_executable_simd_width": null
+        },
+        {
+          "index": 1,
+          "nvn_stage": 1,
+          "vulkan_stage": 16,
+          "spirv_sha256": "569b378a012388d711a115030bd1f41af66d38aebb645118baacd1e90a8f5a3a",
+          "spirv_word_count": 29766,
+          "required_subgroup_size": null,
+          "require_full_subgroups": false,
+          "live_executable_simd_width": null
+        }
+      ],
+      "all_selected_identities_match": true,
+      "application_revision_receipt": 2,
+      "application_width_receipt": 8,
+      "safe_three_MAX_absent_application_receipt": true,
+      "live_indirect_grid": null,
+      "gpu_executed_draw_count": null,
+      "gpu_mesh_outputs_independently_captured": false,
+      "observed_attachments": {
+        "width": 1536,
+        "height": 864,
+        "sample_count_flag": 1,
+        "depth_format": 126,
+        "color_formats": [
+          122
+        ]
+      },
+      "final_observed_state": "play",
+      "observed_map": "KokiriForest_Child",
+      "observed_game": {
+        "age": "child",
+        "event": false,
+        "loading": false
+      },
+      "control_status_native_frame": 1037,
+      "control_shot_reply_native_frame": 1039,
+      "control_shot_reply_present": 1038,
+      "observed_offscreen_surface": [
+        1920,
+        1080
+      ],
+      "control_png_dimensions": [
+        2048,
+        1152
+      ],
+      "control_png_sha256": "2fde29df194d87565d76fd0e984dd2300fd69e8698b8b46a0f24a2c2f2e41870",
+      "image_capture_completed": true,
+      "single_image_parent_review": {
+        "broad_world_player_and_foliage_visible": true,
+        "HUD_hearts_minimap_and_move_hint_visible": false,
+        "review_is_not_rendering_acceptance": true
+      },
+      "all_frozen_file_identity_and_hash_checks_match_before_after": true,
+      "actual_process_map_device_inode_and_library_hashes_attested": true,
+      "initial_exec_environment_matched_controlled_plan": true,
+      "controlled_environment_files_unchanged_after": true,
+      "immutable_common_seeds_unchanged_after": true,
+      "no_source_matched_pipeline_or_background_job_error_observed": true,
+      "known_startup_network_policy_omission_count": 10,
+      "owned_process_stopped_and_reaped": true,
+      "private_artifact_sha256": {
+        "runtime_result": "6c351248bf6bbd0a95e7a736d8cc9bc76bfdcd4184e8d8bf11f177cd68b46b5e",
+        "terminal_receipt": "76c9e6499240df144b07ffdc0c38d414e0b0f5ebe05ab13ef628bf16816ec32d",
+        "command_identity": "95b7e9fca9a8052d0758e447330023833e2e9fac0006e774dc2ba6f7e7656bb3",
+        "actual_options": "0a26b2b1761733f0369c3a23348797492783bc8d12b4beb41ccf54c6ddd68b7f",
+        "initial_process_maps": "8caac69476d79b3e8c37816be3b565e5a9e1b61cb6205f8360837826319cdc15",
+        "final_process_maps": "0adc2b2c77952951ecda82eb4f169970f77a79b8cf6d68b10856f34495565f7d",
+        "raw_log": "72082d3c2fb7ee005f554a4466e9bd0534db772c2ac657a186dca960b6ad2a33"
+      },
+      "native_feature_validation_established": false,
+      "pixel_equivalence_established": false,
+      "benchmark_eligible": false
+    },
+    {
+      "mode": "candidate16",
+      "integration_revision": 2,
+      "opt_in_value": "16",
+      "diagnostic_completed": true,
+      "identity_scope": "CPU command recording and selected modules; not GPU indirect-value or executable-width observation",
+      "recorded_draw_events": 32,
+      "program": "d8e59341cf4f629c",
+      "variant": "0c8f08626a9d98a4",
+      "selected_stages": [
+        {
+          "index": 0,
+          "nvn_stage": 7,
+          "vulkan_stage": 128,
+          "spirv_sha256": "8754612a7395d1f804d4e56a7c18cb5a6f23ed2e02f01879cbc51bd108682de0",
+          "spirv_word_count": 44043,
+          "required_subgroup_size": 16,
+          "require_full_subgroups": false,
+          "live_executable_simd_width": null
+        },
+        {
+          "index": 1,
+          "nvn_stage": 1,
+          "vulkan_stage": 16,
+          "spirv_sha256": "569b378a012388d711a115030bd1f41af66d38aebb645118baacd1e90a8f5a3a",
+          "spirv_word_count": 29766,
+          "required_subgroup_size": null,
+          "require_full_subgroups": false,
+          "live_executable_simd_width": null
+        }
+      ],
+      "all_selected_identities_match": true,
+      "application_revision_receipt": 2,
+      "application_width_receipt": 16,
+      "safe_three_MAX_absent_application_receipt": true,
+      "live_indirect_grid": null,
+      "gpu_executed_draw_count": null,
+      "gpu_mesh_outputs_independently_captured": false,
+      "observed_attachments": {
+        "width": 1536,
+        "height": 864,
+        "sample_count_flag": 1,
+        "depth_format": 126,
+        "color_formats": [
+          122
+        ]
+      },
+      "final_observed_state": "play",
+      "observed_map": "KokiriForest_Child",
+      "observed_game": {
+        "age": "child",
+        "event": false,
+        "loading": false
+      },
+      "control_status_native_frame": 1089,
+      "control_shot_reply_native_frame": 1091,
+      "control_shot_reply_present": 1090,
+      "observed_offscreen_surface": [
+        1920,
+        1080
+      ],
+      "control_png_dimensions": [
+        2048,
+        1152
+      ],
+      "control_png_sha256": "fd1ec6a186c920c9dd51b7e303671fadf229279b8a866afdc677973def59631f",
+      "image_capture_completed": true,
+      "single_image_parent_review": {
+        "broad_world_player_and_foliage_visible": true,
+        "HUD_hearts_minimap_and_move_hint_visible": true,
+        "review_is_not_rendering_acceptance": true
+      },
+      "all_frozen_file_identity_and_hash_checks_match_before_after": true,
+      "actual_process_map_device_inode_and_library_hashes_attested": true,
+      "initial_exec_environment_matched_controlled_plan": true,
+      "controlled_environment_files_unchanged_after": true,
+      "immutable_common_seeds_unchanged_after": true,
+      "no_source_matched_pipeline_or_background_job_error_observed": true,
+      "known_startup_network_policy_omission_count": 10,
+      "owned_process_stopped_and_reaped": true,
+      "private_artifact_sha256": {
+        "runtime_result": "27180f5812ef28f3d5b43671bbf7f14050df8f64335eb196ab2e25aaa35ca188",
+        "terminal_receipt": "d032f138dbc61006d86e9df8577935dce280cf9f8b4f644e236e36e5854c9350",
+        "command_identity": "fa5e676d3caadeb9b5942cce13f8b3cd5b1aa569112dab7f844aea8c01f50e4f",
+        "actual_options": "1a89d6534c8a3b726b1d1948830a8a3cee356d95c45f1a031144b3bde6fd4772",
+        "initial_process_maps": "3b01cd66a8125382d51aac96ad8124ea56ed57516e2258ac9e38918b26cfb31c",
+        "final_process_maps": "bff03a3c5b4d30cd5f19d30d17dedc6bb046c008883846e4444ebada2fe0cc95",
+        "raw_log": "24d5fceca11873a11d1e3ca5c9b29c8e5bddb7100dedaae78b70e3deae51876b"
+      },
+      "native_feature_validation_established": false,
+      "pixel_equivalence_established": false,
+      "benchmark_eligible": false
+    }
+  ],
+  "image_comparison_limits": {
+    "matched_native_frames": false,
+    "matched_temporal_camera_animation_or_UI_state": false,
+    "parent_observation": "All three single images show broad world, player and foliage. Candidate16 also shows HUD hearts/minimap/move hint absent from the other captured images. Positions, ambient leaves and temporal/UI states differ. These differences are not attributed to the candidate without a matched-state reference.",
+    "native_scene_resolution_certified_by_PNG_size": false,
+    "headless_presentation": [
+      1920,
+      1080
+    ],
+    "target_attachments": [
+      1536,
+      864
+    ],
+    "requested_control_image": [
+      2048,
+      1152
+    ]
+  },
+  "unresolved_native_quality_gaps": [
+    "Ten startup movie-upscale network programs are still omitted by policy.",
+    "AMD FSR 3.1 replaces the native gameplay reconstruction network in this configuration.",
+    "Hair/foliage coverage, motion and anti-aliasing equivalence remain unverified.",
+    "A single broad-scene screenshot does not certify all native features, stages or temporal behavior."
+  ],
+  "acceptance": {
+    "selected_module_and_requested_policy_identity_diagnostic_completed": true,
+    "live_executable_SIMD_width_observed": false,
+    "GPU_generated_indirect_grid_captured": false,
+    "deterministic_matched_workload_established": false,
+    "full_native_feature_and_quality_acceptance": false,
+    "pixel_or_temporal_output_equivalence": false,
+    "performance_run": false,
+    "benchmark_eligible": false,
+    "performance_gain_established": false,
+    "independently_injected_live_input_isolation_established": false
+  },
+  "frozen_artifacts_and_historical_V1_observation_unchanged": true,
+  "references": [
+    "docs/native-mesh-warp32-integration.md",
+    "research/native-mesh-warp32-integration-v2.json",
+    "docs/mesa-cache-policy.md",
+    "research/mesa-cache-policy-observation.json",
+    "research/native-network-restoration.md",
+    "research/native-renderer-identity-pilot.json"
+  ]
+}

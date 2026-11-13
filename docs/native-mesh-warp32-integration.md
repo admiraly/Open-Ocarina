@@ -1,6 +1,6 @@
 # Opt-in native mesh warp32 lowering — revision 2
 
-The [independently authored integration patch](../patches/hookshot/mesh-warp32-lowering.patch) is now revision2. Its safe compiler profile requires `HS_CS32_MAX_INSTS` **absent**, not empty or zero, plus exactly `HS_SPILL_BATCH=1`, `HS_PUSH_SHADOW=1` and `shader_spilling_rate=1`. The earlier MAX-present profile could enable a global compute-width fallback and must not be used as a current runtime recommendation. Native mesh lowering remains **disabled by default**. This revision has build/CPU checks and a bounded compile-only comparison; no revision2 integrated launch, new-driver runtime validation, native-quality 60 FPS or image-quality gain is claimed.
+The [independently authored integration patch](../patches/hookshot/mesh-warp32-lowering.patch) is now revision2. Its safe compiler profile requires `HS_CS32_MAX_INSTS` **absent**, not empty or zero, plus exactly `HS_SPILL_BATCH=1`, `HS_PUSH_SHADOW=1` and `shader_spilling_rate=1`. The earlier MAX-present profile could enable a global compute-width fallback and must not be used as a current runtime recommendation. Native mesh lowering remains **disabled by default**. Build/CPU checks and compile-only comparisons are now followed by [three bounded V2/E5 integrated identity diagnostics](../research/native-renderer-v2-e5-pilot.json), with the option disabled and requested widths8/16. These establish selected module and requested-policy identities with private control images; full rendering validation, performance and image-quality gains remain unproven.
 
 The patch follows the nine-patch renderer chain in [the revision2 receipt](../research/native-mesh-warp32-integration-v2.json). The [revision1 receipt](../research/native-mesh-warp32-integration.json) and its observations remain historical; the public patch filename is unchanged, with V1 bytes retained in Git commit `01f8fa2` and its private freeze. It embeds program/module digests and independently authored transformation code, with no game shader blob. Its C++ structural core ports the reviewed [CPU prototype](../research/mesh-warp32-transform.md). The existing translator emits the original module first; a guarded post-emission pass changes only its two ballots and logical subgroup ID/Lt-mask behavior. The generic Eden subgroup emitter and `profile_graphics` remain unchanged.
 
@@ -19,7 +19,7 @@ Every condition must hold before replacement:
 
 The device check reserves14612 Workgroup bytes and14740 combined payload/shared bytes, preserving the original declared payload. It checks the local-size/output maxima against advertised limits. Workgroup size stays32; mesh grid, descriptors, fragment stage, output stores and quality work are preserved. Only the qualifying native mesh stage requests8/16; all other programs retain their original policy. There is no generic vote/shuffle emulation and no change to the task stage of `43ec86f35fd937b9`.
 
-The driver ID/version gate does **not** hash the loaded ICD automatically; another patched Mesa build can share its version number. The old audited library `5ea19ac96aa52d061ecf2b8e23df7ed3d7d3b36c7d2ae7fe62f01c5a9b610aaa` was used only for the bounded revision2 compile comparison. Further integrated validation must pin a separately approved cache-safe driver and establish its runtime behavior; the ID/version gate alone supplies no such admission. The scope is the reviewed A770 configuration, not a portable Vulkan lane-mapping rule. The [mesh mapping observation](../research/mesh-mapping-probe.md), [implementation audit](../research/mesh-lane-mapping.md), live shader identity and separately reviewed output comparisons supply evidence with different limits; none is silently promoted by this patch.
+The driver ID/version gate does **not** hash the loaded ICD automatically; another patched Mesa build can share its version number. The old audited library `5ea19ac96aa52d061ecf2b8e23df7ed3d7d3b36c7d2ae7fe62f01c5a9b610aaa` was used only for the bounded revision2 compile comparison. The later V2/E5 identity diagnostics separately pin the cache-safe driver and attest its actual process mappings, file identity and hash; the ID/version gate alone supplies no such admission. Complete runtime output validation remains separate. The scope is the reviewed A770 configuration, not a portable Vulkan lane-mapping rule. The [mesh mapping observation](../research/mesh-mapping-probe.md), [implementation audit](../research/mesh-lane-mapping.md), live shader identity and separately reviewed output comparisons supply evidence with different limits; none is silently promoted by this patch.
 
 ## Why MAX must be absent
 
@@ -100,7 +100,44 @@ The following table identifies **V1**, not the current public patch/source. Thos
 Renderer flags are C++20/O2/g0/NDEBUG/release/x86-64-v3. The generic build banner's lifted-code O1 setting does not describe the renderer. Previous frozen binaries and Python tools remain unchanged. Private frozen artifacts are under ignored `local/mesh-warp32-native-frozen-022dcb3aee0a/`.
 
 
-The V1 source/build task did not launch the renderer; its subsequent parent pilot is recorded below. The V2 receipt has no integrated launch. Further validation must report its own exact renderer/module/driver identities, failures, image checks and performance limits.
+The V1 source/build task did not launch the renderer; its subsequent parent pilot is recorded below. The V2 build receipt also predates integrated launches. Its later V2/E5 runtime observation is separate and preserves the build receipt and historical V1 artifacts unchanged.
+
+## V2/E5 integrated identity diagnostics
+
+[New sanitized metadata](../research/native-renderer-v2-e5-pilot.json) records three
+sequential diagnostics using the same frozen V2 renderer `d2b60ba1…`, host
+`4eb32b56…` and cache-safe E5 driver `e5a1305e…`. Each process started from fresh,
+verified copies of the same immutable userdata and driver-cache seeds, with MAX
+absent and the safe three compiler options. Actual loaded renderer/driver file
+device and inode matched the SHA-pinned images, and frozen files, environment
+files and common seeds matched again after each owned process stopped and reaped.
+
+Each mode recorded 32 matching target events: original mesh835…/required32 with the
+option disabled, then native mesh875…/required8 and875…/required16. The fragment
+remained569…; both candidates logged the exact revision2 application receipt.
+Actual settings confirmed per-frame game time, the console cap, frame generation
+off, docked output2048×1152 and the existing FSR3.1/dynamic-resolution configuration.
+Explicit screenshot dimensions produced private 2048×1152 control images; the
+headless presentation surface stayed1920×1080 and target attachments1536×864.
+Requested image size does not certify native scene resolution.
+
+Parent review saw broad world, Link and foliage in all three images. Their native
+frames, positions and temporal/UI states differ; the width16 image also includes
+HUD elements absent from the other two captures. These observations do not
+attribute the difference to lowering or establish output equivalence. Live
+executable SIMD width and GPU-generated indirect grid remain unknown. Script
+parser/frame-clock logs establish that the configured script path ran; they do
+not independently test interference from live devices. No benchmark or native
+quality acceptance follows. Ten movie-network policy omissions, the gameplay FSR
+replacement and hair/foliage fidelity gaps remain explicit.
+
+Two earlier V2/E5 attempts remain failed harness observations: one confused the
+control-bridge exclusivity field with script ownership; the next matched unrelated
+pipeline and failed-program counters on one statistics line. Neither rejection
+established a game or pipeline-creation failure. Harness revision3 corrected those
+observations, passed synthetic and saved-fixture checks, and completed all three
+diagnostics without a source-matched pipeline/device/background-job error. The
+failed artifacts were preserved and were not relabeled as completed runs.
 
 ## Historical V1 integrated identity diagnostic (legacy MAX profile)
 
