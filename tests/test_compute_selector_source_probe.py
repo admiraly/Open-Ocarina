@@ -30,7 +30,8 @@ class SelectorSourceProbeTests(unittest.TestCase):
             self.assertEqual(''.join(lines),(probe.ROOT/'src/probes'/filename).read_text())
 
     def test_unreviewed_source_rejected_before_compilation(self):
-        with tempfile.TemporaryDirectory(dir=probe.ROOT/'local') as tmp:
+        # Clean checkouts have no ignored scratch directory.
+        with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);source=root/'source/gpu/vk';source.mkdir(parents=True)
             (source/'vk_draw.cpp').write_text('changed')
             with self.assertRaisesRegex(ValueError,'Unreviewed renderer source'):
