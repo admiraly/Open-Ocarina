@@ -1,0 +1,952 @@
+{
+  "schema": 1,
+  "date": "2026-11-13",
+  "scope": [
+    "Three compile-only pipelines under the same23/17 union layout and02 physical2-control policy; none created during preparation.",
+    "Compile-only native binary contains no resource allocation, queue retrieval, command or submission API imports.",
+    "No new replay executor/ABI, runtime identity/alias verification or live renderer capture admission."
+  ],
+  "CPU_prepared": true,
+  "Vulkan_opened": false,
+  "pipeline_created": false,
+  "dispatch_executed": false,
+  "execution_admitted": false,
+  "profile_sha256": "d6a343cade4fec41cc005fe3b2eb7fe1ceb333f28fda7c5ae1866a43a4983982",
+  "new_tool_sha256": "e25f93a7ddba3cfc2a2a5887beabbe2de030f8c5843574b2171945377b94d5a3",
+  "test_source_sha256": "cef01005c62c158345ffe2e0b7cb695c24952fb4efcd1f9ad812e2468a0d9c32",
+  "tests": {
+    "dedicated_passed": 8,
+    "native_capability_negative_cases": 13,
+    "instance_linker_trap_CPU_checks_passed": true,
+    "all16_statistics_fields_and_formats_preserved": true,
+    "framing_fixture_is_not_GPU_input": true
+  },
+  "native": {
+    "binary_sha256": "e1596b94893d5fd45f49b587a047c8ccc52615fe792418734cd93dc4a985d7a7",
+    "counted_anchors": [
+      "remove-sampler-float-helper",
+      "remove-buffer-helpers",
+      "remove-image-helpers",
+      "remove-execution-tail",
+      "new-compile-only-magic",
+      "reject-execution-before-input",
+      "keep-sampler-frame-without-objects",
+      "compile-only-before-instance",
+      "third-module-identity",
+      "push-capacity23",
+      "stage-SSBO17",
+      "set-SSBO17",
+      "stage-resources23",
+      "nonuniform-gate-signature",
+      "null-and-nonuniform-feature-gate",
+      "exact-array-alias-contract",
+      "same-memory23-descriptors",
+      "binding13-array8",
+      "alias-storage-type",
+      "alias-null-state",
+      "validate-literal-aliases",
+      "query-nonuniform-before-device",
+      "require-statistics-before-device",
+      "enable-nonuniform-no-variable-pointers",
+      "actual-compute32",
+      "separate-native-result-profile",
+      "all-structured-statistics-retained",
+      "application-identity"
+    ],
+    "diff_sha256": "4b55040ac2a8c414b89bec7d14ee7fd1002771b6062a6c54e07d70080bf1d5d0",
+    "execution_imports_absent": true,
+    "flags": [
+      "-std=c11",
+      "-O2",
+      "-DNDEBUG",
+      "-Wall",
+      "-Wextra",
+      "-Werror"
+    ],
+    "source_sha256": "156c2b971ada7c76a6f3c54ec95663e1167a8f50c6a31273715acbb35880d02c"
+  },
+  "plans": {
+    "array": {
+      "control": "array32.bin",
+      "control_sha256": "1c34091132517b03755f535b58cc8c5fc8f1c0f8ab7358d9c8fd4685775cc6a3",
+      "execution_mode_rejected": true,
+      "module_sha256": "7c6322e1a7b4a84206977fd0a0af165b7dedeb0eb9cbd8fb7c211ec1af77d7bd",
+      "native_CPU_check": {
+        "allocations": 60,
+        "dispatch_executed": false,
+        "images": 4,
+        "native_plan_validated": true
+      }
+    },
+    "original": {
+      "control": "original32.bin",
+      "control_sha256": "7d253bd336fbd3e190097a63f3776fdc6edb4c9eb4157870252b396daedb896e",
+      "execution_mode_rejected": true,
+      "module_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+      "native_CPU_check": {
+        "allocations": 60,
+        "dispatch_executed": false,
+        "images": 4,
+        "native_plan_validated": true
+      }
+    },
+    "static": {
+      "control": "static32.bin",
+      "control_sha256": "d74a5dab21a3f8d0594db25997d5eb7acc63a8330f0ec4b3497407e0ccb7ef36",
+      "execution_mode_rejected": true,
+      "module_sha256": "d5148342b4517882b25a48e63700cbfb8695454cc05d131da718509ac2563dc0",
+      "native_CPU_check": {
+        "allocations": 60,
+        "dispatch_executed": false,
+        "images": 4,
+        "native_plan_validated": true
+      }
+    }
+  },
+  "original02_pins": {
+    "baseline32.bin": "bc1e6c3a2788190bd16d922c6e5a33b038d6774af02df3325408c0c9d43c26a4",
+    "candidate32.bin": "2f29fb6fc6104eccbd52137591119d2ecdbd6856ab3b4a4cd8d7732118e139c9",
+    "native": "6bbf44eeb4f1521bc052d3a6473d5b2ba0656f986d091c9a19f97d39fb0c87dd",
+    "prepared.json": "1bf7abdd3c37d571ced4bbe046c7e20c115f6121b169c55696bb8ffa679b23d4",
+    "profile.json": "384a4064fc0aa593e4f9984122fe3f93dfaf089dfed608ee8fb0bacbace658e7",
+    "vulkan_compute_interval_replay.c": "9b67fbdec5487cd5138395455b58c7148114ee902f7bfa643bebc30cb741e55f"
+  },
+  "source_ledger": {
+    "patches/hookshot/check_binding_provenance.py": "53b54a68256feba6d60a4919c1f530d0d94fcc8bec004ec559e20099feca7d4a",
+    "patches/hookshot/check_dispatch_parameters.py": "ddf942ec838e6578fa3464e3d30288fc9572e4eab30b3d06fae1b4cbd1e96207",
+    "patches/hookshot/check_occurrence_capture.py": "0723a5cb5009d43f39213e420264c801154cc7c24ce6719b797b604ac1ed8f06",
+    "patches/hookshot/check_page_table_patch.py": "ea13eb27b0df1d7cb30410316d7a05f44ba9a4e652260ddc7541062234de3a52",
+    "patches/hookshot/check_sampled_image_capture.py": "130b2c0be1d2b7392ec4448750b1ed82e03c9da7de8fbc5a2a91b94f63f7d42f",
+    "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+    "tools/compute_interval_array_compile.py": "e25f93a7ddba3cfc2a2a5887beabbe2de030f8c5843574b2171945377b94d5a3",
+    "tools/compute_interval_array_lowering.py": "d8c4a899e350408c52b6e1121ce74f244bc182f327b35007e4c7990ed214e13d",
+    "tools/compute_interval_lowering.py": "3176a7e0130b5d722a88fdb2d5ab9512fff4afecf78e10828eb6747b38ca00ca",
+    "tools/compute_interval_replay.py": "9a5e3835c251047f51ba23e9042ac9b821c9e6543adc9f979186d10afcdecb85",
+    "tools/physical_replay.py": "07172fa9b268fc65ffc5a83b1ddd51b11151c23354388dafca411280d4f87b7f",
+    "tools/physical_span_contract.py": "f60dabf565b21b5b883d2784541682c27b88df8520bc16fffe5117d115d6ac33",
+    "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+    "tools/vulkan_physical_replay.c": "0bacac3eda5c93a50b2ff2efdd3a595a0b260bfee371cd7b3e4da85ed70b538d"
+  },
+  "union_layout": {
+    "bindings": [
+      {
+        "binding": 0,
+        "count": 1,
+        "set": 0,
+        "type": 6
+      },
+      {
+        "binding": 1,
+        "count": 1,
+        "set": 0,
+        "type": 6
+      },
+      {
+        "binding": 2,
+        "count": 1,
+        "set": 0,
+        "type": 7
+      },
+      {
+        "binding": 3,
+        "count": 1,
+        "set": 0,
+        "type": 7
+      },
+      {
+        "binding": 4,
+        "count": 1,
+        "set": 0,
+        "type": 7
+      },
+      {
+        "binding": 5,
+        "count": 1,
+        "set": 0,
+        "type": 7
+      },
+      {
+        "binding": 6,
+        "count": 1,
+        "set": 0,
+        "type": 7
+      },
+      {
+        "binding": 7,
+        "count": 3,
+        "set": 0,
+        "type": 7
+      },
+      {
+        "binding": 8,
+        "count": 1,
+        "set": 0,
+        "type": 1
+      },
+      {
+        "binding": 9,
+        "count": 1,
+        "set": 0,
+        "type": 1
+      },
+      {
+        "binding": 10,
+        "count": 1,
+        "set": 0,
+        "type": 1
+      },
+      {
+        "binding": 11,
+        "count": 1,
+        "set": 0,
+        "type": 1
+      },
+      {
+        "binding": 12,
+        "count": 1,
+        "set": 0,
+        "type": 7
+      },
+      {
+        "binding": 13,
+        "count": 8,
+        "set": 0,
+        "type": 7
+      }
+    ],
+    "entry_point": "main",
+    "push_constant_bytes": 56,
+    "workgroup": [
+      64,
+      1,
+      1
+    ]
+  },
+  "push_bytes": 88,
+  "root_push_offset": 48,
+  "local_size": [
+    64,
+    1,
+    1
+  ],
+  "required_width": 32,
+  "require_full_subgroups": true,
+  "additional_descriptors": [
+    [
+      13,
+      0,
+      7,
+      0,
+      7,
+      0,
+      0,
+      1370880,
+      464
+    ],
+    [
+      13,
+      1,
+      7,
+      0,
+      28,
+      0,
+      0,
+      2527232,
+      16960
+    ],
+    [
+      13,
+      2,
+      7,
+      0,
+      25,
+      0,
+      0,
+      7284096,
+      64
+    ],
+    [
+      13,
+      3,
+      7,
+      0,
+      27,
+      0,
+      0,
+      2129664,
+      192
+    ],
+    [
+      13,
+      4,
+      7,
+      0,
+      7,
+      0,
+      0,
+      1329408,
+      40960
+    ],
+    [
+      13,
+      5,
+      7,
+      0,
+      25,
+      0,
+      0,
+      7356416,
+      156852224
+    ],
+    [
+      13,
+      6,
+      7,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      13,
+      7,
+      7,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  ],
+  "graph_extension_proof": {
+    "descriptor_elements": 23,
+    "extra_allocations": 0,
+    "original_allocations_unchanged": 60,
+    "same_owner_offset_range_null_for_all8_aliases": true,
+    "storage_buffer_elements": 17
+  },
+  "driver": {
+    "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+    "library_name": "libvulkan_intel.so",
+    "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+  },
+  "compiler_environment": {
+    "HS_CS32_MAX_INSTS": null,
+    "HS_FORCE_SIMD8": null,
+    "HS_SPILL_BATCH": "1",
+    "HS_SUBGROUP8": null,
+    "shader_spilling_rate": "1"
+  },
+  "runtime_environment": {
+    "HS_PUSH_SHADOW": null
+  },
+  "controlled_compiler_options": {
+    "HS_CS32_MAX_INSTS": null,
+    "HS_FORCE_SIMD8": null,
+    "HS_LARGE_GRF": null,
+    "HS_LARGE_GRF_BIT": null,
+    "HS_PUSH_SHADOW": null,
+    "HS_RA_DEBUG": null,
+    "HS_SPILL_BATCH": "1",
+    "HS_SPILL_PCT": null,
+    "HS_SUBGROUP8": null,
+    "INTEL_DEBUG": null,
+    "RX_VK_NOOPT": null,
+    "RX_VK_WARP64": null,
+    "shader_spilling_rate": "1"
+  },
+  "fresh_private_cache_per_case_required": true,
+  "array_bundle_artifacts": {
+    "alias-plan.json": "87556a394524d0e70acccbd9a9dd63c56ae6e40f97375e7d70af8a1ebb507c60",
+    "candidate.spv": "7c6322e1a7b4a84206977fd0a0af165b7dedeb0eb9cbd8fb7c211ec1af77d7bd",
+    "records.bin": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+    "report.json": "33e0eb3f96d49fc9f962305e53f47f367a621f5d6d0af31da97a027c61482981"
+  },
+  "additional_feature": "shaderStorageBufferArrayNonUniformIndexing",
+  "VariablePointers_requested": false,
+  "device_limits_queried": false,
+  "actual_array_proof": {
+    "finite": [
+      {
+        "counter_bits": 32,
+        "initial_high": 6,
+        "initial_low": 0,
+        "left_update": "high=mid",
+        "midpoint": "low + ((high-low)>>1)",
+        "other_control_flow_cycles": false,
+        "right_update": "low=mid+1",
+        "width": 4
+      },
+      {
+        "counter_bits": 32,
+        "initial_high": 6,
+        "initial_low": 0,
+        "left_update": "high=mid",
+        "midpoint": "low + ((high-low)>>1)",
+        "other_control_flow_cycles": false,
+        "right_update": "low=mid+1",
+        "width": 16
+      }
+    ],
+    "hit_shape": [
+      {
+        "NonUniform_route_access_load": true,
+        "alias_readonly_or_restrict_added": false,
+        "array_binding": 13,
+        "descriptor_count": 8,
+        "pointer_return_or_phi_added": false,
+        "typed_storage_value_return": true,
+        "width": 4
+      },
+      {
+        "NonUniform_route_access_load": true,
+        "alias_readonly_or_restrict_added": false,
+        "array_binding": 13,
+        "descriptor_count": 8,
+        "pointer_return_or_phi_added": false,
+        "typed_storage_value_return": true,
+        "width": 16
+      }
+    ],
+    "preservation": {
+      "added_capabilities": [
+        5301,
+        5308
+      ],
+      "added_global_opcodes": {
+        "28": 2,
+        "29": 3,
+        "30": 4,
+        "32": 4,
+        "43": 8,
+        "59": 3,
+        "71": 19,
+        "72": 16
+      },
+      "all_other_function_instruction_words_identical": true,
+      "entry_interface_additions": [
+        11185,
+        11192,
+        11197
+      ],
+      "modified_functions": [
+        107,
+        850
+      ],
+      "original_globals_preserved": true,
+      "original_store_and_main_preserved": true,
+      "physical_miss_suffixes": [
+        {
+          "unchanged_binary_words": 166,
+          "width": 4
+        },
+        {
+          "unchanged_binary_words": 166,
+          "width": 16
+        }
+      ],
+      "untouched_functions": [
+        {
+          "function_id": 332,
+          "sha256": "de875370a3c7eaf3d7a765fb30a74925cc7654cd24285a58e03e73a61db6aa1e"
+        },
+        {
+          "function_id": 491,
+          "sha256": "b72d4cec079eb53e517f0e818a559f86c372d9ed2f4de1aba240f621555e49f4"
+        },
+        {
+          "function_id": 691,
+          "sha256": "31235fd1eacc48c094e863ce0f115d4165f61030ba905f48db635751c3fc485b"
+        },
+        {
+          "function_id": 1050,
+          "sha256": "bf6f6964c8c6e180101ea72fd9e411dec06153175d44b70a805745740a132906"
+        },
+        {
+          "function_id": 1209,
+          "sha256": "bf7906794f31f179b1911dea1b9c0a76fa6b7ad8162e3b0267130947af4313e2"
+        }
+      ]
+    },
+    "record_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+    "selection": {
+      "4": {
+        "complete_uint64_selection_domain": true,
+        "identity_compared": [
+          "StorageBuffer binding",
+          "descriptor array element",
+          "aligned guest base"
+        ],
+        "maximum_binary_search_iterations": 3,
+        "selection_cells": 13,
+        "typed_index_rule": "uint32(address - aligned_base) >> log2(width)"
+      },
+      "16": {
+        "complete_uint64_selection_domain": true,
+        "identity_compared": [
+          "StorageBuffer binding",
+          "descriptor array element",
+          "aligned guest base"
+        ],
+        "maximum_binary_search_iterations": 3,
+        "selection_cells": 13,
+        "typed_index_rule": "uint32(address - aligned_base) >> log2(width)"
+      }
+    }
+  },
+  "actual_static_proof": {
+    "finite": [
+      {
+        "counter_bits": 32,
+        "initial_high": 6,
+        "initial_low": 0,
+        "left_update": "high=mid",
+        "midpoint": "low + ((high-low)>>1)",
+        "other_control_flow_cycles": false,
+        "right_update": "low=mid+1",
+        "width": 4
+      },
+      {
+        "counter_bits": 32,
+        "initial_high": 6,
+        "initial_low": 0,
+        "left_update": "high=mid",
+        "midpoint": "low + ((high-low)>>1)",
+        "other_control_flow_cycles": false,
+        "right_update": "low=mid+1",
+        "width": 16
+      }
+    ],
+    "preservation": {
+      "added_global_instruction_opcodes": {
+        "29": 1,
+        "30": 2,
+        "32": 2,
+        "43": 7,
+        "59": 1,
+        "71": 5,
+        "72": 14
+      },
+      "all_other_function_instruction_words_identical": true,
+      "categories": [
+        "two load-selector prefixes replaced",
+        "one readonly binding12 added",
+        "new independent record types/constants/annotations",
+        "record interface added to main entry declaration"
+      ],
+      "header_changes": {
+        "generator_provenance_changed": true,
+        "id_bound": [
+          11181,
+          11330
+        ],
+        "version_and_schema_unchanged": true
+      },
+      "modified_functions": [
+        107,
+        850
+      ],
+      "original_globals_preserved_except_added_entry_interface": true,
+      "physical_miss_suffixes": [
+        {
+          "unchanged_binary_words": 166,
+          "width": 4
+        },
+        {
+          "unchanged_binary_words": 166,
+          "width": 16
+        }
+      ],
+      "untouched_functions": [
+        {
+          "function_id": 332,
+          "sha256": "de875370a3c7eaf3d7a765fb30a74925cc7654cd24285a58e03e73a61db6aa1e"
+        },
+        {
+          "function_id": 491,
+          "sha256": "b72d4cec079eb53e517f0e818a559f86c372d9ed2f4de1aba240f621555e49f4"
+        },
+        {
+          "function_id": 691,
+          "sha256": "31235fd1eacc48c094e863ce0f115d4165f61030ba905f48db635751c3fc485b"
+        },
+        {
+          "function_id": 1050,
+          "sha256": "bf6f6964c8c6e180101ea72fd9e411dec06153175d44b70a805745740a132906"
+        },
+        {
+          "function_id": 1209,
+          "sha256": "bf7906794f31f179b1911dea1b9c0a76fa6b7ad8162e3b0267130947af4313e2"
+        }
+      ]
+    }
+  },
+  "actual_original_access_contract": {
+    "finite_work": {
+      "counted_descriptor_search_loops": [
+        {
+          "counter_bits": 32,
+          "iterations_at_most": 3,
+          "step": 1
+        },
+        {
+          "counter_bits": 32,
+          "iterations_at_most": 3,
+          "step": 1
+        }
+      ],
+      "main_has_backedges": false,
+      "reachable_functions": 3,
+      "recursive_calls": false,
+      "scope": "Finite shader instruction control flow; not a deadline, memory-validity or GPU scheduling guarantee",
+      "static_helper_call_sites": 72,
+      "unresolved_cycles": []
+    },
+    "helpers": [
+      {
+        "data_alignment_operand": 4,
+        "data_width": 4,
+        "entry_alignment_operand": 8,
+        "entry_width": 8,
+        "maximum_offset": 4092,
+        "table_entries": 3145728,
+        "windows": [
+          [
+            68719476736,
+            8589934592,
+            0
+          ],
+          [
+            545460846592,
+            4294967296,
+            2097152
+          ]
+        ]
+      },
+      {
+        "data_alignment_operand": 4,
+        "data_width": 16,
+        "entry_alignment_operand": 8,
+        "entry_width": 8,
+        "maximum_offset": 4080,
+        "table_entries": 3145728,
+        "windows": [
+          [
+            68719476736,
+            8589934592,
+            0
+          ],
+          [
+            545460846592,
+            4294967296,
+            2097152
+          ]
+        ]
+      }
+    ],
+    "page_size": 4096,
+    "reachable_physical_loads": 4,
+    "root_push_offset": 48,
+    "spirv_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+    "table_bytes": 25165824
+  },
+  "modules": {
+    "array": {
+      "module_sha256": "7c6322e1a7b4a84206977fd0a0af165b7dedeb0eb9cbd8fb7c211ec1af77d7bd",
+      "reflection": {
+        "bindings": [
+          {
+            "binding": 0,
+            "count": 1,
+            "set": 0,
+            "type": 6
+          },
+          {
+            "binding": 1,
+            "count": 1,
+            "set": 0,
+            "type": 6
+          },
+          {
+            "binding": 2,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 3,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 4,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 5,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 6,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 7,
+            "count": 3,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 8,
+            "count": 1,
+            "set": 0,
+            "type": 1
+          },
+          {
+            "binding": 9,
+            "count": 1,
+            "set": 0,
+            "type": 1
+          },
+          {
+            "binding": 10,
+            "count": 1,
+            "set": 0,
+            "type": 1
+          },
+          {
+            "binding": 11,
+            "count": 1,
+            "set": 0,
+            "type": 1
+          },
+          {
+            "binding": 12,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 13,
+            "count": 8,
+            "set": 0,
+            "type": 7
+          }
+        ],
+        "entry_point": "main",
+        "push_constant_bytes": 56,
+        "workgroup": [
+          64,
+          1,
+          1
+        ]
+      }
+    },
+    "original": {
+      "module_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+      "reflection": {
+        "bindings": [
+          {
+            "binding": 0,
+            "count": 1,
+            "set": 0,
+            "type": 6
+          },
+          {
+            "binding": 1,
+            "count": 1,
+            "set": 0,
+            "type": 6
+          },
+          {
+            "binding": 2,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 3,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 4,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 5,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 6,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 7,
+            "count": 3,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 8,
+            "count": 1,
+            "set": 0,
+            "type": 1
+          },
+          {
+            "binding": 9,
+            "count": 1,
+            "set": 0,
+            "type": 1
+          },
+          {
+            "binding": 10,
+            "count": 1,
+            "set": 0,
+            "type": 1
+          },
+          {
+            "binding": 11,
+            "count": 1,
+            "set": 0,
+            "type": 1
+          }
+        ],
+        "entry_point": "main",
+        "push_constant_bytes": 56,
+        "workgroup": [
+          64,
+          1,
+          1
+        ]
+      }
+    },
+    "static": {
+      "module_sha256": "d5148342b4517882b25a48e63700cbfb8695454cc05d131da718509ac2563dc0",
+      "reflection": {
+        "bindings": [
+          {
+            "binding": 0,
+            "count": 1,
+            "set": 0,
+            "type": 6
+          },
+          {
+            "binding": 1,
+            "count": 1,
+            "set": 0,
+            "type": 6
+          },
+          {
+            "binding": 2,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 3,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 4,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 5,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 6,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 7,
+            "count": 3,
+            "set": 0,
+            "type": 7
+          },
+          {
+            "binding": 8,
+            "count": 1,
+            "set": 0,
+            "type": 1
+          },
+          {
+            "binding": 9,
+            "count": 1,
+            "set": 0,
+            "type": 1
+          },
+          {
+            "binding": 10,
+            "count": 1,
+            "set": 0,
+            "type": 1
+          },
+          {
+            "binding": 11,
+            "count": 1,
+            "set": 0,
+            "type": 1
+          },
+          {
+            "binding": 12,
+            "count": 1,
+            "set": 0,
+            "type": 7
+          }
+        ],
+        "entry_point": "main",
+        "push_constant_bytes": 56,
+        "workgroup": [
+          64,
+          1,
+          1
+        ]
+      }
+    }
+  },
+  "source_graph": {
+    "original_owners": 59,
+    "record_owners": 1,
+    "new_owners": 0,
+    "original_bytes": 1163919360,
+    "record_owner_bytes": 8784,
+    "all_original_input_inventory_entries_pinned": 75,
+    "all_original_proof_artifact_entries_pinned": 14,
+    "original_input_inventory_sha256": "695600d6077881c07e13cc6cbbf651b3d64b8f69e87b90b71f2daa7e4b09f9bd"
+  },
+  "limitations": [
+    "No device/pipeline call was issued; feature/limit gates are prepared and CPU-tested, not queried here.",
+    "No dispatch code, queue retrieval, buffer/image allocation or replay path remains in the derived native host.",
+    "Native framing tests intentionally use authored header words and structural records, never original instructions or a Vulkan pipeline.",
+    "Actual original module/store/MISS preservation and finite/nonuniform/alias audits were repeated from exact frozen files during real preparation.",
+    "A future GPU/device lease and fresh file-hash admission are required before any compile-only native mode.",
+    "No new replay ABI, source renderer integration, GPU time, performance or FPS result is established."
+  ]
+}

@@ -1,0 +1,197 @@
+{
+  "CPU_evidence": [
+    "Ten new tests: linker-trapped framing, old ABI/static module/grid rejection, literal and constructed-handle alias mutations,13 capacity/feature mutations, exact dispatch/export source retention, full60 byte/guard comparisons.",
+    "O2 DNDEBUG Werror native build and nm inspection; one dispatch/submit/fence import path; no device/queue idle import.",
+    "All three actual controls checked by native --check-only and Python base proof/input/graph admission."
+  ],
+  "CPU_prepared": true,
+  "Vulkan_opened": false,
+  "adapter_sha256": "33a786ade6020aa5627f83a6478922e6aaa56f1b8045c6e97af124ddd8db1805",
+  "alias_contract": "8 exact owner/offset/range/null clones; actual constructed VkBuffer+offset+range checked before command creation; binding6 included; two null pairs.",
+  "common_compile_prepared_sha256": "79d0032821e5722da59919f849c08c2d59f31ba295dee05327bdc6f5c8d32f24",
+  "common_compile_profile_sha256": "d6a343cade4fec41cc005fe3b2eb7fe1ceb333f28fda7c5ae1866a43a4983982",
+  "compiler_options": {
+    "HS_CS32_MAX_INSTS": null,
+    "HS_FORCE_SIMD8": null,
+    "HS_LARGE_GRF": null,
+    "HS_LARGE_GRF_BIT": null,
+    "HS_PUSH_SHADOW": null,
+    "HS_RA_DEBUG": null,
+    "HS_SPILL_BATCH": "1",
+    "HS_SPILL_PCT": null,
+    "HS_SUBGROUP8": null,
+    "INTEL_DEBUG": null,
+    "RX_VK_NOOPT": null,
+    "RX_VK_WARP64": null,
+    "shader_spilling_rate": "1"
+  },
+  "complete_readback": {
+    "all_bytes_rehashed_and_compared": true,
+    "original_bytes": 1163919360,
+    "original_owners": 59,
+    "record_and_guard_bytes": 8784,
+    "record_expected_sha256": "0ae9e410ac93d40b4ec73073a303fdcb5fa0921dbc01c81ff1e38a349f82c393",
+    "record_owner": 1,
+    "total_bytes": 1163928144,
+    "total_owners": 60
+  },
+  "device_features_and_capacity": {
+    "VariablePointers_requested": false,
+    "nullDescriptor_required": true,
+    "push_and_per_stage_resources": 23,
+    "sampled_images_per_stage_and_set": 4,
+    "samplers_per_stage_and_set": 4,
+    "shaderStorageBufferArrayNonUniformIndexing_required": true,
+    "storage_per_stage_and_set": 17,
+    "thresholds_only_not_queried": true,
+    "uniform_per_stage_and_set": 2
+  },
+  "dispatch": {
+    "actual_subgroup_size_required": 32,
+    "child_rlimit_overrides": false,
+    "count_per_case": 1,
+    "fence_bound_ns": 2000000000,
+    "full_subgroups": true,
+    "grid": [
+      2,
+      1,
+      1
+    ],
+    "local": [
+      64,
+      1,
+      1
+    ],
+    "parent_pipe_bound_bytes": 67108864,
+    "process_bound_seconds": 30
+  },
+  "dispatch_executed": false,
+  "modules": {
+    "array": "7c6322e1a7b4a84206977fd0a0af165b7dedeb0eb9cbd8fb7c211ec1af77d7bd",
+    "original": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b"
+  },
+  "native": {
+    "binary_sha256": "89a60f998c5d6b5975bebbd061b8b6b80d5c25f3fe4f247389b217ecf2a1a8c1",
+    "counted_anchors": [
+      "common23:remove-sampler-float-helper",
+      "common23:remove-buffer-helpers",
+      "common23:remove-image-helpers",
+      "common23:remove-execution-tail",
+      "common23:new-compile-only-magic",
+      "common23:reject-execution-before-input",
+      "common23:keep-sampler-frame-without-objects",
+      "common23:compile-only-before-instance",
+      "common23:third-module-identity",
+      "common23:push-capacity23",
+      "common23:stage-SSBO17",
+      "common23:set-SSBO17",
+      "common23:stage-resources23",
+      "common23:nonuniform-gate-signature",
+      "common23:null-and-nonuniform-feature-gate",
+      "common23:exact-array-alias-contract",
+      "common23:same-memory23-descriptors",
+      "common23:binding13-array8",
+      "common23:alias-storage-type",
+      "common23:alias-null-state",
+      "common23:validate-literal-aliases",
+      "common23:query-nonuniform-before-device",
+      "common23:require-statistics-before-device",
+      "common23:enable-nonuniform-no-variable-pointers",
+      "common23:actual-compute32",
+      "common23:separate-native-result-profile",
+      "common23:all-structured-statistics-retained",
+      "common23:application-identity",
+      "restore02-sampler-float",
+      "restore02-buffer",
+      "restore02-images",
+      "restore02-dispatch-tail",
+      "new-replay-only-ABI",
+      "restore-explicit-execute-mode",
+      "restore-explicit-compile-or-execute-branch",
+      "restore-sampler-objects",
+      "only-original-and-array-modules",
+      "constructed-handle-alias-check",
+      "check-actual-alias-before-command-pool",
+      "runtime-alias-check-receipt",
+      "new-application-identity"
+    ],
+    "diff_sha256": "19045a0194b44d5ef5e218f4801a2bae8e3dce06297b7d75057857cbf900f2de",
+    "execution_tail_retained": true,
+    "flags": [
+      "-std=c11",
+      "-O2",
+      "-DNDEBUG",
+      "-Wall",
+      "-Wextra",
+      "-Werror"
+    ],
+    "source_sha256": "99787c9014fdd3f0d094d978fe89579a35179f102a1b9b6c8d49257e462ad1f1"
+  },
+  "pipeline_created": false,
+  "plans": {
+    "array-once": {
+      "CPU_check": {
+        "allocations": 60,
+        "dispatch_executed": false,
+        "images": 4,
+        "native_plan_validated": true
+      },
+      "control": "array-once.bin",
+      "control_sha256": "612ab50d6b6dfbac6f64e6392a840d1a4fcbd97cf9e1e5cbcf83eaf158e309ff",
+      "module_sha256": "7c6322e1a7b4a84206977fd0a0af165b7dedeb0eb9cbd8fb7c211ec1af77d7bd",
+      "single_use_runtime_grant_required": true
+    },
+    "baseline-once": {
+      "CPU_check": {
+        "allocations": 60,
+        "dispatch_executed": false,
+        "images": 4,
+        "native_plan_validated": true
+      },
+      "control": "baseline-once.bin",
+      "control_sha256": "a6142f0d91492567b7c162aef2796ec3487c59707b5cea2364ed48c54b98ab65",
+      "module_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+      "single_use_runtime_grant_required": true
+    },
+    "baseline-repeat": {
+      "CPU_check": {
+        "allocations": 60,
+        "dispatch_executed": false,
+        "images": 4,
+        "native_plan_validated": true
+      },
+      "control": "baseline-repeat.bin",
+      "control_sha256": "a6142f0d91492567b7c162aef2796ec3487c59707b5cea2364ed48c54b98ab65",
+      "module_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+      "single_use_runtime_grant_required": true
+    }
+  },
+  "prepared_sha256": "9d882565af79a985b1a9d253d24207c1b8829c30e4752519b9825bbb625a57c4",
+  "private_preparation": "local/compute-interval-array-replay/final-review",
+  "profile_sha256": "8642b6514100eb2ad3c5b227376e0b560a26290e827c44b97e5077decb00027c",
+  "runtime_grant_required_per_case": true,
+  "schema": "open-ocarina.array-union-owned-replay-preparation-summary/v1",
+  "scope": [
+    "Owned frozen diagnostic inputs, not as-submitted renderer descriptors or live integration.",
+    "No dispatch/pipeline/device during preparation. No runtime correctness or speed established.",
+    "A future runner must admit/recheck all source, input, proof, plan, module and driver pins before/after one reviewed case; this tool exposes preparation/comparison only."
+  ],
+  "source_ledger": {
+    "patches/hookshot/check_binding_provenance.py": "53b54a68256feba6d60a4919c1f530d0d94fcc8bec004ec559e20099feca7d4a",
+    "patches/hookshot/check_dispatch_parameters.py": "ddf942ec838e6578fa3464e3d30288fc9572e4eab30b3d06fae1b4cbd1e96207",
+    "patches/hookshot/check_occurrence_capture.py": "0723a5cb5009d43f39213e420264c801154cc7c24ce6719b797b604ac1ed8f06",
+    "patches/hookshot/check_page_table_patch.py": "ea13eb27b0df1d7cb30410316d7a05f44ba9a4e652260ddc7541062234de3a52",
+    "patches/hookshot/check_sampled_image_capture.py": "130b2c0be1d2b7392ec4448750b1ed82e03c9da7de8fbc5a2a91b94f63f7d42f",
+    "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+    "tools/compute_interval_array_compile.py": "e25f93a7ddba3cfc2a2a5887beabbe2de030f8c5843574b2171945377b94d5a3",
+    "tools/compute_interval_array_lowering.py": "d8c4a899e350408c52b6e1121ce74f244bc182f327b35007e4c7990ed214e13d",
+    "tools/compute_interval_array_replay.py": "33a786ade6020aa5627f83a6478922e6aaa56f1b8045c6e97af124ddd8db1805",
+    "tools/compute_interval_lowering.py": "3176a7e0130b5d722a88fdb2d5ab9512fff4afecf78e10828eb6747b38ca00ca",
+    "tools/compute_interval_replay.py": "9a5e3835c251047f51ba23e9042ac9b821c9e6543adc9f979186d10afcdecb85",
+    "tools/physical_replay.py": "07172fa9b268fc65ffc5a83b1ddd51b11151c23354388dafca411280d4f87b7f",
+    "tools/physical_span_contract.py": "f60dabf565b21b5b883d2784541682c27b88df8520bc16fffe5117d115d6ac33",
+    "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+    "tools/vulkan_physical_replay.c": "0bacac3eda5c93a50b2ff2efdd3a595a0b260bfee371cd7b3e4da85ed70b538d"
+  },
+  "tests_sha256": "caf029a4c754daa7179b59ceb07001217119d5359b548846ca300e6c8454d51f"
+}

@@ -1,0 +1,521 @@
+{
+  "schema": "open-ocarina.compute-interval-array-lowering/v1",
+  "CPU_only": true,
+  "Vulkan_opened": false,
+  "pipeline_compiled": false,
+  "dispatch_executed": false,
+  "execution_admitted": false,
+  "original_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+  "candidate_sha256": "7c6322e1a7b4a84206977fd0a0af165b7dedeb0eb9cbd8fb7c211ec1af77d7bd",
+  "candidate_bytes": 255856,
+  "tool_sha256": "d8c4a899e350408c52b6e1121ce74f244bc182f327b35007e4c7990ed214e13d",
+  "dependencies": {
+    "tools/compute_interval_lowering.py": "3176a7e0130b5d722a88fdb2d5ab9512fff4afecf78e10828eb6747b38ca00ca",
+    "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+    "tools/physical_span_contract.py": "f60dabf565b21b5b883d2784541682c27b88df8520bc16fffe5117d115d6ac33"
+  },
+  "manifest_sha256": "4c4b5fcaf73318b8edc08406a58e39a2702544f86183e7d894455e7d363206b9",
+  "record_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+  "record_bytes": 592,
+  "alias_plan_sha256": "87556a394524d0e70acccbd9a9dd63c56ae6e40f97375e7d70af8a1ebb507c60",
+  "reflection": {
+    "entry_point": "main",
+    "workgroup": [
+      64,
+      1,
+      1
+    ],
+    "push_constant_bytes": 56,
+    "bindings": [
+      {
+        "set": 0,
+        "binding": 0,
+        "type": 6,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 1,
+        "type": 6,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 2,
+        "type": 7,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 3,
+        "type": 7,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 4,
+        "type": 7,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 5,
+        "type": 7,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 6,
+        "type": 7,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 7,
+        "type": 7,
+        "count": 3
+      },
+      {
+        "set": 0,
+        "binding": 8,
+        "type": 1,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 9,
+        "type": 1,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 10,
+        "type": 1,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 11,
+        "type": 1,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 12,
+        "type": 7,
+        "count": 1
+      },
+      {
+        "set": 0,
+        "binding": 13,
+        "type": 7,
+        "count": 8
+      }
+    ]
+  },
+  "preservation": {
+    "all_other_function_instruction_words_identical": true,
+    "untouched_functions": [
+      {
+        "function_id": 332,
+        "sha256": "de875370a3c7eaf3d7a765fb30a74925cc7654cd24285a58e03e73a61db6aa1e"
+      },
+      {
+        "function_id": 491,
+        "sha256": "b72d4cec079eb53e517f0e818a559f86c372d9ed2f4de1aba240f621555e49f4"
+      },
+      {
+        "function_id": 691,
+        "sha256": "31235fd1eacc48c094e863ce0f115d4165f61030ba905f48db635751c3fc485b"
+      },
+      {
+        "function_id": 1050,
+        "sha256": "bf6f6964c8c6e180101ea72fd9e411dec06153175d44b70a805745740a132906"
+      },
+      {
+        "function_id": 1209,
+        "sha256": "bf7906794f31f179b1911dea1b9c0a76fa6b7ad8162e3b0267130947af4313e2"
+      }
+    ],
+    "physical_miss_suffixes": [
+      {
+        "width": 4,
+        "unchanged_binary_words": 166
+      },
+      {
+        "width": 16,
+        "unchanged_binary_words": 166
+      }
+    ],
+    "modified_functions": [
+      107,
+      850
+    ],
+    "original_globals_preserved": true,
+    "added_capabilities": [
+      5301,
+      5308
+    ],
+    "added_global_opcodes": {
+      "71": 19,
+      "72": 16,
+      "30": 4,
+      "29": 3,
+      "32": 4,
+      "59": 3,
+      "43": 8,
+      "28": 2
+    },
+    "entry_interface_additions": [
+      11185,
+      11192,
+      11197
+    ],
+    "original_store_and_main_preserved": true
+  },
+  "hit_path_audit": [
+    {
+      "width": 4,
+      "array_binding": 13,
+      "descriptor_count": 8,
+      "typed_storage_value_return": true,
+      "NonUniform_route_access_load": true,
+      "pointer_return_or_phi_added": false,
+      "alias_readonly_or_restrict_added": false
+    },
+    {
+      "width": 16,
+      "array_binding": 13,
+      "descriptor_count": 8,
+      "typed_storage_value_return": true,
+      "NonUniform_route_access_load": true,
+      "pointer_return_or_phi_added": false,
+      "alias_readonly_or_restrict_added": false
+    }
+  ],
+  "finite_lookup_audit": [
+    {
+      "width": 4,
+      "initial_low": 0,
+      "initial_high": 6,
+      "counter_bits": 32,
+      "midpoint": "low + ((high-low)>>1)",
+      "left_update": "high=mid",
+      "right_update": "low=mid+1",
+      "other_control_flow_cycles": false
+    },
+    {
+      "width": 16,
+      "initial_low": 0,
+      "initial_high": 6,
+      "counter_bits": 32,
+      "midpoint": "low + ((high-low)>>1)",
+      "left_update": "high=mid",
+      "right_update": "low=mid+1",
+      "other_control_flow_cycles": false
+    }
+  ],
+  "selection_proof": {
+    "4": {
+      "complete_uint64_selection_domain": true,
+      "selection_cells": 13,
+      "maximum_binary_search_iterations": 3,
+      "identity_compared": [
+        "StorageBuffer binding",
+        "descriptor array element",
+        "aligned guest base"
+      ],
+      "typed_index_rule": "uint32(address - aligned_base) >> log2(width)"
+    },
+    "16": {
+      "complete_uint64_selection_domain": true,
+      "selection_cells": 13,
+      "maximum_binary_search_iterations": 3,
+      "identity_compared": [
+        "StorageBuffer binding",
+        "descriptor array element",
+        "aligned guest base"
+      ],
+      "typed_index_rule": "uint32(address - aligned_base) >> log2(width)"
+    }
+  },
+  "alias_proof": {
+    "entries": 8,
+    "source_roots": [
+      [
+        2,
+        0
+      ],
+      [
+        3,
+        0
+      ],
+      [
+        4,
+        0
+      ],
+      [
+        5,
+        0
+      ],
+      [
+        6,
+        0
+      ],
+      [
+        7,
+        0
+      ],
+      [
+        7,
+        1
+      ],
+      [
+        7,
+        2
+      ]
+    ],
+    "direct_binding6_store_alias_route": 4,
+    "VkBuffer_handle_equality_checked": false,
+    "future_host_obligation": "Bind each array element to exactly the original VkBuffer/offset/range/null; comparing allocation bytes is insufficient."
+  },
+  "original_main_direct_store_sites": [
+    {
+      "binding": 6,
+      "root_variable": "%72",
+      "pointer_type": "%67"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%59",
+      "pointer_type": "%54"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%72",
+      "pointer_type": "%67"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%59",
+      "pointer_type": "%54"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%59",
+      "pointer_type": "%54"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%72",
+      "pointer_type": "%67"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%59",
+      "pointer_type": "%54"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%84",
+      "pointer_type": "%79"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%84",
+      "pointer_type": "%79"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%84",
+      "pointer_type": "%79"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%59",
+      "pointer_type": "%54"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%72",
+      "pointer_type": "%67"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%72",
+      "pointer_type": "%67"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%59",
+      "pointer_type": "%54"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%84",
+      "pointer_type": "%79"
+    },
+    {
+      "binding": 6,
+      "root_variable": "%84",
+      "pointer_type": "%79"
+    }
+  ],
+  "required_additional_features": [
+    "shaderStorageBufferArrayNonUniformIndexing"
+  ],
+  "new_capabilities": [
+    "ShaderNonUniform",
+    "StorageBufferArrayNonUniformIndexing"
+  ],
+  "VariablePointers_added": false,
+  "descriptor_capacity": {
+    "total": 23,
+    "storage_buffers": 17,
+    "device_limits_queried": false
+  },
+  "limitations": [
+    "Owned frozen records only; actual VkBuffer alias identity remains a future host obligation.",
+    "No Vulkan or pipeline compilation. Descriptor/push/null limits and nonuniform feature capacity have not been queried for this23-resource layout.",
+    "Existing replay ABI cannot admit binding13 or these aliases; no new replay ABI is implemented here.",
+    "Prior synthetic alias fixture supports bounded feasibility, not proof of this module or full native rendering.",
+    "Code generation, spills, instruction count, alias correctness and execution results remain unknown for this new candidate."
+  ],
+  "date": "2026-11-13",
+  "additional_aliases": [
+    {
+      "binding": 13,
+      "element": 0,
+      "type": 7,
+      "view": "buffer-16",
+      "offset": 1370880,
+      "range": 464,
+      "same_VkBuffer_as_original": {
+        "binding": 2,
+        "element": 0
+      },
+      "null": false
+    },
+    {
+      "binding": 13,
+      "element": 1,
+      "type": 7,
+      "view": "buffer-59",
+      "offset": 2527232,
+      "range": 16960,
+      "same_VkBuffer_as_original": {
+        "binding": 3,
+        "element": 0
+      },
+      "null": false
+    },
+    {
+      "binding": 13,
+      "element": 2,
+      "type": 7,
+      "view": "buffer-54",
+      "offset": 7284096,
+      "range": 64,
+      "same_VkBuffer_as_original": {
+        "binding": 4,
+        "element": 0
+      },
+      "null": false
+    },
+    {
+      "binding": 13,
+      "element": 3,
+      "type": 7,
+      "view": "buffer-57",
+      "offset": 2129664,
+      "range": 192,
+      "same_VkBuffer_as_original": {
+        "binding": 5,
+        "element": 0
+      },
+      "null": false
+    },
+    {
+      "binding": 13,
+      "element": 4,
+      "type": 7,
+      "view": "buffer-16",
+      "offset": 1329408,
+      "range": 40960,
+      "same_VkBuffer_as_original": {
+        "binding": 6,
+        "element": 0
+      },
+      "null": false
+    },
+    {
+      "binding": 13,
+      "element": 5,
+      "type": 7,
+      "view": "buffer-54",
+      "offset": 7356416,
+      "range": 156852224,
+      "same_VkBuffer_as_original": {
+        "binding": 7,
+        "element": 0
+      },
+      "null": false
+    },
+    {
+      "binding": 13,
+      "element": 6,
+      "type": 7,
+      "view": null,
+      "offset": 0,
+      "range": 0,
+      "same_VkBuffer_as_original": {
+        "binding": 7,
+        "element": 1
+      },
+      "null": true
+    },
+    {
+      "binding": 13,
+      "element": 7,
+      "type": 7,
+      "view": null,
+      "offset": 0,
+      "range": 0,
+      "same_VkBuffer_as_original": {
+        "binding": 7,
+        "element": 2
+      },
+      "null": true
+    }
+  ],
+  "tests": {
+    "independently_authored_test_count": 9,
+    "passed": true,
+    "test_source_sha256": "92c5d50ac9fa9eb5588db46a61975f3ad70286b74bc6cbef8dfb50de825ebb50",
+    "original_instructions_used_in_test_fixtures": false,
+    "mutations_rejected": [
+      "NonUniform route/access/load removal",
+      "alias readonly/restrict promise",
+      "typed array stride/member offset",
+      "route source field",
+      "typed shift",
+      "binary-search recurrence",
+      "original main/MISS/global instruction changes",
+      "descriptor view/offset/range/null remapping"
+    ]
+  },
+  "SPIRV_validation": {
+    "passed": true,
+    "target": "vulkan1.3",
+    "flags": [
+      "--uniform-buffer-standard-layout"
+    ],
+    "assembler_flags": [
+      "--target-env",
+      "vulkan1.3",
+      "--preserve-numeric-ids"
+    ],
+    "version": "SPIRV-Tools v2026.1 unknown hash, 2026-02-16T00:00:00+00:00"
+  },
+  "scope": "Separate CPU-only compiler alternative to the static eight-way hit switch; not compiled or replayed."
+}

@@ -1,0 +1,523 @@
+{
+  "cache_policy": "Fresh isolated empty cache per case, writes enabled, no import/reuse.",
+  "cases": [
+    {
+      "all131_post_terminal_hashes_match": true,
+      "cache_files_after_terminal": 3,
+      "case": "original",
+      "error": null,
+      "native": {
+        "VariablePointers_enabled": false,
+        "actual_subgroup_size": 32,
+        "array_compile_profile": 1,
+        "compile_only": true,
+        "device_id": 22176,
+        "device_vendor": 32902,
+        "dispatch_executed": false,
+        "executable_statistics": [
+          {
+            "description": "Number of GEN instructions in the final generated shader executable.",
+            "format": 2,
+            "name": "Instructions",
+            "value": 144485
+          },
+          {
+            "description": "Code size in bytes",
+            "format": 2,
+            "name": "Code size",
+            "value": 2889872
+          },
+          {
+            "description": "Number of instructions in the final generated shader executable which access external units such as the constant cache or the sampler.",
+            "format": 2,
+            "name": "SENDs",
+            "value": 1559
+          },
+          {
+            "description": "Number of loops (not unrolled) in the final generated shader executable.",
+            "format": 2,
+            "name": "Loops",
+            "value": 72
+          },
+          {
+            "description": "Estimate of the number of EU cycles required to execute the final generated executable. This is an estimate only and may vary greatly from actual run-time performance.",
+            "format": 2,
+            "name": "Cycles",
+            "value": 3821821
+          },
+          {
+            "description": "Number of scratch spill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Spills",
+            "value": 6690
+          },
+          {
+            "description": "Number of scratch fill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Fills",
+            "value": 14943
+          },
+          {
+            "description": "Number of bytes of scratch memory required by the generated shader executable. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Scratch Memory Size",
+            "value": 32768
+          },
+          {
+            "description": "Number of GRF registers required by the shader.",
+            "format": 2,
+            "name": "GRF registers",
+            "value": 0
+          },
+          {
+            "description": "Number of push constants ranges provided to the shader.",
+            "format": 2,
+            "name": "Push constant ranges",
+            "value": 0
+          },
+          {
+            "description": "Number of GRF registers in the payload registers dedicated to constants.",
+            "format": 2,
+            "name": "Push constant registers",
+            "value": 0
+          },
+          {
+            "description": "Largest SIMD dispatch width.",
+            "format": 2,
+            "name": "Max dispatch width",
+            "value": 32
+          },
+          {
+            "description": "Maximum number of registers used across the entire shader.",
+            "format": 2,
+            "name": "Max live registers",
+            "value": 560
+          },
+          {
+            "description": "Number of bytes of workgroup shared memory used by this shader including any padding.",
+            "format": 2,
+            "name": "Workgroup Memory Size",
+            "value": 0
+          },
+          {
+            "description": "Non SSA regs after NIR translation to BRW.",
+            "format": 2,
+            "name": "Non SSA regs after NIR",
+            "value": 1372
+          },
+          {
+            "description": "Hash generated from shader source or vkd3d-proton provided.",
+            "format": 2,
+            "name": "Source hash",
+            "value": 14125175244154702039
+          }
+        ],
+        "experiment_manifest_sha256": "d6a343cade4fec41cc005fe3b2eb7fe1ceb333f28fda7c5ae1866a43a4983982",
+        "module_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+        "record_payload_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+        "shaderStorageBufferArrayNonUniformIndexing_enabled": true,
+        "union_descriptor_count": 23,
+        "union_storage_buffer_count": 17
+      },
+      "native_result_sha256": "7af1981c1eae0014619e856d25f11a2cf04d5cd9986bdd2c6826021a09f88156",
+      "review_plan_sha256": "89984b0c5fdfc916d7e9a3ccdccdd18f6e75b3bd3be2e89a013ff55ef20eda35",
+      "terminal": {
+        "captured_bytes": {
+          "stderr": 83,
+          "stdout": 3150
+        },
+        "child_reaped": true,
+        "child_resource_limits_overridden": false,
+        "combined_limit_bytes": 67108864,
+        "elapsed_wall_seconds": 14.344614746049047,
+        "process_wall_bound_seconds": 90,
+        "returncode": 0,
+        "stop_reason": null
+      },
+      "terminal_id": "grant-original-01",
+      "terminal_sha256": "9482a736249bec0d776890a63fc0c5749eef034f893b59184b15633a01594c73"
+    },
+    {
+      "all131_post_terminal_hashes_match": true,
+      "cache_files_after_terminal": 3,
+      "case": "static",
+      "error": null,
+      "native": {
+        "VariablePointers_enabled": false,
+        "actual_subgroup_size": 32,
+        "array_compile_profile": 1,
+        "compile_only": true,
+        "device_id": 22176,
+        "device_vendor": 32902,
+        "dispatch_executed": false,
+        "executable_statistics": [
+          {
+            "description": "Number of GEN instructions in the final generated shader executable.",
+            "format": 2,
+            "name": "Instructions",
+            "value": 128800
+          },
+          {
+            "description": "Code size in bytes",
+            "format": 2,
+            "name": "Code size",
+            "value": 2557616
+          },
+          {
+            "description": "Number of instructions in the final generated shader executable which access external units such as the constant cache or the sampler.",
+            "format": 2,
+            "name": "SENDs",
+            "value": 1981
+          },
+          {
+            "description": "Number of loops (not unrolled) in the final generated shader executable.",
+            "format": 2,
+            "name": "Loops",
+            "value": 72
+          },
+          {
+            "description": "Estimate of the number of EU cycles required to execute the final generated executable. This is an estimate only and may vary greatly from actual run-time performance.",
+            "format": 2,
+            "name": "Cycles",
+            "value": 2900285
+          },
+          {
+            "description": "Number of scratch spill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Spills",
+            "value": 9257
+          },
+          {
+            "description": "Number of scratch fill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Fills",
+            "value": 10178
+          },
+          {
+            "description": "Number of bytes of scratch memory required by the generated shader executable. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Scratch Memory Size",
+            "value": 32768
+          },
+          {
+            "description": "Number of GRF registers required by the shader.",
+            "format": 2,
+            "name": "GRF registers",
+            "value": 0
+          },
+          {
+            "description": "Number of push constants ranges provided to the shader.",
+            "format": 2,
+            "name": "Push constant ranges",
+            "value": 0
+          },
+          {
+            "description": "Number of GRF registers in the payload registers dedicated to constants.",
+            "format": 2,
+            "name": "Push constant registers",
+            "value": 0
+          },
+          {
+            "description": "Largest SIMD dispatch width.",
+            "format": 2,
+            "name": "Max dispatch width",
+            "value": 32
+          },
+          {
+            "description": "Maximum number of registers used across the entire shader.",
+            "format": 2,
+            "name": "Max live registers",
+            "value": 557
+          },
+          {
+            "description": "Number of bytes of workgroup shared memory used by this shader including any padding.",
+            "format": 2,
+            "name": "Workgroup Memory Size",
+            "value": 0
+          },
+          {
+            "description": "Non SSA regs after NIR translation to BRW.",
+            "format": 2,
+            "name": "Non SSA regs after NIR",
+            "value": 1168
+          },
+          {
+            "description": "Hash generated from shader source or vkd3d-proton provided.",
+            "format": 2,
+            "name": "Source hash",
+            "value": 1873164481611099883
+          }
+        ],
+        "experiment_manifest_sha256": "d6a343cade4fec41cc005fe3b2eb7fe1ceb333f28fda7c5ae1866a43a4983982",
+        "module_sha256": "d5148342b4517882b25a48e63700cbfb8695454cc05d131da718509ac2563dc0",
+        "record_payload_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+        "shaderStorageBufferArrayNonUniformIndexing_enabled": true,
+        "union_descriptor_count": 23,
+        "union_storage_buffer_count": 17
+      },
+      "native_result_sha256": "1f87ff738a96edc5845f9591a882ce46d689f76b5f5f0691f26550267a136c88",
+      "review_plan_sha256": "5146c3f4dd2c6a7c29473591e81d85514f1d6edb0a1e32c111512cf266202db2",
+      "terminal": {
+        "captured_bytes": {
+          "stderr": 83,
+          "stdout": 3149
+        },
+        "child_reaped": true,
+        "child_resource_limits_overridden": false,
+        "combined_limit_bytes": 67108864,
+        "elapsed_wall_seconds": 15.114720211946405,
+        "process_wall_bound_seconds": 90,
+        "returncode": 0,
+        "stop_reason": null
+      },
+      "terminal_id": "grant-static-01",
+      "terminal_sha256": "ea048235652b0fb00b7e1b15b38a992f57f552ee8e92faa4c4dd88066f908721"
+    },
+    {
+      "all131_post_terminal_hashes_match": true,
+      "cache_files_after_terminal": 3,
+      "case": "array",
+      "error": null,
+      "native": {
+        "VariablePointers_enabled": false,
+        "actual_subgroup_size": 32,
+        "array_compile_profile": 1,
+        "compile_only": true,
+        "device_id": 22176,
+        "device_vendor": 32902,
+        "dispatch_executed": false,
+        "executable_statistics": [
+          {
+            "description": "Number of GEN instructions in the final generated shader executable.",
+            "format": 2,
+            "name": "Instructions",
+            "value": 89834
+          },
+          {
+            "description": "Code size in bytes",
+            "format": 2,
+            "name": "Code size",
+            "value": 1807200
+          },
+          {
+            "description": "Number of instructions in the final generated shader executable which access external units such as the constant cache or the sampler.",
+            "format": 2,
+            "name": "SENDs",
+            "value": 1514
+          },
+          {
+            "description": "Number of loops (not unrolled) in the final generated shader executable.",
+            "format": 2,
+            "name": "Loops",
+            "value": 72
+          },
+          {
+            "description": "Estimate of the number of EU cycles required to execute the final generated executable. This is an estimate only and may vary greatly from actual run-time performance.",
+            "format": 2,
+            "name": "Cycles",
+            "value": 2568049
+          },
+          {
+            "description": "Number of scratch spill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Spills",
+            "value": 4134
+          },
+          {
+            "description": "Number of scratch fill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Fills",
+            "value": 9032
+          },
+          {
+            "description": "Number of bytes of scratch memory required by the generated shader executable. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Scratch Memory Size",
+            "value": 32768
+          },
+          {
+            "description": "Number of GRF registers required by the shader.",
+            "format": 2,
+            "name": "GRF registers",
+            "value": 0
+          },
+          {
+            "description": "Number of push constants ranges provided to the shader.",
+            "format": 2,
+            "name": "Push constant ranges",
+            "value": 0
+          },
+          {
+            "description": "Number of GRF registers in the payload registers dedicated to constants.",
+            "format": 2,
+            "name": "Push constant registers",
+            "value": 0
+          },
+          {
+            "description": "Largest SIMD dispatch width.",
+            "format": 2,
+            "name": "Max dispatch width",
+            "value": 32
+          },
+          {
+            "description": "Maximum number of registers used across the entire shader.",
+            "format": 2,
+            "name": "Max live registers",
+            "value": 556
+          },
+          {
+            "description": "Number of bytes of workgroup shared memory used by this shader including any padding.",
+            "format": 2,
+            "name": "Workgroup Memory Size",
+            "value": 0
+          },
+          {
+            "description": "Non SSA regs after NIR translation to BRW.",
+            "format": 2,
+            "name": "Non SSA regs after NIR",
+            "value": 1349
+          },
+          {
+            "description": "Hash generated from shader source or vkd3d-proton provided.",
+            "format": 2,
+            "name": "Source hash",
+            "value": 9970401502913428313
+          }
+        ],
+        "experiment_manifest_sha256": "d6a343cade4fec41cc005fe3b2eb7fe1ceb333f28fda7c5ae1866a43a4983982",
+        "module_sha256": "7c6322e1a7b4a84206977fd0a0af165b7dedeb0eb9cbd8fb7c211ec1af77d7bd",
+        "record_payload_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+        "shaderStorageBufferArrayNonUniformIndexing_enabled": true,
+        "union_descriptor_count": 23,
+        "union_storage_buffer_count": 17
+      },
+      "native_result_sha256": "f0e3730b7a39b8417eb4628b319447d0b0d2d2977c9a1feb23329ceb220a55e7",
+      "review_plan_sha256": "a2fc4cf495d25ff50d339870ace1743bc40ed4baa7c6ed13b2040c5ae86426b0",
+      "terminal": {
+        "captured_bytes": {
+          "stderr": 83,
+          "stdout": 3147
+        },
+        "child_reaped": true,
+        "child_resource_limits_overridden": false,
+        "combined_limit_bytes": 67108864,
+        "elapsed_wall_seconds": 7.400062166969292,
+        "process_wall_bound_seconds": 90,
+        "returncode": 0,
+        "stop_reason": null
+      },
+      "terminal_id": "grant-array-01",
+      "terminal_sha256": "9ebf25d43df14805360c1fbb65419ceb5be69f19b5d72843e1b3cbad3c9d4fc3"
+    }
+  ],
+  "common_profile_sha256": "d6a343cade4fec41cc005fe3b2eb7fe1ceb333f28fda7c5ae1866a43a4983982",
+  "controlled_compiler_options": {
+    "HS_CS32_MAX_INSTS": null,
+    "HS_FORCE_SIMD8": null,
+    "HS_LARGE_GRF": null,
+    "HS_LARGE_GRF_BIT": null,
+    "HS_PUSH_SHADOW": null,
+    "HS_RA_DEBUG": null,
+    "HS_SPILL_BATCH": "1",
+    "HS_SPILL_PCT": null,
+    "HS_SUBGROUP8": null,
+    "INTEL_DEBUG": null,
+    "RX_VK_NOOPT": null,
+    "RX_VK_WARP64": null,
+    "shader_spilling_rate": "1"
+  },
+  "driver": {
+    "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+    "library_name": "libvulkan_intel.so",
+    "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+  },
+  "interpretation": [
+    "Array candidate has fewer compiler-reported instructions, SENDs, spills and fills in this fixed layout/policy; scratch remains 32768 bytes in all cases.",
+    "Elapsed wall seconds measure host process compilation/queries, not GPU execution time. Cycles is a compiler estimate.",
+    "This does not establish alias correctness, real renderer integration, rendering quality, runtime speed or FPS."
+  ],
+  "limits": {
+    "VariablePointers_requested": false,
+    "descriptor_elements": 23,
+    "gates_before_logical_device": true,
+    "nullDescriptor_enabled": true,
+    "push_bytes": 88,
+    "require_full_subgroups": true,
+    "required_subgroup_size": 32,
+    "sampled_images": 4,
+    "samplers": 4,
+    "shaderStorageBufferArrayNonUniformIndexing_enabled": true,
+    "storage_buffer_elements": 17,
+    "uniform_buffer_elements": 2
+  },
+  "native": {
+    "binary_sha256": "e1596b94893d5fd45f49b587a047c8ccc52615fe792418734cd93dc4a985d7a7",
+    "counted_anchors": [
+      "remove-sampler-float-helper",
+      "remove-buffer-helpers",
+      "remove-image-helpers",
+      "remove-execution-tail",
+      "new-compile-only-magic",
+      "reject-execution-before-input",
+      "keep-sampler-frame-without-objects",
+      "compile-only-before-instance",
+      "third-module-identity",
+      "push-capacity23",
+      "stage-SSBO17",
+      "set-SSBO17",
+      "stage-resources23",
+      "nonuniform-gate-signature",
+      "null-and-nonuniform-feature-gate",
+      "exact-array-alias-contract",
+      "same-memory23-descriptors",
+      "binding13-array8",
+      "alias-storage-type",
+      "alias-null-state",
+      "validate-literal-aliases",
+      "query-nonuniform-before-device",
+      "require-statistics-before-device",
+      "enable-nonuniform-no-variable-pointers",
+      "actual-compute32",
+      "separate-native-result-profile",
+      "all-structured-statistics-retained",
+      "application-identity"
+    ],
+    "diff_sha256": "4b55040ac2a8c414b89bec7d14ee7fd1002771b6062a6c54e07d70080bf1d5d0",
+    "execution_imports_absent": true,
+    "flags": [
+      "-std=c11",
+      "-O2",
+      "-DNDEBUG",
+      "-Wall",
+      "-Wextra",
+      "-Werror"
+    ],
+    "source_sha256": "156c2b971ada7c76a6f3c54ec95663e1167a8f50c6a31273715acbb35880d02c"
+  },
+  "preparation_sha256": "79d0032821e5722da59919f849c08c2d59f31ba295dee05327bdc6f5c8d32f24",
+  "process_scan": {
+    "array": "No candidate found; scan result checked before launch.",
+    "observation_sha256": "2d66178fe9301261f3d774ef5dae647314974650a7b85473b54c89b4c77d4597",
+    "original": "No known game or GPU helper candidate found before launch.",
+    "static": "Scan matched a transient standalone fpx_sticky_test CPU-test path. Launch did not branch on that scan result. Process exited and temporary directory vanished before FD/dependency inspection; GPU FD state was not retrospectively established. No unrelated process was signalled."
+  },
+  "runner_sha256": "311d031477b091d1f7197527d1b5d05c77c45ed2864fc146abaabeb46d3c4fad",
+  "schema": "open-ocarina.array-union-compile-observation/v1",
+  "scope": "Three single-pipeline compile-only observations; no command recording, queue retrieval/submission, dispatch, rendering, runtime equivalence or FPS measurement.",
+  "source_ledger": {
+    "patches/hookshot/check_binding_provenance.py": "53b54a68256feba6d60a4919c1f530d0d94fcc8bec004ec559e20099feca7d4a",
+    "patches/hookshot/check_dispatch_parameters.py": "ddf942ec838e6578fa3464e3d30288fc9572e4eab30b3d06fae1b4cbd1e96207",
+    "patches/hookshot/check_occurrence_capture.py": "0723a5cb5009d43f39213e420264c801154cc7c24ce6719b797b604ac1ed8f06",
+    "patches/hookshot/check_page_table_patch.py": "ea13eb27b0df1d7cb30410316d7a05f44ba9a4e652260ddc7541062234de3a52",
+    "patches/hookshot/check_sampled_image_capture.py": "130b2c0be1d2b7392ec4448750b1ed82e03c9da7de8fbc5a2a91b94f63f7d42f",
+    "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+    "tools/compute_interval_array_compile.py": "e25f93a7ddba3cfc2a2a5887beabbe2de030f8c5843574b2171945377b94d5a3",
+    "tools/compute_interval_array_lowering.py": "d8c4a899e350408c52b6e1121ce74f244bc182f327b35007e4c7990ed214e13d",
+    "tools/compute_interval_lowering.py": "3176a7e0130b5d722a88fdb2d5ab9512fff4afecf78e10828eb6747b38ca00ca",
+    "tools/compute_interval_replay.py": "9a5e3835c251047f51ba23e9042ac9b821c9e6543adc9f979186d10afcdecb85",
+    "tools/physical_replay.py": "07172fa9b268fc65ffc5a83b1ddd51b11151c23354388dafca411280d4f87b7f",
+    "tools/physical_span_contract.py": "f60dabf565b21b5b883d2784541682c27b88df8520bc16fffe5117d115d6ac33",
+    "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+    "tools/vulkan_physical_replay.c": "0bacac3eda5c93a50b2ff2efdd3a595a0b260bfee371cd7b3e4da85ed70b538d"
+  }
+}

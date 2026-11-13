@@ -17,6 +17,13 @@ isolated-dispatch median was lower in both batches. CPU reset/oracle gaps can
 affect clock/cache state, and all background GPU activity was not excluded.
 This is an isolated observation, not a normal-frame FPS result, live renderer
 integration, native-quality acceptance or an accepted gameplay optimization.
+The [descriptor-array alternative](compute-interval-array-compile-observation.md)
+has now compiled alongside the original and static-route modules under one
+23-descriptor layout at actual width 32. Compiler instruction/spill counts are
+smaller for the array candidate in this observation; they are not runtime timings.
+Its separate [owned replay preparation](compute-interval-array-replay.md) checks
+actual buffer-handle aliasing and requires complete outputs against two baselines.
+That candidate has not executed yet.
 
 [Native mesh lowering revision 2](native-mesh-warp32-integration.md) requires the
 MAX-absent compiler policy; earlier integrated pilots remain explicitly revision 1.
