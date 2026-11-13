@@ -89,5 +89,11 @@
     "only_empty_context_line_prefixes_removed": true,
     "fuzz_zero_applies": true,
     "all_resulting_source_files_byte_identical_to_compiled": true
+  },
+  "cache_provenance_clarification": {
+    "prior_runtime_program_cache_retained_with_copied_install": true,
+    "program_cache_prelaunch_file_hashes_recorded": false,
+    "cold_start_translation_measurement": false,
+    "scope": "The private preparation note saying program_cache_seeded=false was incorrect for metadata05: copying the earlier install retained its genuine runtime cache. Its program-cache files were not in the case prelaunch hash inventory. Save/Mesa-cache and admitted binary pins remain as recorded; the observed unchanged idle counters still describe this frame. No frozen plan or raw result was rewritten."
   }
 }

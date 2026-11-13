@@ -112,3 +112,9 @@ resolution. No renderer or observation was relabeled.
 The published patch removes the space prefix from otherwise empty diff-context
 lines. Applying it with zero fuzz produces byte-identical source files to the
 compiled overlay; the executed and published patch hashes are recorded separately.
+
+Metadata05 retained a genuine program cache when its earlier private install was
+copied. Those program-cache files were not in the prelaunch file-pin inventory;
+the private preparation note saying none was seeded was incorrect. Its zero new
+translations therefore carry no cold-start claim. This clarification preserves
+the frozen plan and raw observation, including the frame's unchanged idle counters.
