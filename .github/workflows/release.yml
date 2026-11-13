@@ -121,6 +121,8 @@ jobs:
     runs-on: windows-2022
     timeout-minutes: 60
     steps:
+      - name: Disable autocrlf
+        run: git config --global core.autocrlf false
       - name: Check out the Hookshot snapshot
         uses: actions/checkout@v4
         with:
