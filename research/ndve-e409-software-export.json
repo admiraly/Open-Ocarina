@@ -1,0 +1,637 @@
+{
+  "schema": "open-ocarina.ndve-stage-software-export-observation/v1",
+  "scope": "CPU-only conditional translation of one exact native movie stage; no live variant equality, input capture, Vulkan loading, pipeline or shader execution",
+  "identity": {
+    "program": "e409733c45530d75",
+    "native_control_code_sha256": "1d660217708e2a99339df4ac6814d2843c5ad83f9c20dd7b429cb529aee41afa",
+    "nvn_stage": 5,
+    "workgroup": [
+      32,
+      1,
+      1
+    ],
+    "shared_bytes": 3360,
+    "declared_native_instruction_bytes": 22400,
+    "native_end_code_bytes": 22528,
+    "encoded_HMMA16816F16_nonfalse_predicate_sites": 72,
+    "seed_stage_index": 20433,
+    "container": "NDVE",
+    "container_program_index": 2,
+    "inventory": "research/native-network-inventory.json",
+    "inventory_sha256": "1a2244aafe5a0e5d940dfdb0eed04a7257d7cf2ed1b862e03ec23b13c9517298",
+    "asset_compressed_sha256": "405b7d96ac787c5f3eaf79f3c47605ca38dacbbf2d34fe116e24beee4f655922",
+    "asset_decoded_sha256": "27f940cb2f52b8f8df822b686a2fd4f938d8df4fca9cbf68b0b4bfeeac3e1399"
+  },
+  "tools": {
+    "tools/ndve_stage_export.py": "489fb296c20e00f27dcb3838e094751db2579ba0ff631c110677267f15606409",
+    "tools/ndve_stage_contract.py": "d48cef16c34c5266eaf88fb1989eddc676a3514385f874d0e86bc3f9b391c48b",
+    "tests/test_ndve_stage_export.py": "25774419b121b1749952c37ead3baf267b646fee3306d2daf821689b2b1f8168",
+    "tests/test_ndve_stage_contract.py": "3aaf3a364c952f02f71a613607f2a209e1679c79e3f583762a3450ffa900b121"
+  },
+  "translation": {
+    "source_tree": "58ca709617448e06af382c3443dd88dac3ffcb8e",
+    "source_manifest_sha256": "1b18dad86b49fba862de0c7024c135e19dc8ee498da2db3cbc31ec87a6e4f319",
+    "compile_dependencies_sha256": "266e2459ae3d84233d6d031ade3d0ccebd31ab778bc85dcd044e2afce728219b",
+    "driver_source_sha256": "b48f4c4649506237aa6cf68e2afe8af8014fb44b737354eb0c81c787f426f235",
+    "helper_sha256": "a743841cca13473e9557aaae6052169f55630dff0a47110ee77dfe71c5248e50",
+    "compiler_sha256": "4ea85504401d9f5c05109d6cb05778b241aa8d56fde1da2e5bc7ba46cffd44f5",
+    "compiler_flags": [
+      "-std=c++2b",
+      "-O2",
+      "-DNDEBUG",
+      "-march=x86-64-v3",
+      "-Wno-everything",
+      "-DFMT_HEADER_ONLY",
+      "-DVK_NO_PROTOTYPES",
+      "-include",
+      "algorithm",
+      "-include",
+      "cstdio",
+      "-include",
+      "cstdlib",
+      "-include",
+      "cstring",
+      "-include",
+      "functional",
+      "-include",
+      "string",
+      "-include",
+      "vector"
+    ],
+    "CPU_jobs": 4,
+    "source_seed_sha256": "413cc8fb8b438419bfc3aac98bdac7fe351af2243926c5805d69e46f58b864a3",
+    "singleton_seed_sha256": "95400de44200c3239709520b6c239556c641c86ff82f0bb301c9fc33fd144744",
+    "module_sha256": "169b30754016737e4b49bb633dc2e2656b62e6f40fbdccbd907a538393f28338",
+    "module_words": 83223
+  },
+  "private_evidence": {
+    "export_report_sha256": "fd8b325465154e92e02d99517f5b1065caa3181fa9ca815e39e377c4d4c47d3c",
+    "contract_report_sha256": "d86ff76187168fb59bac78aeb4dd270f6cf35ff76e74fa036ed6097c048e0364",
+    "disassembly_sha256": "cbf640221ad3e99ad6c8dc6983ea014dbfb79eb1f1d8a01e881b541c85aa592a",
+    "undefined_imports_sha256": "39d68ee1d24ee050eb5dbb2938891cb39436113aae551257130a30762a319e3e",
+    "bake_manifest_sha256": "31b0e535a1d4d8cf679bf465c7369e20ae97c38b3877c06ec652bfa2ab9ba28a",
+    "bake_program_report_sha256": "94842e5de9ad4b3ea4bbdefed27ba38c55150d21c90d12de072c2c1fc752b944",
+    "environment_queries_sha256": "7cf3b977263178dc6027bbf5d790871af6bea70a581406797f95cb3f948266c6"
+  },
+  "source_algorithms": {
+    "offline_driver_path": "nx2/bake_ds/bake_ds.cpp",
+    "offline_driver_sha256": "e3710be6a55a0fd901291bff48505aa85a148db1cf1e4c1a2613ea649e9e3e49",
+    "software_matrix_path": "gpu/vk/eden/shader_recompiler/backend/spirv/emit_spirv_warp.cpp",
+    "software_matrix_sha256": "dd70de41fe60e74a4d2ccc6aec9178f32d245378dfbfa61b83ecce2f28a8d4ea",
+    "software_algorithm": "One helper, eight K-pair loop iterations, float32 FMA accumulations, explicit half rounding at K=8 and K=16, fragment routing through subgroup shuffles; independently certifying console arithmetic remains open"
+  },
+  "configuration": {
+    "renderer_hardware_native_mma": false,
+    "Ampere_native_matrix_multiply": true,
+    "SPIRV_mma_software": true,
+    "EDEN_NX2_TENSOR": null,
+    "required_future_subgroup": 32,
+    "SSBO_alignment_lower_bound": 16,
+    "offline_answers": "Default compute texture/pointer answers with synthetic slot tokens for query tracking; no live answer provenance",
+    "preset": "tensor-software",
+    "variant_cap": 1,
+    "variant_index": 0,
+    "recorded_answer_hash": "00000400000006cc",
+    "environment": [
+      "RX_VK_MMA_SOFTWARE=1"
+    ],
+    "ambient_environment": "Only PATH/LANG/LC_ALL inherited; no other shader or driver options",
+    "runtime_info": "Shader::RuntimeInfo zero-initialized; not captured from the renderer",
+    "profile_source": "Exact source-pinned make_profile()/host_info(); configured assumptions, not device-query results",
+    "profile_assumptions": {
+      "SPIRV_version": "1.6",
+      "unified_descriptor_binding": true,
+      "descriptor_aliasing": true,
+      "integer_bits": [
+        8,
+        16,
+        64
+      ],
+      "buffer_storage_bits": [
+        8,
+        16
+      ],
+      "float_controls": true,
+      "separate_denorm_and_rounding": true,
+      "fp32_denorm_preserve_and_flush_supported": true,
+      "fp16_and_fp32_signed_zero_nan_preserve": true,
+      "vote": true,
+      "supported_subgroup_stages_mask": "0x7fffffff",
+      "maximum_subgroup_size": 32,
+      "sampled_image_array_nonuniform_indexing": true,
+      "typeless_image_loads": true,
+      "int64_atomics": true,
+      "warp_size_potentially_larger_than_guest": false,
+      "host_float16": true,
+      "host_float64": true,
+      "host_int64": true,
+      "host_conditional_barrier": true
+    },
+    "other_profile_fields": "All exact fields and defaults are fixed by the pinned source; equality to a live runtime profile is unproved"
+  },
+  "compiler_queries": [
+    {
+      "kind": "cbuf",
+      "answer": 0,
+      "bank": 0,
+      "offset": 88,
+      "resolved": 0,
+      "synthetic_slot_token": 0,
+      "calls": 1
+    },
+    {
+      "kind": "cbuf",
+      "answer": 32856,
+      "bank": 0,
+      "offset": 88,
+      "resolved": 0,
+      "synthetic_slot_token": 1,
+      "calls": 1
+    },
+    {
+      "kind": "texture_bound_buffer",
+      "answer": 0,
+      "resolved": 1,
+      "calls": 19
+    },
+    {
+      "kind": "texture_integer",
+      "answer": 0,
+      "handle": 32856,
+      "resolved": 0,
+      "calls": 1
+    }
+  ],
+  "query_interpretation": [
+    "cbuf0.byte88 is requested with synthetic slot token 0x8058 during actual compilation; default noninteger texture classification is an assumed answer, not live texture metadata.",
+    "The unforced cbuf0.byte88=0 row is recorded later while saving answers; it is also unresolved and is not a captured handle.",
+    "texture_bound_buffer=0 comes from the supplied native stage metadata. No texture-type, pixel-format or storage-pointer callback was invoked in this export.",
+    "Runtime descriptor/format/answer/profile equality must be established before using this module as a live-stage reference."
+  ],
+  "retained_work": {
+    "encoded_HMMA_sites": 72,
+    "encoded_count_scope": "Static declared native body excluding always-false predicates; not a dynamic execution count",
+    "MatrixMulAddF16_IR_sites": 72,
+    "software_helper_static_main_call_sites": 72,
+    "software_function_static_body_counts": {
+      "loop_merges": 1,
+      "subgroup_shuffle": 4,
+      "Fma": 8,
+      "UnpackHalf2x16": 6,
+      "RoundEven": 4,
+      "PackHalf2x16": 2
+    },
+    "translated_programs": 1,
+    "translation_failures": 0,
+    "skipped_programs": 0,
+    "cooperative_matrix_opcodes": 0,
+    "keep_list_or_live_renderer_policy_modified": false,
+    "no_stub_or_tensor_work_skip_requested": true,
+    "all_original_console_instructions_independently_certified": false
+  },
+  "module_contract": {
+    "workgroup": [
+      32,
+      1,
+      1
+    ],
+    "required_future_subgroup": 32,
+    "shared_bytes": 3360,
+    "push_range_bytes": 56,
+    "push_members": [
+      {
+        "member": 0,
+        "offset": 0,
+        "declared_bytes": 16
+      },
+      {
+        "member": 1,
+        "offset": 16,
+        "declared_bytes": 8
+      },
+      {
+        "member": 2,
+        "offset": 48,
+        "declared_bytes": 8
+      }
+    ],
+    "reachable_push_offsets": [
+      48
+    ],
+    "descriptors": [
+      {
+        "set": 0,
+        "binding": 0,
+        "variables": [
+          "%75",
+          "%81"
+        ],
+        "descriptor_type": "uniform_buffer",
+        "descriptor_count": 1,
+        "loads": 69,
+        "stores": 0,
+        "length_queries": 0,
+        "image_reads": 0,
+        "image_writes": 0,
+        "image_queries": 0
+      },
+      {
+        "set": 0,
+        "binding": 1,
+        "variables": [
+          "%86",
+          "%96",
+          "%106"
+        ],
+        "descriptor_type": "storage_buffer",
+        "descriptor_count": 1,
+        "loads": 1,
+        "stores": 16,
+        "length_queries": 1,
+        "image_reads": 0,
+        "image_writes": 0,
+        "image_queries": 0
+      },
+      {
+        "set": 0,
+        "binding": 2,
+        "variables": [
+          "%87",
+          "%97",
+          "%107"
+        ],
+        "descriptor_type": "storage_buffer",
+        "descriptor_count": 1,
+        "loads": 17,
+        "stores": 0,
+        "length_queries": 1,
+        "image_reads": 0,
+        "image_writes": 0,
+        "image_queries": 0
+      },
+      {
+        "set": 0,
+        "binding": 3,
+        "variables": [
+          "%88",
+          "%98",
+          "%108"
+        ],
+        "descriptor_type": "storage_buffer",
+        "descriptor_count": 1,
+        "loads": 3,
+        "stores": 0,
+        "length_queries": 1,
+        "image_reads": 0,
+        "image_writes": 0,
+        "image_queries": 0
+      },
+      {
+        "set": 0,
+        "binding": 4,
+        "variables": [
+          "%91",
+          "%101",
+          "%111"
+        ],
+        "descriptor_type": "storage_buffer",
+        "descriptor_count": 3,
+        "loads": 3,
+        "stores": 0,
+        "length_queries": 3,
+        "image_reads": 0,
+        "image_writes": 0,
+        "image_queries": 0
+      },
+      {
+        "set": 0,
+        "binding": 5,
+        "variables": [
+          "%115"
+        ],
+        "descriptor_type": "combined_image_sampler",
+        "descriptor_count": 1,
+        "loads": 19,
+        "stores": 0,
+        "length_queries": 0,
+        "image_reads": 19,
+        "image_writes": 0,
+        "image_queries": 0
+      }
+    ],
+    "declared_descriptor_layouts": [
+      {
+        "set": 0,
+        "binding": 0,
+        "storage": "Uniform",
+        "variable": "%75",
+        "declared_block_bytes_before_runtime_tail": 65536,
+        "members": [
+          {
+            "offset": 0,
+            "type": "OpTypeArray",
+            "array_stride": 4
+          }
+        ]
+      },
+      {
+        "set": 0,
+        "binding": 0,
+        "storage": "Uniform",
+        "variable": "%81",
+        "declared_block_bytes_before_runtime_tail": 65536,
+        "members": [
+          {
+            "offset": 0,
+            "type": "OpTypeArray",
+            "array_stride": 8
+          }
+        ]
+      },
+      {
+        "set": 0,
+        "binding": 1,
+        "storage": "StorageBuffer",
+        "variable": "%86",
+        "declared_block_bytes_before_runtime_tail": 0,
+        "members": [
+          {
+            "offset": 0,
+            "type": "OpTypeRuntimeArray",
+            "array_stride": 4
+          }
+        ]
+      },
+      {
+        "set": 0,
+        "binding": 2,
+        "storage": "StorageBuffer",
+        "variable": "%87",
+        "declared_block_bytes_before_runtime_tail": 0,
+        "members": [
+          {
+            "offset": 0,
+            "type": "OpTypeRuntimeArray",
+            "array_stride": 4
+          }
+        ]
+      },
+      {
+        "set": 0,
+        "binding": 3,
+        "storage": "StorageBuffer",
+        "variable": "%88",
+        "declared_block_bytes_before_runtime_tail": 0,
+        "members": [
+          {
+            "offset": 0,
+            "type": "OpTypeRuntimeArray",
+            "array_stride": 4
+          }
+        ]
+      },
+      {
+        "set": 0,
+        "binding": 4,
+        "storage": "StorageBuffer",
+        "variable": "%91",
+        "declared_block_bytes_before_runtime_tail": 0,
+        "members": [
+          {
+            "offset": 0,
+            "type": "OpTypeRuntimeArray",
+            "array_stride": 4
+          }
+        ]
+      },
+      {
+        "set": 0,
+        "binding": 1,
+        "storage": "StorageBuffer",
+        "variable": "%96",
+        "declared_block_bytes_before_runtime_tail": 0,
+        "members": [
+          {
+            "offset": 0,
+            "type": "OpTypeRuntimeArray",
+            "array_stride": 8
+          }
+        ]
+      },
+      {
+        "set": 0,
+        "binding": 2,
+        "storage": "StorageBuffer",
+        "variable": "%97",
+        "declared_block_bytes_before_runtime_tail": 0,
+        "members": [
+          {
+            "offset": 0,
+            "type": "OpTypeRuntimeArray",
+            "array_stride": 8
+          }
+        ]
+      },
+      {
+        "set": 0,
+        "binding": 3,
+        "storage": "StorageBuffer",
+        "variable": "%98",
+        "declared_block_bytes_before_runtime_tail": 0,
+        "members": [
+          {
+            "offset": 0,
+            "type": "OpTypeRuntimeArray",
+            "array_stride": 8
+          }
+        ]
+      },
+      {
+        "set": 0,
+        "binding": 4,
+        "storage": "StorageBuffer",
+        "variable": "%101",
+        "declared_block_bytes_before_runtime_tail": 0,
+        "members": [
+          {
+            "offset": 0,
+            "type": "OpTypeRuntimeArray",
+            "array_stride": 8
+          }
+        ]
+      },
+      {
+        "set": 0,
+        "binding": 1,
+        "storage": "StorageBuffer",
+        "variable": "%106",
+        "declared_block_bytes_before_runtime_tail": 0,
+        "members": [
+          {
+            "offset": 0,
+            "type": "OpTypeRuntimeArray",
+            "array_stride": 16
+          }
+        ]
+      },
+      {
+        "set": 0,
+        "binding": 2,
+        "storage": "StorageBuffer",
+        "variable": "%107",
+        "declared_block_bytes_before_runtime_tail": 0,
+        "members": [
+          {
+            "offset": 0,
+            "type": "OpTypeRuntimeArray",
+            "array_stride": 16
+          }
+        ]
+      },
+      {
+        "set": 0,
+        "binding": 3,
+        "storage": "StorageBuffer",
+        "variable": "%108",
+        "declared_block_bytes_before_runtime_tail": 0,
+        "members": [
+          {
+            "offset": 0,
+            "type": "OpTypeRuntimeArray",
+            "array_stride": 16
+          }
+        ]
+      },
+      {
+        "set": 0,
+        "binding": 4,
+        "storage": "StorageBuffer",
+        "variable": "%111",
+        "declared_block_bytes_before_runtime_tail": 0,
+        "members": [
+          {
+            "offset": 0,
+            "type": "OpTypeRuntimeArray",
+            "array_stride": 16
+          }
+        ]
+      },
+      {
+        "set": 0,
+        "binding": 5,
+        "storage": "UniformConstant",
+        "variable": "%115",
+        "image_type": {
+          "scalar_type": "OpTypeFloat",
+          "scalar_bits": 32,
+          "dimension": "2D",
+          "depth": 0,
+          "arrayed": 0,
+          "multisampled": 0,
+          "sampled": 1,
+          "format": "Unknown"
+        }
+      }
+    ],
+    "reachable_physical_load_sites": 2,
+    "reachable_physical_store_sites": 0,
+    "physical_pointer_push_offsets": [
+      48
+    ],
+    "reachable_group_opcodes": {
+      "OpGroupNonUniformShuffle": 223,
+      "OpGroupNonUniformBallot": 3,
+      "OpGroupNonUniformAny": 2
+    },
+    "reachable_barrier_instruction_count": 108,
+    "reachable_atomic_instruction_count": 0,
+    "capabilities": [
+      "Float16",
+      "GroupNonUniform",
+      "GroupNonUniformBallot",
+      "GroupNonUniformShuffle",
+      "GroupNonUniformVote",
+      "ImageGatherExtended",
+      "ImageQuery",
+      "Int16",
+      "Int64",
+      "PhysicalStorageBufferAddresses",
+      "SampledBuffer",
+      "Shader",
+      "SignedZeroInfNanPreserve"
+    ],
+    "resource_footprints_complete": false,
+    "race_freedom_proven": false,
+    "descriptor_ranges_captured": false,
+    "declared_UBO_extent_is_not_actual_Vulkan_range": true,
+    "static_analysis_sources": {
+      "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+      "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+      "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+    }
+  },
+  "next_missing_inputs": [
+    {
+      "id": "live_variant",
+      "needed": "Exact native identity plus live cbuf0.byte88, texture registration/noninteger classification, compiler answer hash, runtime specialization and actual host profile. Prove or re-export the selected variant."
+    },
+    {
+      "id": "logical_buffers",
+      "needed": "Exact submitted UBO0 and six SSBO descriptor elements at bindings1,2,3,4[0..2], including bytes, original offsets/ranges/ArrayLength/null states, typed aliases and resource ownership. Binding1 is read/write and needs both its initial state and complete after-state."
+    },
+    {
+      "id": "sampled_image",
+      "needed": "Binding5 texture texels, view format/type/extents/subresources, sampler and image layout; old bound-slot rejection diagnostics do not identify these inputs."
+    },
+    {
+      "id": "physical_inputs",
+      "needed": "All56 push bytes including root at48, guest-page table, reachable physical backing ranges and address relocation/alias certificate; logical descriptor snapshots alone are insufficient."
+    },
+    {
+      "id": "dispatch_and_order",
+      "needed": "Exact dispatch grid/origin/event association plus producer completion, CPU-writer/alias/order evidence and bounded work proof. Observed rejection-log grid900 is not a captured replay input or independence proof."
+    },
+    {
+      "id": "console_oracle",
+      "needed": "Independent arithmetic/layout checks against original console behavior and complete stage outputs before admitting this software translation as a correctness oracle."
+    }
+  ],
+  "validation": {
+    "focused_tests": 10,
+    "full_suite_tests": 887,
+    "full_suite_skipped": 5,
+    "full_suite_passed": true,
+    "SPIRV_validation_passed": true,
+    "validator": "SPIRV-Tools v2026.1",
+    "validator_flags": [
+      "--target-env",
+      "vulkan1.3",
+      "--uniform-buffer-standard-layout"
+    ],
+    "compiler": "clang++22.1.8 Fedora",
+    "compiled_translation_units": 164,
+    "Vulkan_or_dlopen_imports": false,
+    "new_public_files_checked_by_audit_function": true,
+    "indexed_public_tree_check_passed": true,
+    "git_diff_check_passed": true
+  },
+  "claims": {
+    "original_console_arithmetic_independently_certified": false,
+    "live_variant_selected": false,
+    "complete_replay_inputs": false,
+    "GPU_execution": false,
+    "rendering_equivalence": false,
+    "FPS_gain": false,
+    "Vulkan_calls": false,
+    "live_runtime_profile_equal": false,
+    "complete_original_network_restored": false,
+    "weights_or_network_architecture_inferred": false
+  },
+  "limits": [
+    "No game asset, native instruction body, generated shader, private log, or absolute machine path is published.",
+    "This is a source-pinned conditional actual-stage translation, not a keep-list policy claim or a live selected variant.",
+    "Static instruction/call/access counts do not establish dynamic execution counts, memory footprints, race freedom or console arithmetic equivalence.",
+    "No game host, device, pipeline, dispatch, runtime capture, rendering or FPS test was performed.",
+    "Valid participation at subgroup operations and barriers, and a bounded real-dispatch work proof, remain unestablished; local32 alone does not prove them."
+  ]
+}

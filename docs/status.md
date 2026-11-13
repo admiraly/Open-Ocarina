@@ -56,6 +56,10 @@ identifies ten omitted startup programs as movie-upscale networks. Their linear
 fallback, gameplay FSR replacement and hair/foliage sampling remain separate quality
 gaps. No native-quality restoration, accepted gameplay optimization or real 60 FPS
 result is established.
+One actual movie stage now has a [conditional software-matrix export](ndve-stage-software-export.md)
+through the open translator, preserving all 72 static matrix sites. Its texture
+answer and host profile are offline assumptions; it has not executed or restored
+a native network. Live compiler answers and complete replay inputs remain open.
 Four [synthetic cooperative-matrix fixtures](../research/matrix-restoration-observation.json)
 match complete CPU outputs at actual width 32. The subsequent
 [packed original-layout bridge](matrix-warp-bridge.md) passes identity and layout
