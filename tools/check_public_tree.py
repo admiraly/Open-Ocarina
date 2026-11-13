@@ -25,7 +25,8 @@ def audit(name, content, symlink=False):
                                  "tests/grok_replay_vertex_bind_harness.cpp",
                                  "tools/vulkan_compile_probe.c", "tools/vulkan_execution_probe.c",
                                  "tools/vulkan_graphics_compile_probe.c", "tools/vulkan_mesh_execution_probe.c",
-                                 "tools/vulkan_physical_replay.c", "tools/vulkan_mesh_replay.c"})
+                                 "tools/vulkan_physical_replay.c", "tools/vulkan_mesh_replay.c",
+                                 "tools/vulkan_d8_interval_replay.c"})
     if set(path.parts) & PRIVATE_PARTS or (path.suffix not in ALLOWED and path.name not in NAMES and not scoped_source):
         errors.append("unapproved artifact path/type")
     if len(content) > 256 * 1024 or b"\0" in content:

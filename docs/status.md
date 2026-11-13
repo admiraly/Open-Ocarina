@@ -4,6 +4,14 @@ Updated 2026-11-13. This page distinguishes working tools, local observations, a
 
 ## Latest reviewed results
 
+The D8 graphics interval candidate now passes a separate
+[complete owned mesh-output comparison](grok-d8-interval-replay-observation.md)
+on the A770. All 89,984 bytes match two fresh originals and two earlier
+references for the captured origin-128, two-group window; input buffers and
+guards remain unchanged. This complements its paired compiler results. It
+does not establish general equivalence, live integration, warp32 composition,
+native quality or a gameplay FPS improvement.
+
 The [cache-policy correction](mesa-cache-policy.md) now separates compiler settings
 across stage keys, pipeline caches and disk caches. The isolated driver reproduces
 all 59 complete compute allocations at widths 32, 32 repeated, 16 and 8 on one

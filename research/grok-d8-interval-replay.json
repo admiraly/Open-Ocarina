@@ -1,0 +1,27 @@
+{
+  "schema": "open-ocarina.grok-d8-interval-replay-metadata/v1",
+  "execution_admitted": false,
+  "timing_admitted": false,
+  "gpu_executed": false,
+  "queue_retrieved": false,
+  "historical_atomicity_certified": false,
+  "owned_replay_writers": 0,
+  "pins": {
+    "original": "835aa59799c6ecb621034d946e2fa4eadb1aa2407d293321ae3e3052882bc9b3",
+    "candidate": "c2ae946e5b4706d220e3adb940ee00e4b382f326ca4f63586d043b2990650129",
+    "records": "40c0e1d71a67998d9da47b9aec592616d3e9cb7de1ad512887835f5b087cd09a",
+    "instrumented_original": "747185e77510c027a0f23e4d598292c3d1bf47d3c95a145204497d439fae2002",
+    "instrumented_candidate": "2e1f4dc75b2a673026d0d1233baa85b384510234144f08916f798fcf198521cc"
+  },
+  "layout": {
+    "set0_bindings": 10,
+    "set0_elements": 12,
+    "owned_elements": 14,
+    "common33_elements": 33,
+    "known_a770_max_push_descriptors": 32,
+    "uses_push_descriptors": false
+  },
+  "comparison": "complete capture bytes against two original32 runs; no partial samples",
+  "composition_admitted": false,
+  "hash_guard_relaxed": false
+}

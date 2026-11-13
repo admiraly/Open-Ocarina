@@ -23,7 +23,8 @@ class SourceScopeTests(unittest.TestCase):
     def test_reviewed_replay_sources_are_exact_path_allowances(self):
         source=b"// Independently authored CPU fixture\n"
         names=("src/probes/grok_memory_mirror_plan.h",
-               "tests/grok_replay_vertex_bind_harness.cpp")
+               "tests/grok_replay_vertex_bind_harness.cpp",
+               "tools/vulkan_d8_interval_replay.c")
         for name in names:
             self.assertEqual(audit(name,source),[])
             self.assertIn("symlink",audit(name,source,symlink=True))
@@ -32,7 +33,9 @@ class SourceScopeTests(unittest.TestCase):
         for other in ("src/probes/other.h", "src/probes/grok_memory_mirror_plan.hpp",
                       "imports/grok_memory_mirror_plan.h", "tests/other.cpp",
                       "imports/grok_replay_vertex_bind_harness.cpp",
-                      "tests/subdir/grok_replay_vertex_bind_harness.cpp"):
+                      "tests/subdir/grok_replay_vertex_bind_harness.cpp",
+                      "imports/vulkan_d8_interval_replay.c", "tools/subdir/vulkan_d8_interval_replay.c",
+                      "tools/vulkan_d8_interval_replay.cpp"):
             self.assertIn("unapproved artifact path/type",audit(other,source))
 
     def test_reviewed_interval_header_is_an_exact_path_allowance(self):

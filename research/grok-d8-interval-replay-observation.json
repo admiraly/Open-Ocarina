@@ -1,0 +1,236 @@
+{
+  "schema": "open-ocarina.grok-d8-interval-replay-observation/v1",
+  "date": "2026-11-13",
+  "review_sha256": "83d93fefad7f6e09b077e89f41bdf71384e2385e9e74ee075626402db77b8f5e",
+  "prepared_plan_sha256": "dcd6b4a302078dc9743ef578a7cc2ce3ab1bd55ff008928795e221e57e411c76",
+  "native_helper_sha256": "9342e1fa139fc44b3f3e0ad87bcc0a07c21f1e523e09360aac93b4ffafe523be",
+  "native_helper_source_sha256": "9b68796bd2866b52a1f4fdd4f601fed8588dd5fda6d30e526a8d56458202cbad",
+  "gpu_executed": true,
+  "scope": "frozen logical readonly D8 origin-128 two-group owned replay",
+  "origin": [
+    128,
+    0,
+    0
+  ],
+  "groups": [
+    2,
+    1,
+    1
+  ],
+  "original_grid": [
+    705,
+    1,
+    1
+  ],
+  "subgroup_size": 32,
+  "same_owned_input_graph": true,
+  "input_buffers": 10,
+  "input_payload_bytes": 172954500,
+  "record_bytes": 400,
+  "record_buffer_guard_bytes": 128,
+  "capture_bytes_per_case": 89984,
+  "descriptor_elements": 14,
+  "uses_push_descriptors": false,
+  "historical_baseline_count": 2,
+  "historical_atomicity_certified": false,
+  "general_equivalence_proven": false,
+  "warp32_composition_admitted": false,
+  "live_integration_admitted": false,
+  "timing_measured": false,
+  "fps_measured": false,
+  "cases": [
+    {
+      "case": "original32-a",
+      "result_sha256": "69d040ca258a5de9bdd008ca23f627a0c34864fa5369ba1c84ded84615c83592",
+      "native": {
+        "schema": 2,
+        "output_profile": "d8-interval-mesh-owned/v1",
+        "gpu_executed": true,
+        "mesh_draw_calls": 1,
+        "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "driver": "Intel open-source Mesa driver",
+        "driver_info": "Mesa 26.2.4",
+        "vendor_id": 32902,
+        "device_id": 22176,
+        "requested_width": 32,
+        "actual_width": 32,
+        "width_source": "pipeline_executable_properties",
+        "executable_stage": 128,
+        "workgroup": [
+          32,
+          1,
+          1
+        ],
+        "draw_mesh_tasks": [
+          2,
+          1,
+          1
+        ],
+        "origin": [
+          128,
+          0,
+          0
+        ],
+        "fence_timeout_ns": 2000000000,
+        "input_bytes_unchanged": true,
+        "control_bytes_unchanged": true,
+        "robustBufferAccess2": true,
+        "nullDescriptor": true,
+        "capture_bytes": 89984,
+        "rasterizer_discard": true,
+        "attachments": 0,
+        "pipeline_optimization_disabled": false
+      },
+      "capture": {
+        "sha256": "e0a4f3356246714cd1a4bad3a0f4a5ecdc005dc6ea4e2f9f020ab1acb71b5bbf",
+        "counts": [
+          {
+            "vertices": 128,
+            "primitives": 32
+          },
+          {
+            "vertices": 128,
+            "primitives": 32
+          }
+        ],
+        "all_guards_and_writtenness_valid": true
+      },
+      "reference_comparisons": 2,
+      "all_complete_capture_bytes_equal": true,
+      "exit_code": 0,
+      "reaped": true,
+      "driver_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+    },
+    {
+      "case": "original32-b",
+      "result_sha256": "0d76c46d84711bd647c13e45ff0003b23eee8ab8e3a6156236c000039f86b9f7",
+      "native": {
+        "schema": 2,
+        "output_profile": "d8-interval-mesh-owned/v1",
+        "gpu_executed": true,
+        "mesh_draw_calls": 1,
+        "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "driver": "Intel open-source Mesa driver",
+        "driver_info": "Mesa 26.2.4",
+        "vendor_id": 32902,
+        "device_id": 22176,
+        "requested_width": 32,
+        "actual_width": 32,
+        "width_source": "pipeline_executable_properties",
+        "executable_stage": 128,
+        "workgroup": [
+          32,
+          1,
+          1
+        ],
+        "draw_mesh_tasks": [
+          2,
+          1,
+          1
+        ],
+        "origin": [
+          128,
+          0,
+          0
+        ],
+        "fence_timeout_ns": 2000000000,
+        "input_bytes_unchanged": true,
+        "control_bytes_unchanged": true,
+        "robustBufferAccess2": true,
+        "nullDescriptor": true,
+        "capture_bytes": 89984,
+        "rasterizer_discard": true,
+        "attachments": 0,
+        "pipeline_optimization_disabled": false
+      },
+      "capture": {
+        "sha256": "e0a4f3356246714cd1a4bad3a0f4a5ecdc005dc6ea4e2f9f020ab1acb71b5bbf",
+        "counts": [
+          {
+            "vertices": 128,
+            "primitives": 32
+          },
+          {
+            "vertices": 128,
+            "primitives": 32
+          }
+        ],
+        "all_guards_and_writtenness_valid": true
+      },
+      "reference_comparisons": 3,
+      "all_complete_capture_bytes_equal": true,
+      "exit_code": 0,
+      "reaped": true,
+      "driver_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+    },
+    {
+      "case": "candidate32",
+      "result_sha256": "4f70b8fb230da416e4015cf451beea010d4909490ccccc4321d316783bcad08d",
+      "native": {
+        "schema": 2,
+        "output_profile": "d8-interval-mesh-owned/v1",
+        "gpu_executed": true,
+        "mesh_draw_calls": 1,
+        "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "driver": "Intel open-source Mesa driver",
+        "driver_info": "Mesa 26.2.4",
+        "vendor_id": 32902,
+        "device_id": 22176,
+        "requested_width": 32,
+        "actual_width": 32,
+        "width_source": "pipeline_executable_properties",
+        "executable_stage": 128,
+        "workgroup": [
+          32,
+          1,
+          1
+        ],
+        "draw_mesh_tasks": [
+          2,
+          1,
+          1
+        ],
+        "origin": [
+          128,
+          0,
+          0
+        ],
+        "fence_timeout_ns": 2000000000,
+        "input_bytes_unchanged": true,
+        "control_bytes_unchanged": true,
+        "robustBufferAccess2": true,
+        "nullDescriptor": true,
+        "capture_bytes": 89984,
+        "rasterizer_discard": true,
+        "attachments": 0,
+        "pipeline_optimization_disabled": false
+      },
+      "capture": {
+        "sha256": "e0a4f3356246714cd1a4bad3a0f4a5ecdc005dc6ea4e2f9f020ab1acb71b5bbf",
+        "counts": [
+          {
+            "vertices": 128,
+            "primitives": 32
+          },
+          {
+            "vertices": 128,
+            "primitives": 32
+          }
+        ],
+        "all_guards_and_writtenness_valid": true
+      },
+      "reference_comparisons": 4,
+      "all_complete_capture_bytes_equal": true,
+      "exit_code": 0,
+      "reaped": true,
+      "driver_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+    }
+  ],
+  "limitations": [
+    "Two of 705 groups at one frozen descriptor/input state; not a whole-scene or all-input proof.",
+    "Input deduplication follows readonly logical snapshots, not a historical imported-memory alias certificate.",
+    "The record is fixed for this capture; live producer, ABI and lifetime integration remain required.",
+    "No shader timestamp, whole-frame timing, rendering-quality or native-feature acceptance.",
+    "All known game/helper competitors were absent; unknown background GPU applications were not exhaustively excluded."
+  ]
+}
