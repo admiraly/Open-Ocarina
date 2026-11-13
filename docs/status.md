@@ -53,6 +53,12 @@ match complete CPU outputs at actual width 32. The subsequent
 [packed original-layout bridge](matrix-warp-bridge.md) passes identity and layout
 fixtures, while its rounding diagnostic changes negative zeros to positive zeros.
 These establish isolated arithmetic and layout cases, without restoring an original network. The
+[revision 04 batch](matrix-warp-batch04-observation.md) now verifies one completed
+64-workgroup dispatch, including every input byte, all guards and all 4,096
+completion markers. All 16 exact safe cases matched; diagnostic differences
+include changed zero signs and two adjacent normal-half encodings. These results
+do not establish general arithmetic equivalence or admit a production matrix path.
+The
 [CPU observer primitives](benchmark-observer.md) still need real producer adapters;
 they do not certify a benchmark.
 The [bounded native-record adapter](benchmark-replay-adapter.md) now decodes a

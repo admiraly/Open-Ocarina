@@ -1,0 +1,1238 @@
+{
+  "schema": "open-ocarina.matrix-warp32-finite-batch-preparation/v1",
+  "profile": "open-ocarina.matrix-warp32-finite-batch/v1",
+  "header_magic": "OOMATB32",
+  "scope": "CPU-only preparation and proofs for at most64 independent workgroups, each one local32/physical32 logical warp",
+  "review_plan_sha256": "596eb1d0adb88a2b5c8998ac7d320f15ef5ce4be36b504c36dd3b8bf471eccd7",
+  "source_sha256": {
+    "tools/matrix_warp_batch.py": "60fa166454c6086a645c78646da365080d1a1a51c67a8c0afd7caa0f7caf61a8",
+    "src/probes/matrix_warp_batch.c": "69de71d83d12ba2d44e02acfff90358255957fd93b5ef9a964a261c93fe16165",
+    "tests/test_matrix_warp_batch.py": "acea000cc2ab6ef652c443c974584fa36e602bc2da64d543f5a25131358256f1"
+  },
+  "dependency_sha256": {
+    "tools/matrix_warp_batch.py": "60fa166454c6086a645c78646da365080d1a1a51c67a8c0afd7caa0f7caf61a8",
+    "src/probes/matrix_warp_batch.c": "69de71d83d12ba2d44e02acfff90358255957fd93b5ef9a964a261c93fe16165",
+    "tools/matrix_warp_bridge.py": "28f35436b7ef7e7b3076da773c054b62b32b73790ea109872f956c4b1c753cf1",
+    "tools/matrix_restore_probe.py": "80a97bd7289c85d1ceaf5c145d948caf216cc75af556dd3e246399cc8e3e2e37",
+    "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+    "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+    "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c"
+  },
+  "helper": {
+    "source_sha256": "69de71d83d12ba2d44e02acfff90358255957fd93b5ef9a964a261c93fe16165",
+    "binary_sha256": "b1120315eb627badd6e57323eccae0d3b47f81c1deb4eaca9c079f17cbf663c3",
+    "build_flags": [
+      "-std=c11",
+      "-O2",
+      "-DNDEBUG",
+      "-Wall",
+      "-Wextra",
+      "-Werror"
+    ],
+    "compiled_fixture_binding_header_sha256": "a1050788a4aebfa87ecdba8cd0daa34f2c42fd332105ddfe1652a3403986da75",
+    "sha256_selftest_passed": true,
+    "all_bundle_bytes_cryptographically_bound_before_instance": true,
+    "safe_groups_independently_integer_validated": 16,
+    "safe_reference_packed_words_independently_integer_validated": 1024,
+    "diagnostic_arithmetic_reference": "Pinned Python oracle; complete reference bytes bound to compiled SHA-256, not independently recomputed in C"
+  },
+  "shader": {
+    "source_sha256": "2d06791a81dc0a035c9b58f0ec17408f68d7ea139c0335d7d81f1c24d3de5eb1",
+    "spirv_sha256": "05ad0298ebda529c0c8bf8c3bb3e6a984edf01ce1d3d029de5fe70f066e78194",
+    "spirv_bytes": 8580,
+    "build_flags": [
+      "-V",
+      "--target-env",
+      "vulkan1.3",
+      "-Os"
+    ],
+    "spirv_validation_target": "vulkan1.3",
+    "spirv_validation_passed": true,
+    "change_from_frozen_parent": "Only input/output group-relative slot indexing and workgroup index declaration; CPU reverse-substitution test verifies the remaining shader body is identical",
+    "native_pipeline_compiled": false
+  },
+  "bundle": {
+    "sha256": "0a0f9316727489e50de3030e001154ce55fe6cf3414a26b9d28de7ff38c033b7",
+    "bytes": 98856,
+    "groups": 64,
+    "safe_exact_groups": 16,
+    "diagnostic_groups": 48,
+    "finite_half_input_elements": 32768,
+    "seed": 1330598978,
+    "sampling": "SHA-256 of little-endian seed/group/matrix/element tuple; finite exponent remapping documented in source",
+    "reference_aggregate_half_classes": {
+      "positive_zero": 432,
+      "negative_zero": 128,
+      "subnormal": 252,
+      "normal": 5391,
+      "infinity": 1989,
+      "nan": 0
+    },
+    "reference_half_class_count": 8192,
+    "finite_inputs_not_presumed_to_produce_nan_or_infinity": true,
+    "cases": [
+      {
+        "group": 0,
+        "name": "identity",
+        "safe_exact": true,
+        "input_payload_sha256": "525fc27f64948bb43114ee1a431accb2d1f45dad6736279385e737ea44b03b1f",
+        "reference_payload_sha256": "61de80a072716adde2ccd4e67f076a1a5233513cf7bffc5326839496e1300c5d",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 1,
+        "name": "layout",
+        "safe_exact": true,
+        "input_payload_sha256": "0872977558d72165613d639d1753f754285f009d62265d58d865843df4890761",
+        "reference_payload_sha256": "d9d96de8d03d96cf40998ebf9bf68ab86ce40a2759842003e26fe1f43cc4b7a4",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 2,
+        "name": "positive-zero",
+        "safe_exact": true,
+        "input_payload_sha256": "5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+        "reference_payload_sha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+        "reference_half_classes": {
+          "positive_zero": 128,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 0,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 3,
+        "name": "small-integer-00",
+        "safe_exact": true,
+        "input_payload_sha256": "3a02e8c6c9274ca1316c108ce7b1fd9d5414916b4903554368861fb34dfcbe67",
+        "reference_payload_sha256": "f0714572f97b4b5c32b9989b646bd8983b41995dd417b322b493411fbabf129a",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 4,
+        "name": "small-integer-01",
+        "safe_exact": true,
+        "input_payload_sha256": "4f03eb666ccb9261e54527d8d629310f1289e1e885a7399b696601bc651eda15",
+        "reference_payload_sha256": "ddf6e5e64c8ee1af1ede1cf3037569c89e4b6ec34901c627a4cfbc3c047486cf",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 5,
+        "name": "small-integer-02",
+        "safe_exact": true,
+        "input_payload_sha256": "531170a110bc2a3d85b4a8ad4efab985bd145dadbdc06ac15985f126c431f5d8",
+        "reference_payload_sha256": "1afd2c518ec585fa7c6273b115c22a8a07e71d50d2317bb29cc06d772f3f340b",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 6,
+        "name": "small-integer-03",
+        "safe_exact": true,
+        "input_payload_sha256": "9168f7476cec9a185ebac81bed1ec3a61cd6b77db0db171fb858819e64000aab",
+        "reference_payload_sha256": "fe964d5c7915e2460110a891370eca427780b015068fbf80938419da659b8a88",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 7,
+        "name": "small-integer-04",
+        "safe_exact": true,
+        "input_payload_sha256": "17e5ac758f70f2420438ee26da2d3287e2a123e8e98feae183988ea59acf4fa0",
+        "reference_payload_sha256": "71068ff00deea50e760bb03f1acd50b3bee8dac726277b3df4e098e8ff01afab",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 8,
+        "name": "small-integer-05",
+        "safe_exact": true,
+        "input_payload_sha256": "abd5ef12e92cb6b629d32b9eb70d55940b561c1a4cb876ac0a401254ce31e9a6",
+        "reference_payload_sha256": "694cc652713e34d089c3f1bb89caebb87e96cd2e5a82f0878ead9e3d360f70d5",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 9,
+        "name": "small-integer-06",
+        "safe_exact": true,
+        "input_payload_sha256": "e9ccbab673c48629e3f42b481be23859221bdb7c0eeb5ec1abbf03188efaae57",
+        "reference_payload_sha256": "a7f87f7e4921764ee3786fbc96fd1f622697ec859ffa61bf06ce2e7507e683ab",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 10,
+        "name": "small-integer-07",
+        "safe_exact": true,
+        "input_payload_sha256": "359471f9c7f0ca23cb0d9663b8856cc028ff89f476e7785f1792716f4c9ef703",
+        "reference_payload_sha256": "d5bbfb2f499ad74a3bcb41e33d374e56c5c95b3b37e564b2dbd8d6b8d59f71f7",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 11,
+        "name": "small-integer-08",
+        "safe_exact": true,
+        "input_payload_sha256": "870a993f9cd8ca2979362cf9d22d5ffe746d555222a6fa53507ca1b8b1252d9d",
+        "reference_payload_sha256": "13badb9a309bfb2a16226d09d65d8a5eb50c1099517cdd1e82737b2a609a5ffd",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 12,
+        "name": "small-integer-09",
+        "safe_exact": true,
+        "input_payload_sha256": "32894c1541250856b812716b2409ca329b1f5b9a33dd64f2ec82cbb12a0c4c24",
+        "reference_payload_sha256": "10ee447c55b0bd49b8762a4b93b3f7b639b3cbde1b33752de658f0803864c926",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 13,
+        "name": "small-integer-10",
+        "safe_exact": true,
+        "input_payload_sha256": "ff5ac9af4c5b87a8e3ed2aadc8c906704fc1fb418213805075ec0eb8ab6ce7dd",
+        "reference_payload_sha256": "0eccacb807c3571eaf111315820b9da02b33975bdb71898767596dc6a00886ee",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 14,
+        "name": "small-integer-11",
+        "safe_exact": true,
+        "input_payload_sha256": "001b576f9ca3f88bdcd682aaf544861dd456c665d81a7ce88476b4cafdcbc84e",
+        "reference_payload_sha256": "890d32adb231b429375262b770199356a423f37d65b09f53502a0b175928f80d",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 15,
+        "name": "small-integer-12",
+        "safe_exact": true,
+        "input_payload_sha256": "0a81eece0f5233ab2844a95af11b99ea9c355f2e8e0bd7e120e85df023dd68b4",
+        "reference_payload_sha256": "8fc1ad9c8cdf68247b1fa5e389a0a95b346229b11514e7da787e98520593f9c9",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 16,
+        "name": "midpoint-k8-checkpoint",
+        "safe_exact": false,
+        "input_payload_sha256": "4c4ca96f129695a59c8661b4f9ab012cd37e539949217436276c74c460f20d71",
+        "reference_payload_sha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+        "reference_half_classes": {
+          "positive_zero": 128,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 0,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 17,
+        "name": "positive-zero-padding-negative-zero",
+        "safe_exact": false,
+        "input_payload_sha256": "8b067836338429356c49b5034f0332d31c1607db7423a18baa85a88ebc848e82",
+        "reference_payload_sha256": "3e62521bbd0e5a7b224c13b996478934c13ca9e642ac317fa777eda1cbedfea5",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 128,
+          "subnormal": 0,
+          "normal": 0,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 18,
+        "name": "cancellation-reduction-order",
+        "safe_exact": false,
+        "input_payload_sha256": "19d7afdbc9ff511fab28a797aded25074bc3e57861e1be3343c6d9154f4a1166",
+        "reference_payload_sha256": "5341e6b2646979a70e57653007a1f310169421ec9bdd9f1a5648f75ade005af1",
+        "reference_half_classes": {
+          "positive_zero": 128,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 0,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 19,
+        "name": "half-subnormal-preservation",
+        "safe_exact": false,
+        "input_payload_sha256": "cac2193c31b31155d4ff2804ae08a9fd9d0017175ee7565562c959e78996f7d5",
+        "reference_payload_sha256": "ee0b4470e096a22020e14451385f6b6c57594c29d13ae6284e11556ec79f7739",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 128,
+          "normal": 0,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 20,
+        "name": "half-underflow-midpoint",
+        "safe_exact": false,
+        "input_payload_sha256": "68ef39a13592a4f06fc908446e1e16cf64cdb45f571d3af4df88415f59ccb1b5",
+        "reference_payload_sha256": "39317e353e4bde921ead9906a589733871e7607b91b92ccc423522c0a7ff56a1",
+        "reference_half_classes": {
+          "positive_zero": 48,
+          "negative_zero": 0,
+          "subnormal": 80,
+          "normal": 0,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 21,
+        "name": "half-normal-subnormal-boundary",
+        "safe_exact": false,
+        "input_payload_sha256": "d5764011a5c9938a147956c4569b5af96cb3eece29d6a9145fc16c15a0550c1d",
+        "reference_payload_sha256": "c2152137fdf0822f9ec91557d8f20152b09f9b9caf04c13b1ace44f87ec6d1a8",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 44,
+          "normal": 84,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 22,
+        "name": "half-overflow-midpoint",
+        "safe_exact": false,
+        "input_payload_sha256": "2bbff10ebf4a4575358a088eacaf797bb145e523bdd18b2f62dce0fb1df214df",
+        "reference_payload_sha256": "964be9f3dd7af6621f981d2a1b748a8e4a9c9827a65ca8346d19183b11b24220",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 32,
+          "infinity": 96,
+          "nan": 0
+        }
+      },
+      {
+        "group": 23,
+        "name": "half-midpoint-even-odd",
+        "safe_exact": false,
+        "input_payload_sha256": "7763103b04d512c152b5ff8756fa03a3cf98eb1d107df171ed32270b044194d6",
+        "reference_payload_sha256": "7ad21b523faa812b2461c5016d64992213a2faf27f160a70fb3c1a64f17e4646",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 24,
+        "name": "exponent-pair-00",
+        "safe_exact": false,
+        "input_payload_sha256": "ff637d850520e4a067cebc6afe4202cc1f7d833ee5f476d7b194af2a8c35acda",
+        "reference_payload_sha256": "658b3f509dbf62cf9923767b659f567bf364a75d57b6878c76eed3e16e3597c2",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 25,
+        "name": "exponent-pair-01",
+        "safe_exact": false,
+        "input_payload_sha256": "8bf4e6a04eea41628df873dcf7b61fab56c5beb800a1fcfd040f381a95802bc7",
+        "reference_payload_sha256": "aab95f22d568c14949ca896d8f1618b2f7ea98cca607a1b026d47f66b874f54f",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 26,
+        "name": "exponent-pair-02",
+        "safe_exact": false,
+        "input_payload_sha256": "a0c0e4be2854f48f1c44c3242f4815a2b85f384f25720e7ee80a36e85dbd2468",
+        "reference_payload_sha256": "aab95f22d568c14949ca896d8f1618b2f7ea98cca607a1b026d47f66b874f54f",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 27,
+        "name": "exponent-pair-03",
+        "safe_exact": false,
+        "input_payload_sha256": "fea8e2f1807f713bbf7fa2f9cecec237b83ba4c8ca2bb92b2689c2e32145a973",
+        "reference_payload_sha256": "aab95f22d568c14949ca896d8f1618b2f7ea98cca607a1b026d47f66b874f54f",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 28,
+        "name": "exponent-pair-04",
+        "safe_exact": false,
+        "input_payload_sha256": "caa166df6673699131e94b0f42d3844e90892d67e41a4be07a1497c063bded73",
+        "reference_payload_sha256": "aab95f22d568c14949ca896d8f1618b2f7ea98cca607a1b026d47f66b874f54f",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 29,
+        "name": "exponent-pair-05",
+        "safe_exact": false,
+        "input_payload_sha256": "0bd25e8eb7039d9acbf810cd84cf830874471904f3aa19dd1f95a55b81e003a1",
+        "reference_payload_sha256": "aab95f22d568c14949ca896d8f1618b2f7ea98cca607a1b026d47f66b874f54f",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 30,
+        "name": "exponent-pair-06",
+        "safe_exact": false,
+        "input_payload_sha256": "7576dcb7893219a525569bf279f797bd2cc3c66b100e02292fd3a828a9ba6d48",
+        "reference_payload_sha256": "aab95f22d568c14949ca896d8f1618b2f7ea98cca607a1b026d47f66b874f54f",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 31,
+        "name": "exponent-pair-07",
+        "safe_exact": false,
+        "input_payload_sha256": "5ce6b6c85dee82dfaef1436b4f8b4d8ffc77fa08235383be3a0b6cd836579c2d",
+        "reference_payload_sha256": "21e9ae8c7de46931bc5c986f0cc82a1930259fac70985520141075f38f8eaf34",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 32,
+        "name": "finite-exponent-mantissa-00",
+        "safe_exact": false,
+        "input_payload_sha256": "82681dadc99c025b554ee6fc7ab8872e6643821ac52134df3ad735839b2377cc",
+        "reference_payload_sha256": "2d8e322aa5c09e4f904874a9bd72d624e76d2376e8814caca32de30ea0208cbb",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 6,
+          "infinity": 122,
+          "nan": 0
+        }
+      },
+      {
+        "group": 33,
+        "name": "finite-exponent-mantissa-01",
+        "safe_exact": false,
+        "input_payload_sha256": "be6f006c4b3696e39e84107fd3fc78882b52f1937ca459e17612ac301921dd9e",
+        "reference_payload_sha256": "2c07ee65f6050d9f6d2bbd55f1e0bdcb52514fc5b7ca1ba80b770dbae77b3a4f",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 10,
+          "infinity": 118,
+          "nan": 0
+        }
+      },
+      {
+        "group": 34,
+        "name": "finite-exponent-mantissa-02",
+        "safe_exact": false,
+        "input_payload_sha256": "f86d7b91bca9a75f90bceed135f84c657f2dcb8b71fb08b53520c9bd4a80e5fc",
+        "reference_payload_sha256": "6e7c9d06176412678bd3e5dfe39dcd97d906d2709d381155468a327e96d42ddd",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 17,
+          "infinity": 111,
+          "nan": 0
+        }
+      },
+      {
+        "group": 35,
+        "name": "finite-exponent-mantissa-03",
+        "safe_exact": false,
+        "input_payload_sha256": "50da5909f444766dfde8fcde3ed28163fbdfdd2d01f5430321f47013d006de6b",
+        "reference_payload_sha256": "81e786041e05187b282496952b3689c046c96a3c15a4746c3df7f286f4454d11",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 8,
+          "infinity": 120,
+          "nan": 0
+        }
+      },
+      {
+        "group": 36,
+        "name": "finite-exponent-mantissa-04",
+        "safe_exact": false,
+        "input_payload_sha256": "55d7658113fcc806aef84f1df0c1517d579d6c356ad8071411270389877aef29",
+        "reference_payload_sha256": "ce774246df3cab185ef700bcd8f3f049f9d0c0409332e54aceff4613a59f12e1",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 3,
+          "infinity": 125,
+          "nan": 0
+        }
+      },
+      {
+        "group": 37,
+        "name": "finite-exponent-mantissa-05",
+        "safe_exact": false,
+        "input_payload_sha256": "55c8251b57049bb1f32736dcac14e4b5deb74d35d209ec033c17a953a8221917",
+        "reference_payload_sha256": "03e89e0cd1144f7f8f157a670b01a3daa321ba87d6f53668b5085ff5ac8321d9",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 10,
+          "infinity": 118,
+          "nan": 0
+        }
+      },
+      {
+        "group": 38,
+        "name": "finite-exponent-mantissa-06",
+        "safe_exact": false,
+        "input_payload_sha256": "ab4f1e744ef520aab0e3f64b7724dab8cb6250ad7c8184797618ddb624d4773d",
+        "reference_payload_sha256": "cde25c8012d7e05e39bd0a581c7d6f2abb97a302af5227ce4c6af693a32a0fd2",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 18,
+          "infinity": 110,
+          "nan": 0
+        }
+      },
+      {
+        "group": 39,
+        "name": "finite-exponent-mantissa-07",
+        "safe_exact": false,
+        "input_payload_sha256": "c27aee1bda940fbfca85d003e2675c4914cacca9190dd0e605268baa1581fd90",
+        "reference_payload_sha256": "4100fa02b5794b5d9cefe7b3bf80682b3ae6e41b8d262c3f7940c85131226a23",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 8,
+          "infinity": 120,
+          "nan": 0
+        }
+      },
+      {
+        "group": 40,
+        "name": "balanced-finite-products-00",
+        "safe_exact": false,
+        "input_payload_sha256": "c99e1565dfc516ee7b3e4966b070df0c781f7020c5e8729b25ccdb7e006ff0b3",
+        "reference_payload_sha256": "aa9e84f861c803e677fcd261995125dd7f9afebdda4dc98ad87f971408874c44",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 41,
+        "name": "balanced-finite-products-01",
+        "safe_exact": false,
+        "input_payload_sha256": "08b3fa9cc5281eee7b1b7aecb3eac90ebb11b013ffe70f50bb87357458478d21",
+        "reference_payload_sha256": "1be34adeb64ad880012e0b06a19b6abc04898e77a09ee8b704e9dcf8a8c5b0e5",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 42,
+        "name": "balanced-finite-products-02",
+        "safe_exact": false,
+        "input_payload_sha256": "1ddffacef9f2f7b6ed4d4c193fb25dabf9a75a872ca88edc57459130f49825c7",
+        "reference_payload_sha256": "0a6a24ba7618338e7074ca26cb09ad9f8e7c7d45036b90d34087497f33b8d8d2",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 43,
+        "name": "balanced-finite-products-03",
+        "safe_exact": false,
+        "input_payload_sha256": "b1967cdac69b8c7c90df19fd3a1f8da411a2dc390cc04772e8024ca253786801",
+        "reference_payload_sha256": "59e12aa6f6f6719452612b13cb2b72d6f5b0a325df3c51ecc5c1a45867e8718a",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 44,
+        "name": "balanced-finite-products-04",
+        "safe_exact": false,
+        "input_payload_sha256": "d1af74349791eaaa4ddeee28b538753ef909781128e3213aa2dea881fd0fad68",
+        "reference_payload_sha256": "17c9ceab5ce4bc2b1f43a66110988acf6c8511f2cfeae3aff1afdce19701e155",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 45,
+        "name": "balanced-finite-products-05",
+        "safe_exact": false,
+        "input_payload_sha256": "d4f0a23248dc5c63c9a2f0167233e46e7a9b2bd6d3555a7165518f3044e433ea",
+        "reference_payload_sha256": "91f9fa7a269cb72b53b83c5ea7f58a2a995c788ae3e9b061be69fa5417682fbd",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 46,
+        "name": "balanced-finite-products-06",
+        "safe_exact": false,
+        "input_payload_sha256": "97dccf2ad2e763b3a4606d9e8a1199e72b527a82474c5eb5ca76437216f273cf",
+        "reference_payload_sha256": "bc9b0580b370c28c09a7a82b7b7f254f9b793a7f76d6eddc4513670bb5e51ab2",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 47,
+        "name": "balanced-finite-products-07",
+        "safe_exact": false,
+        "input_payload_sha256": "75725767fd294f14e105f41b38a14517cfc53408e3159ee02d27c15748df0663",
+        "reference_payload_sha256": "51d21046cb4ab53777a6af4a5c0d2bd3ef08db41e8cb0a45f02f765795c6ce91",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 48,
+        "name": "finite-half-bits-00",
+        "safe_exact": false,
+        "input_payload_sha256": "03851055d0966056d2cd64b68136694621e34d7b70038b13609cf2e8e9a227b2",
+        "reference_payload_sha256": "1daec6651e861a5d27ac4cb061859a7193620a0c68bdbb60c23637b4b5a93ab5",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 3,
+          "infinity": 125,
+          "nan": 0
+        }
+      },
+      {
+        "group": 49,
+        "name": "finite-half-bits-01",
+        "safe_exact": false,
+        "input_payload_sha256": "ac12f2a857ae20dc4575c3ed63c92b4542f3c2dd19aa6af6df1bebcae0421f2d",
+        "reference_payload_sha256": "f7c6ac3e97b9701413cf72e8760ee872187c178fb7f6ebb1b8289de77c757a4d",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 9,
+          "infinity": 119,
+          "nan": 0
+        }
+      },
+      {
+        "group": 50,
+        "name": "finite-half-bits-02",
+        "safe_exact": false,
+        "input_payload_sha256": "0accf213015e9982c88e4e978542fc317505a8252aa339c2066a1d01399b93a2",
+        "reference_payload_sha256": "6a685dafa561aad7d4ccdf5eeedc1ce35f0a43168ad744add50e0c6da33364ca",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 5,
+          "infinity": 123,
+          "nan": 0
+        }
+      },
+      {
+        "group": 51,
+        "name": "finite-half-bits-03",
+        "safe_exact": false,
+        "input_payload_sha256": "375047b04935089de318a274cd966488ebf18c30dace9b0694a1a02fb8711f4b",
+        "reference_payload_sha256": "6130f24fa97d356323e41c67c00d61c72c7ca16f158069106b3f0f3710c5f30b",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 12,
+          "infinity": 116,
+          "nan": 0
+        }
+      },
+      {
+        "group": 52,
+        "name": "finite-half-bits-04",
+        "safe_exact": false,
+        "input_payload_sha256": "752c88354a48c1f33b699ee95aed60df48f5e1a0c10472d10c13b3f420d6e801",
+        "reference_payload_sha256": "7a2d0b4cb0c2a90815c21f313fafce4b3a27bfce22295a08a9fc704fc974abd0",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 6,
+          "infinity": 122,
+          "nan": 0
+        }
+      },
+      {
+        "group": 53,
+        "name": "finite-half-bits-05",
+        "safe_exact": false,
+        "input_payload_sha256": "ce279af6cd9dbd4e5e9f6f3bcf2486e1719d85d57443f21af91f35fabc36a316",
+        "reference_payload_sha256": "c7d4c6025c26a4f94d3d78afaa743e9cd9f68beda504fd77596dd38d444f8e5a",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 7,
+          "infinity": 121,
+          "nan": 0
+        }
+      },
+      {
+        "group": 54,
+        "name": "finite-half-bits-06",
+        "safe_exact": false,
+        "input_payload_sha256": "1231c65a7e5b8498a3181e62b0d45075681f879f5646bd9e72d085ae38d0050a",
+        "reference_payload_sha256": "f5aa729de7d5d95def6ca818b4340d84dccf248584651f96b1bbcc4d4d0fb3b8",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 3,
+          "infinity": 125,
+          "nan": 0
+        }
+      },
+      {
+        "group": 55,
+        "name": "finite-half-bits-07",
+        "safe_exact": false,
+        "input_payload_sha256": "c868cbcffedb55a543db5cb237515be406d56904276bf1c991460835279a0bb3",
+        "reference_payload_sha256": "c6d98a1b6feb2c8b821b5e9a44128658b029713e0252b5c32421a30990e832c7",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 30,
+          "infinity": 98,
+          "nan": 0
+        }
+      },
+      {
+        "group": 56,
+        "name": "low-exponent-finite-bits-00",
+        "safe_exact": false,
+        "input_payload_sha256": "3a7d78e238f8c8c7202aa6a432738b2bc9a6d43c2e598cadc79dbd418faeec68",
+        "reference_payload_sha256": "66da5256751dcb79c3f148207026a8741b512b74b1cefed8bd2697ec879a0946",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 57,
+        "name": "low-exponent-finite-bits-01",
+        "safe_exact": false,
+        "input_payload_sha256": "cbf1438bcd6d0285a4d869b5db60806350454320ac82bad5522ce5eba07d40ec",
+        "reference_payload_sha256": "fc3e8ec78bb4d4bc74ec424914334c538dcec6d055b87515b980da08d07bb63c",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 58,
+        "name": "low-exponent-finite-bits-02",
+        "safe_exact": false,
+        "input_payload_sha256": "304af5707b06e62d4a2ad87102b694559200f1cb4debe57aacd6e2c6414bc23f",
+        "reference_payload_sha256": "2c3417b16fed0dcbc541da5d2aa4d7e2050e3360ad590fc2365fe18e637eb40a",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 59,
+        "name": "low-exponent-finite-bits-03",
+        "safe_exact": false,
+        "input_payload_sha256": "9db20402b7835055c6f4492b0d231655c23f7dc9b88c622137602026c7a9a797",
+        "reference_payload_sha256": "38a396f84dfe51b4b4980fa283aa69fa9eb9f84d3aaae86bf8b262ad90a0643d",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 60,
+        "name": "low-exponent-finite-bits-04",
+        "safe_exact": false,
+        "input_payload_sha256": "95f1fb3b1f3ac0bfcaba597ac44781bcb123768164d67b93bcea44ead164dd79",
+        "reference_payload_sha256": "cf1b9b3a041cbe1eae2af7f0092f955cac1216d45e202a945fe06a8e604dba33",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 61,
+        "name": "low-exponent-finite-bits-05",
+        "safe_exact": false,
+        "input_payload_sha256": "8e188553ad2531db4058d0ac25c190fe6bb8c1b1ef3aa5e9bcba4b06038a1dbb",
+        "reference_payload_sha256": "910e3ff06754ddeaf8c423deaccd439a9c1415fc501213dec008dfcff7c8dafe",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 62,
+        "name": "low-exponent-finite-bits-06",
+        "safe_exact": false,
+        "input_payload_sha256": "f83cd68d2485f21cac51c43aa51fa30a6189473ed26aeeb671b067ff3bfa5ad6",
+        "reference_payload_sha256": "f486180357d68a0ebeb74eee7cc8e145515c216d2e12716b2f488a3afe239595",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      },
+      {
+        "group": 63,
+        "name": "low-exponent-finite-bits-07",
+        "safe_exact": false,
+        "input_payload_sha256": "d6ac4b237c146d02dcc849f54d2c9048281a56b16a3d509b4a2fa739a2dfe499",
+        "reference_payload_sha256": "3b182afbf1221c1e6e2112b47f0c03b712c309e9c456c970ef0c8e15464735ae",
+        "reference_half_classes": {
+          "positive_zero": 0,
+          "negative_zero": 0,
+          "subnormal": 0,
+          "normal": 128,
+          "infinity": 0,
+          "nan": 0
+        }
+      }
+    ]
+  },
+  "named_counterexamples": {
+    "final_half_cast_is_not_checkpoint_equivalent": {
+      "checkpoint_half": 0,
+      "final_only_half": 4096
+    },
+    "positive_zero_padding_changes_negative_zero": {
+      "checkpoint_half": 32768,
+      "padded_sequential_half": 0
+    },
+    "native_reduction_order_cannot_be_assumed": {
+      "ordered_half": 0,
+      "reordered_half": 15360
+    }
+  },
+  "layout_proof": {
+    "parent_single_warp": {
+      "logical_lanes": 32,
+      "required_physical_subgroup_size": 32,
+      "workgroup": [
+        32,
+        1,
+        1
+      ],
+      "logical_warps": 1,
+      "disjoint_shared_elements": {
+        "A": 256,
+        "B": 128,
+        "C": 128
+      },
+      "tile_elements_per_uniform_phase": 128,
+      "tile_writes_per_lane": 4,
+      "tile_owner_rule": "index modulo 32",
+      "m_iterations": 2,
+      "k_chunk_iterations": 2,
+      "matrix_calls_per_dispatch": 4,
+      "uniformity_scope": "Only this independently authored fixture's constant-bounded collective path"
+    },
+    "independent_workgroups": 64,
+    "unique_input_payload_words": 16384,
+    "unique_output_payload_words": 4096,
+    "input_inner_guard_words": 2048,
+    "output_inner_guard_words": 2048,
+    "all_payload_slots_disjoint_and_complete": true,
+    "all_shader_storage_accesses_skip_inner_guards": true,
+    "shared_arrays_private_to_each_workgroup": true,
+    "declared_shared_bytes_per_workgroup": 2304
+  },
+  "gpu_admission_requirements_for_future_review": {
+    "api_version": "1.3",
+    "vendor_id": 32902,
+    "device_id": 22176,
+    "minimum_compute_shared_bytes": 2304,
+    "minimum_compute_workgroup_count_x": 64,
+    "minimum_compute_invocations_and_x_size": 32,
+    "minimum_storage_buffer_range_bytes": 73728,
+    "minimum_storage_descriptors_per_stage_and_set": 2,
+    "storage_offset_alignment_must_divide_bytes": 256,
+    "required_compute_subgroup_size": 32,
+    "features": [
+      "robustBufferAccess",
+      "shaderFloat16",
+      "vulkanMemoryModel",
+      "subgroupSizeControl",
+      "computeFullSubgroups",
+      "cooperativeMatrix",
+      "pipelineExecutableInfo"
+    ],
+    "shape": {
+      "M": 8,
+      "N": 8,
+      "K": 16,
+      "A": "float16",
+      "B": "float16",
+      "C": "float32",
+      "result": "float32",
+      "scope": "subgroup",
+      "saturating": false
+    }
+  },
+  "driver_profile_for_future_review": {
+    "name": "cache-safe-e5",
+    "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+    "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3"
+  },
+  "driver_policy_for_future_review": {
+    "name": "native-safe",
+    "controlled_options": {
+      "HS_CS32_MAX_INSTS": null,
+      "HS_SPILL_BATCH": "1",
+      "HS_PUSH_SHADOW": "1",
+      "shader_spilling_rate": "1",
+      "INTEL_DEBUG": null,
+      "HS_SPILL_PCT": null,
+      "HS_RA_DEBUG": null,
+      "HS_FORCE_SIMD8": null,
+      "HS_LARGE_GRF": null,
+      "HS_SUBGROUP8": null,
+      "HS_LARGE_GRF_BIT": null,
+      "RX_VK_WARP64": null,
+      "RX_VK_NOOPT": null
+    },
+    "full_environment_snapshot": false,
+    "profile_scope": "MAX absent; no global compute fallback opt-in"
+  },
+  "bounds": {
+    "actual_prepared_groups": 64,
+    "maximum_groups": 64,
+    "local_size": [
+      32,
+      1,
+      1
+    ],
+    "required_and_permitted_physical_subgroup_width": 32,
+    "logical_warps_per_workgroup": 1,
+    "dispatch": [
+      64,
+      1,
+      1
+    ],
+    "maximum_dispatch_calls": 1,
+    "matrix_calls_per_workgroup_from_constant_source_loops": 4,
+    "guarded_input_bytes": 73728,
+    "guarded_output_bytes": 24576,
+    "input_payload_bytes": 65536,
+    "output_payload_bytes": 16384,
+    "input_stride_words": 288,
+    "output_stride_words": 96,
+    "inner_guard_bytes_each_end_per_group": 64,
+    "outer_guard_bytes_each_end_per_buffer": 256,
+    "full_output_packed_payload_words": 4096,
+    "full_output_half_elements": 8192,
+    "fence_timeout_ns": 2000000000,
+    "process_timeout_seconds": 30
+  },
+  "validation": {
+    "focused_tests_passed": 15,
+    "full_suite_tests_run": 709,
+    "full_suite_tests_passed": 704,
+    "full_suite_tests_skipped": 5,
+    "full_suite_result": "OK (skipped=5)",
+    "skip_scope": "Existing optional descriptor-array native CPU integration tests; all15 new batch tests executed and passed",
+    "C_sha256_independent_hashlib_lengths": [
+      0,
+      1,
+      3,
+      55,
+      56,
+      63,
+      64,
+      65,
+      119,
+      120,
+      127,
+      128,
+      129,
+      1000,
+      98856
+    ],
+    "linker_trap_intercepts_vkCreateInstance_before_real_Vulkan": true,
+    "cpu_selftest_and_full_bundle_paths_return_before_trap": true,
+    "safe_reference_rebinding_still_rejected_by_independent_integer_math": true,
+    "narrowed_width_rebinding_still_rejected_by_structural_gate": true,
+    "all_sampled_fixture_mutations_rejected_by_compiled_digest": true,
+    "all_input_and_output_group_payload_indices_disjoint_and_complete": true,
+    "safe_and_diagnostic_mismatches_separately_counted_without_tolerance": true,
+    "inner_guard_corruption_refused_by_full_output_classifier": true
+  },
+  "compiler_versions": {
+    "cc": "cc (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)",
+    "glslangValidator": "Glslang Version: 11:16.2.0",
+    "spirv-val": "SPIRV-Tools v2026.1 unknown hash, 2026-02-16T00:00:00+00:00"
+  },
+  "preserved_parent_profiles": {
+    "frozen_bridge_source_commit": "62a9a09f895446b5217a1c99009b1928635cd89d",
+    "bridge_plan_sha256": "7cc5763ea2edfbccba0da82dea095639c07d94818682eb503f72ad727525c7c6",
+    "bridge_preparation_sha256": "4a74dc9d6966a443d2f91ec6f0241a6b1cbdeed41cd1d93bfece5dbea4478ede",
+    "bridge_observation_sha256": "bb2bd271e64392b7e691d95b43abe6fe360ce0a8656073fc277e000643202e0c",
+    "matrix03_plan_sha256": "3ce51b8a74ad5dd1efbe5652a2f124df9c13e3451c4149db2921c914b17af19f",
+    "matrix03_preparation_sha256": "44a977938e1b121cc1128b785c25592ba7c9d86d41253aa9b7546d095780c3c8",
+    "matrix03_observation_sha256": "600b98290c2064fcd04108efea267c7e635e89fb643c74d6dda5283115ef8a53",
+    "all_frozen_parent_sources_helpers_modules_fixtures_dependencies_and_receipts_rechecked_unchanged": true
+  },
+  "execution": {
+    "vulkan_instance_created": false,
+    "physical_device_queried": false,
+    "logical_device_created": false,
+    "pipeline_compiled": false,
+    "gpu_dispatched": false,
+    "vendor_source_or_driver_written": false,
+    "renderer_or_production_feature_policy_changed": false,
+    "game_inputs_or_weights_used": false
+  },
+  "limitations": [
+    "Finite input classifications are computed by the pinned oracle; no NaN or infinity outcome is presumed.",
+    "Padded matrix arithmetic has no general original-console equivalence claim.",
+    "Every workgroup is an independent local32/physical32 single warp; no multi-warp workgroup or original game control flow is covered.",
+    "Safe cases require exact equality; diagnostics report bit/class differences without a production tolerance or NaN-payload contract.",
+    "No production shader, weights, assets, driver or renderer policy changed.",
+    "The batch is deterministic coverage, not exhaustive finite-half arithmetic verification.",
+    "CPU validation and successful SPIR-V validation do not establish actual pipeline acceptance, native output correctness, original network restoration, scene quality or FPS improvement.",
+    "No machine IR or actual DPAS instruction evidence was captured."
+  ]
+}
