@@ -1,0 +1,698 @@
+diff --git a/host/nvn_native.c b/host/nvn_native.c
+--- a/host/nvn_native.c
++++ b/host/nvn_native.c
+@@ -21,7 +21,7 @@
+ #include "hos.h"
+ #include "../gpu/render/rx_nvn.h"
+ #define OO_BENCH_BRIDGE_IMPLEMENTATION
+-#include "oo_benchmark_bridge.h"
++#include "oo_benchmark_window.h"
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -1074,7 +1074,7 @@
+     if (!nheld) return;
+     EnterCriticalSection(&held_cs);
+     for (LONG i = 0; i < nheld; i++) {
+-        const OoBenchBridgeV1* b=hos_posix_oo_benchmark_bridge_v1();
++        const OoBenchBridgeV1* b=hos_posix_oo_benchmark_window_v2();
+         uint64_t old=b?b->exchange_origin(held[i].oo_origin):0;
+         if(b)b->note(OO_BENCH_QUEUE_GAP,held[i].oo_origin,0,0); /* original held path drops its native queue */
+         rx_nvn_submit(held[i].h, held[i].n);
+@@ -1191,8 +1191,8 @@
+ /* the game allocates this much (we do not use it): the three blocks, rounded to 4 KiB */
+ NV(nvnQueueBuilderGetQueueMemorySize) { const nvn_queue_builder *b = QB(P(0)); RET((b->cmd_sz + b->comp_sz + b->ctl_sz + 4095) & ~4095ull); }
+ NV(nvnQueueBuilderSetQueueMemory) { QB(P(0))->mem = U64(1); QB(P(0))->mem_sz = U64(2); }
+-NV(nvnQueueInitialize) { nvn_queue *q = (nvn_queue *)P(0); q->magic = NVN_MAGIC('Q', 'U', 'E', 'U'); q->submits = 0; {const OoBenchBridgeV1* b=hos_posix_oo_benchmark_bridge_v1();if(b)b->lifetime(OO_BENCH_QUEUE,(uint64_t)(uintptr_t)q,OO_BENCH_CREATE);} RET(1); }
+-NV(nvnQueueFinalize) { {const OoBenchBridgeV1* b=hos_posix_oo_benchmark_bridge_v1();if(b)b->lifetime(OO_BENCH_QUEUE,(uint64_t)(uintptr_t)P(0),OO_BENCH_RETIRE);} ((nvn_queue *)P(0))->magic = 0; }
++NV(nvnQueueInitialize) { nvn_queue *q = (nvn_queue *)P(0); q->magic = NVN_MAGIC('Q', 'U', 'E', 'U'); q->submits = 0; {const OoBenchBridgeV1* b=hos_posix_oo_benchmark_window_v2();if(b)b->lifetime(OO_BENCH_QUEUE,(uint64_t)(uintptr_t)q,OO_BENCH_CREATE);} RET(1); }
++NV(nvnQueueFinalize) { {const OoBenchBridgeV1* b=hos_posix_oo_benchmark_window_v2();if(b)b->lifetime(OO_BENCH_QUEUE,(uint64_t)(uintptr_t)P(0),OO_BENCH_RETIRE);} ((nvn_queue *)P(0))->magic = 0; }
+ NV(nvnQueueGetError) { if (P(1)) memset(P(1), 0, sizeof(NVNqueueErrorInfo)); RET(NVN_QUEUE_GET_ERROR_RESULT_GPU_NO_ERROR); }
+ NV(nvnQueueFlush) { held_flush(); }
+ NV(nvnQueueFinish) {
+@@ -2369,15 +2369,22 @@
+ /* Called only after resolve_deferred. copy_lock protects lifetime while copying,
+    but does not serialize every possible guest/deferred writer: source atomicity stays unknown. */
+ static uint64_t oo_bench_copy_ingress(uint64_t queue,uint64_t serial,const uint64_t* handles,int n) {
+-    const OoBenchBridgeV1* b=hos_posix_oo_benchmark_bridge_v1();if(!b)return 0;
++    const OoBenchBridgeV1* b=hos_posix_oo_benchmark_window_v2();if(!b)return 0;
+     uint64_t origin=b->ingress(OO_BENCH_SUBMIT,queue,serial,0,NULL,(uint32_t)n);
+     b->note(OO_BENCH_SOURCE_ATOMICITY,origin,0,0);
++    if(!origin)return 0;
+     AcquireSRWLockShared(&copy_lock);
+     for(int i=0;i<n;++i){
+         if(!live_handle_has(handles[i])){b->note(OO_BENCH_BAD_LIFETIME,origin,(uint32_t)i,0);continue;}
+         const copy_prefix* pre=(const copy_prefix*)(uintptr_t)handles[i]-1;
+-        if(pre->magic!=COPY_MAGIC||pre->bytes<sizeof(*pre)+16||pre->bytes>sizeof(*pre)+OO_BENCH_MAX_STREAM){b->note(OO_BENCH_BAD_ORIGIN,origin,(uint32_t)i,0);continue;}
+-        b->stream(origin,(uint32_t)i,(const void*)(uintptr_t)handles[i],(uint32_t)(pre->bytes-sizeof(*pre)));
++        /* flatten owns this copy. pre->bytes is the safe length, not a command-byte dump. Recordings grow with the pool past 1 MiB; only a missing, dead, or non-owned prefix is BAD_ORIGIN. */
++        const int owned=pre->magic==COPY_MAGIC;
++        const uint64_t raw=owned?pre->bytes:0;
++        const uint64_t payload=raw>sizeof(*pre)?raw-sizeof(*pre):0;
++        const uint32_t prefix_length=raw>UINT32_MAX?UINT32_MAX:(uint32_t)raw;
++        if(!owned||payload<16||payload>UINT32_MAX){b->note(OO_BENCH_BAD_ORIGIN,origin,(uint32_t)i,prefix_length);continue;}
++        const uint32_t why=b->stream(origin,(uint32_t)i,(const void*)(uintptr_t)handles[i],(uint32_t)payload);
++        if(why)b->note(why,origin,(uint32_t)i,prefix_length);
+     }
+     ReleaseSRWLockShared(&copy_lock);
+     return origin;
+@@ -2408,7 +2415,7 @@
+            core is given up for it, as Present and AcquireTexture do, so the game's other threads run on it meanwhile.
+            Nothing in the replay runs guest code or needs the core) */
+         const int away = hos_vcore_away();
+-        const OoBenchBridgeV1* oo_bridge=hos_posix_oo_benchmark_bridge_v1();
++        const OoBenchBridgeV1* oo_bridge=hos_posix_oo_benchmark_window_v2();
+         const uint64_t oo_old=oo_bridge?oo_bridge->exchange_origin(oo_origin):0;
+         rx_nvn_submit_q(h, n, (uint64_t)(uintptr_t)q);
+         if(oo_bridge)oo_bridge->exchange_origin(oo_old);
+@@ -2418,7 +2425,7 @@
+     EnterCriticalSection(&held_cs);
+     if (nheld == (LONG)(sizeof held / sizeof *held)) {   /* (full: what is held goes now) */
+         for (LONG i = 0; i < nheld; i++) {
+-        const OoBenchBridgeV1* b=hos_posix_oo_benchmark_bridge_v1();
++        const OoBenchBridgeV1* b=hos_posix_oo_benchmark_window_v2();
+         uint64_t old=b?b->exchange_origin(held[i].oo_origin):0;
+         if(b)b->note(OO_BENCH_QUEUE_GAP,held[i].oo_origin,0,0); /* original held path drops its native queue */
+         rx_nvn_submit(held[i].h, held[i].n);
+@@ -2476,10 +2483,10 @@
+     const nvn_tex *t0 = win_tex(o, 0);
+     hos_log("nvn: window of %d textures (%d active), %dx%d format %#x", o->ntex, o->active, (int)t0->d.width,
+             (int)t0->d.height, t0->d.format);
+-    {const OoBenchBridgeV1* b=hos_posix_oo_benchmark_bridge_v1();if(b)b->lifetime(OO_BENCH_WINDOW,(uint64_t)(uintptr_t)o,OO_BENCH_CREATE);}
++    {const OoBenchBridgeV1* b=hos_posix_oo_benchmark_window_v2();if(b)b->lifetime(OO_BENCH_WINDOW,(uint64_t)(uintptr_t)o,OO_BENCH_CREATE);}
+     RET(1);
+ }
+-NV(nvnWindowFinalize) {const OoBenchBridgeV1* b=hos_posix_oo_benchmark_bridge_v1();if(b)b->lifetime(OO_BENCH_WINDOW,(uint64_t)(uintptr_t)P(0),OO_BENCH_RETIRE);}
++NV(nvnWindowFinalize) {const OoBenchBridgeV1* b=hos_posix_oo_benchmark_window_v2();if(b)b->lifetime(OO_BENCH_WINDOW,(uint64_t)(uintptr_t)P(0),OO_BENCH_RETIRE);}
+ NV(nvnWindowSetDebugLabel) {}
+ NV(nvnWindowSetNumActiveTextures) { nvn_win *o = (nvn_win *)P(0); if (I(1) < 2 || I(1) > o->ntex) die("%d active window textures", I(1)); o->active = I(1); }
+ NV(nvnWindowGetNumActiveTextures) { const nvn_win *o = (const nvn_win *)P(0); RET((uint32_t)(o->active ? o->active : o->ntex)); }
+@@ -2535,7 +2542,7 @@
+     const int trace = hos_vi_present_trace_enabled();
+     int64_t phases[4] = {0};
+     if (trace) phases[0] = hos_now_ns();
+-    const OoBenchBridgeV1* oo_bridge=hos_posix_oo_benchmark_bridge_v1();
++    const OoBenchBridgeV1* oo_bridge=hos_posix_oo_benchmark_window_v2();
+     const uint64_t oo_origin=oo_bridge?oo_bridge->ingress(OO_BENCH_PRESENT,(uint64_t)(uintptr_t)o,o->presents+1,i,o->crop,0):0;
+     held_flush();   /* (a present flushes the queue) */
+     {
+diff --git a/host/control.c b/host/control.c
+--- a/host/control.c
++++ b/host/control.c
+@@ -23,6 +23,7 @@
+ 
+    tests/control_test.c builds this file with a fake game (HOS_CONTROL_NO_GAME) and drives it over a real socket. */
+ #include "control.h"
++#include "oo_benchmark_window.h"
+ 
+ #include <ctype.h>
+ #include <errno.h>
+@@ -1756,6 +1757,20 @@
+     reply_end(c, &b);
+ }
+ 
++/* The same-user control socket is the only explicit window trigger. */
++static void append_benchmark_window(Buf* b,const OoWindowStatus* s){
++ buf_printf(b,",\"benchmark_window\":{\"state\":%u,\"pending\":%u,\"events\":%u,\"bytes\":%u,\"flags\":%llu,\"lost\":%llu,\"begin_ns\":%llu,\"close_ns\":%llu,\"written\":%s,\"pending_parts\":%u,\"pending_links\":%u,\"pending_presents\":%u,\"denial_count\":%u,\"denial_reason\":%u,\"denial_handle\":%u,\"denial_prefix_length\":%u,\"denial_origin\":%llu,\"fault_count\":%u,\"faults\":[",s->state,s->pending,s->events,s->bytes,(unsigned long long)s->flags,(unsigned long long)s->lost,(unsigned long long)s->begin_ns,(unsigned long long)s->close_ns,s->state==OO_WINDOW_WRITTEN?"true":"false",s->pending_parts,s->pending_streams,s->pending_presents,s->denial_count,s->denial_reason,s->denial_handle,s->denial_prefix,(unsigned long long)s->denial_origin,s->fault_count);
++ for(uint32_t i=0;i<s->fault_count&&i<8;++i){const OoBenchFaultV1* f=&s->faults[i];if(i)buf_puts(b,",");buf_printf(b,"{\"reason\":%u,\"hooksite\":%u,\"origin\":%llu,\"part\":%llu,\"slot\":%llu,\"generation\":%llu,\"sequence\":%llu}",f->reason,f->hooksite,(unsigned long long)f->origin,(unsigned long long)f->part,(unsigned long long)f->slot,(unsigned long long)f->generation,(unsigned long long)f->sequence);} 
++ buf_puts(b,"]}");
++}
++static void cmd_benchmark_window(int ci,const JDoc* d,int req,const char* id){
++ const char* action=str_arg(d,req,"action");uint32_t code=0;if(!action||!strcmp(action,"status"))code=0;else if(!strcmp(action,"begin"))code=1;else if(!strcmp(action,"close"))code=2;else return reply_error(&G.conns[ci],id,"bad_request","benchmark_window action: status, begin, close");
++ OoWindowStatus s={0};int result=hos_posix_oo_benchmark_window_control(code,&s);
++ Buf b={0};
++ if(result<0){char msg[160];snprintf(msg,sizeof msg,"window result %d state %u flags %llu lost %llu pending %u faults %u",result,s.state,(unsigned long long)s.flags,(unsigned long long)s.lost,s.pending,s.fault_count);reply_start(&b,id,0);buf_puts(&b,",\"error\":");buf_str(&b,"window_failed");buf_puts(&b,",\"message\":");buf_str(&b,msg);append_benchmark_window(&b,&s);reply_end(&G.conns[ci],&b);return;}
++ reply_start(&b,id,1);append_benchmark_window(&b,&s);reply_end(&G.conns[ci],&b);
++}
++
+ /* ---- one request line ---- */
+ static void request(int ci, const char *line, size_t len) {
+     Conn *c = &G.conns[ci];
+@@ -1782,7 +1797,8 @@
+     if (d.n[req].type != J_OBJ) return reply_error(c, id, "bad_request", "a request is a JSON object");
+     const char *cmd = str_arg(&d, req, "cmd");
+     if (!cmd) return reply_error(c, id, "bad_request", "no cmd");
+-    if (!strcmp(cmd, "status")) cmd_status(ci, id);
++    if (!strcmp(cmd, "benchmark_window")) cmd_benchmark_window(ci,&d,req,id);
++    else if (!strcmp(cmd, "status")) cmd_status(ci, id);
+     else if (!strcmp(cmd, "press") || !strcmp(cmd, "stick") || !strcmp(cmd, "sequence")) cmd_input(ci, &d, req, id, cmd);
+     else if (!strcmp(cmd, "release")) cmd_release(ci, &d, req, id);
+     else if (!strcmp(cmd, "saves")) cmd_saves(ci, id);
+diff --git a/gpu/vk/vk_replay.cpp b/gpu/vk/vk_replay.cpp
+--- a/gpu/vk/vk_replay.cpp
++++ b/gpu/vk/vk_replay.cpp
+@@ -380,8 +380,47 @@
+     ts_pending[r.slot] = true;
+ }
+ 
++// Coverage of the recording parts touched by the submit now on the replay thread.
++// 1 new recording, 2 split inside the submission, 3 parallel tail/fallback,
++// 4 resume of the same value after a wait, 5 burst continuation of an open part.
++// Segment command buffers keep part 0 and are not given invented part ids.
++struct OoCoverWatch {
++    int active = 0;
++    uint64_t origin = 0;
++    uint64_t observed_value = 0;
++    uint64_t parts[32]{};
++    uint32_t hooks[32]{};
++    int n = 0;
++};
++OoCoverWatch oo_cover_watch;
++uint64_t oo_cover_observed_value(uint64_t scheduled, uint64_t explicit_observed) {
++    if (explicit_observed != UINT64_MAX) return explicit_observed;
++    return oo_cover_watch.active ? oo_cover_watch.observed_value : scheduled;
++}
++int oo_cover_hook = 0;
++int oo_cover_resume = 0;
++void oo_cover_add(uint64_t part, uint32_t hook) {
++    if (!oo_cover_watch.active || !part) return;
++    for (int i = 0; i < oo_cover_watch.n; ++i) if (oo_cover_watch.parts[i] == part) return;
++    if (oo_cover_watch.n >= 32) {
++        if (const auto* b = oo_bench_bridge()) b->note(OO_BENCH_CAPACITY, oo_cover_watch.origin, part, hook);
++        return;
++    }
++    const int i = oo_cover_watch.n++;
++    oo_cover_watch.parts[i] = part;
++    oo_cover_watch.hooks[i] = hook ? hook : 1u;
++}
++void oo_cover_flush() {
++    if (!oo_cover_watch.active) return;
++    if (const auto* b = oo_bench_bridge()) {
++        for (int i = 0; i < oo_cover_watch.n; ++i)
++            b->note(0, oo_cover_watch.origin, oo_cover_watch.parts[i], 4ull | (uint64_t)oo_cover_watch.hooks[i] << 32);
++    }
++    oo_cover_watch = {};
++}
++
+ /// The next recording slot, begun, for the submission that will signal value
+-Recording& begin_recording(uint64_t value) {
++Recording& begin_recording(uint64_t value, uint64_t bench_value = UINT64_MAX) {
+     if(oo_bench_bridge()&&rec_timeline){uint64_t reached=0;oo_bench_query_counter(dev.device,rec_timeline,&reached);}
+     if(memory_pt_snapshot_enabled()&&rec_timeline) {
+         uint64_t done=0;
+@@ -412,7 +451,9 @@
+     gprof_begin_recording(r.slot, r.cmd, r.upload);
+     r.value = value;
+     r.part = ++rec_part_next;
+-    if(const auto* b=oo_bench_bridge())b->part_begin(r.part,(uint32_t)r.slot,++r.oo_generation,value);
++    // The Vulkan timeline tag can be the burst maximum. The observed part stays on this submit's bound value.
++    if(const auto* b=oo_bench_bridge())b->part_begin(r.part,(uint32_t)r.slot,++r.oo_generation,oo_cover_observed_value(value,bench_value));
++    oo_cover_add(r.part, oo_cover_hook ? (uint32_t)oo_cover_hook : (oo_cover_resume ? 4u : 1u));
+     memory_recording_part(r.part);
+     memory_recording_value(value, completed());
+     texture_begin_recording(r.upload, value);
+@@ -1434,7 +1475,9 @@
+     full_barrier(cmd, "barrier (recording end)");
+     submit_recording(*rec_cur, false);
+     ub_first_of_recording = ub_updates.size();
++    oo_cover_hook = 2;
+     Recording& r = begin_recording(rec_cur_value);
++    oo_cover_hook = 0;
+     memory_begin_submission();
+     full_barrier(r.cmd, "barrier (recording start)");
+     rec_cur = &r;
+@@ -1666,7 +1709,9 @@
+         static int told;
+         if (told++ < 8) logf("vk: parallel replay: a segment's init command buffer could not be begun: recorded on the replay thread");
+         texture_set_segment(++seq);
++        oo_cover_hook = 3;
+         Recording& rest = begin_recording(rec_cur_value);
++        oo_cover_hook = 0;
+         full_barrier(rest.cmd);
+         rec_cur = &rest;
+         cmd = rest.cmd;
+@@ -1757,7 +1802,9 @@
+     }
+     // what follows, after them all (the uniform updates are written to guest memory at the submission's end)
+     texture_set_segment(++seq);
++    oo_cover_hook = 3;
+     Recording& nr = begin_recording(rec_cur_value);
++    oo_cover_hook = 0;
+     full_barrier(nr.cmd);
+     rec_cur = &nr;
+     cmd = nr.cmd;
+@@ -2122,6 +2169,10 @@
+     if(const auto* b=oo_bench_bridge()){
+         const uint64_t origin=b->value_origin(value);b->note(0,origin,value,1);
+         if(burst_open)b->note(OO_BENCH_BURST,origin,value,0);
++        oo_cover_watch = {};
++        oo_cover_watch.active = origin ? 1 : 0;
++        oo_cover_watch.origin = origin;
++        oo_cover_watch.observed_value = value;
+     }
+     ReplayPin pin;
+     SlowWatch slow("submit");
+@@ -2132,6 +2183,7 @@
+         submit_memory_work(value);
+     }
+     if (burst_open && rec_cur) {   // (the burst's recording goes on: what the piece before did, done first)
++        oo_cover_add(rec_cur->part, oo_cover_resume ? 4u : 5u);
+         end_pass(rec_cur->cmd);
+         full_barrier(rec_cur->cmd, "barrier (a burst's next submit start)");
+         use_queue_state(queue);
+@@ -2141,7 +2193,9 @@
+         ub_prune(completed());
+         rec_value_now = tag;
+         ub_first_of_recording = ub_updates.size();
+-        Recording& first = begin_recording(tag);
++        oo_cover_hook = oo_cover_resume ? 4 : 1;
++        Recording& first = begin_recording(tag, value);
++        oo_cover_hook = 0;
+         memory_begin_submission();
+         full_barrier(first.cmd, "barrier (recording start)");
+         rec_cur = &first, rec_cur_value = tag, rec_parts = 0, part_work = 0;
+@@ -2170,7 +2224,12 @@
+         rec_open_values.push_back(value);
+     }
+     if (!burst_open) finish_recording(value);   // (a burst's: at its end)
+-    if(const auto* b=oo_bench_bridge())b->note(0,b->value_origin(value),value,stop?2:3);
++    if(const auto* b=oo_bench_bridge()){
++        const uint64_t origin=b->value_origin(value);
++        oo_cover_flush(); // every part this submit recorded, including an earlier resume/split part
++        b->note(0,origin,value,stop?2:3);
++    }
++    oo_cover_resume = 0;
+     if (stop) return false;
+     if (pushed.load() < value) pushed = value;
+     st_submits++;
+@@ -2209,6 +2268,7 @@
+             q.handles.clear();
+             const uint8_t* from = forced ? op_next(q.p) : q.p;
+             (forced ? st_forced_waits : st_resumed)++;
++            oo_cover_resume = 1;
+             if (!run_submit(handles.data(), (int)handles.size(), q.value, queue, false, q.cb, from, true)) return;
+             continue;
+         }
+diff --git a/gpu/vk/oo_benchmark_renderer.h b/gpu/vk/oo_benchmark_renderer.h
+--- a/gpu/vk/oo_benchmark_renderer.h
++++ b/gpu/vk/oo_benchmark_renderer.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: GPL-3.0-or-later */
+ #pragma once
+-#include "../../host/oo_benchmark_bridge.h"
++#include "../../host/oo_benchmark_window.h"
+ #if defined(__linux__)
+ #include <dlfcn.h>
+ #endif
+@@ -9,7 +9,7 @@
+     static const OoBenchBridgeV1* const api=[]() -> const OoBenchBridgeV1* {
+ #if defined(__linux__)
+         using Get=const OoBenchBridgeV1*(*)(void);
+-        auto get=reinterpret_cast<Get>(dlsym(RTLD_DEFAULT,"hos_posix_oo_benchmark_bridge_v1"));
++        auto get=reinterpret_cast<Get>(dlsym(RTLD_DEFAULT,"hos_posix_oo_benchmark_window_v2"));
+         const OoBenchBridgeV1* p=get?get():nullptr;
+         return p&&p->abi==OO_BENCH_ABI&&p->size>=sizeof(OoBenchBridgeV1)?p:nullptr;
+ #else
+diff --git a/host/oo_benchmark_window.h b/host/oo_benchmark_window.h
+new file mode 100644
+--- /dev/null
++++ b/host/oo_benchmark_window.h
+@@ -0,0 +1,388 @@
++/* SPDX-License-Identifier: GPL-3.0-or-later
++ * Bounded opt-in native observation bridge v1. Never a benchmark certificate.
++ * One host C translation unit defines OO_BENCH_BRIDGE_IMPLEMENTATION.
++ */
++#ifndef OO_BENCHMARK_WINDOW_H
++#define OO_BENCHMARK_WINDOW_H
++#include <stddef.h>
++#include <stdint.h>
++#ifdef __cplusplus
++extern "C" {
++#endif
++#define OO_BENCH_ABI 2u
++#ifndef OO_BENCH_MAX_EVENTS
++#define OO_BENCH_MAX_EVENTS 4096u
++#endif
++#ifndef OO_BENCH_MAX_BYTES
++#define OO_BENCH_MAX_BYTES (8u*1024u*1024u)
++#endif
++#ifndef OO_BENCH_MAX_OBJECTS
++#define OO_BENCH_MAX_OBJECTS 1024u
++#endif
++#ifndef OO_BENCH_MAX_VALUES
++#define OO_BENCH_MAX_VALUES 2048u
++#endif
++#ifndef OO_BENCH_MAX_PARTS
++#define OO_BENCH_MAX_PARTS 2048u
++#endif
++#define OO_BENCH_MAX_STREAM (1024u*1024u)
++enum { OO_BENCH_QUEUE=1,OO_BENCH_WINDOW=2,OO_BENCH_TIMELINE=3 };
++enum { OO_BENCH_LOOKUP=0,OO_BENCH_CREATE=1,OO_BENCH_RETIRE=2 };
++enum { OO_BENCH_LIFETIME=1,OO_BENCH_RETIRED,OO_BENCH_SUBMIT,OO_BENCH_PRESENT,OO_BENCH_STREAM,
++       OO_BENCH_VALUE,OO_BENCH_PART,OO_BENCH_PLAN,OO_BENCH_HELD,OO_BENCH_RESULT,
++       OO_BENCH_BATCH,OO_BENCH_POLL,OO_BENCH_COMPLETE,OO_BENCH_UNKNOWN,OO_BENCH_RUN,OO_BENCH_PRESENT_CLOSED };
++enum { OO_WINDOW_BASE_LIFETIME=17,OO_WINDOW_BASE_SLOT,OO_WINDOW_BEGIN,OO_WINDOW_CLOSED,OO_WINDOW_UNSELECTED_SLOT };
++enum { OO_WINDOW_IDLE,OO_WINDOW_OPEN,OO_WINDOW_DRAINING,OO_WINDOW_WRITTEN,OO_WINDOW_ERROR };
++typedef struct OoBenchFaultV1 { uint32_t reason,hooksite;uint64_t origin,part,slot,generation,sequence; } OoBenchFaultV1;
++typedef struct OoWindowStatus { uint32_t state,events,bytes,pending;uint64_t flags,lost,begin_ns,close_ns;uint32_t pending_parts,pending_streams,pending_presents,denial_count,denial_reason,denial_handle,denial_prefix;uint64_t denial_origin;uint32_t fault_count;OoBenchFaultV1 faults[8]; } OoWindowStatus;
++int hos_posix_oo_benchmark_window_control(uint32_t action,OoWindowStatus* out);
++enum { OO_BENCH_NEW=1,OO_BENCH_PLANNED,OO_BENCH_PENDING_BATCH,OO_BENCH_SUBMITTED,
++       OO_BENCH_FAILED,OO_BENCH_DONE };
++enum { OO_BENCH_CAPACITY=1,OO_BENCH_BAD_LIFETIME=2,OO_BENCH_BAD_ORIGIN=3,
++       OO_BENCH_BAD_PART=4,OO_BENCH_SOURCE_ATOMICITY=5,OO_BENCH_QUEUE_GAP=6,
++       OO_BENCH_BURST=7,OO_BENCH_EVENT_WAIT=8,OO_BENCH_DEVICE_ERROR=9,
++       OO_BENCH_FILE_ERROR=10,OO_BENCH_RANDOM_ERROR=11,OO_BENCH_SERIAL_ERROR=12,OO_BENCH_FRAMEGEN=13 };
++#define OO_BENCH_SCOPE_UNKNOWN (UINT64_C(15)<<48) /* camera, memory, input, dependency coverage */
++typedef struct OoBenchEventV1 {
++    uint32_t kind;int32_t result;uint64_t serial,at_ns,v[8];uint32_t payload_offset,payload_size;
++} OoBenchEventV1;
++typedef struct OoBenchStatusV1 { uint64_t flags,lost,session[2];uint32_t events,bytes; } OoBenchStatusV1;
++typedef struct OoBenchBridgeV1 {
++    uint32_t abi,size;
++    uint64_t (*clock_ns)(void);
++    uint64_t (*lifetime)(uint32_t,uint64_t,uint32_t);
++    uint64_t (*ingress)(uint32_t,uint64_t,uint64_t,int32_t,const int32_t*,uint32_t);
++    uint32_t (*stream)(uint64_t,uint32_t,const void*,uint32_t);
++    uint64_t (*exchange_origin)(uint64_t);
++    uint64_t (*current_origin)(void);
++    void (*bind_value)(uint64_t,uint64_t,uint64_t,uint32_t);
++    uint64_t (*value_origin)(uint64_t);
++    void (*part_begin)(uint64_t,uint32_t,uint64_t,uint64_t);
++    void (*part_plan)(uint64_t,uint64_t,uint64_t);
++    void (*part_hold)(uint64_t,uint64_t);
++    void (*part_result)(uint64_t,uint64_t,int32_t);
++    void (*batch_result)(uint64_t,uint64_t,int32_t);
++    void (*counter)(uint64_t,int32_t,uint64_t);
++    void (*present_closed)(uint64_t);
++    void (*note)(uint32_t,uint64_t,uint64_t,uint64_t);
++    int (*status)(OoBenchStatusV1*);
++    int (*read_event)(uint32_t,OoBenchEventV1*);
++    int (*read_bytes)(uint32_t,void*,uint32_t);
++    uint32_t (*part_state)(uint64_t);
++    int (*window)(uint32_t,OoWindowStatus*);
++} OoBenchBridgeV1;
++/* Existing Linux link recipe exports hos_posix_*; no renderer host-table ABI change. */
++const OoBenchBridgeV1* hos_posix_oo_benchmark_window_v2(void);
++#ifdef __cplusplus
++}
++#endif
++
++#ifdef OO_BENCH_BRIDGE_IMPLEMENTATION
++#ifdef __linux__
++#include <errno.h>
++#include <stdio.h>
++#include <fcntl.h>
++#include <pthread.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/random.h>
++#include <unistd.h>
++#ifndef OO_BENCH_CLOCK_NS
++#define OO_BENCH_CLOCK_NS() ((uint64_t)hos_now_ns())
++#endif
++#ifndef OO_BENCH_RANDOM
++#define OO_BENCH_RANDOM(p,n) getrandom((p),(n),GRND_NONBLOCK)
++#endif
++/* Internal keys are never serialized. IDs survive object-address/slot reuse. */
++typedef struct OoBenchObject { uint64_t key,id,generation;uint32_t kind,active;uint64_t counter;int counter_seen; } OoBenchObject;
++typedef struct OoBenchValue { uint64_t value,origin; } OoBenchValue;
++typedef struct OoBenchPart {
++    uint64_t part,generation,value,origin,seq,timeline,batch;uint32_t slot,state,in_window;
++} OoBenchPart;
++typedef struct OoWindowSlot {uint32_t slot;uint64_t generation,emitted;} OoWindowSlot;
++typedef struct OoBenchState {
++    uint32_t window_state,baseline_n,slots_n;uint64_t begin_ns,close_ns,startup_flags,startup_lost,startup_events[16],boundary_parts;
++    struct { uint64_t origin; uint32_t handle,reason,prefix_length; } denials[8]; uint32_t denial_n;
++    /* Many selected origins may share a part, and one origin may require every part it actually recorded. */
++    struct { uint64_t origin,part,generation,sequence;uint32_t slot,hook,ordinal,relation; } links[512]; uint32_t links_n;
++    OoBenchFaultV1 faults[8]; uint32_t fault_n;
++    uint64_t settled[256]; uint32_t settled_n;
++    OoBenchEventV1 baseline[OO_BENCH_MAX_OBJECTS+OO_BENCH_MAX_PARTS+1];
++    OoWindowSlot slots[OO_BENCH_MAX_PARTS];
++    OoBenchStatusV1 status;uint64_t serial,poll;
++    OoBenchObject objects[OO_BENCH_MAX_OBJECTS];uint32_t objects_n;
++    OoBenchValue values[OO_BENCH_MAX_VALUES];uint32_t values_n;
++    OoBenchPart parts[OO_BENCH_MAX_PARTS];uint32_t parts_n;
++    OoBenchEventV1 events[OO_BENCH_MAX_EVENTS];unsigned char bytes[OO_BENCH_MAX_BYTES];
++    int output;
++} OoBenchState;
++static OoBenchState* oo_bench_s;
++static pthread_once_t oo_bench_once=PTHREAD_ONCE_INIT;
++static pthread_mutex_t oo_bench_mu=PTHREAD_MUTEX_INITIALIZER;
++static _Thread_local uint64_t oo_bench_origin;
++static _Thread_local OoBenchFaultV1 oo_bench_fault_ctx;
++static uint64_t oo_bench_clock(void){return OO_BENCH_CLOCK_NS();}
++static void oo_bench_fault(uint32_t reason) {
++    if(oo_bench_s->window_state>=OO_WINDOW_WRITTEN)return;
++    uint64_t* flags=oo_bench_s->window_state==OO_WINDOW_IDLE?&oo_bench_s->startup_flags:&oo_bench_s->status.flags;
++    if(reason<48)*flags|=UINT64_C(1)<<reason;
++    else *flags|=UINT64_C(1)<<OO_BENCH_BAD_ORIGIN;
++    if(oo_bench_s->window_state!=OO_WINDOW_IDLE&&oo_bench_s->fault_n<8){
++        OoBenchFaultV1 row=oo_bench_fault_ctx;row.reason=reason;
++        int seen=0;for(uint32_t i=0;i<oo_bench_s->fault_n;++i){const OoBenchFaultV1* f=&oo_bench_s->faults[i];if(f->reason==row.reason&&f->hooksite==row.hooksite&&f->origin==row.origin&&f->part==row.part&&f->slot==row.slot&&f->generation==row.generation&&f->sequence==row.sequence)seen=1;}
++        if(!seen)oo_bench_s->faults[oo_bench_s->fault_n++]=row;
++    }
++    oo_bench_fault_ctx=(OoBenchFaultV1){0};
++}
++static uint64_t oo_bench_serial(void) {
++    if(oo_bench_s->serial==UINT64_MAX){oo_bench_fault(OO_BENCH_SERIAL_ERROR);return 0;}
++    return ++oo_bench_s->serial;
++}
++static OoBenchEventV1* oo_bench_event(uint32_t kind,int32_t result) {
++    OoBenchState* s=oo_bench_s;
++    if(s->window_state==OO_WINDOW_IDLE){if(kind>=1&&kind<=16){uint64_t* n=&s->startup_events[kind-1];if(*n==UINT64_MAX){s->startup_flags|=UINT64_C(1)<<OO_BENCH_SERIAL_ERROR;++s->startup_lost;}else ++*n;}return NULL;}
++    if(s->window_state>=OO_WINDOW_WRITTEN)return NULL;
++    if(s->status.events==OO_BENCH_MAX_EVENTS){oo_bench_fault(OO_BENCH_CAPACITY);++s->status.lost;return NULL;}
++    const uint64_t serial=oo_bench_serial();if(!serial){++s->status.lost;return NULL;}
++    OoBenchEventV1* e=&s->events[s->status.events++];memset(e,0,sizeof(*e));
++    e->kind=kind;e->result=result;e->serial=serial;e->at_ns=oo_bench_clock();return e;
++}
++static uint64_t oo_bench_lifetime_locked(uint32_t kind,uint64_t key,uint32_t action) {
++    OoBenchState* s=oo_bench_s;OoBenchObject* active=NULL;uint64_t generation=0;
++    if(!key||kind<OO_BENCH_QUEUE||kind>OO_BENCH_TIMELINE){oo_bench_fault(OO_BENCH_BAD_LIFETIME);return 0;}
++    for(uint32_t i=0;i<s->objects_n;++i){OoBenchObject* o=&s->objects[i];
++        if(o->kind==kind&&o->key==key){generation=o->generation;if(o->active)active=o;}}
++    if(action==OO_BENCH_LOOKUP){if(!active)oo_bench_fault(OO_BENCH_BAD_LIFETIME);return active?active->id:0;}
++    if(action==OO_BENCH_RETIRE){
++        if(!active){oo_bench_fault(OO_BENCH_BAD_LIFETIME);return 0;}active->active=0;
++        OoBenchEventV1* e=oo_bench_event(OO_BENCH_RETIRED,0);if(e){e->v[0]=active->id;e->v[1]=kind;e->v[2]=active->generation;}
++        return active->id;
++    }
++    if(action==OO_BENCH_CREATE&&active){
++        active->active=0;oo_bench_fault(OO_BENCH_BAD_LIFETIME);
++        OoBenchEventV1* e=oo_bench_event(OO_BENCH_RETIRED,OO_BENCH_BAD_LIFETIME);if(e){e->v[0]=active->id;e->v[1]=kind;e->v[2]=active->generation;}
++        return 0; /* overlapping lifetime invalidates evidence; never reuse the old semaphore ID */
++    }
++    if(action!=OO_BENCH_CREATE||active||generation==UINT64_MAX||s->objects_n==OO_BENCH_MAX_OBJECTS){oo_bench_fault(active?OO_BENCH_BAD_LIFETIME:OO_BENCH_CAPACITY);return 0;}
++    OoBenchObject* o=&s->objects[s->objects_n++];*o=(OoBenchObject){key,oo_bench_serial(),generation+1,kind,1,0,0};
++    OoBenchEventV1* e=oo_bench_event(OO_BENCH_LIFETIME,0);if(e){e->v[0]=o->id;e->v[1]=kind;e->v[2]=o->generation;}return o->id;
++}
++static const OoBenchEventV1* oo_bench_origin_locked(uint64_t origin) {
++    for(uint32_t i=0;i<oo_bench_s->status.events;++i){const OoBenchEventV1* e=&oo_bench_s->events[i];
++        if(e->serial==origin&&(e->kind==OO_BENCH_SUBMIT||e->kind==OO_BENCH_PRESENT))return e;}
++    return NULL;
++}
++static uint64_t oo_bench_value_locked(uint64_t value) {
++    for(uint32_t i=0;i<oo_bench_s->values_n;++i)if(oo_bench_s->values[i].value==value)return oo_bench_s->values[i].origin;
++    return 0;
++}
++static OoBenchPart* oo_bench_part_locked(uint64_t part) {
++    for(uint32_t i=0;i<oo_bench_s->parts_n;++i)if(oo_bench_s->parts[i].part==part)return &oo_bench_s->parts[i];
++    oo_bench_fault(OO_BENCH_BAD_PART);return NULL;
++}
++static uint64_t oo_bench_lifetime(uint32_t kind,uint64_t key,uint32_t action) {
++    pthread_mutex_lock(&oo_bench_mu);if(oo_bench_s->window_state>=OO_WINDOW_WRITTEN){pthread_mutex_unlock(&oo_bench_mu);return 0;}uint64_t id=oo_bench_lifetime_locked(kind,key,action);pthread_mutex_unlock(&oo_bench_mu);return id;
++}
++static uint64_t oo_bench_ingress(uint32_t kind,uint64_t key,uint64_t native_serial,int32_t texture,const int32_t* crop,uint32_t handles) {
++    pthread_mutex_lock(&oo_bench_mu);
++    if((kind!=OO_BENCH_SUBMIT&&kind!=OO_BENCH_PRESENT)||!native_serial||handles>64){oo_bench_fault(OO_BENCH_BAD_ORIGIN);pthread_mutex_unlock(&oo_bench_mu);return 0;}
++    uint64_t object=oo_bench_lifetime_locked(kind==OO_BENCH_PRESENT?OO_BENCH_WINDOW:OO_BENCH_QUEUE,key,OO_BENCH_LOOKUP);
++    for(uint32_t i=0;i<oo_bench_s->objects_n;++i){OoBenchObject* o=&oo_bench_s->objects[i];if(o->id==object){
++        if(o->counter_seen&&native_serial<=o->counter){oo_bench_fault(OO_BENCH_BAD_ORIGIN);}o->counter=native_serial;o->counter_seen=1;}}
++    if(oo_bench_s->window_state==OO_WINDOW_DRAINING||oo_bench_s->window_state>=OO_WINDOW_WRITTEN){pthread_mutex_unlock(&oo_bench_mu);return 0;}
++    OoBenchEventV1* e=oo_bench_event(kind,0);uint64_t origin=e?e->serial:0;
++    if(e){e->v[0]=origin;e->v[1]=object;e->v[2]=native_serial;e->v[3]=(uint32_t)texture;e->v[4]=handles;
++        if(crop){e->v[5]=(uint32_t)crop[0]|((uint64_t)(uint32_t)crop[1]<<32);e->v[6]=(uint32_t)crop[2]|((uint64_t)(uint32_t)crop[3]<<32);}}
++    pthread_mutex_unlock(&oo_bench_mu);return origin;
++}
++/* Owned command bytes are exact. OO_BENCH_MAX_STREAM is not an ownership limit: flatten copies the whole recording and the pool grows past 1 MiB. The 8 MiB aggregate still bounds the window. A size that does not fit is refused whole. */
++static uint32_t oo_bench_stream(uint64_t origin,uint32_t handle,const void* data,uint32_t size) {
++    pthread_mutex_lock(&oo_bench_mu);OoBenchState* s=oo_bench_s;uint32_t why=0;
++    if(!origin||s->window_state>=OO_WINDOW_WRITTEN){if(s->window_state==OO_WINDOW_IDLE)oo_bench_event(OO_BENCH_STREAM,0);pthread_mutex_unlock(&oo_bench_mu);return OO_BENCH_BAD_ORIGIN;}
++    const OoBenchEventV1* parent=oo_bench_origin_locked(origin);
++    if(!parent||parent->kind!=OO_BENCH_SUBMIT||handle>=parent->v[4]||!data||size<16||size>OO_BENCH_MAX_BYTES-s->status.bytes){why=size>OO_BENCH_MAX_BYTES-s->status.bytes?OO_BENCH_CAPACITY:OO_BENCH_BAD_ORIGIN;oo_bench_fault(why);++s->status.lost;}
++    else {OoBenchEventV1* e=oo_bench_event(OO_BENCH_STREAM,0);if(!e)why=OO_BENCH_CAPACITY;else{e->v[0]=origin;e->v[1]=handle;e->v[2]=size;e->v[3]=origin; /* owned generation, not source atomicity */
++        e->payload_offset=s->status.bytes;e->payload_size=size;memcpy(s->bytes+s->status.bytes,data,size);s->status.bytes+=size;}}
++    pthread_mutex_unlock(&oo_bench_mu);return why;
++}
++static uint64_t oo_bench_exchange(uint64_t origin){uint64_t old=oo_bench_origin;oo_bench_origin=origin;return old;}
++static uint64_t oo_bench_current(void){return oo_bench_origin;}
++static void oo_bench_bind(uint64_t value,uint64_t origin,uint64_t queue,uint32_t kind) {
++    pthread_mutex_lock(&oo_bench_mu);OoBenchState* s=oo_bench_s;if(!origin||s->window_state>=OO_WINDOW_WRITTEN){if(s->window_state==OO_WINDOW_IDLE)oo_bench_event(OO_BENCH_VALUE,0);pthread_mutex_unlock(&oo_bench_mu);return;}uint64_t old=oo_bench_value_locked(value);
++    if(old){if(old!=origin&&origin)oo_bench_fault(OO_BENCH_BAD_ORIGIN);pthread_mutex_unlock(&oo_bench_mu);return;}
++    if(!value||!oo_bench_origin_locked(origin)||s->values_n==OO_BENCH_MAX_VALUES){oo_bench_fault(!origin?OO_BENCH_BAD_ORIGIN:OO_BENCH_CAPACITY);pthread_mutex_unlock(&oo_bench_mu);return;}
++    s->values[s->values_n++]=(OoBenchValue){value,origin};uint64_t q=queue?oo_bench_lifetime_locked(OO_BENCH_QUEUE,queue,OO_BENCH_LOOKUP):0;
++    const OoBenchEventV1* parent=oo_bench_origin_locked(origin);
++    if(kind==OO_BENCH_SUBMIT&&(!queue||!parent||parent->v[1]!=q))oo_bench_fault(OO_BENCH_QUEUE_GAP);
++    OoBenchEventV1* e=oo_bench_event(OO_BENCH_VALUE,0);if(e){e->v[0]=origin;e->v[1]=value;e->v[2]=q;e->v[3]=kind;}
++    pthread_mutex_unlock(&oo_bench_mu);
++}
++static uint64_t oo_bench_value(uint64_t value){pthread_mutex_lock(&oo_bench_mu);uint64_t origin=oo_bench_value_locked(value);pthread_mutex_unlock(&oo_bench_mu);return origin;}
++static void oo_bench_part_begin(uint64_t part,uint32_t slot,uint64_t generation,uint64_t value) {
++    pthread_mutex_lock(&oo_bench_mu);OoBenchState* s=oo_bench_s;
++    if(s->window_state>=OO_WINDOW_WRITTEN){pthread_mutex_unlock(&oo_bench_mu);return;}
++    uint64_t prior=0;OoWindowSlot* entry=NULL;for(uint32_t i=0;i<s->slots_n;++i)if(s->slots[i].slot==slot){entry=&s->slots[i];prior=entry->generation;break;}
++    if(!part||prior==UINT64_MAX||generation!=prior+1||(!entry&&s->slots_n==OO_BENCH_MAX_PARTS)){oo_bench_fault(OO_BENCH_BAD_PART);pthread_mutex_unlock(&oo_bench_mu);return;}
++    if(!entry)entry=&s->slots[s->slots_n++];*entry=(OoWindowSlot){slot,generation,entry->emitted};
++    if(!oo_bench_value_locked(value)){if(s->window_state==OO_WINDOW_IDLE)oo_bench_event(OO_BENCH_PART,0);else if(s->window_state!=OO_WINDOW_DRAINING){++s->boundary_parts;OoBenchEventV1* e=oo_bench_event(OO_WINDOW_UNSELECTED_SLOT,0);if(e){e->v[0]=slot;e->v[1]=generation;e->v[2]=part;entry->emitted=generation;}}pthread_mutex_unlock(&oo_bench_mu);return;}
++    if(s->window_state==OO_WINDOW_DRAINING&&entry->emitted&&generation!=entry->emitted+1){oo_bench_fault(OO_BENCH_BAD_PART);pthread_mutex_unlock(&oo_bench_mu);return;}
++    int duplicate=0;for(uint32_t i=0;i<s->parts_n;++i)if(s->parts[i].part==part)duplicate=1;
++    if(!part||duplicate||generation!=prior+1||s->parts_n==OO_BENCH_MAX_PARTS){oo_bench_fault(s->parts_n==OO_BENCH_MAX_PARTS?OO_BENCH_CAPACITY:OO_BENCH_BAD_PART);pthread_mutex_unlock(&oo_bench_mu);return;}
++    uint64_t origin=oo_bench_value_locked(value);if(!origin)oo_bench_fault(OO_BENCH_BAD_ORIGIN);
++    OoBenchPart* p=&s->parts[s->parts_n++];*p=(OoBenchPart){part,generation,value,origin,0,0,0,slot,OO_BENCH_NEW,(s->window_state==OO_WINDOW_OPEN||s->window_state==OO_WINDOW_DRAINING)};
++    OoBenchEventV1* e=oo_bench_event(OO_BENCH_PART,0);if(e){e->v[0]=part;e->v[1]=slot;e->v[2]=generation;e->v[3]=value;e->v[4]=origin;entry->emitted=generation;}
++    pthread_mutex_unlock(&oo_bench_mu);
++}
++static void oo_bench_plan(uint64_t part,uint64_t seq,uint64_t semaphore) {
++    pthread_mutex_lock(&oo_bench_mu);OoBenchPart* p=NULL;for(uint32_t i=0;i<oo_bench_s->parts_n;++i)if(oo_bench_s->parts[i].part==part)p=&oo_bench_s->parts[i];if(!p||oo_bench_s->window_state>=OO_WINDOW_WRITTEN){if(oo_bench_s->window_state==OO_WINDOW_IDLE)oo_bench_event(OO_BENCH_PLAN,0);pthread_mutex_unlock(&oo_bench_mu);return;}
++    uint64_t timeline=oo_bench_lifetime_locked(OO_BENCH_TIMELINE,semaphore,OO_BENCH_LOOKUP);
++    int collision=0;for(uint32_t i=0;i<oo_bench_s->parts_n;++i){OoBenchPart* other=&oo_bench_s->parts[i];if(other!=p&&other->seq==seq&&other->timeline==timeline)collision=1;}
++    if(p){if(p->state!=OO_BENCH_NEW||!seq||!timeline||collision)oo_bench_fault(OO_BENCH_BAD_PART);else{p->seq=seq;p->timeline=timeline;p->state=OO_BENCH_PLANNED;}}
++    OoBenchEventV1* e=oo_bench_event(OO_BENCH_PLAN,0);if(e){e->v[0]=part;e->v[1]=seq;e->v[2]=timeline;}
++    pthread_mutex_unlock(&oo_bench_mu);
++}
++static void oo_bench_hold(uint64_t part,uint64_t batch) {
++    pthread_mutex_lock(&oo_bench_mu);OoBenchPart* p=NULL;for(uint32_t i=0;i<oo_bench_s->parts_n;++i)if(oo_bench_s->parts[i].part==part)p=&oo_bench_s->parts[i];if(!p||oo_bench_s->window_state>=OO_WINDOW_WRITTEN){if(oo_bench_s->window_state==OO_WINDOW_IDLE)oo_bench_event(OO_BENCH_HELD,0);pthread_mutex_unlock(&oo_bench_mu);return;}
++    if(!p||p->state!=OO_BENCH_PLANNED||!batch)oo_bench_fault(OO_BENCH_BAD_PART);
++    else {p->batch=batch;p->state=OO_BENCH_PENDING_BATCH;}
++    OoBenchEventV1* e=oo_bench_event(OO_BENCH_HELD,0);if(e){e->v[0]=part;e->v[1]=batch;}
++    pthread_mutex_unlock(&oo_bench_mu);
++}
++static void oo_bench_result_locked(OoBenchPart* p,int32_t result) {
++    if(!p)return;
++    p->state=result==0?OO_BENCH_SUBMITTED:OO_BENCH_FAILED;
++    if(result!=0)oo_bench_fault(OO_BENCH_DEVICE_ERROR);
++    OoBenchEventV1* e=oo_bench_event(OO_BENCH_RESULT,result);if(e){e->v[0]=p->part;e->v[1]=p->seq;e->v[2]=p->timeline;e->v[3]=p->origin;e->v[4]=p->batch;}
++}
++static void oo_bench_result(uint64_t part,uint64_t seq,int32_t result) {
++    pthread_mutex_lock(&oo_bench_mu);OoBenchPart* p=NULL;for(uint32_t i=0;i<oo_bench_s->parts_n;++i)if(oo_bench_s->parts[i].part==part)p=&oo_bench_s->parts[i];if(!p||oo_bench_s->window_state>=OO_WINDOW_WRITTEN){if(oo_bench_s->window_state==OO_WINDOW_IDLE){oo_bench_event(OO_BENCH_RESULT,result);if(result)oo_bench_fault(OO_BENCH_DEVICE_ERROR);}pthread_mutex_unlock(&oo_bench_mu);return;}
++    if(!p||p->state!=OO_BENCH_PLANNED||p->seq!=seq){
++        oo_bench_fault(OO_BENCH_BAD_PART);if(result!=0)oo_bench_fault(OO_BENCH_DEVICE_ERROR);
++        OoBenchEventV1* e=oo_bench_event(OO_BENCH_RESULT,result);if(e){e->v[0]=part;e->v[1]=seq;e->v[2]=p?p->timeline:0;e->v[3]=p?p->origin:0;e->v[4]=p?p->batch:0;}
++    }else oo_bench_result_locked(p,result);
++    pthread_mutex_unlock(&oo_bench_mu);
++}
++static void oo_bench_batch(uint64_t batch,uint64_t seq,int32_t result) {
++    pthread_mutex_lock(&oo_bench_mu);uint64_t largest=0;uint32_t count=0;
++    for(uint32_t i=0;i<oo_bench_s->parts_n;++i){OoBenchPart* p=&oo_bench_s->parts[i];if(p->batch==batch&&p->state==OO_BENCH_PENDING_BATCH){if(p->seq>largest)largest=p->seq;++count;}}
++    if(!count||oo_bench_s->window_state>=OO_WINDOW_WRITTEN){if(oo_bench_s->window_state==OO_WINDOW_IDLE){oo_bench_event(OO_BENCH_BATCH,result);if(result)oo_bench_fault(OO_BENCH_DEVICE_ERROR);}pthread_mutex_unlock(&oo_bench_mu);return;}
++    if(!batch||!count||largest>seq)oo_bench_fault(OO_BENCH_BAD_PART);
++    // A maximum sequence cannot exclude earlier unselected members in the batch.
++    // No complete driver member-list witness exists in this ABI.
++    if(count){oo_bench_fault(OO_BENCH_QUEUE_GAP);OoBenchEventV1* gap=oo_bench_event(OO_BENCH_UNKNOWN,OO_BENCH_QUEUE_GAP);if(gap){gap->v[1]=batch;gap->v[2]=seq;gap->v[3]=largest;}}
++    OoBenchEventV1* e=oo_bench_event(OO_BENCH_BATCH,result);if(e){e->v[0]=batch;e->v[1]=seq;e->v[2]=count;}
++    for(uint32_t i=0;i<oo_bench_s->parts_n;++i){OoBenchPart* p=&oo_bench_s->parts[i];if(p->batch==batch&&p->state==OO_BENCH_PENDING_BATCH)oo_bench_result_locked(p,result);}
++    pthread_mutex_unlock(&oo_bench_mu);
++}
++static void oo_bench_counter(uint64_t semaphore,int32_t result,uint64_t value) {
++    pthread_mutex_lock(&oo_bench_mu);OoBenchState* s=oo_bench_s;if(s->window_state>=OO_WINDOW_WRITTEN){pthread_mutex_unlock(&oo_bench_mu);return;}uint64_t timeline=oo_bench_lifetime_locked(OO_BENCH_TIMELINE,semaphore,OO_BENCH_LOOKUP);
++    if(s->poll==UINT64_MAX){oo_bench_fault(OO_BENCH_SERIAL_ERROR);pthread_mutex_unlock(&oo_bench_mu);return;}
++    uint32_t hits=0;if(result==0){for(uint32_t i=0;i<s->parts_n;++i){OoBenchPart* p=&s->parts[i];if(p->timeline==timeline&&p->seq&&p->seq<=value&&p->state==OO_BENCH_SUBMITTED)++hits;}}
++    /* Drain keeps polls that complete selected work and polls that report a device error. Idle success polls stay off the event log and do not count as loss. */
++    if(s->window_state==OO_WINDOW_DRAINING&&result==0&&!hits){pthread_mutex_unlock(&oo_bench_mu);return;}
++    uint64_t poll=++s->poll;OoBenchEventV1* e=oo_bench_event(OO_BENCH_POLL,result);if(e){e->v[0]=timeline;e->v[1]=value;e->v[2]=poll;}
++    OoBenchObject* object=NULL;for(uint32_t i=0;i<s->objects_n;++i)if(s->objects[i].id==timeline)object=&s->objects[i];
++    if(result!=0)oo_bench_fault(OO_BENCH_DEVICE_ERROR);
++    else if(!object||(object->counter_seen&&value<object->counter))oo_bench_fault(OO_BENCH_BAD_LIFETIME);
++    else {object->counter=value;object->counter_seen=1;for(uint32_t i=0;i<s->parts_n;++i){OoBenchPart* p=&s->parts[i];if(p->timeline==timeline&&p->seq&&p->seq<=value&&p->state==OO_BENCH_SUBMITTED){p->state=OO_BENCH_DONE;
++        e=oo_bench_event(OO_BENCH_COMPLETE,0);if(e){e->v[0]=p->part;e->v[1]=p->seq;e->v[2]=timeline;e->v[3]=poll;e->v[4]=p->origin;}}}}
++    pthread_mutex_unlock(&oo_bench_mu);
++}
++static void oo_bench_present_closed(uint64_t value) {
++    pthread_mutex_lock(&oo_bench_mu);uint64_t origin=oo_bench_value_locked(value),last=0;if(!origin||oo_bench_s->window_state>=OO_WINDOW_WRITTEN){if(oo_bench_s->window_state==OO_WINDOW_IDLE)oo_bench_event(OO_BENCH_PRESENT_CLOSED,0);pthread_mutex_unlock(&oo_bench_mu);return;}uint32_t count=0;
++    const OoBenchEventV1* ingress=oo_bench_origin_locked(origin);
++    if(!ingress||ingress->kind!=OO_BENCH_PRESENT)oo_bench_fault(OO_BENCH_BAD_ORIGIN);
++    for(uint32_t i=0;i<oo_bench_s->parts_n;++i){OoBenchPart* p=&oo_bench_s->parts[i];if(p->value==value){++count;if(p->part>last)last=p->part;}}
++    if(!count)oo_bench_fault(OO_BENCH_BAD_PART);
++    OoBenchEventV1* e=oo_bench_event(OO_BENCH_PRESENT_CLOSED,0);if(e){e->v[0]=origin;e->v[1]=value;e->v[2]=last;e->v[3]=count;}
++    pthread_mutex_unlock(&oo_bench_mu);
++}
++static int oo_bench_settled(uint64_t origin){for(uint32_t i=0;i<oo_bench_s->settled_n;++i)if(oo_bench_s->settled[i]==origin)return 1;return 0;}
++static OoBenchPart* oo_bench_find_part(uint64_t part){for(uint32_t i=0;i<oo_bench_s->parts_n;++i)if(oo_bench_s->parts[i].part==part)return &oo_bench_s->parts[i];return NULL;}
++/* 1 accepted, 2 exact duplicate, 0 refused and not recorded as a link. */
++static int oo_bench_accept_link(OoBenchState* s,uint64_t origin,uint64_t part,uint32_t hook){
++    const OoBenchEventV1* ingress=oo_bench_origin_locked(origin);
++    OoBenchPart* p=oo_bench_find_part(part);
++    OoWindowSlot* slot=NULL;if(p){for(uint32_t i=0;i<s->slots_n;++i)if(s->slots[i].slot==p->slot)slot=&s->slots[i];}
++    int changed=p&&oo_bench_value_locked(p->value)!=p->origin;
++    int timeline_dead=0;if(p&&p->timeline){timeline_dead=1;for(uint32_t i=0;i<s->objects_n;++i)if(s->objects[i].id==p->timeline)timeline_dead=!s->objects[i].active;}
++    int bad=!ingress||ingress->kind!=OO_BENCH_SUBMIT||!p||!p->in_window||!slot||slot->generation<p->generation||changed||timeline_dead||p->state==OO_BENCH_FAILED;
++    if(bad){oo_bench_fault_ctx=(OoBenchFaultV1){OO_BENCH_BAD_PART,hook,origin,part,p?p->slot:0,p?p->generation:0,p?p->seq:0};oo_bench_fault(OO_BENCH_BAD_PART);return 0;}
++    for(uint32_t i=0;i<s->links_n;++i)if(s->links[i].origin==origin&&s->links[i].part==part)return 2;
++    if(s->links_n>=512){oo_bench_fault_ctx=(OoBenchFaultV1){OO_BENCH_CAPACITY,hook,origin,part,p->slot,p->generation,p->seq};oo_bench_fault(OO_BENCH_CAPACITY);return 0;}
++    uint32_t ordinal=1,relation=1;for(uint32_t i=0;i<s->links_n;++i)if(s->links[i].origin==origin){ordinal=s->links[i].ordinal+1;relation=2;}
++    s->links[s->links_n++]=(typeof(s->links[0])){origin,part,p->generation,p->seq,p->slot,hook,ordinal,relation};
++    return 1;
++}
++static void oo_bench_note(uint32_t reason,uint64_t origin,uint64_t a,uint64_t b){pthread_mutex_lock(&oo_bench_mu);OoBenchState* s=oo_bench_s;if(s->window_state>=OO_WINDOW_WRITTEN||(!origin&&s->window_state!=OO_WINDOW_IDLE)){pthread_mutex_unlock(&oo_bench_mu);return;}
++    int link=0;uint32_t link_low=(uint32_t)b;if(!reason&&link_low==4&&origin&&a){link=oo_bench_accept_link(s,origin,a,(uint32_t)(b>>32));if(link!=1){pthread_mutex_unlock(&oo_bench_mu);return;}}
++    if(!reason&&link_low==3&&origin&&s->settled_n<256&&!oo_bench_settled(origin))s->settled[s->settled_n++]=origin;
++    if(reason==OO_BENCH_BAD_ORIGIN||reason==OO_BENCH_BAD_LIFETIME||reason==OO_BENCH_CAPACITY){int seen=0;for(uint32_t i=0;i<s->denial_n;++i)if(s->denials[i].origin==origin&&s->denials[i].handle==(uint32_t)a&&s->denials[i].reason==reason)seen=1;if(!seen&&s->denial_n<8)s->denials[s->denial_n++]=(typeof(s->denials[0])){origin,(uint32_t)a,reason,(uint32_t)b};}
++    if(reason)oo_bench_fault(reason);
++    /* Repeated atomicity, burst and wait notes stay in the flags. Drain does not give each repeat an event. */
++    if(s->window_state==OO_WINDOW_DRAINING&&reason&&(reason==OO_BENCH_SOURCE_ATOMICITY||reason==OO_BENCH_BURST||reason==OO_BENCH_EVENT_WAIT)){pthread_mutex_unlock(&oo_bench_mu);return;}
++    OoBenchEventV1* e=oo_bench_event(reason?OO_BENCH_UNKNOWN:OO_BENCH_RUN,(int32_t)reason);if(e){e->v[0]=origin;e->v[1]=a;e->v[2]=link?4:b;if(link){const typeof(s->links[0])* row=&s->links[s->links_n-1];e->v[3]=row->ordinal;e->v[4]=row->slot;e->v[5]=row->generation;e->v[6]=row->sequence;e->v[7]=row->hook|((uint64_t)row->relation<<32);}}pthread_mutex_unlock(&oo_bench_mu);}
++static int oo_bench_status(OoBenchStatusV1* out){if(!out)return 0;pthread_mutex_lock(&oo_bench_mu);*out=oo_bench_s->status;pthread_mutex_unlock(&oo_bench_mu);return 1;}
++static int oo_bench_read_event(uint32_t at,OoBenchEventV1* out){if(!out)return 0;pthread_mutex_lock(&oo_bench_mu);int ok=at<oo_bench_s->status.events;if(ok)*out=oo_bench_s->events[at];pthread_mutex_unlock(&oo_bench_mu);return ok;}
++static int oo_bench_read_bytes(uint32_t at,void* out,uint32_t n){if(!out)return 0;pthread_mutex_lock(&oo_bench_mu);int ok=at<=oo_bench_s->status.bytes&&n<=oo_bench_s->status.bytes-at;if(ok)memcpy(out,oo_bench_s->bytes+at,n);pthread_mutex_unlock(&oo_bench_mu);return ok;}
++static uint32_t oo_bench_part_state(uint64_t part){pthread_mutex_lock(&oo_bench_mu);OoBenchPart* p=oo_bench_part_locked(part);uint32_t state=p?p->state:0;pthread_mutex_unlock(&oo_bench_mu);return state;}
++static void oo_bench_u32(unsigned char* p,uint32_t v){for(unsigned i=0;i<4;++i)p[i]=(unsigned char)(v>>(8*i));}
++static void oo_bench_u64(unsigned char* p,uint64_t v){for(unsigned i=0;i<8;++i)p[i]=(unsigned char)(v>>(8*i));}
++static int oo_bench_write(int fd,const void* data,size_t n){const unsigned char* p=(const unsigned char*)data;while(n){ssize_t done=write(fd,p,n);if(done<0&&errno==EINTR)continue;if(done<=0)return 0;p+=done;n-=(size_t)done;}return 1;}
++/* Explicit close owns the bridge mutex through serialization. No game/GPU wait. */
++static int oo_window_write_event(int fd,const OoBenchEventV1* e){unsigned char b[96]={0};oo_bench_u32(b,e->kind);oo_bench_u32(b+4,(uint32_t)e->result);oo_bench_u64(b+8,e->serial);oo_bench_u64(b+16,e->at_ns);for(unsigned j=0;j<8;++j)oo_bench_u64(b+24+8*j,e->v[j]);oo_bench_u32(b+88,e->payload_offset);oo_bench_u32(b+92,e->payload_size);return oo_bench_write(fd,b,sizeof b);}
++#ifndef OO_WINDOW_SYNC
++#define OO_WINDOW_SYNC(fd) fsync(fd)
++#endif
++#ifndef OO_WINDOW_CLOSE
++#define OO_WINDOW_CLOSE(fd) close(fd)
++#endif
++#ifndef OO_WINDOW_LINK
++#define OO_WINDOW_LINK(from,to) link(from,to)
++#endif
++static int oo_bench_denied(uint64_t origin){for(uint32_t i=0;i<oo_bench_s->denial_n;++i)if(oo_bench_s->denials[i].origin==origin)return 1;return 0;}
++static int oo_bench_run_seen(uint64_t origin){for(uint32_t i=0;i<oo_bench_s->status.events;++i){const OoBenchEventV1* e=&oo_bench_s->events[i];if(e->kind==OO_BENCH_RUN&&e->v[0]==origin&&e->v[2]==1)return 1;}return 0;}
++static int oo_bench_linked(uint64_t origin,uint64_t part){for(uint32_t i=0;i<oo_bench_s->links_n;++i)if(oo_bench_s->links[i].origin==origin&&oo_bench_s->links[i].part==part)return 1;return 0;}
++static void oo_window_counts(uint32_t* parts_left,uint32_t* streams_left,uint32_t* presents_left,int* permanent){OoBenchState* s=oo_bench_s;*parts_left=*streams_left=*presents_left=0;*permanent=0;
++ for(uint32_t i=0;i<s->parts_n;++i)if(s->parts[i].state!=OO_BENCH_DONE)++*parts_left;
++ for(uint32_t i=0;i<s->status.events;++i){const OoBenchEventV1* e=&s->events[i];if(e->kind==OO_BENCH_SUBMIT){uint32_t streams=0,parts=0,links=0;for(uint32_t j=0;j<s->status.events;++j)streams+=s->events[j].kind==OO_BENCH_STREAM&&s->events[j].v[0]==e->serial;for(uint32_t j=0;j<s->parts_n;++j)parts+=s->parts[j].origin==e->serial&&s->parts[j].in_window;for(uint32_t j=0;j<s->links_n;++j)links+=s->links[j].origin==e->serial;if(streams!=e->v[4]){++*streams_left;if(oo_bench_denied(e->serial))*permanent=1;}else if(links){int ready=!oo_bench_run_seen(e->serial)||oo_bench_settled(e->serial);for(uint32_t j=0;j<s->links_n;++j)if(s->links[j].origin==e->serial){OoBenchPart* p=oo_bench_find_part(s->links[j].part);int changed=p&&oo_bench_value_locked(p->value)!=p->origin;int dead=0;if(p&&p->timeline){dead=1;for(uint32_t k=0;k<s->objects_n;++k)if(s->objects[k].id==p->timeline)dead=!s->objects[k].active;}if(!p||!p->in_window||changed||dead||p->state==OO_BENCH_FAILED){*permanent=1;ready=0;}else if(p->state!=OO_BENCH_DONE)ready=0;}for(uint32_t j=0;j<s->parts_n;++j)if(s->parts[j].origin==e->serial&&s->parts[j].in_window&&!oo_bench_linked(e->serial,s->parts[j].part)){if(!oo_bench_run_seen(e->serial)||oo_bench_settled(e->serial)){oo_bench_fault_ctx=(OoBenchFaultV1){OO_BENCH_BAD_PART,0,e->serial,s->parts[j].part,s->parts[j].slot,s->parts[j].generation,s->parts[j].seq};oo_bench_fault(OO_BENCH_BAD_PART);*permanent=1;}ready=0;}if(!ready&&!*permanent)++*streams_left;}else if(oo_bench_run_seen(e->serial)&&!oo_bench_settled(e->serial)){++*streams_left;}else if(!parts||(oo_bench_run_seen(e->serial)&&oo_bench_settled(e->serial))){++*streams_left;if(oo_bench_settled(e->serial)){oo_bench_fault_ctx=(OoBenchFaultV1){OO_BENCH_BAD_PART,8,e->serial,0,0,0,0};oo_bench_fault(OO_BENCH_BAD_PART);*permanent=1;}}}
++  if(e->kind==OO_BENCH_PRESENT){uint32_t closed=0,parts=0;uint64_t last=0;for(uint32_t j=0;j<s->parts_n;++j)if(s->parts[j].origin==e->serial){++parts;if(s->parts[j].part>last)last=s->parts[j].part;}for(uint32_t j=0;j<s->status.events;++j){const OoBenchEventV1* c=&s->events[j];if(c->kind==OO_BENCH_PRESENT_CLOSED&&c->v[0]==e->serial&&c->v[2]==last&&c->v[3]==parts)++closed;}if(closed!=1||!parts){++*presents_left;if(closed&&!parts)*permanent=1;}}}
++ if(!*presents_left){int any=0;for(uint32_t i=0;i<s->status.events;++i)any+=s->events[i].kind==OO_BENCH_PRESENT;if(!any)++*presents_left;}}
++static uint32_t oo_window_pending(void){uint32_t a,b,c;int permanent;oo_window_counts(&a,&b,&c,&permanent);return a+b+c;}
++int hos_posix_oo_benchmark_window_control(uint32_t action,OoWindowStatus* out){const OoBenchBridgeV1* api=hos_posix_oo_benchmark_window_v2();if(!api)return -1;pthread_mutex_lock(&oo_bench_mu);OoBenchState* s=oo_bench_s;int result=0;
++ if(action==1){if(s->window_state!=OO_WINDOW_IDLE)result=-2;else if(s->startup_lost||(s->startup_flags&((UINT64_C(1)<<OO_BENCH_CAPACITY)|(UINT64_C(1)<<OO_BENCH_BAD_LIFETIME)|(UINT64_C(1)<<OO_BENCH_BAD_PART)|(UINT64_C(1)<<OO_BENCH_SERIAL_ERROR)|(UINT64_C(1)<<OO_BENCH_RANDOM_ERROR))))result=-3;else{
++  s->begin_ns=oo_bench_clock();s->window_state=OO_WINDOW_OPEN;
++  for(uint32_t i=0;i<s->objects_n;++i){const OoBenchObject* o=&s->objects[i];OoBenchEventV1* e=&s->baseline[s->baseline_n++];e->kind=OO_WINDOW_BASE_LIFETIME;e->serial=oo_bench_serial();e->at_ns=s->begin_ns;e->v[0]=o->id;e->v[1]=o->kind;e->v[2]=o->generation;e->v[3]=o->active;e->v[4]=o->counter;e->v[5]=o->counter_seen;}
++  for(uint32_t i=0;i<s->slots_n;++i){OoBenchEventV1* e=&s->baseline[s->baseline_n++];e->kind=OO_WINDOW_BASE_SLOT;e->serial=oo_bench_serial();e->at_ns=s->begin_ns;e->v[0]=s->slots[i].slot;e->v[1]=s->slots[i].generation;}
++  OoBenchEventV1* e=oo_bench_event(OO_WINDOW_BEGIN,0);if(e){e->v[0]=s->baseline_n;e->v[1]=s->startup_flags;}
++ }}else if(action==2){if(s->window_state==OO_WINDOW_OPEN)s->window_state=OO_WINDOW_DRAINING;if(s->window_state==OO_WINDOW_DRAINING){
++  uint32_t pending_parts,pending_streams,pending_presents;int permanent;oo_window_counts(&pending_parts,&pending_streams,&pending_presents,&permanent);
++  if(permanent||(s->status.flags&(UINT64_C(1)<<OO_BENCH_BAD_PART))){s->window_state=OO_WINDOW_ERROR;result=-3;}
++  else if(oo_window_pending())result=1;
++  else if(s->status.lost||(s->status.flags&UINT64_C(0x101e))||s->status.events==OO_BENCH_MAX_EVENTS){s->window_state=OO_WINDOW_ERROR;result=-3;}
++  else{const char* path=getenv("HOS_OO_BENCH_OUTPUT");char temporary[4200],directory[4096];int fd=-1;
++   if(path&&*path&&strlen(path)<sizeof directory){snprintf(temporary,sizeof temporary,"%s.pending.%016llx",path,(unsigned long long)s->status.session[0]);snprintf(directory,sizeof directory,"%s",path);char* slash=strrchr(directory,'/');if(slash){if(slash==directory)slash[1]=0;else *slash=0;}else strcpy(directory,".");fd=open(temporary,O_WRONLY|O_CREAT|O_EXCL|O_CLOEXEC|O_NOFOLLOW,0600);}
++   if(fd<0){oo_bench_fault(OO_BENCH_FILE_ERROR);s->window_state=OO_WINDOW_ERROR;result=-4;}
++   else{OoBenchEventV1* e=oo_bench_event(OO_WINDOW_CLOSED,0);s->close_ns=e?e->at_ns:oo_bench_clock();if(e){e->v[0]=s->parts_n;e->v[1]=s->baseline_n;}unsigned char h[256]={0};memcpy(h,"OOBENCHWINDOW2",14);oo_bench_u32(h+16,2);oo_bench_u32(h+20,96);oo_bench_u64(h+24,s->status.flags);oo_bench_u64(h+32,s->status.lost);oo_bench_u64(h+40,s->status.session[0]);oo_bench_u64(h+48,s->status.session[1]);oo_bench_u32(h+56,s->status.events);oo_bench_u32(h+60,s->status.bytes);oo_bench_u32(h+64,s->baseline_n);oo_bench_u32(h+68,OO_WINDOW_WRITTEN);oo_bench_u64(h+72,s->begin_ns);oo_bench_u64(h+80,s->close_ns);oo_bench_u64(h+88,s->startup_flags);oo_bench_u64(h+96,s->startup_lost);for(unsigned i=0;i<16;++i)oo_bench_u64(h+104+8*i,s->startup_events[i]);oo_bench_u64(h+232,s->boundary_parts);
++    int ok=oo_bench_write(fd,h,sizeof h);for(uint32_t i=0;ok&&i<s->baseline_n;++i)ok=oo_window_write_event(fd,&s->baseline[i]);for(uint32_t i=0;ok&&i<s->status.events;++i)ok=oo_window_write_event(fd,&s->events[i]);if(ok)ok=oo_bench_write(fd,s->bytes,s->status.bytes);if(ok)ok=OO_WINDOW_SYNC(fd)==0;if(OO_WINDOW_CLOSE(fd)!=0)ok=0;
++    int published=0;if(ok){ok=OO_WINDOW_LINK(temporary,path)==0;published=ok;}if(unlink(temporary)!=0)ok=0;
++    if(ok){int parent=open(directory,O_RDONLY|O_DIRECTORY|O_CLOEXEC);if(parent<0)ok=0;else{ok=OO_WINDOW_SYNC(parent)==0;if(OO_WINDOW_CLOSE(parent)!=0)ok=0;}}
++    if(ok)s->window_state=OO_WINDOW_WRITTEN;else{if(published)unlink(path);oo_bench_fault(OO_BENCH_FILE_ERROR);s->window_state=OO_WINDOW_ERROR;result=-4;}
++   }
++  }
++ }else if(s->window_state!=OO_WINDOW_WRITTEN)result=-2;
++ }else if(action!=0)result=-2;
++ if(out){uint32_t pending_parts,pending_streams,pending_presents;int permanent;oo_window_counts(&pending_parts,&pending_streams,&pending_presents,&permanent);OoWindowStatus st={0};st.state=s->window_state;st.events=s->status.events;st.bytes=s->status.bytes;st.pending=oo_window_pending();st.flags=s->status.flags;st.lost=s->status.lost;st.begin_ns=s->begin_ns;st.close_ns=s->close_ns;st.pending_parts=pending_parts;st.pending_streams=pending_streams;st.pending_presents=pending_presents;st.denial_count=s->denial_n;st.denial_reason=s->denial_n?s->denials[0].reason:0;st.denial_handle=s->denial_n?s->denials[0].handle:0;st.denial_prefix=s->denial_n?s->denials[0].prefix_length:0;st.denial_origin=s->denial_n?s->denials[0].origin:0;st.fault_count=s->fault_n;if(s->fault_n)memcpy(st.faults,s->faults,s->fault_n*sizeof st.faults[0]);*out=st;}pthread_mutex_unlock(&oo_bench_mu);return result;
++}
++static void oo_bench_initialize(void){const char* on=getenv("HOS_OO_BENCH_BRIDGE");const char* window=getenv("HOS_OO_BENCH_WINDOW");if(!on||strcmp(on,"1")||!window||strcmp(window,"1"))return;
++ oo_bench_s=(OoBenchState*)calloc(1,sizeof(OoBenchState));if(!oo_bench_s)return;oo_bench_s->output=-1;oo_bench_s->status.flags=OO_BENCH_SCOPE_UNKNOWN;
++ if(OO_BENCH_RANDOM(oo_bench_s->status.session,sizeof oo_bench_s->status.session)!=(ssize_t)sizeof oo_bench_s->status.session)oo_bench_fault(OO_BENCH_RANDOM_ERROR);
++}
++static const OoBenchBridgeV1 oo_bench_api={OO_BENCH_ABI,sizeof(OoBenchBridgeV1),oo_bench_clock,oo_bench_lifetime,oo_bench_ingress,oo_bench_stream,oo_bench_exchange,oo_bench_current,oo_bench_bind,oo_bench_value,oo_bench_part_begin,oo_bench_plan,oo_bench_hold,oo_bench_result,oo_bench_batch,oo_bench_counter,oo_bench_present_closed,oo_bench_note,oo_bench_status,oo_bench_read_event,oo_bench_read_bytes,oo_bench_part_state,hos_posix_oo_benchmark_window_control};
++__attribute__((visibility("default"))) const OoBenchBridgeV1* hos_posix_oo_benchmark_window_v2(void){pthread_once(&oo_bench_once,oo_bench_initialize);return oo_bench_s?&oo_bench_api:NULL;}
++#else
++int hos_posix_oo_benchmark_window_control(uint32_t action,OoWindowStatus* out){(void)action;(void)out;return -1;}
++const OoBenchBridgeV1* hos_posix_oo_benchmark_window_v2(void){return NULL;}
++#endif
++#endif
++#endif

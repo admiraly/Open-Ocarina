@@ -4,6 +4,13 @@ Updated 2026-11-13. This page distinguishes working tools, local observations, a
 
 ## Latest reviewed results
 
+A bounded [native command window](benchmark-native-window-r8.md) now captures
+40 owned streams, 19 settled native submit runs, four presents and 108 completed
+recording parts with no lost events or structural reader errors. Source atomicity,
+burst and event-wait faults remain recorded, together with the unknown camera,
+memory, input and dependency scope. This is diagnostic acquisition, without
+whole-frame equality, native-quality acceptance or an FPS result.
+
 A bounded [foliage pass history](foliage-pass-history.md) now records 55 raster
 passes and 104 attachment rows for one reviewed gameplay frame, with unchanged
 idle compiler observations and zero pass readbacks. The dark leaf-card producer

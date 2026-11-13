@@ -1,0 +1,95 @@
+{
+  "schema": "open-ocarina.native-window-r8-observation/v1",
+  "role": "diagnostic collection only",
+  "acceptance": {
+    "timing": false,
+    "fps": false,
+    "native_quality": false,
+    "restoration": false,
+    "whole_frame_equality": false
+  },
+  "base_tree": "85562df89be995cba1985717f26aa5df8cd118f8",
+  "capture_backing_overlay": "already present in the base tree; host/capture_backing.h was not edited",
+  "r5_patch": "private legacy candidate, not required by the r8 reader or tests",
+  "r5_patch_sha256": "d9c4e15f19f4a35ba121545adb841722d9ea80e9c95a2a50f673dc67fdb4545d",
+  "r8_patch": "patches/hookshot/benchmark-native-window-r8.patch",
+  "published_identity": "whitespace=nowarn reapplication matches executed source bytes; whitespace=error rejects one trailing space in executed host/control.c",
+  "applied_tree": "2ca541552afc7563807f381e7d1aa50cfd9b7fa9",
+  "executed_source_sha256": {
+    "host/oo_benchmark_window.h": "207893b73e8e884c46b0201e76cdfbc946563ae8e705ef52c458f25ad63066fc",
+    "host/nvn_native.c": "cf22df90f2df652762a1fc697cb7d3e6f895c7b60980fb16078b61c6d798f6ab",
+    "host/control.c": "1439a963d035d8791aa3bcb4128b998ae352285dd351ba60dbbd4b25985a8550",
+    "gpu/vk/vk_replay.cpp": "bcc7cb05d2f24797044eea819ba391cf2f36f81cc900910b0b9a4a87142487b1",
+    "gpu/vk/oo_benchmark_renderer.h": "f46c0102c1f98b42f29164c991359070acded85025ad9182b57c5586ad52bad3"
+  },
+  "reader_sha256": "ebf8f568af5a9d0d7c5117bdb41412228270119aeb90747910f488c4ef9940dc",
+  "c_abi": "function table and OoWindowStatus match r6; they do not match the r5 status struct",
+  "acquisition": {
+    "owned_streams": 40,
+    "native_submit_runs": 19,
+    "all_native_runs_settled": true,
+    "native_presents": 4,
+    "recording_parts": 108,
+    "recording_parts_actual_submit_and_observed_completion": 108,
+    "payload_bytes": 4362416,
+    "producer_events_including_begin_close": 1052,
+    "lost": 0,
+    "pending": 0,
+    "structural_errors": 0,
+    "bounded_faults": [
+      {
+        "reason": 5,
+        "name": "source_atomicity",
+        "origin": 0,
+        "part": 0
+      },
+      {
+        "reason": 7,
+        "name": "burst",
+        "origin": 0,
+        "part": 0
+      },
+      {
+        "reason": 8,
+        "name": "event_wait",
+        "origin": 0,
+        "part": 0
+      }
+    ],
+    "core_plus_unselected_slot_events": 1050,
+    "process": 2390145,
+    "stop": "TERM reaped 42.58s pid gone no KILL",
+    "root_plan_sha256": "35009e203f6b0d8a944ddcaefcfc2de3c72ffa640356d3a6ae890445ae398fde",
+    "host_sha256": "b667aed8ad70dee7c5e4c34f763ec1e945ebfa801479521f285c16e1ba9f1fb0",
+    "renderer_sha256": "9ca436492e73cd65c7117ea564546359d74a1881131120cfe447edf456ce8a65",
+    "native_window_sha256": "dee5dc3c52897dd74820f492320aeccac20410e1d67e7f33f92878715ad528e4",
+    "report_sha256": "83f51bfc9547c001edf2f1b8eeda1dcdca2d309d96e115baabf2cd7af123aa4f",
+    "result_sha256": "0651adef07f14c3551d355c28d3858626d7dd3580f094574dedf1b7a81a577e8"
+  },
+  "retained_unknowns": [
+    "source atomicity",
+    "bursts",
+    "event waits",
+    "camera",
+    "memory",
+    "input",
+    "dependency"
+  ],
+  "omitted_native_nn_workloads": 10,
+  "parallel_segment_part0": "excluded",
+  "runtime_parallel": 0,
+  "historical": {
+    "r4_actual": "BAD_ORIGIN; the old per-stream 1 MiB limit reproduced the refusal on CPU",
+    "r5_actual": "copied 4374256 bytes with zero lost events, then failed close with BAD_PART; precise runtime hook unknown",
+    "r7_actual": "failed closed premature missing link",
+    "r6_root_03": "never launched"
+  },
+  "not_published": [
+    "native command bytes",
+    "png frames",
+    "raw logs",
+    "full captured JSON report"
+  ],
+  "GPU_executed_by_this_candidate": false,
+  "reader_public_change": "Correct CLI import root; reader state-machine logic unchanged from the executed reader"
+}
