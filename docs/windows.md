@@ -5,7 +5,7 @@ Status: game-free Windows builds are compiled and smoke-tested on GitHub Actions
 ## What you need
 
 - Your own copy of the game at the supported version: program `0400486024DEC000`, update `v131072`, build `e0f3ccfa`. Either one `.nup` file holding the game and that update, or the extracted `romfs` and `exefs` folders. A complete `romfs` is about 23.8 GB; other versions are refused.
-- Windows 10 or 11 (64-bit) with a Vulkan 1.3 driver that supports mesh shaders:
+- Windows 10 or 11 (64-bit) with a Vulkan 1.3+ driver (GPUs with hardware mesh shaders are fastest; older Vulkan 1.3+ GPUs such as Pascal / Quadro P-series run with automatic compute fallback and on-demand shader compilation):
   - **NVIDIA:** current GeForce Game Ready / Studio driver. Optionally tick **NVIDIA DLSS** in the builder (downloads NVIDIA's DLSS SDK under NVIDIA's license at build time).
   - **AMD:** current Adrenalin Vulkan 1.3 driver. Optionally tick **AMD FSR 4** in the builder (compiles FSR 4 support and downloads AMD's signed FSR runtime under AMD's license at build time).
 - Around **45 GB** of free disk space on an SSD is recommended during the build.
@@ -21,8 +21,7 @@ Everything required to build and play on Windows is bundled inside `Open-Ocarina
 Steps:
 1. Download `Open-Ocarina-<version>-windows-x64.zip` from the release page and extract it to a normal folder (for example `C:\Tools\Open-Ocarina`, avoiding OneDrive-synced folders if possible).
 2. Double-click `HookshotBuilder.exe`.
-3. Choose your `.nup` file (or `romfs` + `exefs` folders) and choose where the built game goes (default: `%USERPROFILE%\Games\Open-Ocarina`).
-4. *(Optional)* Tick **NVIDIA DLSS** (NVIDIA RTX GPUs) or **AMD FSR 4** (supported AMD GPUs).
+3. Choose your `.nup` file (or `romfs` + `exefs` folders) — Open-Ocarina automatically detects your GPU & Vulkan capabilities, asks only if a system choice is needed (such as NVIDIA DLSS on RTX GPUs, AMD FSR 4 on RDNA 4 GPUs, or skipping slow upfront shader compilation on non-mesh-shader GPUs), and builds into `%USERPROFILE%\Games\Open-Ocarina`.
 5. Click **Build the game**, then **Play** once finished (`open-ocarina.exe`).
 
 > Note: If Windows Defender or SmartScreen warns on an unsigned zip download, extract to an allowed folder; if `tools\python\python.exe` is quarantined, restore it or extract again into an excluded folder.

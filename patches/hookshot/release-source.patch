@@ -13,6 +13,21 @@ index c809f97..5cadf4c 100644
  
      internal static Home Resolve(string? requested, string appDirectory, string standard, bool portableRequested = false)
      {
+diff --git a/builder/HookshotBuilder/BuilderSettings.cs b/builder/HookshotBuilder/BuilderSettings.cs
+index a1406a0..df0476e 100644
+--- a/builder/HookshotBuilder/BuilderSettings.cs
++++ b/builder/HookshotBuilder/BuilderSettings.cs
+@@ -12,6 +12,10 @@ sealed class BuilderSettings
+     public bool Fsr { get; set; }    // (AMD FSR 4 ticked)
+     public bool FsrLicense { get; set; }   // (AMD's license accepted when it was ticked: a tick saved before it was asked has not)
+     public bool PrepareLater { get; set; }   // ("Prepare shaders now" unticked)
++    public bool DlssAsked { get; set; }      // (already prompted on an RTX GPU)
++    public bool FsrAsked { get; set; }       // (already prompted on an AMD GPU)
++    public bool IntelAsked { get; set; }     // (already informed on an Intel GPU)
++    public bool PrepareAsked { get; set; }   // (already prompted/defaulted on a non-mesh-shader GPU)
+     public int? MemoryGb { get; set; }
+     public string? Track { get; set; }   // (the update track chosen, Updater.cs: release, rc or nightly; null: these tools' own)   // (Build memory; null: Automatic. The updates use it too, as they show no menu)
+ 
 diff --git a/builder/HookshotBuilder/Finder.cs b/builder/HookshotBuilder/Finder.cs
 index 61e4940..89ef256 100644
 --- a/builder/HookshotBuilder/Finder.cs
@@ -51,11 +66,131 @@ index 61e4940..89ef256 100644
                  Directory.CreateDirectory(Path.GetDirectoryName(link)!);
                  ((System.Runtime.InteropServices.ComTypes.IPersistFile)sl).Save(link, true);
              }
+diff --git a/builder/HookshotBuilder/HookshotBuilder.csproj b/builder/HookshotBuilder/HookshotBuilder.csproj
+index 62431a5..6c217d4 100644
+--- a/builder/HookshotBuilder/HookshotBuilder.csproj
++++ b/builder/HookshotBuilder/HookshotBuilder.csproj
+@@ -9,7 +9,7 @@
+     <AssemblyName>HookshotBuilder</AssemblyName>
+     <RootNamespace>HookshotBuilder</RootNamespace>
+     <Version>0.1.0</Version>
+-    <Product>Hookshot Builder</Product>
++    <Product>Open-Ocarina</Product>
+     <ApplicationManifest>app.manifest</ApplicationManifest>
+     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+     <ApplicationIcon Condition="Exists('..\..\work\hookshot.ico')">..\..\work\hookshot.ico</ApplicationIcon>
+diff --git a/builder/HookshotBuilder/MainWindow.xaml b/builder/HookshotBuilder/MainWindow.xaml
+index 1244ef2..f9ac6b6 100644
+--- a/builder/HookshotBuilder/MainWindow.xaml
++++ b/builder/HookshotBuilder/MainWindow.xaml
+@@ -1,7 +1,7 @@
+ <Window x:Class="HookshotBuilder.MainWindow"
+         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+-        Title="Hookshot" Width="960" Height="600" ResizeMode="CanMinimize"
++        Title="Open-Ocarina" Width="960" Height="600" ResizeMode="CanMinimize"
+         WindowStartupLocation="CenterScreen" Background="Transparent" AllowDrop="True"
+         UseLayoutRounding="True" SnapsToDevicePixels="True" FontFamily="{StaticResource Ui}">
+ 
+@@ -42,7 +42,7 @@
+             <Image.Effect><DropShadowEffect BlurRadius="24" ShadowDepth="14" Direction="270" Opacity="0.6" Color="Black"/></Image.Effect>
+           </Image>
+         </Grid>
+-        <TextBlock Text="Hookshot" FontSize="22" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,16,0,0"/>
++        <TextBlock Text="Open-Ocarina" FontSize="22" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,16,0,0"/>
+         <TextBlock x:Name="SplashText" Text="Starting…" FontSize="13" Foreground="#A6FFFFFF" HorizontalAlignment="Center" Margin="0,6,0,0" MinHeight="20"/>
+         <Border Width="200" Height="3" CornerRadius="1.5" Background="#14FFFFFF" Margin="0,16,0,0" ClipToBounds="True">
+           <Border Width="80" HorizontalAlignment="Left" CornerRadius="1.5">
+@@ -72,7 +72,7 @@
+         <Image Source="pack://application:,,,/Images/hookshot.png" Width="28" RenderOptions.BitmapScalingMode="HighQuality">
+           <Image.Effect><DropShadowEffect BlurRadius="6" ShadowDepth="2" Direction="270" Opacity="0.5" Color="Black"/></Image.Effect>
+         </Image>
+-        <TextBlock Text="Hookshot" FontSize="15" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"/>
++        <TextBlock Text="Open-Ocarina" FontSize="15" FontWeight="Bold" Margin="10,0,0,0" VerticalAlignment="Center"/>
+         <Border x:Name="VersionChip" Margin="12,0,0,0" VerticalAlignment="Center" Visibility="Collapsed">
+           <TextBlock x:Name="VersionChipText" FontSize="12" Foreground="{StaticResource InkSoft}" VerticalAlignment="Center"/>
+         </Border>
+@@ -102,10 +102,11 @@
+             <RowDefinition Height="Auto"/>
+             <RowDefinition Height="Auto"/>
+             <RowDefinition Height="Auto"/>
++            <RowDefinition Height="Auto"/>
+           </Grid.RowDefinitions>
+           <StackPanel>
+             <TextBlock x:Name="FilesTitle" Style="{StaticResource Heading}" Text="Build your game"/>
+-            <TextBlock x:Name="FilesSub" Style="{StaticResource Sub}" Text="Pick your game files and where the game goes. Hookshot does the rest, once."/>
++            <TextBlock x:Name="FilesSub" Style="{StaticResource Sub}" Text="Pick your .nup file and where the game goes. Open-Ocarina checks your PC and handles the rest."/>
+           </StackPanel>
+ 
+           <StackPanel Grid.Row="1">
+@@ -195,14 +196,21 @@
+                         ToolTip="Release: the tested versions. Release candidate: the next version, to try before it is released. Nightly: the newest development build, updated with every change."/>
+             </StackPanel>
+             <!-- (make_game.py's last step, the game's prepare-shaders run: unticked, the game prepares them at its first start) -->
+-            <CheckBox x:Name="PrepareTick" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Style="{StaticResource Tick}" Content="Prepare shaders now"
+-                      IsChecked="True" Margin="0,12,0,0"
+-                      ToolTip="Prepares the game's shaders at the end of the build, a few minutes (longer on some GPUs). Unticked, the game prepares them at its first start, behind a black window."/>
++            <StackPanel Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="3" Margin="0,12,0,0">
++              <CheckBox x:Name="PrepareTick" Style="{StaticResource Tick}" Content="Prepare shaders now"
++                        IsChecked="True"
++                        ToolTip="Prepares the game's shaders at the end of the build, a few minutes (longer on GPUs without mesh shaders). Unticked, shaders are handled later."/>
++              <TextBlock x:Name="PrepareNote" Style="{StaticResource Note}" FontSize="11" Margin="26,2,0,0" TextWrapping="Wrap" Visibility="Collapsed"/>
++            </StackPanel>
+           </Grid>
+ 
++          <!-- Detected GPU & Vulkan status (nx2/system_probe.py) -->
++          <TextBlock x:Name="SystemInfoText" Grid.Row="5" Style="{StaticResource Note}" FontSize="12" Margin="0,10,0,0"
++                     Text="Checking your graphics card and Vulkan driver…" TextWrapping="Wrap"/>
++
+           <!-- NVIDIA DLSS: off unless ticked. Ticking it shows NVIDIA's license; the build downloads NVIDIA's SDK under it
+                (make_game.py, scripts/ngx_sdk.py). Nothing of NVIDIA's comes with the builder -->
+-          <StackPanel Grid.Row="5" Margin="0,14,0,0">
++          <StackPanel Grid.Row="6" Margin="0,12,0,0">
+             <CheckBox x:Name="DlssTick" Style="{StaticResource Tick}" IsChecked="False" Click="DlssChanged"
+                       Content="NVIDIA DLSS (downloads NVIDIA's SDK under NVIDIA's license)"/>
+             <TextBlock Style="{StaticResource Note}" FontSize="12" Margin="26,4,0,0" TextWrapping="Wrap"
 diff --git a/builder/HookshotBuilder/MainWindow.xaml.cs b/builder/HookshotBuilder/MainWindow.xaml.cs
-index a37424e..0db88fe 100644
+index a37424e..c2b610f 100644
 --- a/builder/HookshotBuilder/MainWindow.xaml.cs
 +++ b/builder/HookshotBuilder/MainWindow.xaml.cs
-@@ -166,7 +166,10 @@ public partial class MainWindow : Window
+@@ -43,6 +43,8 @@ public partial class MainWindow : Window
+     double compileEta = -1;
+     long thisCompile, previousTotal = -1;
+     string lastFailure = "";
++    SystemProbeResult? systemProbe;
++    bool dlssAsked, fsrAsked, intelAsked, prepareAsked, skipPrepareForGpu;
+ 
+     public MainWindow()
+     {
+@@ -71,8 +73,8 @@ public partial class MainWindow : Window
+         Loaded += (_, _) => Start();
+         var tools = Tools.Find();
+         ToolsNote.Text = tools != null
+-            ? "Nothing else to install: Hookshot's own build tools are here, downloaded and checked by its setup."
+-            : "Hookshot's build tools are missing from its folder. Press Build and Hookshot offers to download them again.";
++            ? "Nothing else to install: Open-Ocarina's own build tools are here."
++            : "Open-Ocarina's build tools are missing from its folder. Press Build and Open-Ocarina offers to download them again.";
+         SetStep(0);
+         Refresh();
+     }
+@@ -102,7 +104,7 @@ public partial class MainWindow : Window
+         }
+         if (LaunchArg() is { } launchFolder)   // (Hookshot Launcher.exe in the game folder)
+         {
+-            SplashText.Text = "Starting Hookshot…";
++            SplashText.Text = "Starting Open-Ocarina…";
+             await Task.Delay(700);
+             ShowMain();
+             ShowLauncher(launchFolder);
+@@ -120,6 +122,7 @@ public partial class MainWindow : Window
+         ShowMain();
+         if (Environment.GetEnvironmentVariable("HOOKSHOT_UI_PREVIEW") is { Length: > 0 } preview) { Preview(preview); return; }
+         CheckAll();
++        _ = ProbeSystemAsync();
+         latestTag = Environment.GetEnvironmentVariable("HOOKSHOT_LATEST_TAG") is { Length: > 0 } fake ? (fake == "none" ? null : fake) : await Updater.LatestTag(Track);
+         RefreshMode();
+     }
+@@ -166,7 +169,10 @@ public partial class MainWindow : Window
          {
              if (!Directory.Exists(System.IO.Path.Combine(folder, ".hookshot_exefs")) || !Directory.Exists(System.IO.Path.Combine(folder, "romfs")))
                  return null;
@@ -67,7 +202,7 @@ index a37424e..0db88fe 100644
                  if (line.StartsWith("version=")) return line[8..].Trim() is { Length: > 0 } v ? v : null;
          }
          catch (Exception) { }
-@@ -253,7 +256,10 @@ public partial class MainWindow : Window
+@@ -253,7 +259,10 @@ public partial class MainWindow : Window
      {
          try
          {
@@ -79,7 +214,7 @@ index a37424e..0db88fe 100644
                  if (line.StartsWith("version=")) return line[8..].Trim() is { Length: > 0 } v ? v : null;
          }
          catch (Exception) { }
-@@ -263,8 +269,13 @@ public partial class MainWindow : Window
+@@ -263,8 +272,13 @@ public partial class MainWindow : Window
      /// The game in a folder: bin\hookshot.exe below its launcher (hookshot.exe), or hookshot.exe in a folder built before the launcher
      static string GameExe(string folder)
      {
@@ -95,7 +230,183 @@ index a37424e..0db88fe 100644
      }
  
      /// (the launcher already checked for updates: the game does not ask again)
-@@ -1370,7 +1381,7 @@ public partial class MainWindow : Window
+@@ -325,7 +339,7 @@ public partial class MainWindow : Window
+     // ---- Save my pipeline list: the game folder's pipeline list and the "Submit your pipelines" issue's template, filled in,
+     // zipped into the Downloads folder by nx2/pipeline_share.py (as the Linux builder and the game's menu do), then the template
+     // on the clipboard, the zip shown in its folder and the issue opened. Nothing is uploaded: the player attaches the zip ----
+-    const string ShareIssue = "https://github.com/NotRexed/Hookshot/issues/2034";
++    const string ShareIssue = "https://github.com/admiraly/Open-Ocarina/issues";
+ 
+     async void LaunchShareClick(object sender, RoutedEventArgs e)
+     {
+@@ -429,6 +443,10 @@ public partial class MainWindow : Window
+         s.Romfs = BuilderHome.LoadPath(s.Romfs);
+         s.Exefs = BuilderHome.LoadPath(s.Exefs);
+         PrepareTick.IsChecked = !s.PrepareLater;
++        dlssAsked = s.DlssAsked;
++        fsrAsked = s.FsrAsked;
++        intelAsked = s.IntelAsked;
++        prepareAsked = s.PrepareAsked;
+         if (!string.IsNullOrEmpty(s.Out)) OutPath.Text = s.Out;
+         DlssTick.IsChecked = s.Dlss;
+         dlssLicense = s.DlssLicense;
+@@ -463,6 +481,10 @@ public partial class MainWindow : Window
+                                           Fsr = FsrTick.IsChecked == true,
+                                           FsrLicense = fsrLicense,
+                                           PrepareLater = PrepareTick.IsChecked != true,
++                                          DlssAsked = dlssAsked,
++                                          FsrAsked = fsrAsked,
++                                          IntelAsked = intelAsked,
++                                          PrepareAsked = prepareAsked,
+                                           MemoryGb = MemoryBox.SelectedItem is int gb ? gb : null,
+                                           Track = chosenTrack ?? BuilderSettings.Load(SettingsPath)?.Track };
+             Directory.CreateDirectory(System.IO.Path.GetDirectoryName(SettingsPath)!);
+@@ -869,13 +891,15 @@ public partial class MainWindow : Window
+                 }
+                 return;
+         }
+-        SaveSettings();
+         var tools = Tools.Find();
+         if (tools == null)
+         {
+-            ShowProblem("The build tools are not in Hookshot's folder.", tools: true);
++            SaveSettings();
++            ShowProblem("The build tools are not in Open-Ocarina's folder.", tools: true);
+             return;
+         }
++        if (!ConfirmSystemOptions()) return;
++        SaveSettings();
+         var args = new List<string>();
+         if (romfs != null && exefs != null) args.AddRange(new[] { "--romfs", romfs, "--exefs", exefs });
+         else if (chosenNup != null) args.AddRange(new[] { "--nup", chosenNup });
+@@ -883,10 +907,125 @@ public partial class MainWindow : Window
+         args.AddRange(new[] { "--out", OutPath.Text, "--language", lang.Code });
+         if (FsrTick.IsChecked == true) args.Add("--fsr");   // (an --update of the folder keeps it: make_game.py's mark)
+         prepareNow = PrepareTick.IsChecked == true;
+-        Run(tools, ShaderStep.Args(args, prepareNow), dlss: DlssTick.IsChecked == true,
++        var skipForGpu = !prepareNow && (skipPrepareForGpu || systemProbe?.Primary?.MeshShader == false);
++        Run(tools, ShaderStep.Args(args, prepareNow, skipForGpu), dlss: DlssTick.IsChecked == true,
+             fsr: FsrTick.IsChecked == true && fsrLicense);
+     }
+ 
++
++    async Task ProbeSystemAsync()
++    {
++        var tools = Tools.Find();
++        if (tools == null || SystemInfoText == null) return;
++        var res = await Task.Run(() => ProbeSystem(tools));
++        if (res == null)
++        {
++            SystemInfoText.Text = "";
++            SystemInfoText.Visibility = Visibility.Collapsed;
++            return;
++        }
++        systemProbe = res;
++        SystemInfoText.Text = "This PC: " + res.Summary;
++        SystemInfoText.Foreground = (Brush)FindResource(res.Vulkan13 ? "InkSoft" : "Bad");
++        if (res.Primary is { MeshShader: false })
++        {
++            PrepareNote.Text = "Recommended off for this GPU (no hardware mesh shaders): shaders compile automatically as you play instead of waiting 1+ hour upfront.";
++            PrepareNote.Visibility = Visibility.Visible;
++            if (BuilderSettings.Load(SettingsPath) == null)
++            {
++                PrepareTick.IsChecked = false;
++                skipPrepareForGpu = true;
++            }
++        }
++    }
++
++    bool ConfirmSystemOptions()
++    {
++        if (systemProbe == null) return true;
++        if (!systemProbe.Vulkan13)
++        {
++            if (MessageBox.Show(this,
++                    $"No Vulkan 1.3 graphics driver was detected on this PC ({systemProbe.Summary}).\n\n" +
++                    "Open-Ocarina requires a Vulkan 1.3+ graphics driver to run. Build the game anyway?",
++                    "Vulkan 1.3 driver needed", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
++                return false;
++        }
++        if (systemProbe.Primary is { Vendor: "nvidia", Rtx: true } rtxGpu && DlssTick.IsChecked != true && !dlssAsked)
++        {
++            dlssAsked = true;
++            if (MessageBox.Show(this,
++                    $"NVIDIA RTX GPU detected ({rtxGpu.Name}).\n\n" +
++                    "Enable NVIDIA DLSS upscaling?\n\n" + DlssLicense,
++                    "NVIDIA DLSS", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
++            {
++                DlssTick.IsChecked = true;
++                dlssLicense = true;
++            }
++        }
++        if (systemProbe.Primary is { Vendor: "amd", Rdna4: true } amdGpu && FsrTick.IsChecked != true && !fsrAsked)
++        {
++            fsrAsked = true;
++            if (MessageBox.Show(this,
++                    $"AMD Radeon GPU detected ({amdGpu.Name}).\n\n" +
++                    "Enable AMD FSR 4 upscaling?\n\n" + FsrLicense,
++                    "AMD FSR 4", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
++            {
++                FsrTick.IsChecked = true;
++                fsrLicense = true;
++            }
++        }
++        if (systemProbe.Primary is { Vendor: "intel" } intelGpu && !intelAsked)
++        {
++            intelAsked = true;
++            if (MessageBox.Show(this,
++                    $"Intel GPU detected ({intelGpu.Name}).\n\n" +
++                    "Intel Arc on Windows is not yet supported by Intel's official Windows Vulkan driver (Intel Arc works on Linux with Open-Ocarina's patched Mesa driver).\n\n" +
++                    "Continue building anyway?",
++                    "Intel GPU notice", MessageBoxButton.YesNo, MessageBoxImage.Information) != MessageBoxResult.Yes)
++                return false;
++        }
++        if (systemProbe.Primary is { MeshShader: false } slowGpu && PrepareTick.IsChecked == true && !prepareAsked)
++        {
++            prepareAsked = true;
++            if (MessageBox.Show(this,
++                    $"Your GPU ({slowGpu.Name}) does not support hardware mesh shaders, so pre-building all ~38,000 shaders upfront can take over an hour.\n\n" +
++                    "Skip upfront shader pre-building and compile shaders automatically as you play instead? (Recommended)",
++                    "Shader preparation", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
++            {
++                PrepareTick.IsChecked = false;
++                skipPrepareForGpu = true;
++            }
++        }
++        return true;
++    }
++
++    static SystemProbeResult? ProbeSystem(Tools tools)
++    {
++        try
++        {
++            var si = new ProcessStartInfo(tools.Python)
++            {
++                WorkingDirectory = tools.Root,
++                UseShellExecute = false,
++                CreateNoWindow = true,
++                RedirectStandardOutput = true,
++                RedirectStandardError = true,
++            };
++            si.ArgumentList.Add("-I");
++            si.ArgumentList.Add("-B");
++            si.ArgumentList.Add(tools.MakeGame);
++            si.ArgumentList.Add("--probe-system");
++            using var p = Process.Start(si);
++            if (p == null) return null;
++            var json = p.StandardOutput.ReadToEnd();
++            p.WaitForExit(5000);
++            if (p.ExitCode != 0 || string.IsNullOrWhiteSpace(json)) return null;
++            return System.Text.Json.JsonSerializer.Deserialize<SystemProbeResult>(json,
++                new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
++        }
++        catch (Exception) { return null; }
++    }
++
+     const string DlssLicense =
+         "NVIDIA DLSS is NVIDIA's, not Hookshot's. With it ticked, the build downloads NVIDIA's DLSS SDK (release v310.9.16) from " +
+         "github.com/NVIDIA/DLSS, under NVIDIA's own license, the NVIDIA RTX SDKs license:\n\n" +
+@@ -1370,7 +1509,7 @@ public partial class MainWindow : Window
              Application.Current.Shutdown();
              return;
          }
@@ -104,8 +415,69 @@ index a37424e..0db88fe 100644
      }
  
      // ================= the update (Updater.cs): the game started this app with --update <folder> =================
+@@ -1452,7 +1591,7 @@ public partial class MainWindow : Window
+ 
+     void CloseWindow(object sender, RoutedEventArgs e)
+     {
+-        if (runner != null && MessageBox.Show(this, T(S.CloseQuestion), "Hookshot", MessageBoxButton.YesNo) != MessageBoxResult.Yes) return;
++        if (runner != null && MessageBox.Show(this, T(S.CloseQuestion), "Open-Ocarina", MessageBoxButton.YesNo) != MessageBoxResult.Yes) return;
+         runner?.Cancel();
+         Close();
+     }
+@@ -1586,3 +1725,30 @@ sealed class StepRow
+         number.Foreground = B("Bad");
+     }
+ }
++
++sealed class SystemProbeResult
++{
++    public string Os { get; set; } = "";
++    [System.Text.Json.Serialization.JsonPropertyName("vulkan_ok")]
++    public bool VulkanOk { get; set; }
++    [System.Text.Json.Serialization.JsonPropertyName("vulkan_1_3")]
++    public bool Vulkan13 { get; set; }
++    public GpuInfo? Primary { get; set; }
++    public string Summary { get; set; } = "";
++}
++
++sealed class GpuInfo
++{
++    public string Name { get; set; } = "";
++    public string Vendor { get; set; } = "";
++    [System.Text.Json.Serialization.JsonPropertyName("device_type")]
++    public string DeviceType { get; set; } = "";
++    [System.Text.Json.Serialization.JsonPropertyName("api_version")]
++    public string ApiVersion { get; set; } = "";
++    [System.Text.Json.Serialization.JsonPropertyName("vram_mb")]
++    public int VramMb { get; set; }
++    [System.Text.Json.Serialization.JsonPropertyName("mesh_shader")]
++    public bool MeshShader { get; set; }
++    public bool Rtx { get; set; }
++    public bool Rdna4 { get; set; }
++}
+diff --git a/builder/HookshotBuilder/ShaderStep.cs b/builder/HookshotBuilder/ShaderStep.cs
+index e906f00..7e7f581 100644
+--- a/builder/HookshotBuilder/ShaderStep.cs
++++ b/builder/HookshotBuilder/ShaderStep.cs
+@@ -8,13 +8,14 @@ static class ShaderStep
+ {
+     public const string Id = "shaders";
+     public const string Later = "--no-prepare-shaders";
++    public const string Skip = "--skip-prepare-shaders";
+     // (make_game.py NOT_PREPARED: a plain line, so a builder that does not know it only shows it)
+     static readonly Regex NotPrepared = new(@"^the shaders were not prepared now \((.*)\): ");
+ 
+     /// make_game's arguments with the player's choice (unticked: the game prepares its shaders at its first start)
+-    public static List<string> Args(List<string> args, bool prepare)
++    public static List<string> Args(List<string> args, bool prepare, bool skipForGpu = false)
+     {
+-        if (!prepare) args.Add(Later);
++        if (!prepare) args.Add(skipForGpu ? Skip : Later);
+         return args;
+     }
+ 
 diff --git a/builder/HookshotBuilder/Updater.cs b/builder/HookshotBuilder/Updater.cs
-index fc59cfc..7b12efc 100644
+index fc59cfc..b06c2d1 100644
 --- a/builder/HookshotBuilder/Updater.cs
 +++ b/builder/HookshotBuilder/Updater.cs
 @@ -14,7 +14,7 @@ namespace HookshotBuilder;
@@ -117,16 +489,20 @@ index fc59cfc..7b12efc 100644
      const string Asset = "HookshotBuilder.zip";
      const string SetupAsset = "HookshotBuilder.exe";            // (the setup, builder/setup/setup.c: a release holds it and its list)
      const string SetupList = "hookshot-setup.txt";              // (scripts/make_setup_parts.py)
-@@ -38,7 +38,7 @@ static class Updater
+@@ -38,9 +38,10 @@ static class Updater
      // ---- the update tracks (the Track menu; by default the track of these tools). host/hos_update.c and
      // builder/linux/linux_update.py have the same rules ----
      public const string Release = "release", Candidate = "rc", Nightly = "nightly";
 -    const string Releases = "https://api.github.com/repos/NotRexed/Hookshot/releases";
 +    const string Releases = "https://api.github.com/repos/admiraly/Open-Ocarina/releases";
      static readonly System.Text.RegularExpressions.Regex NightlyName = new(@"-\d+-g[0-9a-f]+(-dirty)?$");
-     static readonly System.Text.RegularExpressions.Regex ReleaseName = new(@"^v(\d+)\.(\d+)\.(\d+)(?:-rc\.(\d+))?$");
+-    static readonly System.Text.RegularExpressions.Regex ReleaseName = new(@"^v(\d+)\.(\d+)\.(\d+)(?:-rc\.(\d+))?$");
++    static readonly System.Text.RegularExpressions.Regex ReleaseName = new(@"^v(\d+)\.(\d+)\.(\d+)(?:-(?:rc|oo)\.(\d+))?$");
++    static bool IsPortableAsset(string? name) => name != null && (name == Asset || (name.StartsWith("Open-Ocarina-", StringComparison.OrdinalIgnoreCase) && name.EndsWith("-windows-x64.zip", StringComparison.OrdinalIgnoreCase)));
  
-@@ -93,7 +93,7 @@ static class Updater
+     /// A build's track from its version: git describe --long's v2.1.0-rc.1-3-g1a2b3c4 is the nightly, v2.1.0-rc.1 a release
+     /// candidate, anything else a release
+@@ -93,7 +94,7 @@ static class Updater
              {
                  try
                  {
@@ -135,7 +511,29 @@ index fc59cfc..7b12efc 100644
                      foreach (var line in list.Split('\n'))
                          if (line.StartsWith("tag ")) return line[4..].Trim();
                  }
-@@ -152,7 +152,7 @@ static class Updater
+@@ -146,13 +147,29 @@ static class Updater
+             catch (Exception) { }
+             await Task.Delay(TimeSpan.FromSeconds(2 << attempt));
+         }
++        try
++        {
++            using var request = new HttpRequestMessage(HttpMethod.Get, Releases + "?per_page=20");
++            request.Headers.Accept.ParseAdd("application/vnd.github+json");
++            using var response = await http.SendAsync(request);
++            if (response.IsSuccessStatusCode)
++            {
++                using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
++                string? newest = null;
++                foreach (var r in doc.RootElement.EnumerateArray())
++                    if (r.GetProperty("tag_name").GetString() is { } t && ReleaseName.IsMatch(t) && (newest == null || Newer(t, newest)))
++                        newest = t;
++                if (newest != null) return newest;
++            }
++        }
++        catch (Exception) { }
+         // (v2.0.0: when the API did not answer, the builder said a game was up to date. The release's setup list names its tag in
+         // its first line, from GitHub's download service, not the API)
+         for (var attempt = 0; attempt < 2; attempt++)
          {
              try
              {
@@ -144,8 +542,331 @@ index fc59cfc..7b12efc 100644
                  foreach (var line in list.Split('\n'))
                      if (line.StartsWith("tag ")) return line[4..].Trim();
              }
+@@ -173,29 +190,66 @@ static class Updater
+         using var http = new HttpClient { Timeout = Timeout.InfiniteTimeSpan };
+         http.DefaultRequestHeaders.UserAgent.ParseAdd("HookshotBuilder");
+         w.Note("Asking GitHub for the latest release");
+-        string? setupUrl = null, setupApiUrl = null, setupDigest = null;
+-        long setupSize = 0;
++        string? newTag = tag, url = null, apiUrl = null, digest = null, setupUrl = null, setupApiUrl = null, setupDigest = null;
++        long size = 0, setupSize = 0;
+         using (var response = await GetWithRetries(w, http, tag == null ? Latest : Releases + "/tags/" + ReleaseOf(tag), token,
+                                                    "application/vnd.github+json", TimeSpan.FromSeconds(30)))
+         using (var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync(token)))
++        {
++            newTag ??= doc.RootElement.GetProperty("tag_name").GetString();
+             foreach (var asset in doc.RootElement.GetProperty("assets").EnumerateArray())
+-                if (asset.GetProperty("name").GetString() == SetupAsset)
++            {
++                var assetName = asset.GetProperty("name").GetString();
++                if (assetName == SetupAsset)
+                 {
+                     setupUrl = asset.GetProperty("browser_download_url").GetString();
+                     setupApiUrl = asset.GetProperty("url").GetString();
+                     setupSize = asset.GetProperty("size").GetInt64();
+                     setupDigest = DigestText(asset);
+                 }
+-        if (setupUrl == null) throw new InvalidOperationException("The latest release has no " + SetupAsset + ".");
++                else if (IsPortableAsset(assetName))
++                {
++                    url = asset.GetProperty("browser_download_url").GetString();
++                    apiUrl = asset.GetProperty("url").GetString();
++                    size = asset.GetProperty("size").GetInt64();
++                    digest = DigestText(asset);
++                }
++            }
++        }
+         var cache = Path.Combine(BuilderHome.Base, "update");
+         Directory.CreateDirectory(cache);
+-        var setup = Path.Combine(cache, SetupAsset);
+-        w.Note("Downloading the new Hookshot Builder");
+-        await DownloadWithRetries(w, http, setupUrl, setupApiUrl, setup, setupSize, setupDigest, token);
+-        var si = new ProcessStartInfo(setup) { UseShellExecute = false, WorkingDirectory = cache };
+-        foreach (var arg in args) si.ArgumentList.Add(arg);
+-        BuilderHome.PassTo(si);
+-        Process.Start(si);
++        if (setupUrl != null)
++        {
++            var setup = Path.Combine(cache, SetupAsset);
++            w.Note("Downloading the new Open-Ocarina Builder");
++            await DownloadWithRetries(w, http, setupUrl, setupApiUrl, setup, setupSize, setupDigest, token);
++            var si = new ProcessStartInfo(setup) { UseShellExecute = false, WorkingDirectory = cache };
++            foreach (var arg in args) si.ArgumentList.Add(arg);
++            BuilderHome.PassTo(si);
++            Process.Start(si);
++            Application.Current.Shutdown();
++            return;
++        }
++        if (url == null || newTag == null) throw new InvalidOperationException("The latest release has no Windows builder archive.");
++        var name = string.Concat(newTag.Where(c => char.IsLetterOrDigit(c) || c == '-' || c == '_' || c == '.'));
++        if (name.Length == 0 || name.Length > 128 || name[0] == '.')
++            throw new InvalidOperationException("The latest release's tag is not a version name.");
++        var zip = Path.Combine(cache, "Open-Ocarina-" + name + ".zip");
++        w.Note($"Downloading Open-Ocarina {newTag} ({size >> 20} MB)");
++        await DownloadWithRetries(w, http, url, apiUrl, zip, size, digest, token, w.DownloadProgress);
++        var parent = Directory.GetParent(AppContext.BaseDirectory.TrimEnd('\\', '/'))!.FullName;
++        string target;
++        if (BuilderHome.Portable)
++            target = await Task.Run(() => PortableArchive.Install(zip, BuilderHome.Base, newTag));
++        else
++            target = await Unpack(zip, Path.Combine(parent, "Open-Ocarina-" + name));
++        try { File.Delete(zip); } catch (Exception) { }
++        var exe = Path.Combine(target, "HookshotBuilder.exe");
++        if (!File.Exists(exe)) throw new FileNotFoundException("The download has no HookshotBuilder.exe.");
++        var psi = new ProcessStartInfo(exe) { UseShellExecute = false, WorkingDirectory = target };
++        foreach (var arg in args) psi.ArgumentList.Add(arg);
++        BuilderHome.PassTo(psi);
++        Process.Start(psi);
+         Application.Current.Shutdown();
+     }
+ 
+@@ -244,7 +298,7 @@ static class Updater
+                 foreach (var asset in doc.RootElement.GetProperty("assets").EnumerateArray())
+                 {
+                     var assetName = asset.GetProperty("name").GetString();
+-                    if (assetName == Asset)
++                    if (IsPortableAsset(assetName))
+                     {
+                         url = asset.GetProperty("browser_download_url").GetString();
+                         apiUrl = asset.GetProperty("url").GetString();
+@@ -479,6 +533,11 @@ static class Updater
+         if (Directory.Exists(part)) Directory.Delete(part, true);
+         await Task.Run(() => ZipFile.ExtractToDirectory(zip, part));
+         var inner = Path.Combine(part, "HookshotBuilder");
++        if (!Directory.Exists(inner))
++        {
++            var nested = Directory.GetDirectories(part).FirstOrDefault(d => File.Exists(Path.Combine(d, "HookshotBuilder.exe")));
++            if (nested != null) inner = nested;
++        }
+         if (Directory.Exists(target)) Directory.Delete(target, true);
+         Directory.Move(Directory.Exists(inner) ? inner : part, target);
+         if (Directory.Exists(part)) Directory.Delete(part, true);
+diff --git a/builder/linux/hookshot_builder.py b/builder/linux/hookshot_builder.py
+index b82775f..33854c0 100644
+--- a/builder/linux/hookshot_builder.py
++++ b/builder/linux/hookshot_builder.py
+@@ -506,7 +506,7 @@ def _arg(name):
+ class Builder(tk.Tk):
+     def __init__(self, launch=None, update=None, fetched=False, tag=None, allow_downgrade_from=None):
+         super().__init__()
+-        self.title("Hookshot Builder")
++        self.title("Open-Ocarina")
+         self.apply_scale()
+         self.apply_theme()
+         self.minsize(self.px(760), self.px(520))
+@@ -534,13 +534,17 @@ class Builder(tk.Tk):
+         self.nup = tk.StringVar(value=self.cfg.get("nup", ""))
+         self.romfs = tk.StringVar(value=self.cfg.get("romfs", ""))
+         self.exefs = tk.StringVar(value=self.cfg.get("exefs", ""))
+-        self.out = tk.StringVar(value=self.cfg.get("out", os.path.expanduser("~/Games/Hookshot")))
++        self.out = tk.StringVar(value=self.cfg.get("out", os.path.expanduser("~/Games/Open-Ocarina")))
+         names = [n for _, n in make_game.LANGUAGES]
+         code = self.cfg.get("language", "en-US")
+         self.language = tk.StringVar(value=dict(make_game.LANGUAGES).get(code, names[0]))
+         self.prepare = tk.BooleanVar(value=self.cfg.get("prepare", "1") != "0")   # (make_game.py's last step: off, at the first start)
+         self.dlss = tk.BooleanVar(value=self.cfg.get("dlss", "0") == "1")
+         self.check_text = tk.StringVar()
++        self.system_probe = None
++        self.skip_prepare_for_gpu = False
++        self.system_text = tk.StringVar(value="Checking your graphics card and Vulkan driver…")
++        self.prepare_note_text = tk.StringVar(value="A few minutes at the end of the build. Unticked, the game prepares them at its first start, behind a black window.")
+         self.space_text = tk.StringVar()
+         self.stage_text = tk.StringVar()
+         self.time_text = tk.StringVar()
+@@ -552,6 +556,7 @@ class Builder(tk.Tk):
+             self.show_launch(launch)
+         else:
+             self.show_form()
++            self.after(150, self.probe_system)
+             self.after(200, self.lookup_latest)
+         self.after(100, self.pump)
+         self.protocol("WM_DELETE_WINDOW", self.close)
+@@ -782,8 +787,8 @@ class Builder(tk.Tk):
+         if self.images.get("logo") is not None:
+             canvas.create_image(x, px(32), image=self.images["logo"], anchor="w")
+             x += self.images["logo"].width() + px(10)
+-        canvas.create_text(x, px(32), text="Hookshot", font="HsBrand", fill=INK, anchor="w")
+-        x += int(self.tk.call("font", "measure", "HsBrand", "Hookshot"))
++        canvas.create_text(x, px(32), text="Open-Ocarina", font="HsBrand", fill=INK, anchor="w")
++        x += int(self.tk.call("font", "measure", "HsBrand", "Open-Ocarina"))
+         if chip:
+             canvas.create_text(x + px(12), px(32), text=chip, font="HsSmall", fill=INK_SOFT, anchor="w")
+         self.header_canvas = canvas
+@@ -848,7 +853,7 @@ class Builder(tk.Tk):
+ 
+     # ---- the form ----
+     def show_form(self):
+-        self.title("Hookshot Builder")
++        self.title("Open-Ocarina")
+         if self.page:
+             self.page.destroy()
+         px = self.px
+@@ -861,7 +866,7 @@ class Builder(tk.Tk):
+         f.columnconfigure(1, minsize=px(20))
+         f.columnconfigure(2, minsize=px(200))
+         ttk.Label(f, text="Build your game", style="Title.TLabel").grid(row=0, column=0, columnspan=3, sticky="w")
+-        ttk.Label(f, text="Pick your game files and where the game goes. Hookshot does the rest, once.", style="Sub.TLabel",
++        ttk.Label(f, text="Pick your .nup file and where the game goes. Open-Ocarina checks your PC and handles the rest.", style="Sub.TLabel",
+                   wraplength=px(800)).grid(row=1, column=0, columnspan=3, sticky="w", pady=(px(6), 0))
+         if game_ready(self.cfg.get("out")):
+             played = ttk.Frame(f)
+@@ -910,11 +915,11 @@ class Builder(tk.Tk):
+                              cursor="hand2")
+         track.grid(row=1, column=0, sticky="we")
+         track.bind("<<ComboboxSelected>>", self.on_track_changed)
++        ttk.Label(options, textvariable=self.system_text, style="Small.TLabel", wraplength=px(560)).pack(anchor="w", pady=(0, px(8)))
+         ttk.Checkbutton(options, text="Prepare shaders now", variable=self.prepare, cursor="hand2").pack(anchor="w")
+-        ttk.Label(options, text="A few minutes at the end of the build. Unticked, the game prepares them at its first start, "
+-                  "behind a black window.", style="Small.TLabel", wraplength=px(540)).pack(anchor="w", padx=(px(26), 0), pady=(px(2), 0))
++        ttk.Label(options, textvariable=self.prepare_note_text, style="Small.TLabel", wraplength=px(540)).pack(anchor="w", padx=(px(26), 0), pady=(px(2), 0))
+         ttk.Checkbutton(options, text="NVIDIA DLSS (downloads NVIDIA's SDK under NVIDIA's license)", variable=self.dlss,
+-                        command=self.on_dlss_changed, cursor="hand2").pack(anchor="w", pady=(px(12), 0))
++                        command=self.on_dlss_changed, cursor="hand2").pack(anchor="w", pady=(px(10), 0))
+         ttk.Label(options, text="For NVIDIA RTX graphics cards. NVIDIA's files stay on this PC: never share a game folder built with them.",
+                   style="Small.TLabel", wraplength=px(540)).pack(anchor="w", padx=(px(26), 0), pady=(px(2), 0))
+ 
+@@ -1024,6 +1029,59 @@ class Builder(tk.Tk):
+             self.lines.put(("check", text))
+         threading.Thread(target=run, daemon=True).start()
+ 
++    def probe_system(self):
++        def run():
++            try:
++                sys.path.insert(0, os.path.join(ROOT, "nx2"))
++                import system_probe
++                self.lines.put(("system", system_probe.probe()))
++            except Exception:
++                self.lines.put(("system", None))
++        threading.Thread(target=run, daemon=True).start()
++
++    def on_system_probed(self, res):
++        if not res:
++            self.system_text.set("")
++            return
++        self.system_probe = res
++        self.system_text.set("This PC: " + res.get("summary", ""))
++        primary = res.get("primary") or {}
++        if primary and not primary.get("mesh_shader", True):
++            self.prepare_note_text.set(
++                "Recommended off for this GPU (no hardware mesh shaders): shaders compile automatically as you play instead of waiting 1+ hour upfront.")
++            if "prepare" not in self.cfg:
++                self.prepare.set(False)
++                self.skip_prepare_for_gpu = True
++
++    def confirm_system_options(self):
++        res = self.system_probe
++        if not res:
++            return True
++        if not res.get("vulkan_1_3"):
++            if not messagebox.askyesno(
++                    "Vulkan 1.3 driver needed",
++                    "No Vulkan 1.3 graphics driver was detected on this PC (%s).\n\n"
++                    "Open-Ocarina requires a Vulkan 1.3+ driver to run. Build the game anyway?" % res.get("summary", "")):
++                return False
++        primary = res.get("primary") or {}
++        if primary.get("vendor") == "nvidia" and primary.get("rtx") and not self.dlss.get() and self.cfg.get("dlss_asked") != "1":
++            self.cfg["dlss_asked"] = "1"
++            if messagebox.askyesno(
++                    "NVIDIA DLSS",
++                    "NVIDIA RTX GPU detected (%s).\n\nEnable NVIDIA DLSS upscaling?\n\n%s" % (primary.get("name", ""), DLSS_LICENSE)):
++                self.dlss.set(True)
++                self.dlss_toggled = True
++                self.cfg["nvidia_license"] = "1"
++        if primary and not primary.get("mesh_shader", True) and self.prepare.get() and self.cfg.get("prepare_asked") != "1":
++            self.cfg["prepare_asked"] = "1"
++            if messagebox.askyesno(
++                    "Shader preparation",
++                    "Your GPU (%s) does not support hardware mesh shaders, so pre-building all ~38,000 shaders upfront can take over an hour.\n\n"
++                    "Skip upfront shader pre-building and compile shaders automatically as you play instead? (Recommended)" % primary.get("name", "")):
++                self.prepare.set(False)
++                self.skip_prepare_for_gpu = True
++        return True
++
+     def lookup_latest(self):
+         def run():
+             forced = os.environ.get("HOOKSHOT_LATEST_TAG")
+@@ -1104,7 +1162,7 @@ class Builder(tk.Tk):
+     def show_launch(self, folder):
+         if self.page:
+             self.page.destroy()
+-        self.title("Hookshot")
++        self.title("Open-Ocarina")
+         px = self.px
+         page = self.page = ttk.Frame(self)
+         page.pack(fill="both", expand=True)
+@@ -1148,7 +1206,7 @@ class Builder(tk.Tk):
+         """Ask before any known downgrade, including a rebuild after changing DLSS on the same track."""
+         if not linux_update.older_version(target, have):
+             return True
+-        return messagebox.askyesno("Hookshot", "%s is older than %s, the version you have now. Install %s?" % (target, have, target))
++        return messagebox.askyesno("Open-Ocarina", "%s is older than %s, the version you have now. Install %s?" % (target, have, target))
+ 
+     def begin_update(self, folder=None):
+         folder = self.update_folder if folder is None else folder
+@@ -1248,32 +1306,37 @@ class Builder(tk.Tk):
+         out = os.path.expanduser(self.out.get().strip())
+         if self.kind.get() == "nup":
+             if not os.path.isfile(self.nup.get()):
+-                return messagebox.showerror("Hookshot", "Choose your game's .nup file.")
++                return messagebox.showerror("Open-Ocarina", "Choose your game's .nup file.")
+             src = ["--nup", self.nup.get()]
+         else:
+             if not (os.path.isdir(self.romfs.get()) and os.path.isdir(self.exefs.get())):
+-                return messagebox.showerror("Hookshot", "Choose your game's romfs and exefs folders.")
++                return messagebox.showerror("Open-Ocarina", "Choose your game's romfs and exefs folders.")
+             src = ["--romfs", self.romfs.get(), "--exefs", self.exefs.get()]
+         if not out:
+-            return messagebox.showerror("Hookshot", "Choose where to save the game.")
++            return messagebox.showerror("Open-Ocarina", "Choose where to save the game.")
+         try:
+             jobs = make_game.requested_jobs(os.environ.get("HOOKSHOT_JOBS"))
+             if jobs is None and os.environ.get("RX_JOBS"):   # (the older setting, still honoured)
+                 jobs = toolchain.default_jobs()
+         except ValueError as error:
+-            return messagebox.showerror("Hookshot", str(error))
++            return messagebox.showerror("Open-Ocarina", str(error))
++        if not self.confirm_system_options():
++            save_config(self.cfg)
++            return
+         code = next((c for c, n in make_game.LANGUAGES if n == self.language.get()), "en-US")
+         dlss = bool(self.dlss.get()) if hasattr(self, "dlss") else False
+         self.cfg.update(kind=self.kind.get(), nup=self.nup.get(), romfs=self.romfs.get(), exefs=self.exefs.get(), out=out, language=code,
+                         prepare="1" if self.prepare.get() else "0", **({"dlss": "1" if dlss else "0"} if hasattr(self, "dlss") else {}))
+         save_config(self.cfg)
++        primary = (self.system_probe or {}).get("primary") or {}
++        skip_flag = "--skip-prepare-shaders" if (self.skip_prepare_for_gpu or (primary and not primary.get("mesh_shader", True))) else "--no-prepare-shaders"
+         # (issue 531) Without HOOKSHOT_JOBS or RX_JOBS, make_game chooses as on Windows, from the memory free now; this window chose
+         # fewer, 80% of the total memory at 3.5 GB each, and the CPU sat at 29%
+         cmd = [sys.executable, "-I", os.path.join(ROOT, "nx2", "make_game.py")] + src + ["--out", out, "--language", code] + \
+-            ([] if jobs is None else ["--jobs", str(jobs)]) + ([] if self.prepare.get() else ["--no-prepare-shaders"]) + \
++            ([] if jobs is None else ["--jobs", str(jobs)]) + ([] if self.prepare.get() else [skip_flag]) + \
+             (dlss_args(True) if dlss else [])
+         slow = slow_disk_warning(out)   # (a warning, not a stop: a hard drive still builds, only much slower)
+-        if slow is not None and not messagebox.askokcancel("Hookshot", slow):
++        if slow is not None and not messagebox.askokcancel("Open-Ocarina", slow):
+             return
+         self.show_progress()
+         self.started = time.time()
+@@ -1354,6 +1417,8 @@ class Builder(tk.Tk):
+                 kind, v = self.lines.get_nowait()
+                 if kind == "check":
+                     self.check_text.set(v)
++                elif kind == "system":
++                    self.on_system_probed(v)
+                 elif kind == "latest":
+                     self.latest = v or None
+                     self.apply_mode()
+@@ -1487,7 +1552,7 @@ class Builder(tk.Tk):
+ 
+     def close(self):
+         if self.proc and self.proc.poll() is None:
+-            if not messagebox.askyesno("Hookshot", "Stop the build and close?"):
++            if not messagebox.askyesno("Open-Ocarina", "Stop the build and close?"):
+                 return
+             os.killpg(self.proc.pid, signal.SIGTERM)
+         self.destroy()
 diff --git a/builder/linux/linux_update.py b/builder/linux/linux_update.py
-index e31436f..e5c1fc8 100644
+index e31436f..bb0513c 100644
 --- a/builder/linux/linux_update.py
 +++ b/builder/linux/linux_update.py
 @@ -23,9 +23,9 @@ import zipfile
@@ -170,6 +891,21 @@ index e31436f..e5c1fc8 100644
  
  
  def newest_release(tags):
+@@ -393,6 +393,14 @@ def latest_tag(get=None, track="release"):
+             return tag
+     except Exception:
+         pass
++    try:
++        import json
++        newest = newest_release([r.get("tag_name") for r in json.loads(get(RELEASES_API).decode("utf-8"))
++                                 if not r.get("draft")])
++        if newest:
++            return newest
++    except Exception:
++        pass
+     try:
+         text = get(LATEST_LIST).decode("utf-8")
+         return parse_list(text, local=False).tag
 diff --git a/builder/py/hookshot_builder/__init__.py b/builder/py/hookshot_builder/__init__.py
 index 168273f..85b7345 100644
 --- a/builder/py/hookshot_builder/__init__.py
@@ -204,6 +940,568 @@ index 3ad0a84..74b59a4 100644
               : g_http_status ? L"GitHub's download servers are failing right now (an error 500 or above, tried 8 times over 3 minutes). "
                                 L"This is on GitHub's side: try again in a few minutes, or later today."
                               : L"Could not reach GitHub to get the Hookshot Builder. Check your internet connection and try again.");
+diff --git a/host/hos_update.c b/host/hos_update.c
+index 07198f3..f22f87a 100644
+--- a/host/hos_update.c
++++ b/host/hos_update.c
+@@ -1,5 +1,5 @@
+ /* (hookshot) The update offer: at start, the latest release on GitHub is asked for (a few seconds at most, nothing when offline), and
+-   when it is not the release this game folder was built with, the player is asked whether to update. Yes starts the Hookshot Builder
++   when it is not the release this game folder was built with, the player is asked whether to update. Yes starts the Open-Ocarina Builder
+    that made the folder (hookshot_version.txt, written by nx2/make_game.py) with --update: it downloads the new release and builds the
+    folder again from the game files the folder keeps, and the game closes. A folder with no hookshot_version.txt (built from the
+    repository, or before updates came in) is never asked about. HOOKSHOT_NO_UPDATE_CHECK=1 (hookshot_env.txt) turns it off */
+@@ -104,8 +104,8 @@ static int newest_tag(const char *body, char *tag, size_t cap) {
+ #include <string.h>
+ 
+ #define UPDATE_HOST L"api.github.com"
+-#define UPDATE_PATH L"/repos/NotRexed/Hookshot/releases/latest"
+-#define RELEASES_PAGE L"https://github.com/NotRexed/Hookshot/releases/latest"
++#define UPDATE_PATH L"/repos/admiraly/Open-Ocarina/releases/latest"
++#define RELEASES_PAGE L"https://github.com/admiraly/Open-Ocarina/releases/latest"
+ 
+ /* (a line "name=value" of a small text file, in UTF-8: its value, trimmed) */
+ static int read_value(const wchar_t *path, const char *name, char *out, size_t cap) {
+@@ -133,7 +133,7 @@ static int read_value(const wchar_t *path, const char *name, char *out, size_t c
+ /* a GET of https://host/path: its body (malloc'd, at most 512 KB), NULL when it did not answer 200 */
+ static char *get_body(const wchar_t *host, const wchar_t *path) {
+     char *body = NULL;
+-    HINTERNET s = WinHttpOpen(L"Hookshot-update-check", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
++    HINTERNET s = WinHttpOpen(L"Open-Ocarina-update-check", WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
+     if (!s) return NULL;
+     WinHttpSetTimeouts(s, 2500, 2500, 2500, 3000);
+     HINTERNET c = WinHttpConnect(s, host, INTERNET_DEFAULT_HTTPS_PORT, 0);
+@@ -163,11 +163,11 @@ static int latest_tag(const char *have, char *tag, size_t cap) {
+     int ok = 0;
+     char *body;
+     if (nightly_version(have)) {
+-        if ((body = get_body(L"github.com", L"/NotRexed/Hookshot/releases/download/nightly/hookshot-setup.txt")))
++        if ((body = get_body(L"github.com", L"/admiraly/Open-Ocarina/releases/download/nightly/hookshot-setup.txt")))
+             ok = tag_in(body, tag, cap), free(body);
+         return ok;
+     }
+-    if (strchr(have, '-') && (body = get_body(UPDATE_HOST, L"/repos/NotRexed/Hookshot/releases?per_page=20"))) {
++    if (strchr(have, '-') && (body = get_body(UPDATE_HOST, L"/repos/admiraly/Open-Ocarina/releases?per_page=20"))) {
+         ok = newest_tag(body, tag, cap);
+         free(body);
+         if (ok) return 1;
+@@ -195,7 +195,7 @@ void hos_update_check(void) {
+     if (!n) return;
+     dir[n - 1] = 0;
+     char have[128], builder[MAX_PATH * 3], skipped[128] = "", tag[128];
+-    _snwprintf(file, MAX_PATH + 64, L"%ls\\hookshot_version.txt", dir);
++    _snwprintf(file, MAX_PATH + 64, L"%ls\\open-ocarina_version.txt", dir);
+     if (!read_value(file, "version", have, sizeof have) || !safe_tag(have)) return;
+     _snwprintf(file, MAX_PATH + 64, L"%ls\\user\\hookshot_update_skip.txt", dir);
+     read_value(file, "skip", skipped, sizeof skipped);
+@@ -212,7 +212,7 @@ void hos_update_check(void) {
+     wchar_t wtag[128], whave[128], wbuilder[MAX_PATH], text[2048];
+     MultiByteToWideChar(CP_UTF8, 0, tag, -1, wtag, 128);
+     MultiByteToWideChar(CP_UTF8, 0, have, -1, whave, 128);
+-    _snwprintf(file, MAX_PATH + 64, L"%ls\\hookshot_version.txt", dir);
++    _snwprintf(file, MAX_PATH + 64, L"%ls\\open-ocarina_version.txt", dir);
+     char local_mode[8];
+     const int portable = read_value(file, "builder_local", local_mode, sizeof local_mode) && !strcmp(local_mode, "1");
+     const int has_builder = portable ? local_builder(file, dir, wbuilder, MAX_PATH) :
+@@ -221,18 +221,18 @@ void hos_update_check(void) {
+                             GetFileAttributesW(wbuilder) != INVALID_FILE_ATTRIBUTES;
+     if (has_builder)
+         _snwprintf(text, 2048,
+-                   L"A new version of Hookshot is out: %ls (this game is %ls).\n\n"
+-                   L"Update now? The game closes, and Hookshot Builder downloads the new version and builds this game folder again from the "
++                   L"A new version of Open-Ocarina is out: %ls (this game is %ls).\n\n"
++                   L"Update now? The game closes, and Open-Ocarina Builder downloads the new version and builds this game folder again from the "
+                    L"game files it keeps. That takes about as long as your first build. Your saves and settings stay.\n\n"
+                    L"Yes: update now\nNo: not now (asked again next time)\nCancel: skip this version",
+                    wtag, whave);
+     else
+         _snwprintf(text, 2048,
+-                   L"A new version of Hookshot is out: %ls (this game is %ls).\n\n"
+-                   L"The Hookshot Builder that made this folder was not found, so it can't update by itself. Open the download page?\n\n"
++                   L"A new version of Open-Ocarina is out: %ls (this game is %ls).\n\n"
++                   L"The Open-Ocarina Builder that made this folder was not found, so it can't update by itself. Open the download page?\n\n"
+                    L"Yes: open the page\nNo: not now (asked again next time)\nCancel: skip this version",
+                    wtag, whave);
+-    const int answer = MessageBoxW(NULL, text, L"Hookshot update", MB_YESNOCANCEL | MB_ICONINFORMATION | MB_TOPMOST | MB_SETFOREGROUND);
++    const int answer = MessageBoxW(NULL, text, L"Open-Ocarina update", MB_YESNOCANCEL | MB_ICONINFORMATION | MB_TOPMOST | MB_SETFOREGROUND);
+     if (answer == IDCANCEL) {
+         wchar_t user[MAX_PATH + 16];
+         _snwprintf(user, MAX_PATH + 16, L"%ls\\user", dir);
+@@ -250,7 +250,7 @@ void hos_update_check(void) {
+     /* (the Python builder: builder= is its pythonw.exe, and builder_args= what goes before --update, its start script) */
+     char bargs[1024] = "";
+     wchar_t wbargs[1024] = L"";
+-    _snwprintf(file, MAX_PATH + 64, L"%ls\\hookshot_version.txt", dir);
++    _snwprintf(file, MAX_PATH + 64, L"%ls\\open-ocarina_version.txt", dir);
+     if (!portable && read_value(file, "builder_args", bargs, sizeof bargs)) MultiByteToWideChar(CP_UTF8, 0, bargs, -1, wbargs, 1024);
+     wchar_t args[MAX_PATH + 1280], wdir[MAX_PATH];
+     _snwprintf(args, MAX_PATH + 1280, L"%ls%ls--update \"%ls\" --tag \"%ls\"", wbargs, wbargs[0] ? L" " : L"", dir, wtag);
+@@ -261,11 +261,11 @@ void hos_update_check(void) {
+     if ((INT_PTR)ShellExecuteW(NULL, L"open", wbuilder, args, slash ? wdir : NULL, SW_SHOWNORMAL) > 32) {
+         void hos_log_flush(void);
+         hos_log_flush();   /* (the lines logged before, queued: host/hos_thread.c log_queue) */
+-        fprintf(stderr, "update: Hookshot Builder started to update to %s; the game closes\n", tag);
++        fprintf(stderr, "update: Open-Ocarina Builder started to update to %s; the game closes\n", tag);
+         fflush(stderr);
+         ExitProcess(0);
+     }
+-    MessageBoxW(NULL, L"Hookshot Builder could not be started. The game starts as it is.", L"Hookshot update", MB_OK | MB_ICONWARNING | MB_TOPMOST);
++    MessageBoxW(NULL, L"Open-Ocarina Builder could not be started. The game starts as it is.", L"Open-Ocarina update", MB_OK | MB_ICONWARNING | MB_TOPMOST);
+ }
+ #elif defined(__linux__)
+ #include "hos_paths.h"
+@@ -329,18 +329,18 @@ static int pipe_tag(const char *cmd, char *tag, size_t cap, int newest) {
+ 
+ static int latest_tag(const char *have, char *tag, size_t cap) {
+     if (nightly_version(have))
+-        return pipe_tag("curl -fsSL --max-time 8 --retry 2 -A Hookshot-update-check "
+-                        "https://github.com/NotRexed/Hookshot/releases/download/nightly/hookshot-linux.txt 2>/dev/null", tag, cap, 0);
+-    if (strchr(have, '-') && pipe_tag("curl -fsSL --max-time 6 --retry 2 -A Hookshot-update-check "
++        return pipe_tag("curl -fsSL --max-time 8 --retry 2 -A Open-Ocarina-update-check "
++                        "https://github.com/admiraly/Open-Ocarina/releases/download/nightly/hookshot-linux.txt 2>/dev/null", tag, cap, 0);
++    if (strchr(have, '-') && pipe_tag("curl -fsSL --max-time 6 --retry 2 -A Open-Ocarina-update-check "
+                                       "-H \"Accept: application/vnd.github+json\" "
+-                                      "'https://api.github.com/repos/NotRexed/Hookshot/releases?per_page=20' 2>/dev/null", tag, cap, 1))
++                                      "'https://api.github.com/repos/admiraly/Open-Ocarina/releases?per_page=20' 2>/dev/null", tag, cap, 1))
+         return 1;
+-    if (pipe_tag("curl -fsSL --max-time 4 --retry 2 -A Hookshot-update-check "
++    if (pipe_tag("curl -fsSL --max-time 4 --retry 2 -A Open-Ocarina-update-check "
+                  "-H \"Accept: application/vnd.github+json\" "
+-                 "https://api.github.com/repos/NotRexed/Hookshot/releases/latest 2>/dev/null", tag, cap, 0))
++                 "https://api.github.com/repos/admiraly/Open-Ocarina/releases/latest 2>/dev/null", tag, cap, 0))
+         return 1;
+-    return pipe_tag("curl -fsSL --max-time 8 --retry 2 -A Hookshot-update-check "
+-                    "https://github.com/NotRexed/Hookshot/releases/latest/download/hookshot-linux.txt 2>/dev/null", tag, cap, 0);
++    return pipe_tag("curl -fsSL --max-time 8 --retry 2 -A Open-Ocarina-update-check "
++                    "https://github.com/admiraly/Open-Ocarina/releases/latest/download/hookshot-linux.txt 2>/dev/null", tag, cap, 0);
+ }
+ 
+ /* the builder an update installed (builder/linux/linux_update.py): <data>/hookshot/builder/versions/<current>/AppRun. The
+@@ -376,7 +376,7 @@ void hos_update_check(void) {
+     char dir[MAX_PATH];
+     memcpy(dir, path, n);
+     dir[n] = 0;
+-    snprintf(path, sizeof path, "%shookshot_version.txt", dir);
++    snprintf(path, sizeof path, "%sopen-ocarina_version.txt", dir);
+     if (!read_value(path, "version", have, sizeof have) || !safe_tag(have)) return;
+     char skip[MAX_PATH + 64];
+     snprintf(skip, sizeof skip, "%s/hookshot_update_skip.txt", hos_user_dir);
+@@ -390,16 +390,16 @@ void hos_update_check(void) {
+     if (strchr(have, '-') && !nightly_version(have) && !newer_version(tag, have)) return;   /* (a release candidate: newer only) */
+     if (!nightly_version(have) && newer_version(have, tag)) return;   /* (a release or release candidate newer than the latest:
+         a test build of the next release, before it is out. "Update" would build the older one over it, 2026-11-11) */
+-    snprintf(path, sizeof path, "%shookshot_version.txt", dir);
++    snprintf(path, sizeof path, "%sopen-ocarina_version.txt", dir);
+     const int has_builder = installed_builder(builder, sizeof builder) ||
+                             (read_value(path, "builder", builder, sizeof builder) && access(builder, X_OK) == 0);
+     char text[1600], cmd[4096];
+     snprintf(text, sizeof text,
+              has_builder
+-                 ? "A new version of Hookshot is out: %s (this game is %s). Update now? The game closes, and Hookshot Builder downloads only what changed and builds this folder again. Your saves and settings stay."
+-                 : "A new version of Hookshot is out: %s (this game is %s). The builder that made this folder was not found. Open the download page?",
++                 ? "A new version of Open-Ocarina is out: %s (this game is %s). Update now? The game closes, and Open-Ocarina Builder downloads only what changed and builds this folder again. Your saves and settings stay."
++                 : "A new version of Open-Ocarina is out: %s (this game is %s). The builder that made this folder was not found. Open the download page?",
+              tag, have);
+-    snprintf(cmd, sizeof cmd, "zenity --list --title=Hookshot --hide-header --column= --text='%s' 'Update now' 'Not now' 'Skip this version'", text);
++    snprintf(cmd, sizeof cmd, "zenity --list --title=Open-Ocarina --hide-header --column= --text='%s' 'Update now' 'Not now' 'Skip this version'", text);
+     FILE *pick = popen(cmd, "r");
+     if (!pick) return;
+     char answer[64] = "";
+@@ -414,7 +414,7 @@ void hos_update_check(void) {
+     if (strncmp(answer, "Update", 6)) return;
+     if (!has_builder) {
+         if (fork() == 0) {
+-            execlp("xdg-open", "xdg-open", "https://github.com/NotRexed/Hookshot/releases/latest", (char *)0);
++            execlp("xdg-open", "xdg-open", "https://github.com/admiraly/Open-Ocarina/releases/latest", (char *)0);
+             _exit(127);
+         }
+         return;
+@@ -425,7 +425,7 @@ void hos_update_check(void) {
+         _exit(127);
+     }
+     if (pid > 0) {
+-        fprintf(stderr, "update: Hookshot Builder started to update to %s; the game closes\n", tag);
++        fprintf(stderr, "update: Open-Ocarina Builder started to update to %s; the game closes\n", tag);
+         fflush(stderr);
+         _exit(0);
+     }
+diff --git a/nx2/make_game.py b/nx2/make_game.py
+index 347ab33..8dda577 100644
+--- a/nx2/make_game.py
++++ b/nx2/make_game.py
+@@ -1333,6 +1333,8 @@ def not_prepared(why):
+ def prepare_skipped(a, environ=None):
+     """Why the build leaves the shaders to the first start, or None: it prepares them"""
+     environ = os.environ if environ is None else environ
++    if getattr(a, "skip_prepare_shaders", False):
++        return "skipped for this GPU (shaders compile as you play)"
+     if a.no_prepare_shaders:
+         return '"Prepare shaders now" is unticked'
+     if environ.get("HOOKSHOT_NO_PREPARE", "0") != "0":   # (set and not 0, as the game reads HOOKSHOT_NO_UPDATE_CHECK)
+@@ -1992,6 +1994,10 @@ def parse_args():
+     p.add_argument("--update", help="a game folder built before: built again from the game files it keeps (the game's update offer)")
+     p.add_argument("--no-prepare-shaders", action="store_true",
+                    help="leave the shaders' preparation to the game's first start (the builder's \"Prepare shaders now\" unticked)")
++    p.add_argument("--skip-prepare-shaders", action="store_true",
++                   help="skip upfront shader pre-building (shaders compile automatically as you play)")
++    p.add_argument("--probe-system", action="store_true",
++                   help="print detected GPU and Vulkan capabilities as JSON and exit")
+     p.add_argument("--log", metavar="FILE", help="also save build output to a UTF-8 file (replaces the file if it exists)")
+     # (NVIDIA DLSS, off unless asked: NVIDIA's SDK into HOOKSHOT_NGX_SDK first, under NVIDIA's license. scripts/ngx_sdk.py)
+     p.add_argument("--fetch-ngx-sdk", action="store_true", help="download NVIDIA's DLSS SDK into HOOKSHOT_NGX_SDK before the build")
+@@ -2003,6 +2009,7 @@ def parse_args():
+                    help="with --fsr (Windows): download AMD's FSR runtime (scripts/ffx_sdk.py) and put it in the game folder")
+     p.add_argument("--accept-amd-license", action="store_true", help="AMD's FSR SDK license, accepted (with --fetch-fsr-runtime)")
+     a = p.parse_args()
++
+     if a.prepare:   # (first: a bad --game below is said as RecompLauncher's "error" line)
+         global PREPARE
+         PREPARE = True
+@@ -2110,6 +2117,10 @@ def end_stale_games(folders):
+ def main(a=None):
+     if a is None:
+         a = parse_args()
++    if a.probe_system:
++        import system_probe
++        print(system_probe.probe_json(), flush=True)
++        return
+     portable_home = portable_game_home(a.update or a.out) if not a.check and (a.update or a.out) else None
+     if a.jobs is not None and a.jobs < 0:
+         fail("--jobs must be 1 or more, or 0 for automatic.")
+@@ -2523,10 +2534,16 @@ def main(a=None):
+                                                     "" if previous is None else " (the last one %s)" % clock(previous)), flush=True)
+     say("times", "%.0f" % total_seconds, "%.0f" % compile_seconds, "-1" if previous is None else "%.0f" % previous)
+     # (after the times: they stay comparable from build to build, without a GPU's minutes that can be switched off)
++    skipped_marker = os.path.join(game_dir, "hookshot_prepare_skipped")
+     skipped = prepare_skipped(a)
+     if skipped:
++        if a.skip_prepare_shaders:
++            with open(skipped_marker, "wb") as f:
++                f.write(b"skipped\n")
+         not_prepared(skipped)
+     else:
++        if os.path.isfile(skipped_marker):
++            os.remove(skipped_marker)
+         prepare_shaders([os.path.join(game_dir, BESIDE[0]), "--prepare-shaders"], out)
+     say("done", out)
+ 
+diff --git a/nx2/system_probe.py b/nx2/system_probe.py
+new file mode 100644
+index 0000000..cc88ce7
+--- /dev/null
++++ b/nx2/system_probe.py
+@@ -0,0 +1,311 @@
++"""Probe the host GPU and Vulkan driver without external tools.
++
++Loads vulkan-1.dll (Windows) or libvulkan.so.1 (Linux) via ctypes and queries
++physical devices, Vulkan API version, device-local VRAM, and VK_EXT_mesh_shader.
++Run with --json for machine-readable output.
++"""
++import ctypes
++import json
++import os
++import platform
++import subprocess
++import sys
++
++VK_SUCCESS = 0
++VK_INCOMPLETE = 5
++VK_MEMORY_HEAP_DEVICE_LOCAL_BIT = 0x1
++VK_EXT_MESH_SHADER_EXTENSION_NAME = b"VK_EXT_mesh_shader"
++
++DEVICE_TYPES = {
++    0: "other",
++    1: "integrated",
++    2: "discrete",
++    3: "virtual",
++    4: "cpu",
++}
++
++VENDORS = {
++    0x10DE: "nvidia",
++    0x1002: "amd",
++    0x8086: "intel",
++}
++
++
++class VkApplicationInfo(ctypes.Structure):
++    _fields_ = [
++        ("sType", ctypes.c_uint32),
++        ("pNext", ctypes.c_void_p),
++        ("pApplicationName", ctypes.c_char_p),
++        ("applicationVersion", ctypes.c_uint32),
++        ("pEngineName", ctypes.c_char_p),
++        ("engineVersion", ctypes.c_uint32),
++        ("apiVersion", ctypes.c_uint32),
++    ]
++
++
++class VkInstanceCreateInfo(ctypes.Structure):
++    _fields_ = [
++        ("sType", ctypes.c_uint32),
++        ("pNext", ctypes.c_void_p),
++        ("flags", ctypes.c_uint32),
++        ("pApplicationInfo", ctypes.POINTER(VkApplicationInfo)),
++        ("enabledLayerCount", ctypes.c_uint32),
++        ("ppEnabledLayerNames", ctypes.c_void_p),
++        ("enabledExtensionCount", ctypes.c_uint32),
++        ("ppEnabledExtensionNames", ctypes.c_void_p),
++    ]
++
++
++class VkPhysicalDeviceLimits(ctypes.Structure):
++    # Only total size matters (504 bytes in Vulkan 1.0+ spec); keep exact padding.
++    _fields_ = [("_raw", ctypes.c_uint8 * 504)]
++
++
++class VkPhysicalDeviceSparseProperties(ctypes.Structure):
++    _fields_ = [("residency", ctypes.c_uint32 * 5)]
++
++
++class VkPhysicalDeviceProperties(ctypes.Structure):
++    _fields_ = [
++        ("apiVersion", ctypes.c_uint32),
++        ("driverVersion", ctypes.c_uint32),
++        ("vendorID", ctypes.c_uint32),
++        ("deviceID", ctypes.c_uint32),
++        ("deviceType", ctypes.c_uint32),
++        ("deviceName", ctypes.c_char * 256),
++        ("pipelineCacheUUID", ctypes.c_uint8 * 16),
++        ("limits", VkPhysicalDeviceLimits),
++        ("sparseProperties", VkPhysicalDeviceSparseProperties),
++    ]
++
++
++class VkMemoryType(ctypes.Structure):
++    _fields_ = [
++        ("propertyFlags", ctypes.c_uint32),
++        ("heapIndex", ctypes.c_uint32),
++    ]
++
++
++class VkMemoryHeap(ctypes.Structure):
++    _fields_ = [
++        ("size", ctypes.c_uint64),
++        ("flags", ctypes.c_uint32),
++    ]
++
++
++class VkPhysicalDeviceMemoryProperties(ctypes.Structure):
++    _fields_ = [
++        ("memoryTypeCount", ctypes.c_uint32),
++        ("memoryTypes", VkMemoryType * 32),
++        ("memoryHeapCount", ctypes.c_uint32),
++        ("memoryHeaps", VkMemoryHeap * 16),
++    ]
++
++
++class VkExtensionProperties(ctypes.Structure):
++    _fields_ = [
++        ("extensionName", ctypes.c_char * 256),
++        ("specVersion", ctypes.c_uint32),
++    ]
++
++
++def _make_version(major, minor, patch=0):
++    return (major << 22) | (minor << 12) | patch
++
++
++def _decode_version(v):
++    return (v >> 22) & 0x7F, (v >> 12) & 0x3FF, v & 0xFFF
++
++
++def _load_vulkan():
++    names = ["vulkan-1.dll"] if os.name == "nt" else ["libvulkan.so.1", "libvulkan.so"]
++    for name in names:
++        try:
++            return ctypes.CDLL(name)
++        except OSError:
++            continue
++    return None
++
++
++def _probe_vulkan():
++    vk = _load_vulkan()
++    if vk is None:
++        return False, [], "Vulkan loader not found"
++
++    vkCreateInstance = vk.vkCreateInstance
++    vkCreateInstance.argtypes = [ctypes.POINTER(VkInstanceCreateInfo), ctypes.c_void_p, ctypes.POINTER(ctypes.c_void_p)]
++    vkCreateInstance.restype = ctypes.c_int32
++
++    vkDestroyInstance = vk.vkDestroyInstance
++    vkDestroyInstance.argtypes = [ctypes.c_void_p, ctypes.c_void_p]
++    vkDestroyInstance.restype = None
++
++    vkEnumeratePhysicalDevices = vk.vkEnumeratePhysicalDevices
++    vkEnumeratePhysicalDevices.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_uint32), ctypes.POINTER(ctypes.c_void_p)]
++    vkEnumeratePhysicalDevices.restype = ctypes.c_int32
++
++    vkGetPhysicalDeviceProperties = vk.vkGetPhysicalDeviceProperties
++    vkGetPhysicalDeviceProperties.argtypes = [ctypes.c_void_p, ctypes.POINTER(VkPhysicalDeviceProperties)]
++    vkGetPhysicalDeviceProperties.restype = None
++
++    vkGetPhysicalDeviceMemoryProperties = vk.vkGetPhysicalDeviceMemoryProperties
++    vkGetPhysicalDeviceMemoryProperties.argtypes = [ctypes.c_void_p, ctypes.POINTER(VkPhysicalDeviceMemoryProperties)]
++    vkGetPhysicalDeviceMemoryProperties.restype = None
++
++    vkEnumerateDeviceExtensionProperties = vk.vkEnumerateDeviceExtensionProperties
++    vkEnumerateDeviceExtensionProperties.argtypes = [
++        ctypes.c_void_p,
++        ctypes.c_char_p,
++        ctypes.POINTER(ctypes.c_uint32),
++        ctypes.POINTER(VkExtensionProperties),
++    ]
++    vkEnumerateDeviceExtensionProperties.restype = ctypes.c_int32
++
++    instance = ctypes.c_void_p()
++    created = False
++    for api_ver in (_make_version(1, 3, 0), _make_version(1, 0, 0)):
++        app = VkApplicationInfo(
++            sType=0,
++            pNext=None,
++            pApplicationName=b"Open-Ocarina-Probe",
++            applicationVersion=1,
++            pEngineName=b"Open-Ocarina",
++            engineVersion=1,
++            apiVersion=api_ver,
++        )
++        ci = VkInstanceCreateInfo(
++            sType=1,
++            pNext=None,
++            flags=0,
++            pApplicationInfo=ctypes.pointer(app),
++            enabledLayerCount=0,
++            ppEnabledLayerNames=None,
++            enabledExtensionCount=0,
++            ppEnabledExtensionNames=None,
++        )
++        res = vkCreateInstance(ctypes.byref(ci), None, ctypes.byref(instance))
++        if res == VK_SUCCESS and instance.value:
++            created = True
++            break
++    if not created:
++        return False, [], "vkCreateInstance failed"
++
++    gpus = []
++    try:
++        count = ctypes.c_uint32(0)
++        res = vkEnumeratePhysicalDevices(instance, ctypes.byref(count), None)
++        if res != VK_SUCCESS or count.value == 0:
++            return True, [], "No Vulkan GPU found"
++        devs = (ctypes.c_void_p * count.value)()
++        res = vkEnumeratePhysicalDevices(instance, ctypes.byref(count), devs)
++        if res not in (VK_SUCCESS, VK_INCOMPLETE):
++            return True, [], "vkEnumeratePhysicalDevices failed"
++        for dev in devs[: count.value]:
++            props = VkPhysicalDeviceProperties()
++            vkGetPhysicalDeviceProperties(dev, ctypes.byref(props))
++            mem = VkPhysicalDeviceMemoryProperties()
++            vkGetPhysicalDeviceMemoryProperties(dev, ctypes.byref(mem))
++            vram_bytes = sum(
++                mem.memoryHeaps[i].size
++                for i in range(min(mem.memoryHeapCount, 16))
++                if mem.memoryHeaps[i].flags & VK_MEMORY_HEAP_DEVICE_LOCAL_BIT
++            )
++            ext_count = ctypes.c_uint32(0)
++            has_mesh = False
++            if vkEnumerateDeviceExtensionProperties(dev, None, ctypes.byref(ext_count), None) == VK_SUCCESS and ext_count.value:
++                exts = (VkExtensionProperties * ext_count.value)()
++                if vkEnumerateDeviceExtensionProperties(dev, None, ctypes.byref(ext_count), exts) in (VK_SUCCESS, VK_INCOMPLETE):
++                    has_mesh = any(e.extensionName == VK_EXT_MESH_SHADER_EXTENSION_NAME for e in exts[: ext_count.value])
++
++            maj, min_, pat = _decode_version(props.apiVersion)
++            name = props.deviceName.decode("utf-8", errors="replace").strip()
++            vendor = VENDORS.get(props.vendorID, "other")
++            dtype = DEVICE_TYPES.get(props.deviceType, "other")
++            upper = name.upper()
++            gpus.append(
++                {
++                    "name": name,
++                    "vendor_id": props.vendorID,
++                    "vendor": vendor,
++                    "device_type": dtype,
++                    "api_version": f"{maj}.{min_}.{pat}",
++                    "vulkan_1_3": (maj > 1) or (maj == 1 and min_ >= 3),
++                    "vram_mb": int(vram_bytes // (1024 * 1024)),
++                    "mesh_shader": bool(has_mesh),
++                    "rtx": vendor == "nvidia" and "RTX" in upper,
++                    "rdna4": vendor == "amd" and ("RX 90" in upper or "RADEON RX 9" in upper),
++                }
++            )
++    finally:
++        vkDestroyInstance(instance, None)
++    return True, gpus, None
++
++
++def _pick_primary(gpus):
++    if not gpus:
++        return None
++    rank = {"discrete": 0, "integrated": 1, "virtual": 2, "other": 3, "cpu": 4}
++    return sorted(
++        gpus,
++        key=lambda g: (
++            0 if g["vulkan_1_3"] else 1,
++            rank.get(g["device_type"], 5),
++            -g["vram_mb"],
++        ),
++    )[0]
++
++
++def _fallback_gpu_names():
++    if os.name == "nt":
++        try:
++            out = subprocess.check_output(
++                ["powershell", "-NoProfile", "-Command", "(Get-CimInstance Win32_VideoController).Name"],
++                stderr=subprocess.DEVNULL,
++                text=True,
++                timeout=4,
++            )
++            return [line.strip() for line in out.splitlines() if line.strip()]
++        except Exception:
++            return []
++    return []
++
++
++def probe():
++    vk_ok, gpus, note = _probe_vulkan()
++    primary = _pick_primary(gpus)
++    vulkan_1_3 = bool(primary and primary["vulkan_1_3"] and primary["device_type"] != "cpu")
++    fallback_names = [] if gpus else _fallback_gpu_names()
++
++    if primary:
++        vram_gb = primary["vram_mb"] / 1024.0
++        vram_text = f" ({vram_gb:.0f} GB)" if vram_gb >= 1.5 else (f" ({primary['vram_mb']} MB)" if primary["vram_mb"] > 0 else "")
++        mesh_text = "Mesh shaders" if primary["mesh_shader"] else "Compute fallback (no hardware mesh shaders)"
++        if not vulkan_1_3:
++            summary = f"{primary['name']}{vram_text} · Vulkan {primary['api_version']} (Vulkan 1.3+ required)"
++        else:
++            summary = f"{primary['name']}{vram_text} · Vulkan {primary['api_version']} · {mesh_text}"
++    elif fallback_names:
++        summary = f"{fallback_names[0]} · No Vulkan 1.3 driver detected"
++    else:
++        summary = f"No Vulkan GPU detected ({note})" if note else "No Vulkan GPU detected"
++
++    return {
++        "os": platform.system().lower(),
++        "vulkan_ok": vk_ok,
++        "vulkan_1_3": vulkan_1_3,
++        "gpus": gpus,
++        "primary": primary,
++        "fallback_names": fallback_names,
++        "summary": summary,
++    }
++
++
++def probe_json():
++    return json.dumps(probe(), separators=(",", ":"))
++
++
++if __name__ == "__main__":
++    if "--json" in sys.argv:
++        print(probe_json())
++    else:
++        print(json.dumps(probe(), indent=2))
 diff --git a/recomplauncher.json b/recomplauncher.json
 index 9a22072..04fd91e 100644
 --- a/recomplauncher.json
@@ -218,7 +1516,7 @@ index 9a22072..04fd91e 100644
      "kind": "iso_or_folder",
      "label": "Your copy of The Legend of Zelda: Ocarina of Time for Nintendo Switch 2, version 131072 (build e0f3ccfa): the .nup file, or the folder that holds its romfs and exefs.",
 diff --git a/scripts/linux/appimage.sh b/scripts/linux/appimage.sh
-index 4044d1a..ca141bd 100755
+index 4044d1a..c3a99d0 100755
 --- a/scripts/linux/appimage.sh
 +++ b/scripts/linux/appimage.sh
 @@ -23,10 +23,10 @@ PY=$DEPS/python/bin/python3
@@ -235,3 +1533,35 @@ index 4044d1a..ca141bd 100755
  
  # ---- the tools' native helpers, built now: the AppImage is read-only. a64emit with its C++ runtime inside (the one this system
  # builds with is newer than older systems have), and the stamp build_emit.py checks, so it is not built again ----
+@@ -154,14 +154,14 @@ cp assets/hookshot.png "$APPDIR/usr/share/icons/hicolor/256x256/apps/hookshot.pn
+ # scripts/linux/publish_parts.sh uploads them: without --base the list named NotRexed/Hookshot's release, which a fork's
+ # CI does not upload to, so a fork's update list named parts that were not there)
+ python3 scripts/linux/make_parts.py "$APPDIR" "$VERSION" "$B/parts" \
+-    --base "https://github.com/${GITHUB_REPOSITORY:-NotRexed/Hookshot}/releases/download/linux-parts"
++    --base "https://github.com/${GITHUB_REPOSITORY:-admiraly/Open-Ocarina}/releases/download/linux-parts"
+ 
+ # The update information AppImageUpdate and Gear Lever read: the newest .zsync of this repository's latest release (or of
+ # the release HOOKSHOT_UPDATE_RELEASE names). appimagetool writes it into the image and makes the .zsync beside it with
+ # its bundled zsyncmake, which names the AppImage by its file name, next to the .zsync on the same release.
+-UPDATE_REPO=${GITHUB_REPOSITORY:-NotRexed/Hookshot}
+-UPDATE_INFO=${HOOKSHOT_UPDATE_INFO:-"gh-releases-zsync|${UPDATE_REPO%%/*}|${UPDATE_REPO#*/}|${HOOKSHOT_UPDATE_RELEASE:-latest}|Hookshot-*-x86_64.AppImage.zsync"}
+-OUT=$B/Hookshot-$VERSION-x86_64.AppImage
++UPDATE_REPO=${GITHUB_REPOSITORY:-admiraly/Open-Ocarina}
++UPDATE_INFO=${HOOKSHOT_UPDATE_INFO:-"gh-releases-zsync|${UPDATE_REPO%%/*}|${UPDATE_REPO#*/}|${HOOKSHOT_UPDATE_RELEASE:-latest}|Open-Ocarina-*-x86_64.AppImage.zsync"}
++OUT=$B/Open-Ocarina-$VERSION-x86_64.AppImage
+ rm -f "$OUT" "$OUT.zsync"
+ # (from build-linux/: appimagetool writes the .zsync into the current folder)
+ (cd "$B" && ARCH=x86_64 APPIMAGE_EXTRACT_AND_RUN=1 "$DEPS/appimagetool" --runtime-file "$DEPS/runtime-x86_64" \
+diff --git a/scripts/linux/check_player_build.sh b/scripts/linux/check_player_build.sh
+index ac66aeb..f4ed36f 100755
+--- a/scripts/linux/check_player_build.sh
++++ b/scripts/linux/check_player_build.sh
+@@ -15,7 +15,7 @@
+ # Neither may write into the image's tree: on a player's PC it is read-only.
+ set -euo pipefail
+ cd "$(dirname "$0")/../.."
+-IMAGE=${1:-$(ls -t build-linux/Hookshot-*-x86_64.AppImage 2>/dev/null | head -1 || true)}
++IMAGE=${1:-$(ls -t build-linux/Open-Ocarina-*-x86_64.AppImage build-linux/Hookshot-*-x86_64.AppImage 2>/dev/null | head -1 || true)}
+ [ -n "$IMAGE" ] && [ -f "$IMAGE" ] || { echo "no AppImage to check (scripts/linux/appimage.sh makes one)"; exit 1; }
+ IMAGE=$(readlink -f "$IMAGE")
+ TMP=$(mktemp -d)
