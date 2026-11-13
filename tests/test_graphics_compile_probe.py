@@ -153,6 +153,19 @@ class GraphicsCompileProbeTests(unittest.TestCase):
         self.assertNotIn("INTEL_DEBUG", runtime)
         self.assertEqual(ambient["shader_spilling_rate"], "999")
 
+    def test_native_safe_profile_removes_max_presence_and_global_overrides(self):
+        for value in ("", "0", "100000"):
+            environment, policy = controlled_driver_environment("native-safe", {
+                "HS_CS32_MAX_INSTS": value, "HS_SUBGROUP8": "0", "HS_LARGE_GRF_BIT": "1",
+                "RX_VK_WARP64": "1", "RX_VK_NOOPT": "1"})
+            self.assertNotIn("HS_CS32_MAX_INSTS", environment)
+            self.assertNotIn("HS_SUBGROUP8", environment)
+            self.assertNotIn("HS_LARGE_GRF_BIT", environment)
+            self.assertNotIn("RX_VK_WARP64", environment)
+            self.assertNotIn("RX_VK_NOOPT", environment)
+            self.assertIsNone(policy["controlled_options"]["HS_CS32_MAX_INSTS"])
+            self.assertEqual(environment, {"HS_SPILL_BATCH": "1", "HS_PUSH_SHADOW": "1", "shader_spilling_rate": "1"})
+
     def test_unknown_driver_profile_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "Unknown"):
             controlled_driver_environment("inherited", {})

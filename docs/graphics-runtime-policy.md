@@ -1,4 +1,6 @@
-# Graphics codegen under the recorded runtime compiler policy
+# Historical V1 graphics codegen under the MAX-present profile
+
+This is a historical V1 experiment. Its `runtime` profile includes `HS_CS32_MAX_INSTS=100000`, which can enable a global compute-width fallback even when set to0. Current native launches require MAX strictly absent and the three-option `native-safe` profile; see [revision2 hardening](native-mesh-warp32-integration.md). Recorded metrics and identities below remain unchanged and are not V2 runtime validation.
 
 The recorded runtime compiler overrides materially change graphics register allocation, especially the conditional SIMD16 candidate. They do **not** remove the large conditional SIMD8 codegen difference. This is a paired compile-only experiment, with no shader execution, output comparison or FPS claim.
 
@@ -8,7 +10,7 @@ The [new evidence](../research/graphics-runtime-policy-observation.json) retains
 
 ## Controlled policies
 
-The wrapper now accepts `--driver-policy diagnostic` (default, preserving the cleared profile) or `--driver-policy runtime`:
+At this historical handoff the wrapper accepted `--driver-policy diagnostic` (cleared profile) or `--driver-policy runtime` (legacy MAX-present). The current wrapper additionally supports `native-safe`; the table below records the old experiment, not a native launch recommendation:
 
 | Controlled option | Diagnostic | Runtime |
 |---|---|---|

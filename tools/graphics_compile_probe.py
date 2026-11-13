@@ -26,9 +26,10 @@ ENABLED_FEATURES = ["robustBufferAccess", "robustBufferAccess2", "shaderInt16", 
                     "fragmentStoresAndAtomics", "uniformBufferStandardLayout", "bufferDeviceAddress",
                     "shaderFloat16", "shaderInt8", "subgroupSizeControl", "dynamicRendering", "meshShader"]
 CONTROLLED_DRIVER_OPTIONS = ("HS_CS32_MAX_INSTS", "HS_SPILL_BATCH", "HS_PUSH_SHADOW", "shader_spilling_rate",
-                             "INTEL_DEBUG", "HS_SPILL_PCT", "HS_RA_DEBUG", "HS_FORCE_SIMD8", "HS_LARGE_GRF")
+                             "INTEL_DEBUG", "HS_SPILL_PCT", "HS_RA_DEBUG", "HS_FORCE_SIMD8", "HS_LARGE_GRF", "HS_SUBGROUP8", "HS_LARGE_GRF_BIT", "RX_VK_WARP64", "RX_VK_NOOPT")
 DRIVER_POLICIES = {"diagnostic": {}, "runtime": {"HS_CS32_MAX_INSTS": "100000", "HS_SPILL_BATCH": "1",
-                                               "HS_PUSH_SHADOW": "1", "shader_spilling_rate": "1"}}
+                                               "HS_PUSH_SHADOW": "1", "shader_spilling_rate": "1"},
+                   "native-safe": {"HS_SPILL_BATCH": "1", "HS_PUSH_SHADOW": "1", "shader_spilling_rate": "1"}}
 
 
 def controlled_driver_environment(name, ambient):
@@ -40,7 +41,9 @@ def controlled_driver_environment(name, ambient):
         environment.pop(key, None)
     environment.update(DRIVER_POLICIES[name])
     policy = {"name": name, "controlled_options": {key: environment.get(key) for key in CONTROLLED_DRIVER_OPTIONS},
-              "full_environment_snapshot": False}
+              "full_environment_snapshot": False,
+              "profile_scope": "historical MAX-present compile-only comparison" if name == "runtime" else
+                               "MAX absent; no global compute fallback opt-in" if name == "native-safe" else "cleared diagnostic"}
     return environment, policy
 
 
@@ -247,7 +250,7 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--prepare-only", action="store_true", help="Validate, reflect and build; never open Vulkan")
     parser.add_argument("--driver-policy", choices=tuple(DRIVER_POLICIES), default="diagnostic",
-                        help="Controlled compiler overrides: prior cleared diagnostic profile, or established runtime values")
+                        help="Controlled compiler overrides: cleared diagnostic, historical MAX-present runtime, or native-safe (MAX absent)")
     parser.add_argument("--driver", type=Path)
     parser.add_argument("--mesa-build", type=Path)
     parser.add_argument("--device", type=int, default=0)

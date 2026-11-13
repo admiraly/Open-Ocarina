@@ -25,6 +25,8 @@ class MeshWarp32LoweringPatchTests(unittest.TestCase):
         result = checker.check_policy(COMPILER)
         self.assertTrue(result['production_device_stage_and_compiler_policy_mocks_checked'])
         self.assertTrue(result['mock_only_no_vulkan_link_or_device_calls'])
+        self.assertTrue(result['max_presence_empty_zero_and_legacy_value_refused'])
+        self.assertTrue(result['all_nine_forbidden_controls_refused_for_empty_zero_and_one'])
 
     def test_missing_authored_source_fails_closed(self):
         with self.assertRaisesRegex(ValueError, 'missing'):

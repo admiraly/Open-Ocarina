@@ -1,0 +1,486 @@
+{
+  "schema": "open-ocarina.native-mesh-warp32-integration/v2",
+  "date": "2026-11-13",
+  "revision": 2,
+  "scope": "Safe compiler-policy hardening, CPU checks and compile-only old-driver comparison; no integrated launch or new-driver runtime validation",
+  "source_pin": "4cf785a0b143bb34026506c9a3fe4f4bb93c797d",
+  "patch_chain": [
+    {
+      "path": "patches/hookshot/compute-identity.patch",
+      "sha256": "2f14873edfdb47b1f915e75bc4bbe6683ef6632bc66fcbfa1d918aa1c176f018"
+    },
+    {
+      "path": "patches/hookshot/page-table-snapshot.patch",
+      "sha256": "c236b96851bc95426202abec6447e672577fdda747fd8405cc435dae435834ab"
+    },
+    {
+      "path": "patches/hookshot/allocation-capture.patch",
+      "sha256": "7d8f23d3824374002472bc4a65f3f078c3306d4c5cd395f97e2a1e083fe49aab"
+    },
+    {
+      "path": "patches/hookshot/occurrence-capture.patch",
+      "sha256": "defdda2dced583678e39daea0dc7e671fcc8926df8374a62ad45fe675692b752"
+    },
+    {
+      "path": "patches/hookshot/graphics-identity.patch",
+      "sha256": "d2572d167c7427c79ce5b600fdeef67a0738678e5e05cbe1ec21db89d8865e53"
+    },
+    {
+      "path": "patches/hookshot/sampled-image-capture.patch",
+      "sha256": "45fd019c2670a0c5c4cb0bfba8decb3701531c8248ec205e2b95ba03969aa362"
+    },
+    {
+      "path": "patches/hookshot/dispatch-parameters.patch",
+      "sha256": "ff86fe706725f2c70dc759a6e2d295ebedee12b5b93b4b6e2cf407c58a689d8e"
+    },
+    {
+      "path": "patches/hookshot/binding-provenance.patch",
+      "sha256": "af88886fb027b91bea136db0c2bf05865cf510232c50fdcbdd9d238d930009b1"
+    },
+    {
+      "path": "patches/hookshot/mesh-input-capture.patch",
+      "sha256": "eea7b1b3181751b6b09811a458626958799f2d9a8511a74fdb8bd49854462f5c"
+    },
+    {
+      "path": "patches/hookshot/mesh-warp32-lowering.patch",
+      "sha256": "8d0cc053103ccf90b51e6c55c6e7ee39292636f03b85e16d74bd8d8d1221854b"
+    }
+  ],
+  "patch_sha256": "8d0cc053103ccf90b51e6c55c6e7ee39292636f03b85e16d74bd8d8d1221854b",
+  "renderer_sha256": "d2b60ba14de991bf335f5b46d3c64a0749489a390c3fbb2db11f162fdb7b3340",
+  "renderer_bytes": 27538440,
+  "changed_source_sha256": {
+    "gpu/vk/mesh_warp32_lowering.h": "73853cf02de8a365568a50d52fbbd2b80363359634bf3bb1655032e40b347b18",
+    "gpu/vk/mesh_warp32_lowering.cpp": "7aad4045124990b8d5d4e35ac919b1bb641ee802d0e8a34ce3e349a317790882",
+    "gpu/vk/vk_shader.h": "6f35878660673e44f05863fa90ccf7508908145002f7a5b106fa0420e5b5c640",
+    "gpu/vk/vk_shader.cpp": "3f6ec34894583ad09933609c00261ebfbd39ba76e5302450747e93090cba480d",
+    "gpu/vk/vk_progcache.cpp": "c1814aa3191390c70927d4cef016952339b95c2907baf3bf0b6dfb803b22fa89",
+    "gpu/vk/vk_draw.cpp": "a32b60545f2512cc13aa7d88776bfff79c9115acc0d3dfd654aae91bc9424a82",
+    "nx2/build.py": "10b20dd6d969c5530ca771777b3467db622889b5e1bd17c209003a078beda0a2"
+  },
+  "source_manifest_sha256": "a3fa5a0d711318b5629b2ab650bbdd8461dc94690c8710d8815e480c64b34be9",
+  "freeze_receipt_sha256": "067ad822f389181f7e825c83dfabc1e4901a67e9b62d7a4eca403b3d77058265",
+  "build": {
+    "workers": 4,
+    "renderer_flags": [
+      "-std=c++20",
+      "-O2",
+      "-g0",
+      "-DNDEBUG",
+      "-DHOOKSHOT_RELEASE",
+      "-march=x86-64-v3"
+    ],
+    "renderer_only": true
+  },
+  "full_test_count": 473,
+  "tests_passed": true,
+  "checks": {
+    "production_cpp_optimized_compile": true,
+    "synthetic_positive_lowering": true,
+    "negative_cases": 11,
+    "malformed_known_opcodes_fail_closed": true,
+    "exact_identity_and_width_guards_checked": true,
+    "scope": "CPU-only authored fixtures; no Vulkan/device/real shader execution",
+    "production_device_stage_and_compiler_policy_mocks_checked": true,
+    "mock_only_no_vulkan_link_or_device_calls": true,
+    "max_presence_empty_zero_and_legacy_value_refused": true,
+    "all_nine_forbidden_controls_refused_for_empty_zero_and_one": true,
+    "nine_patch_chain_apply_checked": true,
+    "cache_keeps_canonical_originals": true,
+    "jit_cache_identity_policy_and_build_stamp_hooks_checked": true,
+    "patch_sha256": "8d0cc053103ccf90b51e6c55c6e7ee39292636f03b85e16d74bd8d8d1221854b"
+  },
+  "policy": {
+    "required": {
+      "HS_SPILL_BATCH": "1",
+      "HS_PUSH_SHADOW": "1",
+      "shader_spilling_rate": "1"
+    },
+    "forbidden_presence": [
+      "HS_CS32_MAX_INSTS",
+      "HS_FORCE_SIMD8",
+      "HS_SUBGROUP8",
+      "HS_SPILL_PCT",
+      "HS_LARGE_GRF",
+      "HS_LARGE_GRF_BIT",
+      "HS_RA_DEBUG",
+      "INTEL_DEBUG",
+      "RX_VK_WARP64"
+    ],
+    "RX_VK_NOOPT": "must be off using upstream env_on",
+    "MAX_empty_or_zero_allowed": false,
+    "cache_policy_revision": 2,
+    "pipeline_policy_tag_revision": 2,
+    "cache_serialization_format": 1,
+    "eligibility_guard_sanitizes_global_environment": false,
+    "safe_launcher_must_also_cover_disabled_baseline": true
+  },
+  "guarded_program": "d8e59341cf4f629c",
+  "guarded_variant": "0c8f08626a9d98a4",
+  "opt_in": "RX_VK_OO_MESH_WARP32=8 or16; otherwise disabled",
+  "native_candidate_sha256": "8754612a7395d1f804d4e56a7c18cb5a6f23ed2e02f01879cbc51bd108682de0",
+  "candidate_bytes_unchanged_from_v1": true,
+  "actual_selected_identity_preserved": true,
+  "compute_fallback_hazard": {
+    "option": "HS_CS32_MAX_INSTS",
+    "presence_not_numeric_truth_controls_fallback": true,
+    "empty_and_zero_still_enable_fallback": true,
+    "readers": [
+      "src/intel/compiler/brw/brw_compile_cs.cpp",
+      "src/intel/compiler/brw/brw_reg_allocate.cpp"
+    ],
+    "numeric_threshold_reader_scope": "MESA_SHADER_COMPUTE and SIMD32",
+    "global_compute_outputs_not_validated_by_graphics_comparison": true
+  },
+  "compile_comparison": {
+    "scope": "Compile-only safe3 vs legacy MAX100000 on unchanged old5ea driver; no queue commands or dispatch",
+    "native_candidate_sha256": "8754612a7395d1f804d4e56a7c18cb5a6f23ed2e02f01879cbc51bd108682de0",
+    "wrapper_sha256": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+    "private_helper_source_sha256": "a5f64c5492306f1a140ccc5cf8b11e51d4ec47c5592c1208b9193d2a3aae01ac",
+    "private_helper_binary_sha256": "268c1e91aca6654d3cb495f20cdf59b67802452d0e12b2a1c589fc52d334d97f",
+    "driver_identity": {
+      "icd_sha256": "f8b0481b1769d3f1135245ec09bb54be5bdc3b20127efae50915b9f7f4ddaa32",
+      "library_name": "libvulkan_intel.so",
+      "library_sha256": "5ea19ac96aa52d061ecf2b8e23df7ed3d7d3b36c7d2ae7fe62f01c5a9b610aaa",
+      "mesa_build_options": {
+        "buildtype": "debugoptimized",
+        "debug": true,
+        "optimization": "2",
+        "b_lto": false,
+        "b_ndebug": "true"
+      },
+      "compute_compiler_flags": [
+        "-DNDEBUG",
+        "-O2",
+        "-g"
+      ],
+      "build_library_digest_matches": true,
+      "graphics_compiler_flags": {
+        "brw_compile_mesh.cpp": [
+          "-DNDEBUG",
+          "-O2",
+          "-g"
+        ],
+        "brw_compile_fs.cpp": [
+          "-DNDEBUG",
+          "-O2",
+          "-g"
+        ]
+      }
+    },
+    "diagnostic_state": {
+      "color_format": 122,
+      "depth_format": 126,
+      "samples": 1,
+      "extent": [
+        1536,
+        864
+      ],
+      "depth_test": true,
+      "depth_write": false,
+      "depth_compare_op": 2,
+      "cull_mode": 0,
+      "front_face": 0,
+      "alpha_to_coverage": false,
+      "color_write_mask": 15
+    },
+    "legacy_policy": {
+      "name": "runtime",
+      "controlled_options": {
+        "HS_CS32_MAX_INSTS": "100000",
+        "HS_SPILL_BATCH": "1",
+        "HS_PUSH_SHADOW": "1",
+        "shader_spilling_rate": "1",
+        "INTEL_DEBUG": null,
+        "HS_SPILL_PCT": null,
+        "HS_RA_DEBUG": null,
+        "HS_FORCE_SIMD8": null,
+        "HS_LARGE_GRF": null,
+        "HS_SUBGROUP8": null,
+        "HS_LARGE_GRF_BIT": null,
+        "RX_VK_WARP64": null,
+        "RX_VK_NOOPT": null
+      },
+      "full_environment_snapshot": false,
+      "profile_scope": "historical MAX-present compile-only comparison"
+    },
+    "safe_policy": {
+      "name": "native-safe",
+      "controlled_options": {
+        "HS_CS32_MAX_INSTS": null,
+        "HS_SPILL_BATCH": "1",
+        "HS_PUSH_SHADOW": "1",
+        "shader_spilling_rate": "1",
+        "INTEL_DEBUG": null,
+        "HS_SPILL_PCT": null,
+        "HS_RA_DEBUG": null,
+        "HS_FORCE_SIMD8": null,
+        "HS_LARGE_GRF": null,
+        "HS_SUBGROUP8": null,
+        "HS_LARGE_GRF_BIT": null,
+        "RX_VK_WARP64": null,
+        "RX_VK_NOOPT": null
+      },
+      "full_environment_snapshot": false,
+      "profile_scope": "MAX absent; no global compute fallback opt-in"
+    },
+    "all_executable_properties_and_statistics_equal": true,
+    "representations": [
+      {
+        "name": "exe-0-repr-0.bin",
+        "bytes": 1098819,
+        "sha256": "4930b2aba0a2270d5f4752e9d7132e8ccf5062046f4d133c7f59dcfeefa46899",
+        "byte_exact": true
+      },
+      {
+        "name": "exe-0-repr-1.bin",
+        "bytes": 30,
+        "sha256": "991fc1825d5b239f3b5791cc2c305516814784ee3324f17f0b5b4a972a51b60a",
+        "byte_exact": true
+      },
+      {
+        "name": "exe-0-repr-2.bin",
+        "bytes": 1964987,
+        "sha256": "0b85571546e43fe65e821927c6eaa808858caf692d9abfaab7a03dbb7755100a",
+        "byte_exact": true
+      },
+      {
+        "name": "exe-1-repr-0.bin",
+        "bytes": 307934,
+        "sha256": "ef4e4af364f197b968bd39404d1e6f5c55145ad5d9a75fa5d97da8a09295aeb5",
+        "byte_exact": true
+      },
+      {
+        "name": "exe-1-repr-1.bin",
+        "bytes": 236,
+        "sha256": "91d1a7abed14534e15cef5da1bf4f204dd1118a8047e616218c7317d5768e9f9",
+        "byte_exact": true
+      },
+      {
+        "name": "exe-1-repr-2.bin",
+        "bytes": 313421,
+        "sha256": "218da1bdf5aa0959fd2b37b182be02ead6f87eafb9c9c36d9225d1e8d3737718",
+        "byte_exact": true
+      }
+    ],
+    "executables": [
+      {
+        "index": 0,
+        "stage_flags": 128,
+        "name": "mesh",
+        "subgroup_size": 8,
+        "statistics": [
+          {
+            "name": "Instructions",
+            "value": 17981
+          },
+          {
+            "name": "Code size",
+            "value": 328048
+          },
+          {
+            "name": "SENDs",
+            "value": 840
+          },
+          {
+            "name": "Loops",
+            "value": 72
+          },
+          {
+            "name": "Cycles",
+            "value": 618601
+          },
+          {
+            "name": "Spills",
+            "value": 284
+          },
+          {
+            "name": "Fills",
+            "value": 258
+          },
+          {
+            "name": "Scratch Memory Size",
+            "value": 4096
+          },
+          {
+            "name": "GRF registers",
+            "value": 0
+          },
+          {
+            "name": "Push constant ranges",
+            "value": 0
+          },
+          {
+            "name": "Push constant registers",
+            "value": 0
+          },
+          {
+            "name": "Max dispatch width",
+            "value": 8
+          },
+          {
+            "name": "Max live registers",
+            "value": 195
+          },
+          {
+            "name": "Workgroup Memory Size",
+            "value": 14612
+          },
+          {
+            "name": "Non SSA regs after NIR",
+            "value": 1204
+          },
+          {
+            "name": "Source hash",
+            "value": 16082219638822208029
+          }
+        ],
+        "internal_representations": [
+          {
+            "name": "Final NIR",
+            "is_text": true,
+            "bytes": 1098819
+          },
+          {
+            "name": "Shader push map",
+            "is_text": true,
+            "bytes": 30
+          },
+          {
+            "name": "GEN Assembly",
+            "is_text": true,
+            "bytes": 1964987
+          }
+        ]
+      },
+      {
+        "index": 1,
+        "stage_flags": 16,
+        "name": "SIMD8 fragment",
+        "subgroup_size": 8,
+        "statistics": [
+          {
+            "name": "Instructions",
+            "value": 2629
+          },
+          {
+            "name": "Code size",
+            "value": 49408
+          },
+          {
+            "name": "SENDs",
+            "value": 57
+          },
+          {
+            "name": "Loops",
+            "value": 1
+          },
+          {
+            "name": "Cycles",
+            "value": 95922
+          },
+          {
+            "name": "Spills",
+            "value": 46
+          },
+          {
+            "name": "Fills",
+            "value": 100
+          },
+          {
+            "name": "Scratch Memory Size",
+            "value": 2048
+          },
+          {
+            "name": "GRF registers",
+            "value": 0
+          },
+          {
+            "name": "Push constant ranges",
+            "value": 4
+          },
+          {
+            "name": "Push constant registers",
+            "value": 11
+          },
+          {
+            "name": "Max dispatch width",
+            "value": 8
+          },
+          {
+            "name": "Max live registers",
+            "value": 159
+          },
+          {
+            "name": "Workgroup Memory Size",
+            "value": 0
+          },
+          {
+            "name": "Non SSA regs after NIR",
+            "value": 489
+          },
+          {
+            "name": "Source hash",
+            "value": 10758258269664525574
+          }
+        ],
+        "internal_representations": [
+          {
+            "name": "Final NIR",
+            "is_text": true,
+            "bytes": 307934
+          },
+          {
+            "name": "Shader push map",
+            "is_text": true,
+            "bytes": 236
+          },
+          {
+            "name": "GEN Assembly",
+            "is_text": true,
+            "bytes": 313421
+          }
+        ]
+      }
+    ],
+    "queue_submitted": false,
+    "render_executed": false
+  },
+  "wrapper": {
+    "source_sha256": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+    "new_profile": "native-safe",
+    "old_source_sha256": "babe4464a339812d6dd980cd851617732b441338c09ff682195f4e89a6ae2b55",
+    "old_source_recovered_from_commit": "01f8fa2a99369a6dc8881bf5ce688e14527434f9",
+    "legacy_runtime_four_required_values_preserved": true,
+    "newly_identified_controls_also_cleared": [
+      "HS_SUBGROUP8",
+      "HS_LARGE_GRF_BIT",
+      "RX_VK_WARP64",
+      "RX_VK_NOOPT"
+    ]
+  },
+  "v1_history": {
+    "historical": true,
+    "source_commit": "01f8fa2a99369a6dc8881bf5ce688e14527434f9",
+    "patch_sha256": "022dcb3aee0a38d3a8e8c3ba187867d120bbc97aea75a432e4728870f8d5c196",
+    "renderer_sha256": "29bdc49d929d60464b93d8c257d1363c171129af5db7e6ff5607a45e88a063a2",
+    "freeze_receipt_sha256": "70c9e64942c7f97d6d94e16614cbaa02a9ee71209f8d79fdee0dc5e5bfb3ba94",
+    "public_pilot_original_json_sha256": "3bb24d73c9bf2fa0f2982bd379103f36f74b9f26e1b0be300af52b0013b6221e",
+    "public_pilot_metadata_qualification_only": true,
+    "all_original_observation_and_hash_fields_unchanged": true,
+    "pilot_is_v2_validation": false,
+    "v1_frozen_artifacts_unchanged": true
+  },
+  "integrated_renderer_launched": false,
+  "approved_new_driver_validation_required": true,
+  "runtime_reference_cache_provenance_established": false,
+  "native_feature_validation_passed": false,
+  "pixel_equivalence_verified": false,
+  "real60_fps_verified": false,
+  "limits": [
+    "The old5ea library is used only for this bounded compile comparison, not a new full-runtime reference.",
+    "Identical native mesh/fragment codegen does not establish compute behavior or complete native-feature rendering.",
+    "New cache-safe Mesa library validation and separately admitted V2 runtime/replay evidence remain required.",
+    "No frozen mesh/physical replay wrapper, instrumenter or prior runtime artifact was changed."
+  ]
+}

@@ -13,7 +13,7 @@ new file mode 100644
 +namespace mkwvk::oo_mesh_warp32 {
 +inline constexpr uint64_t kProgram = 0xd8e59341cf4f629cull;
 +inline constexpr uint64_t kVariant = 0x0c8f08626a9d98a4ull;
-+inline constexpr uint32_t kRevision = 1;
++inline constexpr uint32_t kRevision = 2;
 +inline constexpr const char *kOriginal =
 +    "835aa59799c6ecb621034d946e2fa4eadb1aa2407d293321ae3e3052882bc9b3";
 +inline constexpr const char *kFragment =
@@ -740,7 +740,7 @@ diff --git a/gpu/vk/vk_shader.cpp b/gpu/vk/vk_shader.cpp
  
  // (EvilOOT, RX_VK_PTR_DIAG) the pointer pass's counts for this thread's translations
  // (global_memory_to_storage_buffer_pass.cpp, declared by hand so no Eden header changes)
-@@ -689,6 +691,103 @@
+@@ -689,6 +691,104 @@
  }
  
  /// A word of a stage's constant bank: c0 / c2 the driver's banks, c1 its own constants, c3.. its uniform buffers
@@ -754,13 +754,14 @@ diff --git a/gpu/vk/vk_shader.cpp b/gpu/vk/vk_shader.cpp
 +bool mesh_warp32_runtime_policy() {
 +    if (env_on("RX_VK_NOOPT")) return false;
 +    const std::pair<const char*, const char*> required[] = {
-+        {"HS_CS32_MAX_INSTS", "100000"}, {"HS_SPILL_BATCH", "1"},
-+        {"HS_PUSH_SHADOW", "1"}, {"shader_spilling_rate", "1"}};
++        {"HS_SPILL_BATCH", "1"}, {"HS_PUSH_SHADOW", "1"}, {"shader_spilling_rate", "1"}};
 +    for (const auto& item : required) {
 +        const char* value = std::getenv(item.first);
 +        if (!value || std::strcmp(value, item.second)) return false;
 +    }
-+    for (const char* key : {"INTEL_DEBUG", "HS_SPILL_PCT", "HS_RA_DEBUG", "HS_FORCE_SIMD8", "HS_LARGE_GRF", "RX_VK_WARP64"})
++    // MAX is a presence-based global compute fallback opt-in, even when empty/zero.
++    for (const char* key : {"HS_CS32_MAX_INSTS", "HS_FORCE_SIMD8", "HS_SUBGROUP8", "HS_SPILL_PCT",
++                            "HS_LARGE_GRF", "HS_LARGE_GRF_BIT", "HS_RA_DEBUG", "INTEL_DEBUG", "RX_VK_WARP64"})
 +        if (std::getenv(key)) return false;
 +    return true;
 +}
@@ -832,7 +833,7 @@ diff --git a/gpu/vk/vk_shader.cpp b/gpu/vk/vk_shader.cpp
 +        stage.mesh_warp32_width = width;
 +        stage.oo_identity = actual_identity; // disk cache deliberately retains original words
 +        if (baseline) vkDestroyShaderModule(dev.device, baseline, nullptr);
-+        logf("vk: OO mesh-warp32 applied rev %u prog %016llx variant %016llx required %u shared 14612 source %s actual %s; runtime compiler policy pinned; pipeline failures have no baseline recovery",
++        logf("vk: OO mesh-warp32 applied rev %u prog %016llx variant %016llx required %u shared 14612 source %s actual %s; safe-three compiler policy, MAX absent; pipeline failures have no baseline recovery",
 +             oo_mesh_warp32::kRevision, (unsigned long long)p.key, (unsigned long long)p.variant,
 +             width, oo_mesh_warp32::kOriginal, oo_mesh_warp32::kCandidate);
 +    } catch (const std::exception& error) {
@@ -844,7 +845,7 @@ diff --git a/gpu/vk/vk_shader.cpp b/gpu/vk/vk_shader.cpp
  uint32_t stage_cbuf_word(const NvnState& s, const Stage& st, uint32_t index, uint32_t offset) {
      if (index == 1) {
          uint32_t v = 0;
-@@ -1158,6 +1257,8 @@
+@@ -1158,6 +1258,8 @@
      // lost it)
      const uint64_t translator = HOOKSHOT_SHADER_STAMP;
      add(&translator, sizeof translator);
@@ -853,7 +854,7 @@ diff --git a/gpu/vk/vk_shader.cpp b/gpu/vk/vk_shader.cpp
      const uint32_t depth = host->depth_minus_w() != 0;   // (d3zessete's PR 54: programs made in either depth mode are kept apart)
      add(&depth, sizeof depth);
      // (and a GPU's mesh shaders: a file of native task and mesh programs is no use to the compute fallback, nor its to one)
-@@ -1627,6 +1728,7 @@
+@@ -1627,6 +1729,7 @@
          for (const Stage& st : p.stages)
              if (!st.module) throw Shader::LogicError("vkCreateShaderModule failed");
          record_answers(p, s);   // (task questions not counted: kept conservative)
@@ -929,7 +930,7 @@ diff --git a/gpu/vk/vk_draw.cpp b/gpu/vk/vk_draw.cpp
 +
 +uint64_t mesh_warp32_pipeline_tag(const Program& p) {
 +    for (const Stage& stage : p.stages)
-+        if (stage.mesh_warp32_width) return 0x4f4f573332010000ull | stage.mesh_warp32_width;
++        if (stage.mesh_warp32_width) return 0x4f4f573332020000ull | stage.mesh_warp32_width;
 +    return 0;
  }
  

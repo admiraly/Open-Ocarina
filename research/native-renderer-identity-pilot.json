@@ -165,5 +165,8 @@
     "Existing rejected cooperative-matrix networks and skipped startup work prevent full native-feature/rendering acceptance.",
     "Copied warm driver cache has unresolved override provenance. A cache-policy repair and fresh controlled validation are required before correctness/performance conclusions.",
     "Images, raw logs, shader binaries, saves and inputs remain private. No timings are published as a speed comparison."
-  ]
+  ],
+  "integration_revision": 1,
+  "historical_legacy_MAX_profile": true,
+  "source_commit": "01f8fa2a99369a6dc8881bf5ce688e14527434f9"
 }

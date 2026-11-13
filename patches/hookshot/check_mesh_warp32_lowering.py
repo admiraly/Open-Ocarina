@@ -202,8 +202,12 @@ int main() {
  mock_stage=0;if(mesh_warp32_device(8))return 6;mock_stage=128;
  mock_shared=14611;if(mesh_warp32_device(8))return 7;mock_shared=65536;
  setenv("HS_SPILL_BATCH","0",1);if(mesh_warp32_runtime_policy())return 8;setenv("HS_SPILL_BATCH","1",1);
- setenv("HS_FORCE_SIMD8","1",1);if(mesh_warp32_runtime_policy())return 9;unsetenv("HS_FORCE_SIMD8");
- setenv("HS_RA_DEBUG","1",1);if(mesh_warp32_runtime_policy())return 15;unsetenv("HS_RA_DEBUG");
+ // Every forbidden variable is presence-based: empty and zero must also refuse.
+ for(const char* key:{"HS_CS32_MAX_INSTS","HS_FORCE_SIMD8","HS_SUBGROUP8","HS_SPILL_PCT","HS_LARGE_GRF","HS_LARGE_GRF_BIT","HS_RA_DEBUG","INTEL_DEBUG","RX_VK_WARP64"}) {
+  for(const char* value:{"","0","1"}) {setenv(key,value,1);if(mesh_warp32_runtime_policy())return 18;}
+  unsetenv(key);
+ }
+ setenv("HS_CS32_MAX_INSTS","100000",1);if(mesh_warp32_runtime_policy())return 19;unsetenv("HS_CS32_MAX_INSTS");
  setenv("RX_VK_NOOPT","1",1);if(mesh_warp32_runtime_policy())return 16;setenv("RX_VK_NOOPT","0",1);if(!mesh_warp32_runtime_policy())return 17;unsetenv("RX_VK_NOOPT");
  Stage source;VkPipelineShaderStageCreateInfo info;
  pin_program_stage(info,source);if(static_cast<const VkPipelineShaderStageRequiredSubgroupSizeCreateInfo*>(info.pNext)->requiredSubgroupSize!=32)return 10;
@@ -238,11 +242,13 @@ def check_policy(compiler=None):
         subprocess.run([compiler,'-std=c++20','-O2','-DNDEBUG','-Wall','-Wextra','-Werror',str(work/'mock.cpp'),'-o',str(work/'mock')],
                        check=True,capture_output=True,text=True,timeout=60)
         env=os.environ.copy()
-        for key in ('INTEL_DEBUG','HS_SPILL_PCT','HS_RA_DEBUG','HS_FORCE_SIMD8','HS_LARGE_GRF','RX_VK_WARP64','RX_VK_NOOPT'):env.pop(key,None)
-        env.update(HS_CS32_MAX_INSTS='100000',HS_SPILL_BATCH='1',HS_PUSH_SHADOW='1',shader_spilling_rate='1')
+        for key in ('HS_CS32_MAX_INSTS','HS_FORCE_SIMD8','HS_SUBGROUP8','HS_SPILL_PCT','HS_LARGE_GRF','HS_LARGE_GRF_BIT','HS_RA_DEBUG','INTEL_DEBUG','RX_VK_WARP64','RX_VK_NOOPT'):env.pop(key,None)
+        env.update(HS_SPILL_BATCH='1',HS_PUSH_SHADOW='1',shader_spilling_rate='1')
         subprocess.run([str(work/'mock')],env=env,check=True,timeout=10)
     return {'production_device_stage_and_compiler_policy_mocks_checked':True,
-            'mock_only_no_vulkan_link_or_device_calls':True}
+            'mock_only_no_vulkan_link_or_device_calls':True,
+            'max_presence_empty_zero_and_legacy_value_refused':True,
+            'all_nine_forbidden_controls_refused_for_empty_zero_and_one':True}
 
 
 def check_source(checkout):
