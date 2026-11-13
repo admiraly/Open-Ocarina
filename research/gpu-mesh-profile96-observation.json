@@ -1,0 +1,412 @@
+{
+  "schema": "open-ocarina.sanitized-mesh-profile96-observation/v1",
+  "date": "2026-11-13",
+  "evidence_label": "runtime-mesh-profile96-02",
+  "profile": "6864-position10-96/v1",
+  "scope": "One bounded native input snapshot; artifact integrity and recording association only; no shader replay or output/performance comparison",
+  "source_pin": "4cf785a0b143bb34026506c9a3fe4f4bb93c797d",
+  "renderer_sha256": "81eb49769fddca27c6e8e7f39ba3eb967d697cdbda3a2501d2e7638b6ce8cc14",
+  "host_sha256": "4eb32b56a91869b5d7ac1673f0ca1e3c0841e893a8a34f728ec85344a312cb30",
+  "renderer_patches_sha256": {
+    "patches/hookshot/compute-identity.patch": "2f14873edfdb47b1f915e75bc4bbe6683ef6632bc66fcbfa1d918aa1c176f018",
+    "patches/hookshot/page-table-snapshot.patch": "c236b96851bc95426202abec6447e672577fdda747fd8405cc435dae435834ab",
+    "patches/hookshot/allocation-capture.patch": "7d8f23d3824374002472bc4a65f3f078c3306d4c5cd395f97e2a1e083fe49aab",
+    "patches/hookshot/occurrence-capture.patch": "defdda2dced583678e39daea0dc7e671fcc8926df8374a62ad45fe675692b752",
+    "patches/hookshot/graphics-identity.patch": "d2572d167c7427c79ce5b600fdeef67a0738678e5e05cbe1ec21db89d8865e53",
+    "patches/hookshot/sampled-image-capture.patch": "45fd019c2670a0c5c4cb0bfba8decb3701531c8248ec205e2b95ba03969aa362",
+    "patches/hookshot/dispatch-parameters.patch": "ff86fe706725f2c70dc759a6e2d295ebedee12b5b93b4b6e2cf407c58a689d8e",
+    "patches/hookshot/binding-provenance.patch": "af88886fb027b91bea136db0c2bf05865cf510232c50fdcbdd9d238d930009b1",
+    "patches/hookshot/mesh-input-capture.patch": "eea7b1b3181751b6b09811a458626958799f2d9a8511a74fdb8bd49854462f5c",
+    "patches/hookshot/mesh-warp32-lowering.patch": "8d0cc053103ccf90b51e6c55c6e7ee39292636f03b85e16d74bd8d8d1221854b",
+    "patches/hookshot/mesh-input-profile96.patch": "d87391e4c8ff1130b2c918da4d6e38c45420acd0f43b12b6ea47a33a3b27f51b"
+  },
+  "source_sha256": {
+    "gpu/vk/mesh_input_profile96.h": "cbe6d447278fd352fa7041d2df5e64d41d3ef1aee137d098782686b163a82176",
+    "gpu/vk/mesh_input_capture.h": "e129b121f6a77673852780da3d0d4510f26672912d6dd5f96bf64376203022a6",
+    "gpu/vk/vk_draw.cpp": "95dff220678a9accd83da7e30d72807a49de5090ed3b43311346b41febf87f65",
+    "gpu/vk/vk_memory.cpp": "798c732c88ac9413cb762c5aa32d814c76774527600123da3cf13bde2f9f9ec7",
+    "gpu/vk/vk_internal.h": "5e582b44784962d97edd475fbd314b8e19359d3378facfa1bb87ec2051f215c2"
+  },
+  "renderer_source_manifest_sha256": "9bd8d809efee90419c19bc938b893a74158928d0fe4ad5984566517acb9f41ed",
+  "renderer_freeze_sha256": "212e82b264ec84d25eba5288f7f4cea972e455c016e6791ca76a8885dbb3dbe2",
+  "checker": {
+    "path": "patches/hookshot/check_mesh_input_profile96.py",
+    "sha256": "0216edd64b1abcd9d6ce97e3d9791b74c90c1c3ed91aa5348e987b59a9eafe63",
+    "strict_result": "passed"
+  },
+  "driver_selection": {
+    "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+    "elf_build_id": "05fee58a93a8230fbc4d5e80fc4bab875832695e",
+    "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+    "icd_declared_api_version": "1.4.354",
+    "icd_file_format_version": "1.0.1",
+    "cache_policy_patch_sha256": "a14f1d19c157544aee851f1f48284d6eeb2f5e7dbfb8150c1919c320f4dc787f",
+    "selection_method": "Controlled hashed ICD and driver library, independently hashed before and after the run",
+    "independent_live_mapping_attestation": false,
+    "policy": {
+      "HS_SPILL_BATCH": "1",
+      "HS_PUSH_SHADOW": "1",
+      "shader_spilling_rate": "1",
+      "HS_CS32_MAX_INSTS": null,
+      "HS_FORCE_SIMD8": null,
+      "HS_SUBGROUP8": null
+    },
+    "native_transform_mode": "0"
+  },
+  "capture_manifests_sha256": {
+    "mesh-inputs-6864.json": "274a511b8453ea8a0e8022ff0516c03afcc14e9091bf36420f24bb0261553708",
+    "manifest.json": "e95d9aaf90ef668bdf84ff4fa2af51666c50663cc056aafc53f4614b8bc05274",
+    "allocations.json": "64fe40090da1c3b4975b0c15b9ca49db4381fa52fa7f7e14eccbc218e1c3b751",
+    "binding-provenance.json": "242c4c6d076da2cd0b44fcf120aff014ce8e887915b188fa98221353d52880d4"
+  },
+  "capture_artifact_inventory_sha256": "a8ff193ec0587775152eda97508ceca96945015e3a8756fb490a1c80505937dd",
+  "private_preparation_sha256": "8d9d99148c241443b9ec1ee803fdc07d50a55606ed600f706af8b0132fee646f",
+  "private_launch_sha256": "95109fdd4df9d3cf25392d4caca4287acfd85986069dc6178b8de57199b93e57",
+  "private_watcher_status_sha256": "6db778f4719317159b0f38a9b4e8a1ac3ad37a8fa4b390e0fac884adfe991ac7",
+  "event": {
+    "program": "68642bb810ee3e7c",
+    "variant": "3f3f5b29054673da",
+    "spirv_sha256": "999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93",
+    "stage_index": 0,
+    "nvn_stage": 7,
+    "vk_stage": 128,
+    "recording_part": 8968,
+    "logical_value": 7533,
+    "recording_sequence": 8968,
+    "completed_recording_sequence": 8971,
+    "selected_occurrence": 64,
+    "actual_site_confirmed": true
+  },
+  "completion_scope": "Recording sequence 8968 was covered by observed completed sequence 8971. These are distinct values; completion does not prove historical CPU immutability.",
+  "launch": {
+    "command": "vkCmdDrawMeshTasksIndirectEXT",
+    "draw_count": 1,
+    "stride": 12,
+    "converted": true,
+    "group_count": [
+      67,
+      1,
+      1
+    ],
+    "snapshot": {
+      "size": 12,
+      "sha256": "5970ba39061c9f076ff61281352b079c92ec8ae97d08f81d98029f856b53b2dd"
+    },
+    "source": "Twelve GPU BEFORE bytes at the actual confirmed converted indirect argument position",
+    "cpu_grid_substitution": false
+  },
+  "requested_subgroup": {
+    "required_size": 32,
+    "require_full_subgroups": false
+  },
+  "observed_driver_selected_simd_width": null,
+  "enabled_features_observed": {
+    "nullDescriptor": true
+  },
+  "descriptor_layout_required": [
+    {
+      "set": 0,
+      "binding": 0,
+      "type": 6,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 1,
+      "type": 6,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 2,
+      "type": 6,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 3,
+      "type": 6,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 4,
+      "type": 7,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 5,
+      "type": 7,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 6,
+      "type": 7,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 7,
+      "type": 7,
+      "count": 1,
+      "stage_flags": 128
+    },
+    {
+      "set": 0,
+      "binding": 8,
+      "type": 7,
+      "count": 3,
+      "stage_flags": 128
+    }
+  ],
+  "descriptor_positions": 11,
+  "nonnull_views": 9,
+  "defined_nulls": 2,
+  "descriptor_payload_bytes": 158076400,
+  "launch_payload_bytes": 12,
+  "raw_mesh_payload_bytes": 158076412,
+  "payload_total_scope": "Exact nonnull descriptor slices plus launch bytes; no metadata, full-buffer superset or replay bundle framing",
+  "slots": [
+    {
+      "set": 0,
+      "binding": 0,
+      "element": 0,
+      "type": 6,
+      "null_descriptor": false,
+      "range_bytes": 2224,
+      "snapshot": {
+        "size": 2224,
+        "sha256": "a37c3b01f13d4ebf1e3959a1096f4eced683ac98153c65be334669ba8f267f6d"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 1,
+      "element": 0,
+      "type": 6,
+      "null_descriptor": false,
+      "range_bytes": 12352,
+      "snapshot": {
+        "size": 12352,
+        "sha256": "e774e6098c1965c285e1a1e7bf571a808d4749aaa26d2a9e1b26196afd5814ce"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 2,
+      "element": 0,
+      "type": 6,
+      "null_descriptor": false,
+      "range_bytes": 912,
+      "snapshot": {
+        "size": 912,
+        "sha256": "f7df30661d748d5291ab0f9466acd89369cb8fa0890763aabc8832ecb0dba403"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 3,
+      "element": 0,
+      "type": 6,
+      "null_descriptor": false,
+      "range_bytes": 112,
+      "snapshot": {
+        "size": 112,
+        "sha256": "ec0535d169d69cb0050a911f1475ce5e6c9825efdce750cec4532607f8563158"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 4,
+      "element": 0,
+      "type": 7,
+      "null_descriptor": false,
+      "range_bytes": 192,
+      "snapshot": {
+        "size": 192,
+        "sha256": "ed3b14d661ec67834b18ec44473a00913bd4c60ec5f806349673a7505bf3e559"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 5,
+      "element": 0,
+      "type": 7,
+      "null_descriptor": false,
+      "range_bytes": 64,
+      "snapshot": {
+        "size": 64,
+        "sha256": "4d08d9277bd1ae284ce6b07a01dd52fc3218e468faf46edbac0290e56c0b8f64"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 6,
+      "element": 0,
+      "type": 7,
+      "null_descriptor": false,
+      "range_bytes": 634944,
+      "snapshot": {
+        "size": 634944,
+        "sha256": "28e20bb40d72b3322b32706bfbb27d13df09ec144435d3ee0d552a9c75b4d656"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 7,
+      "element": 0,
+      "type": 7,
+      "null_descriptor": false,
+      "range_bytes": 573376,
+      "snapshot": {
+        "size": 573376,
+        "sha256": "35445064d4ae753f28c87b30ba358c1390f958d7a6d55cd98db87a32fcd62fc0"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 8,
+      "element": 0,
+      "type": 7,
+      "null_descriptor": false,
+      "range_bytes": 156852224,
+      "snapshot": {
+        "size": 156852224,
+        "sha256": "43031106c35d31ab6ed400aadd5b9f69a47284769ec9acacac271d2f0bfafdb3"
+      }
+    },
+    {
+      "set": 0,
+      "binding": 8,
+      "element": 1,
+      "type": 7,
+      "null_descriptor": true,
+      "range_bytes": null,
+      "snapshot": null
+    },
+    {
+      "set": 0,
+      "binding": 8,
+      "element": 2,
+      "type": 7,
+      "null_descriptor": true,
+      "range_bytes": null,
+      "snapshot": null
+    }
+  ],
+  "before_only_superset": {
+    "allocation_candidates": 124,
+    "source_bytes": 2409627648,
+    "staging_budget_bytes": 6442450944,
+    "after_recorded": false,
+    "full_payload_integrity_checked_against_declared_before_hashes": true,
+    "table_copied_as_unused_mesh_superset": true,
+    "complete_physical_replay": false
+  },
+  "cache_provenance": {
+    "mesa_cache_origin": "Initially unseeded, then warmed only by parent-controlled E5 safe3/MAX-absent runs including the failed first attempt",
+    "initial_unknown_cache_seeded": false,
+    "opaque_vulkan_cache_seeded": false,
+    "opaque_vulkan_cache_written_only_by_this_owned_run": true,
+    "canonical_program_and_notes_source": "Stopped runtime-mesh-profile96-01, copied and hash-verified without modifying that source",
+    "canonical_source_unchanged": true,
+    "mesa_before_inventory_sha256": "924cdd546aed544358d2216b9cd6750b265781dc8b0a9f18a7d921eeab006988",
+    "mesa_after_inventory_sha256": "a1dde4dffd2b4101144a9f186fb9173822b6e0ae128a0e540d053e4e0ebf9f00",
+    "mesa_cache_changes": {
+      "added": 20,
+      "removed": 0,
+      "changed": 1
+    },
+    "install_cache_after_inventory_sha256": "53dc87741152f55dcc5486118167b3e01d7e41d9f3b4c14ac7a835c1385b5093"
+  },
+  "input_and_clock": {
+    "same_original_userdata_seed_hash_verified": true,
+    "settings_sha256": "88438c44dd1043247aedf25e517e281608f4b2c82109fcbb006260d22356a5bd",
+    "settings_unchanged": true,
+    "game_speed_setting": 0,
+    "frame_clock": "per-frame",
+    "fps_cap": 60,
+    "menu_script_frames": [
+      4,
+      6,
+      8,
+      10,
+      12,
+      14,
+      16
+    ],
+    "exclusive_and_persistent_requested": true,
+    "live_device_suppression_independently_tested": false,
+    "deterministic_camera_or_workload_certificate": false
+  },
+  "terminal_watcher": {
+    "owned_pidfd": true,
+    "deadline_seconds": 600,
+    "elapsed_seconds": 39.386,
+    "stopped": true,
+    "reason": "requested manifests committed",
+    "signal": "SIGTERM",
+    "exit_code": -15,
+    "all_four_requested_manifests_committed": true,
+    "partial_payload_files": 0,
+    "gpu_lease_released": true,
+    "unrelated_process_signals": false,
+    "elapsed_is_shader_or_fps_measurement": false
+  },
+  "validation": {
+    "artifact_integrity_verified": true,
+    "same_recording_associations_verified": true,
+    "actual_native_site_confirmed": true,
+    "independent_gpu_attestation": false,
+    "nonzero_grid_guard_passed": true,
+    "nonzero_grid_is_execution_authorization": false
+  },
+  "unresolved": [
+    "backing_generation_and_alias_normalization",
+    "cpu_writers_quiesced",
+    "draw_equivalent_input_proof",
+    "whole_graphics_resources_and_outputs"
+  ],
+  "claims": {
+    "runtime_execution_authorized": false,
+    "historical_draw_input_atomicity_proven": false,
+    "cpu_writers_quiesced": false,
+    "canonical_backing_aliases_normalized": false,
+    "shader_replay_executed": false,
+    "shader_output_equivalence_proven": false,
+    "fragment_or_raster_resources_complete": false,
+    "whole_rendering_or_native_quality_proven": false,
+    "optimization_or_fps_gain_proven": false,
+    "replay_complete": false
+  },
+  "limits": [
+    "One selected preparation/confirmed native command at occurrence 64, not global queue order",
+    "Diagnostic rendering split and resource copies perturb scheduling",
+    "Four UBO positions and seven SSBO positions; two reviewed null descriptors preserve enabled-feature zero-handle/zero-offset/whole-range framing without fake bytes or owners",
+    "Exact slice output bounded to one GiB; at most32-group future replay windows require separate preparation and review",
+    "Copied BEFORE bytes and observed lifetimes do not prove immutable CPU writers or historical draw-input atomicity",
+    "No transformed shader, mesh replay executor, screenshot/image comparison or performance benchmark in this observation",
+    "No frozen producer, shader/executor source, global driver installation or unrelated process was changed"
+  ],
+  "previous_failed_attempt": {
+    "evidence_label": "runtime-mesh-profile96-01",
+    "same_frozen_renderer_sha256": "81eb49769fddca27c6e8e7f39ba3eb967d697cdbda3a2501d2e7638b6ce8cc14",
+    "watcher_status_sha256": "db6b6d8cba47a45adf602cee33d4a6cc9c1d915fc0b29b35e21f2896613a8f40",
+    "stopped": true,
+    "reason": "bounded capture timeout",
+    "bound_seconds": 300,
+    "incomplete_payload_at_stop": "buffer-59-before.bin.part",
+    "accepted_or_relabelled_complete": false,
+    "preserved_separately": true,
+    "included_in_this_observation": false
+  }
+}

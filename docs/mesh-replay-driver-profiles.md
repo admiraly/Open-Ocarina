@@ -1,6 +1,8 @@
 # Explicit driver and mesh replay profiles
 
-The current replay wrapper requires an explicit driver profile and compiler policy during CPU preparation. It supports two separately identified mesh output contracts. This update has CPU validation only; its fresh executors and plans need separate review and an exclusive GPU lease before execution. The [previous D8 observations](native-mesh-replay.md) retain their original source, helper, driver and plan hashes.
+Both independently authored output fixtures passed their four authorized GPU cases on the pinned E5 driver: actual widths 32,32,8,16 matched their complete CPU golden buffers. [Sanitized evidence](../research/mesh-replay-e5-fixture-observation.json) records all eight cases and exact artifacts. No game shader ran in this checkpoint. The [previous D8 observations](native-mesh-replay.md) retain their original source, helper, driver and plan hashes.
+
+The current replay wrapper requires an explicit driver profile and compiler policy during CPU preparation. It supports two separately identified mesh output contracts. Fresh real-module plans still need separate review and an exclusive GPU lease before execution.
 
 ## Driver admission
 
@@ -58,7 +60,7 @@ The native execution boundary remains exactly one draw over at most 32 workgroup
 
 ## CPU review handoff
 
-The two fresh private preparations are `local/native-mesh-replay/e5-d8-fixture-review-02` and `local/native-mesh-replay/e5-6864-fixture-review-02`. No GPU execution is included in this handoff.
+The two private preparations are `local/native-mesh-replay/e5-d8-fixture-review-02` and `local/native-mesh-replay/e5-6864-fixture-review-02`. They were reviewed before the separately authorized GPU checkpoint below.
 
 | Artifact | SHA-256 |
 |---|---|
@@ -73,3 +75,11 @@ The two fresh private preparations are `local/native-mesh-replay/e5-d8-fixture-r
 Sixteen dedicated standard-library tests cover profile/policy rejection, wrong-driver refusal before helper launch, all dependency source changes, incomplete source graphs, old schemas, cross-profile layouts, producer flags, exact descriptors/nulls/ranges, output counts/writtenness/guards and CPU-only preparation. The full CPU suite passed 506 tests. Strict C11/O2/NDEBUG compilation with all warnings treated as errors and both matching native validators passed; both mismatched profile/module combinations were rejected in CPU-only validation. External build dependencies are a C compiler, Vulkan headers/loader/pkg-config, SPIR-V assembler/disassembler and validator.
 
 A private CPU pointer audit of the exact 6864 source pair found Logical/GLSL450 addressing, three reachable functions and 144 direct calls in each. Original and conditional contain respectively 12,822/13,060 module instructions and 10,264/10,479 reachable function instructions. Each has 265 UBO loads, 49 SSBO loads, ten input length queries and zero reachable input stores. Neither whole module contains pointer equality/difference/address-conversion operations; reachable pointer consumers are limited to access-chain bases, load sources, store destinations and length-query operands. This supports separate immutable descriptor views for this exact readonly graph. It does not prove historical atomicity, shader transformation equivalence, final rendering or performance.
+
+## Authorized E5 fixture observation
+
+On 2026-11-13, both exact plans and the helper above executed after source review and an exclusive GPU grant. Every case issued one two-workgroup draw. D8 produced 128 vertices per group with primitive counts 128 and 0; 6864 produced 96 vertices per group with primitive counts 96 and 0. Each profile's four full initialized outputs matched its CPU golden hash in the table. Actual executable widths were 32,32,8,16, with mesh stage confirmed by pipeline executable properties.
+
+Both original32 fixture cases passed the complete CPU oracle, count/writtenness/padding and guard checks before the width8 and width16 cases ran. Input and origin-control bytes stayed unchanged. The root independently read all eight saved outputs, checked their records and compared them with the frozen expected files. Execution report hashes are `19ec4b4f421316f1b65343f27cec59802ed80937ee0d995ca5cf5b34ca3d9d0b` for D8 and `4008a08bc5a69aa831a49d2cfc8cf1b5f118042b69c3b43f04328592896a3fea` for 6864. The GPU lease was released immediately after terminal completion.
+
+All cases used independently authored fixtures without subgroup operations or input reads. This establishes bounded executor/profile/capture behavior on the pinned configuration; it does not establish transformation equivalence, shader-side null reads, historical reproduction, rendering quality or speed. No original or transformed game module was executed as part of this fixture checkpoint.

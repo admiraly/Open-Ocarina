@@ -1,0 +1,423 @@
+{
+  "schema": "open-ocarina.mesh-replay-e5-fixture-observation/v1",
+  "observed_date": "2026-11-13",
+  "status": "eight-authorized-synthetic-cases-passed",
+  "gpu_lease_released": true,
+  "source_inputs": "Independently authored mesh fixtures only; no game shaders, assets or captured game descriptor bytes executed",
+  "device": {
+    "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "driver": "Intel open-source Mesa driver",
+    "driver_info": "Mesa 26.2.4",
+    "vendor_id": 32902,
+    "device_id": 22176
+  },
+  "execution_contract": {
+    "mesh_stage": true,
+    "local_size": [
+      32,
+      1,
+      1
+    ],
+    "draws_per_case": 1,
+    "groups_per_case": 2,
+    "fence_timeout_ns": 2000000000,
+    "process_timeout_seconds": 30,
+    "max_groups_per_draw": 32,
+    "rasterizer_discard": true,
+    "rendering_attachments": 0,
+    "null_descriptor_tail": true,
+    "source_inputs_readonly": true,
+    "fresh_capture_and_control_allocations": true
+  },
+  "profiles": [
+    {
+      "output_profile": "d8-position9-128/v1",
+      "mode": "synthetic-fixture",
+      "prepared_plan_sha256": "072af2bb74bcf2da03f6fa4fcb29189f13baedc844002f195408c1804829f275",
+      "execution_report_sha256": "19ec4b4f421316f1b65343f27cec59802ed80937ee0d995ca5cf5b34ca3d9d0b",
+      "helper_sha256": "b379519f9e24eed0d271f438848ecff560ec82b891b7c97f7f805bfaa938a398",
+      "sources": {
+        "tools/mesh_replay.py": "e91bba8b8972a42a9456422fcffacb8fe07803dfa0d47077f448c55113edb222",
+        "tools/vulkan_mesh_replay.c": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+        "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+        "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+        "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+        "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c",
+        "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+        "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+        "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+      },
+      "fixture_source_sha256": "7cf8f030615526b4dc2025114a547a07be7c764f7ece3cc044aece6f9dcf13a8",
+      "fixture_instrumented_sha256": "e548e6d40320c28f1156e8c910fa64ee6f87b936cba15856b41648295b5828fa",
+      "native_input_bundle_sha256": "06e8999c1bd656b51fc54e9834f9ea2e6c37cc5910eaf55e9878bbba5251e36a",
+      "cpu_expected_full_output_sha256": "468f2a6104f33a8adf303f928857d8609753fd73f8033236b61eb6d58d84d7d1",
+      "cpu_expected_full_output_bytes": 89984,
+      "origin": [
+        128,
+        0,
+        0
+      ],
+      "groups": [
+        2,
+        1,
+        1
+      ],
+      "driver_profile": {
+        "name": "cache-safe-e5",
+        "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+        "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+        "policy": "native-safe"
+      },
+      "driver": {
+        "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+        "library_name": "libvulkan_intel.so",
+        "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+      },
+      "compiler_policy": {
+        "name": "native-safe",
+        "controlled_options": {
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_PUSH_SHADOW": "1",
+          "shader_spilling_rate": "1",
+          "INTEL_DEBUG": null,
+          "HS_SPILL_PCT": null,
+          "HS_RA_DEBUG": null,
+          "HS_FORCE_SIMD8": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "HS_LARGE_GRF_BIT": null,
+          "RX_VK_WARP64": null,
+          "RX_VK_NOOPT": null
+        },
+        "full_environment_snapshot": false,
+        "profile_scope": "MAX absent; no global compute fallback opt-in"
+      },
+      "baseline_repeat_identical": true,
+      "all_full_buffers_identical": true,
+      "cases": [
+        {
+          "case": "original32-a",
+          "requested_width": 32,
+          "actual_width": 32,
+          "width_source": "pipeline_executable_properties",
+          "executable_stage": 128,
+          "mesh_draw_calls": 1,
+          "draw_mesh_tasks": [
+            2,
+            1,
+            1
+          ],
+          "full_output_bytes": 89984,
+          "full_output_sha256": "468f2a6104f33a8adf303f928857d8609753fd73f8033236b61eb6d58d84d7d1",
+          "cpu_golden_full_buffer_match": true,
+          "counts": [
+            {
+              "vertices": 128,
+              "primitives": 128
+            },
+            {
+              "vertices": 128,
+              "primitives": 0
+            }
+          ],
+          "all_guards_and_writtenness_valid": true,
+          "padding_and_unwritten_storage_valid": true,
+          "input_bytes_unchanged": true,
+          "control_bytes_unchanged": true
+        },
+        {
+          "case": "original32-b",
+          "requested_width": 32,
+          "actual_width": 32,
+          "width_source": "pipeline_executable_properties",
+          "executable_stage": 128,
+          "mesh_draw_calls": 1,
+          "draw_mesh_tasks": [
+            2,
+            1,
+            1
+          ],
+          "full_output_bytes": 89984,
+          "full_output_sha256": "468f2a6104f33a8adf303f928857d8609753fd73f8033236b61eb6d58d84d7d1",
+          "cpu_golden_full_buffer_match": true,
+          "counts": [
+            {
+              "vertices": 128,
+              "primitives": 128
+            },
+            {
+              "vertices": 128,
+              "primitives": 0
+            }
+          ],
+          "all_guards_and_writtenness_valid": true,
+          "padding_and_unwritten_storage_valid": true,
+          "input_bytes_unchanged": true,
+          "control_bytes_unchanged": true
+        },
+        {
+          "case": "conditional8",
+          "requested_width": 8,
+          "actual_width": 8,
+          "width_source": "pipeline_executable_properties",
+          "executable_stage": 128,
+          "mesh_draw_calls": 1,
+          "draw_mesh_tasks": [
+            2,
+            1,
+            1
+          ],
+          "full_output_bytes": 89984,
+          "full_output_sha256": "468f2a6104f33a8adf303f928857d8609753fd73f8033236b61eb6d58d84d7d1",
+          "cpu_golden_full_buffer_match": true,
+          "counts": [
+            {
+              "vertices": 128,
+              "primitives": 128
+            },
+            {
+              "vertices": 128,
+              "primitives": 0
+            }
+          ],
+          "all_guards_and_writtenness_valid": true,
+          "padding_and_unwritten_storage_valid": true,
+          "input_bytes_unchanged": true,
+          "control_bytes_unchanged": true
+        },
+        {
+          "case": "conditional16",
+          "requested_width": 16,
+          "actual_width": 16,
+          "width_source": "pipeline_executable_properties",
+          "executable_stage": 128,
+          "mesh_draw_calls": 1,
+          "draw_mesh_tasks": [
+            2,
+            1,
+            1
+          ],
+          "full_output_bytes": 89984,
+          "full_output_sha256": "468f2a6104f33a8adf303f928857d8609753fd73f8033236b61eb6d58d84d7d1",
+          "cpu_golden_full_buffer_match": true,
+          "counts": [
+            {
+              "vertices": 128,
+              "primitives": 128
+            },
+            {
+              "vertices": 128,
+              "primitives": 0
+            }
+          ],
+          "all_guards_and_writtenness_valid": true,
+          "padding_and_unwritten_storage_valid": true,
+          "input_bytes_unchanged": true,
+          "control_bytes_unchanged": true
+        }
+      ]
+    },
+    {
+      "output_profile": "6864-position10-96/v1",
+      "mode": "synthetic-fixture",
+      "prepared_plan_sha256": "3e18a8edc06dfc3de7affb3801c07d8592cbd39e4ff8878ed90039ca37dcb6a1",
+      "execution_report_sha256": "4008a08bc5a69aa831a49d2cfc8cf1b5f118042b69c3b43f04328592896a3fea",
+      "helper_sha256": "b379519f9e24eed0d271f438848ecff560ec82b891b7c97f7f805bfaa938a398",
+      "sources": {
+        "tools/mesh_replay.py": "e91bba8b8972a42a9456422fcffacb8fe07803dfa0d47077f448c55113edb222",
+        "tools/vulkan_mesh_replay.c": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+        "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+        "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+        "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+        "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c",
+        "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+        "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+        "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+      },
+      "fixture_source_sha256": "1944ea426326138609f4fbcbdace60ad34cd4c5d8091235c8469036d44c6b162",
+      "fixture_instrumented_sha256": "9453c1a003e070a69e2dd7462aa6ef0de5c433a91e0976fffa45da9bb70cf3a7",
+      "native_input_bundle_sha256": "3c7303741cf42cf5f52adc1bc4e56a834dcb2d2701082c4fa7777a17941757d9",
+      "cpu_expected_full_output_sha256": "f986d679c1b1725a4a9d25ab7661c25ef295044873d0fc0d54644397721e658c",
+      "cpu_expected_full_output_bytes": 73856,
+      "origin": [
+        96,
+        0,
+        0
+      ],
+      "groups": [
+        2,
+        1,
+        1
+      ],
+      "driver_profile": {
+        "name": "cache-safe-e5",
+        "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+        "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+        "policy": "native-safe"
+      },
+      "driver": {
+        "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+        "library_name": "libvulkan_intel.so",
+        "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+      },
+      "compiler_policy": {
+        "name": "native-safe",
+        "controlled_options": {
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_PUSH_SHADOW": "1",
+          "shader_spilling_rate": "1",
+          "INTEL_DEBUG": null,
+          "HS_SPILL_PCT": null,
+          "HS_RA_DEBUG": null,
+          "HS_FORCE_SIMD8": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "HS_LARGE_GRF_BIT": null,
+          "RX_VK_WARP64": null,
+          "RX_VK_NOOPT": null
+        },
+        "full_environment_snapshot": false,
+        "profile_scope": "MAX absent; no global compute fallback opt-in"
+      },
+      "baseline_repeat_identical": true,
+      "all_full_buffers_identical": true,
+      "cases": [
+        {
+          "case": "original32-a",
+          "requested_width": 32,
+          "actual_width": 32,
+          "width_source": "pipeline_executable_properties",
+          "executable_stage": 128,
+          "mesh_draw_calls": 1,
+          "draw_mesh_tasks": [
+            2,
+            1,
+            1
+          ],
+          "full_output_bytes": 73856,
+          "full_output_sha256": "f986d679c1b1725a4a9d25ab7661c25ef295044873d0fc0d54644397721e658c",
+          "cpu_golden_full_buffer_match": true,
+          "counts": [
+            {
+              "vertices": 96,
+              "primitives": 96
+            },
+            {
+              "vertices": 96,
+              "primitives": 0
+            }
+          ],
+          "all_guards_and_writtenness_valid": true,
+          "padding_and_unwritten_storage_valid": true,
+          "input_bytes_unchanged": true,
+          "control_bytes_unchanged": true
+        },
+        {
+          "case": "original32-b",
+          "requested_width": 32,
+          "actual_width": 32,
+          "width_source": "pipeline_executable_properties",
+          "executable_stage": 128,
+          "mesh_draw_calls": 1,
+          "draw_mesh_tasks": [
+            2,
+            1,
+            1
+          ],
+          "full_output_bytes": 73856,
+          "full_output_sha256": "f986d679c1b1725a4a9d25ab7661c25ef295044873d0fc0d54644397721e658c",
+          "cpu_golden_full_buffer_match": true,
+          "counts": [
+            {
+              "vertices": 96,
+              "primitives": 96
+            },
+            {
+              "vertices": 96,
+              "primitives": 0
+            }
+          ],
+          "all_guards_and_writtenness_valid": true,
+          "padding_and_unwritten_storage_valid": true,
+          "input_bytes_unchanged": true,
+          "control_bytes_unchanged": true
+        },
+        {
+          "case": "conditional8",
+          "requested_width": 8,
+          "actual_width": 8,
+          "width_source": "pipeline_executable_properties",
+          "executable_stage": 128,
+          "mesh_draw_calls": 1,
+          "draw_mesh_tasks": [
+            2,
+            1,
+            1
+          ],
+          "full_output_bytes": 73856,
+          "full_output_sha256": "f986d679c1b1725a4a9d25ab7661c25ef295044873d0fc0d54644397721e658c",
+          "cpu_golden_full_buffer_match": true,
+          "counts": [
+            {
+              "vertices": 96,
+              "primitives": 96
+            },
+            {
+              "vertices": 96,
+              "primitives": 0
+            }
+          ],
+          "all_guards_and_writtenness_valid": true,
+          "padding_and_unwritten_storage_valid": true,
+          "input_bytes_unchanged": true,
+          "control_bytes_unchanged": true
+        },
+        {
+          "case": "conditional16",
+          "requested_width": 16,
+          "actual_width": 16,
+          "width_source": "pipeline_executable_properties",
+          "executable_stage": 128,
+          "mesh_draw_calls": 1,
+          "draw_mesh_tasks": [
+            2,
+            1,
+            1
+          ],
+          "full_output_bytes": 73856,
+          "full_output_sha256": "f986d679c1b1725a4a9d25ab7661c25ef295044873d0fc0d54644397721e658c",
+          "cpu_golden_full_buffer_match": true,
+          "counts": [
+            {
+              "vertices": 96,
+              "primitives": 96
+            },
+            {
+              "vertices": 96,
+              "primitives": 0
+            }
+          ],
+          "all_guards_and_writtenness_valid": true,
+          "padding_and_unwritten_storage_valid": true,
+          "input_bytes_unchanged": true,
+          "control_bytes_unchanged": true
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Each profile uses the same independently authored module at all four widths; case names do not imply game source execution.",
+    "Fixtures contain no subgroup operations and do not read their input descriptors; this does not test warp32 transformation or shader-side null reads.",
+    "This validates bounded mesh executor/profile/capture behavior on the pinned driver and policy.",
+    "No historical draw reproduction, real game rendering equivalence, transformation equivalence or performance/FPS conclusion follows."
+  ],
+  "claims": {
+    "game_shaders_executed": false,
+    "historical_draw_reproduced": false,
+    "conditional_transform_equivalence_proven": false,
+    "real_game_rendering_equivalence": false,
+    "fps_gain": false
+  }
+}

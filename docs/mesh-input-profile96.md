@@ -35,6 +35,16 @@ Export occurs only after the exact successful recording submission completes. Fu
 
 CPU-writer quiescence, backing-generation/alias normalization, proof of the historical draw's exact inputs, fragment/raster resources and output/rendering equivalence remain unresolved. The diagnostic pass split is not a native-quality or performance certificate. This overlay adds no runtime execution admission, framebuffer comparison, shader transformation or optimization claim. A new frozen renderer, parent review and an exclusive GPU lease are required before any future capture.
 
+## Bounded E5 capture observation
+
+The [sanitized retry evidence](../research/gpu-mesh-profile96-observation.json) records the completed `runtime-mesh-profile96-02` capture only. It used the frozen profile renderer `81eb4976…`, host `4eb32b56…`, selected E5 driver library `e5a1305e…`, and hashed ICD with safe3 enabled and MAX/forced-width overrides absent. Native transformation mode was0. Only the controlled E5 warm Mesa cache and canonical program/notes cache from the stopped first attempt were reused; opaque Vulkan pipeline caches were not seeded. The seed and settings were hash-checked, with per-frame clock mode, cap60 and the original truncated menu script. This is not a deterministic scene or FPS certificate.
+
+The strict profile checker passed. The actual copied GPU launch is **67×1×1** at selected occurrence64. Eleven positions are present as nine exact GPU views and two defined null descriptors. Descriptor bytes total **158,076,400**, plus twelve launch bytes: **158,076,412 raw bytes**, excluding metadata, full-buffer supersets and replay bundle framing. The record pins source/checker hashes, all four manifest hashes and the complete private artifact inventory.
+
+Submitted recording sequence **8968** is covered by observed completed recording sequence **8971**. These are distinct values. The completion association and checked BEFORE payloads do not prove historical CPU-writer atomicity or canonical backing/alias normalization. The owned pidfd watcher stopped its game process after all four manifests committed; the GPU lease was released. Its roughly39-second wall duration is not a shader timing or performance result.
+
+The earlier attempt reached its300-second bound while exporting a partial buffer payload and remains an incomplete, preserved attempt. It is not relabeled as successful or merged into this capture. No instrumented mesh-output/replay execution, output or image equivalence test, historical-input proof or optimization acceptance follows from this input-capture observation. Separate parent-reviewed replay/device/ownership gates remain in force.
+
 ## Verification and dependencies
 
 ```sh

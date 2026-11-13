@@ -2,6 +2,29 @@
 
 Updated 2026-11-13. This page distinguishes working tools, local observations, and unproven targets. It is not a completion percentage.
 
+## Latest reviewed results
+
+The [cache-policy correction](mesa-cache-policy.md) now separates compiler settings
+across stage keys, pipeline caches and disk caches. The isolated driver reproduces
+all 59 complete compute allocations at widths 32, 32 repeated, 16 and 8 on one
+frozen input graph. This verifies those outputs, without establishing a speedup.
+
+[Native mesh lowering revision 2](native-mesh-warp32-integration.md) requires the
+MAX-absent compiler policy; earlier integrated pilots remain explicitly revision 1.
+The new [driver/profile replay boundary](mesh-replay-driver-profiles.md) pins all
+execution dependencies and separates the D8 and 96-vertex contracts. Both authored
+fixtures now match their complete CPU output oracles at actual widths 32, 32
+repeated, 8 and 16; [the evidence](../research/mesh-replay-e5-fixture-observation.json)
+tests the new executors, rather than real shader transformation equivalence.
+The [96-vertex capture overlay](mesh-input-profile96.md) and
+[output instrumenter](mesh-output-profile96.md) are implemented and tested.
+
+The [native-network investigation](../research/native-network-restoration.md)
+identifies ten omitted startup programs as movie-upscale networks. Their linear
+fallback, gameplay FSR replacement and hair/foliage sampling remain separate quality
+gaps. No native-quality restoration, accepted gameplay optimization or real 60 FPS
+result is established.
+
 ## Implemented starting point
 
 - Module inventory reads NSO header metadata and computes SHA-256 hashes without exporting executable bytes.
