@@ -1,0 +1,221 @@
+{
+  "schema": "open-ocarina.foliage-pass-history-preparation/v1",
+  "date": "2026-11-13",
+  "scope": "CPU-only default-off original12 diagnostic derivative and one metadata-first prepared capture; no runtime permission",
+  "original629_limited_plan": {
+    "schema": "open-ocarina.original629-limited-dump-plan/v1",
+    "renderer_sha256": "629addc24fe06d5170ebd0d6892cd0722dc69e7171ee951abc4188f17d26405d",
+    "host_sha256": "4eb32b56a91869b5d7ac1673f0ca1e3c0841e893a8a34f728ec85344a312cb30",
+    "driver_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+    "proposed_controls": {
+      "RX_VK_DUMP_STEPS": "0-2",
+      "RX_VK_DUMP_ONLY_W": "1536,2048",
+      "RX_VK_DUMP_W": "320"
+    },
+    "source_max_2D_dimension": 16384,
+    "max_three_depth_payload_bytes": 402653184,
+    "compiler_idle_gate_available": false,
+    "aggregate_capture_meter_available": false,
+    "complete_pass_history": false,
+    "admissible_for_requested_complete_capture": false,
+    "executed": false,
+    "reason": "Three global steps can miss all selected-width scene passes; serial pending work is unobserved; no live aggregate diagnostic cap/disarm exists."
+  },
+  "original629_limited_plan_sha256": "06ab6eecb500392a051f04f81a7f3a524ed66d0b3e662008c22f9d73867e5e09",
+  "baseline_source_tree": "58ca709617448e06af382c3443dd88dac3ffcb8e",
+  "baseline_renderer_sha256": "629addc24fe06d5170ebd0d6892cd0722dc69e7171ee951abc4188f17d26405d",
+  "host_sha256": "4eb32b56a91869b5d7ac1673f0ca1e3c0841e893a8a34f728ec85344a312cb30",
+  "driver_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+  "ICD_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+  "final_overlay": {
+    "schema": "open-ocarina.bounded-pass-history-overlay/v1",
+    "patch_sha256": "4bb990b9cbf66419d0d7f2357da5583ecb8aee8da13e1a7ecd43282224857610",
+    "original_sha256": {
+      "gpu/vk/vk_dump.cpp": "3a27c59c48b0f67484979a7d4192f883126f38f4ab65477169408f5993ba61e0",
+      "gpu/vk/vk_dump.h": "71b0bcb8a7751b1a6a8c428929129f67a845b1e5b02782ca2bce9e35edad5ce7",
+      "gpu/vk/vk_draw.cpp": "1f0243d368973d6969cb04c766fb1fa713b578cc4932c0af14f7310f48475b49",
+      "gpu/vk/vk_replay.cpp": "32455c2f47ae68cb5335065f3d4ea42badb6ea3d12920fdf2a5de61b11d62492",
+      "gpu/vk/vk_jobs.cpp": "98fd29c5eee68a9558bb1bccf58b8d9b64e9cbe546c8aae4e0d4bb4c34906046",
+      "gpu/vk/vk_jobs.h": "55c43b5168f2466ee041f0bbc6c82b67bcaa7c96b01bf71252fd65a226dcde9f"
+    },
+    "candidate_sha256": {
+      "gpu/vk/vk_dump.cpp": "ea73c5d77487a2e40cb0b3c43e3a577263923d4b6938fea49aae45652f8d09c3",
+      "gpu/vk/vk_dump.h": "60b37da4fa77d925b7fd7ee52dd4f89def4e8601d151dfcbf5abfd689c9718ac",
+      "gpu/vk/vk_draw.cpp": "c249350be9651fc96d02adcfa2c7f496406997317761277c0d416362e2225949",
+      "gpu/vk/vk_replay.cpp": "26ff442b2e42b373ce3ef3cdc30399cb77c9a7a2f3086bb88517ebdcd0582c16",
+      "gpu/vk/vk_jobs.cpp": "93bc5386f6fff104cf28f5bf9f78c41e30fe1a530f4d9da0b628a8cad90e229b",
+      "gpu/vk/vk_jobs.h": "fe7d1eff7b3918115514f2f18a4f34a04921bde0ce835a8c22071b6d236501c1",
+      "gpu/vk/pass_history_policy.h": "70cb8c7dbf83f7b9650a2bc8238044ed72e548be69889d58cb7e3932b9dbb825"
+    },
+    "default_off": true,
+    "GPU_executed": false,
+    "shared_source_modified": false
+  },
+  "renderer_sha256": "9d3685acd7d37c2cf5392dcdcd44ef4be8e7514688de64963f5713221415e819",
+  "renderer_bytes": 27580832,
+  "source_version": "54dcfb3d",
+  "source_manifest_sha256": "9d1be9a30412f7732ccaf2e968116907b5f80c5bd5f74fa5ed56d4a30e0a5947",
+  "source_manifest_files": 2121,
+  "actual_build": {
+    "translation_units": 207,
+    "failures": 0,
+    "max_build_jobs": 4,
+    "flags": [
+      "-std=c++20",
+      "-O2",
+      "-g0",
+      "-DNDEBUG",
+      "-DHOOKSHOT_RELEASE",
+      "-march=x86-64-v3",
+      "-ffp-contract=off"
+    ],
+    "modified_units": [
+      {
+        "source": "gpu/vk/vk_dump.cpp",
+        "source_sha256": "ea73c5d77487a2e40cb0b3c43e3a577263923d4b6938fea49aae45652f8d09c3",
+        "object_sha256": "487d23015a3b90030f05c861325e934caaf3ce4fef79056a3f5a82dcafcb9b8e",
+        "compiler_exit": 0
+      },
+      {
+        "source": "gpu/vk/vk_draw.cpp",
+        "source_sha256": "c249350be9651fc96d02adcfa2c7f496406997317761277c0d416362e2225949",
+        "object_sha256": "20ed0d0b416a85612f1d5e5be7a1f8f5ea4d33d97814dc59700955a78270cfc3",
+        "compiler_exit": 0
+      },
+      {
+        "source": "gpu/vk/vk_replay.cpp",
+        "source_sha256": "26ff442b2e42b373ce3ef3cdc30399cb77c9a7a2f3086bb88517ebdcd0582c16",
+        "object_sha256": "3aad527110b44782b614f6de616fbe45186adb23c3f2ed2036afed83f9f0000a",
+        "compiler_exit": 0
+      },
+      {
+        "source": "gpu/vk/vk_jobs.cpp",
+        "source_sha256": "93bc5386f6fff104cf28f5bf9f78c41e30fe1a530f4d9da0b628a8cad90e229b",
+        "object_sha256": "0ac2aea3ccaf64794628e45981fe91f5b0fde28e62177ed8bb79cbac0df7754a",
+        "compiler_exit": 0
+      }
+    ],
+    "all_owned_processes_terminal": true,
+    "renderer_loaded": false,
+    "fresh_object_cache": true,
+    "build_log_sha256": "84d5f56c137e004c84f28331a1982099002e9c242943eb5a27fbae22b92d61af",
+    "actual_commands_sha256": "912a8d3bc785ece42ef48191b932faf54b1ae0c7e3fd5bf730d2d2743c21c248",
+    "build_recipe_sha256": "9d9a8f13a184dd6160056d1b6967cf8536d7c2fcf9e59c947a58bf9c0b944dfb",
+    "recorder_sha256": "b232000f325381d71dfc20917bfdf7d7fb407693d87eb35171565a8d9ba6d535"
+  },
+  "prepared_plan_sha256": "4b08cbf0ea495e7b770a60bf4ca7b5056175030e0ede1bc00dfccf132c69f2c4",
+  "launcher_sha256": "a9168691df9b7e42164f5b85e5e76f21f026b194dfe8b5419dfd104fac5919b7",
+  "phase": "metadata-only",
+  "limits": {
+    "control_screenshots": 2,
+    "diagnostic_disk_budget": 536870912,
+    "native_frames_to_settle": 120,
+    "native_image_attempt_cap": 128,
+    "native_metadata_file_bytes": 262144,
+    "native_metadata_rows": 512,
+    "native_readback_resource_copy_payload_cap": 402653184,
+    "observer_log_bytes": 16777216,
+    "process_seconds": 240
+  },
+  "control_screenshot_source_payload_bytes": 18874368,
+  "seed_identity": {
+    "prior_plan_sha256": "2ade0cd1bd126eecd7ab8c93aa045131a8915914419497bf705c402dbecdb355",
+    "save_manifest_files": 6,
+    "cache_manifest_files": 1956,
+    "save_manifest_canonical_sha256": "d14225eaaa2e9d5a21b49eab6b6c433cc3b3b33fcb674527a520adcf9c0d8c96",
+    "cache_manifest_canonical_sha256": "557035a1681edb9f06d44ed18812a14a70e2c5e38e4cced2a904e84b6bbcbb79"
+  },
+  "static_shader_input_sha256": "413cc8fb8b438419bfc3aac98bdac7fe351af2243926c5805d69e46f58b864a3",
+  "static_image_input_sha256": "f77dd8d6448b4204ae2be6c91872f6a3ca4ae64fc6566e7b3ed0c3b908d98ee2",
+  "reference_image": {
+    "PNG_sha256": "de591bcb28de7f4c91ae5bda6d82b2a1946d664e1e6bfdbf9c423e47065cedbb",
+    "manual_card_ROI": [
+      128,
+      286,
+      307,
+      347
+    ],
+    "size": [
+      2048,
+      1152
+    ]
+  },
+  "reference_programs": {
+    "68642bb810ee3e7c": {
+      "candidate_shared_bytes": 11412,
+      "fragment": "3de1d79c321db3863dbb07de0d3fa0cdb126d72c07c2f1d70f0514eda3611b10",
+      "fragment_words": 16083,
+      "native": "43434b023ff17ee4b92ed8e49f19c937c86f15cf31a7034161dd11878f944099",
+      "native_words": 63210,
+      "original": "999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93",
+      "original_words": 62106,
+      "payload_bytes": 128,
+      "source_shared_bytes": 11156,
+      "variant": "3f3f5b29054673da"
+    },
+    "d8e59341cf4f629c": {
+      "candidate_shared_bytes": 14612,
+      "fragment": "569b378a012388d711a115030bd1f41af66d38aebb645118baacd1e90a8f5a3a",
+      "fragment_words": 29766,
+      "native": "8754612a7395d1f804d4e56a7c18cb5a6f23ed2e02f01879cbc51bd108682de0",
+      "native_words": 44043,
+      "original": "835aa59799c6ecb621034d946e2fa4eadb1aa2407d293321ae3e3052882bc9b3",
+      "original_words": 42939,
+      "payload_bytes": 128,
+      "source_shared_bytes": 14356,
+      "variant": "0c8f08626a9d98a4"
+    }
+  },
+  "program_identity_scope": "Expected original modules from earlier baseline; capped startup identities do not prove module identity for every captured pass or identify the card shader.",
+  "readiness_scope": "Three identical explicit normal/serial/active native observations and120 sampled nonloading gameplay frames; actual frame begin/end counters must also remain unchanged. This covers instrumented source queues/counters only.",
+  "nondeterminism": [
+    "Camera transform is not observed/pinned by this host.",
+    "The same save and seven-A script do not fix particle RNG, temporal history or simulation timing.",
+    "A new screenshot/card review is required; ROI coordinates are not assumed stable."
+  ],
+  "unresolved_gates": [
+    "Separate parent GPU lease and frozen-plan re-admission are absent.",
+    "Fresh screenshot/card review is required before one trigger.",
+    "Camera transform and particle RNG are not pinned.",
+    "The observer covers instrumented application queues/counters; opaque external/driver activity is not globally certified.",
+    "Metadata is CPU command-recording observation; no GPU output or first pixel producer is established."
+  ],
+  "validation": {
+    "focused_CPU_tests": 22,
+    "result": "PASS",
+    "actual_added_policy_and_helper_bodies_compiled_with_authored_stubs": true,
+    "normal_serial_snapshot_retry_exhaustion_rejected": true,
+    "partial_writes_and_byte_row_step_caps_tested": true,
+    "missing_allocation_copy_accounting_rejected": true,
+    "default_off_and_metadata_zero_readback_tested": true,
+    "owned_PID_identity_and_escalation_negatives": true,
+    "focused_log_sha256": "caa2181acfa81778e4e5632291e8f3882177972981f38e081e1f74c556cb086b",
+    "staged_publication_full_suite": "Deferred to parent; no staging performed"
+  },
+  "preservation": {
+    "original629_source_and_binary_unchanged": true,
+    "signedness_candidate07_freeze_sha256": "8093011c9cccdcd73c442fa8fdafc293dcc3a6215bf215e3c617ada7b43fb6b5",
+    "signedness_candidate07_files_unchanged": true,
+    "shared_install_or_driver_modified": false
+  },
+  "acceptance": {
+    "CPU_preparation_complete": true,
+    "runtime_authorized": false,
+    "Vulkan_instance_device_pipeline_or_GPU_called_by_preparation": false,
+    "GPU_executed": false,
+    "card_producer_identified": false,
+    "all_native_quality_or_FPS_accepted": false
+  },
+  "references": [
+    "docs/foliage-pass-history.md",
+    "patches/hookshot/bounded-pass-history.patch",
+    "tools/pass_history_capture.py"
+  ],
+  "publication_patch_equivalence": {
+    "executed_patch_sha256": "4bb990b9cbf66419d0d7f2357da5583ecb8aee8da13e1a7ecd43282224857610",
+    "published_patch_sha256": "faf98cacd2438bc7252e7b077ef513cf9cd2ea5f58e5868f3d648e081dc03290",
+    "only_empty_context_line_prefixes_removed": true,
+    "fuzz_zero_applies": true,
+    "all_resulting_source_files_byte_identical_to_compiled": true
+  }
+}

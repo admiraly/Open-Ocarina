@@ -1,0 +1,408 @@
+--- a/gpu/vk/vk_dump.cpp
++++ b/gpu/vk/vk_dump.cpp
+@@ -14,6 +14,11 @@
+ #ifndef HOOKSHOT_ENV_H   // (env_on: the switches' one rule)
+ #include "hookshot_env.h"
+ #endif
++#include "pass_history_policy.h"
++#include "vk_jobs.h"
++#include "vk_draw.h"
++#include "vk_shader.h"
++#include <cstdarg>
+ #include "vk_work.h"   // (after the others: counts the commands that do GPU work, for full_barrier)
+
+ namespace mkwvk {
+@@ -45,6 +50,79 @@
+ int seq = 0;
+ std::vector<Item> items;
+ std::string dir;
++
++// Default-off diagnostic observer. File/row/step/byte bounds are independent of
++// game rendering; an exhausted diagnostic never returns from a draw/dispatch.
++bool history_on() { static const bool on=env_on("RX_VK_OO_PASS_HISTORY");return on; }
++pass_history::Snapshot history_snapshot() {
++ pass_history::Snapshot s;
++ jobs_history_snapshot(&s.epoch,&s.normal,&s.serial,&s.active);
++ shader_stats(&s.translated,&s.failed);s.translation_ms=shader_translate_ms();
++ int64_t draws=0,dispatches=0;draw_stats(&draws,&s.draw_skips,&dispatches,&s.pipelines);
++ int64_t waits=0;double ms=0;draw_stats3(&s.skips,&waits,&ms);
++ s.left_workers=prepare_left_workers();return s;
++}
++struct History {
++ pass_history::Budget budget;pass_history::Snapshot begin;
++ FILE* file=nullptr;uint64_t written=0,order=0;bool ended=false;
++ int64_t present=0;
++} history;
++void history_row(const char* fmt,...) {
++ if(!history.file || !history.budget.row())return;
++ char line[768];va_list ap;va_start(ap,fmt);const int n=vsnprintf(line,sizeof line,fmt,ap);va_end(ap);
++ if(n<0 || n>=(int)sizeof line || history.written+(uint64_t)n+4096>pass_history::kFileCap){history.budget.stop(pass_history::Reason::Rows);return;}
++ const size_t put=fwrite(line,1,(size_t)n,history.file);history.written+=put;
++ if(put!=(size_t)n || fflush(history.file)){history.budget.stop(pass_history::Reason::IO);return;}
++}
++void history_begin(int64_t present) {
++ if(!history_on())return;
++ const auto s=history_snapshot();
++ if(!history.budget.begin(env_on("RX_VK_OO_PASS_PIXELS"),s)){logf("vk: pass-history repeated frame refused");return;}
++ history.begin=s;history.present=present;
++ const char* path=getenv("RX_VK_OO_PASS_HISTORY_FILE");
++ if(!path||!*path || !(history.file=fopen(path,"wbx"))){history.budget.stop(pass_history::Reason::IO);return;}
++ history_row("{\"event\":\"begin\",\"present\":%lld,\"epoch\":%llu,\"normal\":%d,\"serial\":%d,\"active\":%d,\"translated\":%lld,\"failed\":%lld,\"pipelines\":%lld,\"skips\":%lld,\"draw_skips\":%lld,\"translation_ms\":%.17g,\"left_workers\":%s,\"pixels\":%s}\n",(long long)present,(unsigned long long)s.epoch,s.normal,s.serial,s.active,(long long)s.translated,(long long)s.failed,(long long)s.pipelines,(long long)s.skips,(long long)s.draw_skips,s.translation_ms,s.left_workers?"true":"false",history.budget.pixels?"true":"false");
++}
++void history_close_if_done() {
++ if(!history_on()||!history.file||!history.ended||dump_pending())return;
++ const auto& b=history.budget;char line[2048];
++ const int n=snprintf(line,sizeof line,"{\"event\":\"end\",\"present\":%lld,\"incomplete\":%s,\"reason\":%u,\"rows\":%u,\"attempts\":%u,\"admitted\":%u,\"buffer_reserved\":%llu,\"image_reserved\":%llu,\"copy_reserved\":%llu,\"buffer_actual\":%llu,\"image_actual\":%llu,\"copy_actual\":%llu}\n",(long long)history.present,b.incomplete?"true":"false",(unsigned)b.reason,b.rows,b.attempts,b.admitted,(unsigned long long)b.reserved_buffer,(unsigned long long)b.reserved_image,(unsigned long long)b.reserved_copy,(unsigned long long)b.actual_buffer,(unsigned long long)b.actual_image,(unsigned long long)b.actual_copy);
++ bool ok=n>0&&n<(int)sizeof line&&history.written+(uint64_t)n<=pass_history::kFileCap&&fwrite(line,1,(size_t)n,history.file)==(size_t)n;
++ if(fclose(history.file))ok=false;history.file=nullptr;
++ if(!ok)history.budget.stop(pass_history::Reason::IO);
++ logf("vk: pass-history terminal: incomplete %d, reason %u, rows %u, images %u, copied %llu bytes",(int)history.budget.incomplete,(unsigned)history.budget.reason,b.rows,b.admitted,(unsigned long long)b.actual_copy);
++}
++void history_end() {
++ if(!history_on()||!history.budget.used||history.ended)return;
++ const auto end=history_snapshot();history.budget.finish(history.begin,end);history.ended=true;
++ history_row("{\"event\":\"readiness_end\",\"epoch\":%llu,\"normal\":%d,\"serial\":%d,\"active\":%d,\"translated\":%lld,\"failed\":%lld,\"pipelines\":%lld,\"skips\":%lld,\"draw_skips\":%lld,\"translation_ms\":%.17g,\"left_workers\":%s,\"unchanged_work\":%s}\n",(unsigned long long)end.epoch,end.normal,end.serial,end.active,(long long)end.translated,(long long)end.failed,(long long)end.pipelines,(long long)end.skips,(long long)end.draw_skips,end.translation_ms,end.left_workers?"true":"false",history.begin.same_work(end)?"true":"false");
++ history_close_if_done();
++}
++bool history_attachment(Texture* tex,uint32_t level,const char* what) {
++ if(!history_on())return true;
++ ++history.order;if(!tex->levels){history.budget.stop(pass_history::Reason::Unsupported);return false;}level=std::min(level,tex->levels-1);
++ const auto w=std::max(1u,tex->width>>level),h=std::max(1u,tex->height>>level);
++ const bool selected=(w==1536||w==2048);
++ if(!selected)return false;
++ // Labels here are source-generated pass labels containing only fixed words and hex IDs.
++ history_row("{\"event\":\"attachment\",\"order\":%llu,\"step\":%d,\"width\":%u,\"height\":%u,\"format\":%d,\"texture\":%u,\"gpu\":%llu,\"label\":\"%.96s\",\"pixels_requested\":%s,\"diagnostic_stopped\":%s}\n",(unsigned long long)history.order,seq,w,h,(int)tex->format,tex->id,(unsigned long long)tex->gpu,what,history.budget.pixels?"true":"false",history.budget.stopped?"true":"false");
++ return history.budget.pixels&&!history.budget.stopped;
++}
++bool history_reserve(uint64_t buffer,uint64_t image) {
++ if(!history_on())return true;
++ const bool allowed=history.budget.reserve(buffer,image,buffer);
++ history_row("{\"event\":\"reservation\",\"buffer\":%llu,\"image\":%llu,\"copy\":%llu,\"allowed\":%s,\"reason\":%u}\n",(unsigned long long)buffer,(unsigned long long)image,(unsigned long long)buffer,allowed?"true":"false",(unsigned)history.budget.reason);
++ return allowed&&!history.budget.stopped;
++}
++void history_alloc(bool image,uint64_t n) {
++ if(!history_on())return;
++ if(image)history.budget.commit(history.budget.actual_image,history.budget.reserved_image,n);
++ else history.budget.commit(history.budget.actual_buffer,history.budget.reserved_buffer,n);
++}
++void history_copy(uint64_t n) {
++ if(history_on())history.budget.commit(history.budget.actual_copy,history.budget.reserved_copy,n);
++}
++
+
+ Kind kind_of(VkFormat f) {
+     switch (f) {
+@@ -234,7 +312,7 @@
+     snprintf(path, sizeof path, "%s/%03d_%s_%llx.png", dir.c_str(), it.seq, it.what.c_str(), (unsigned long long)it.gpu);
+     for (char* c = path + dir.size() + 1; *c; c++)
+         if (*c == ' ' || *c == ':' || *c == '/' || *c == '\\') *c = '_';
+-    write_png(path, rgba.data(), it.w, it.h);
++    if(!write_png(path, rgba.data(), it.w, it.h) && history_on())history.budget.stop(pass_history::Reason::IO);
+     static const bool raw = env_on("RX_VK_DUMP_RAW");
+     if (raw && it.kind == KIND_FLOAT) {
+         std::string rp(path);
+@@ -249,6 +327,16 @@
+
+ } // namespace
+
++bool dump_history_active(){return history_on();}
++void dump_history_status(){
++ if(!history_on())return;const auto s=history_snapshot();
++ logf("vk: pass-history CPU queues: epoch %llu normal %d serial-total %d serial-active %d translated %lld failed %lld pipelines %lld pending-skips %lld left-workers %d",(unsigned long long)s.epoch,s.normal,s.serial,s.active,(long long)s.translated,(long long)s.failed,(long long)s.pipelines,(long long)s.skips,(int)s.left_workers);
++}
++void dump_history_pass(uint32_t w,uint32_t h,uint64_t first,uint64_t last,int draws,int clears){
++ if(!history_on()||!armed)return;++history.order;
++ if(w!=1536&&w!=2048)return;
++ history_row("{\"event\":\"pass\",\"order\":%llu,\"width\":%u,\"height\":%u,\"first_program\":%llu,\"last_program\":%llu,\"draws\":%d,\"clears\":%d}\n",(unsigned long long)history.order,w,h,(unsigned long long)first,(unsigned long long)last,draws,clears);
++}
+ bool dump_on() {
+     return armed;
+ }
+@@ -272,6 +360,7 @@
+     }
+     if (armed) logf("vk: dump of the frame after present %lld: %d steps so far", (long long)armed_present, seq);
+     if (armed && presents < armed_until) return;   // (a run of frames: one folder, steps numbered on)
++    if(armed)history_end();
+     armed = std::find(targets.begin(), targets.end(), presents) != targets.end();
+     if (!armed) return;
+     armed_present = presents;
+@@ -279,6 +368,7 @@
+     for (size_t i = 0; i < targets.size(); i++)
+         if (targets[i] == presents) armed_until = presents + counts[i];
+     seq = 0;
++    history_begin(presents);
+     const char* base = getenv("RX_VK_DUMP_DIR") ? getenv("RX_VK_DUMP_DIR") : getenv("RX_VK_SHOTS");
+     dir = std::string(base ? base : ".") + "/dump_" + std::to_string(presents);
+     _mkdir(dir.c_str());
+@@ -315,7 +405,9 @@
+ }
+
+ void dump_image(VkCommandBuffer cmd, Texture* tex, uint32_t level, uint32_t layer, const char* what) {
+-    if (!armed || !tex || !tex->image || tex->samples != VK_SAMPLE_COUNT_1_BIT) return;
++    if (!armed || !tex || !tex->image) return;
++    if(!history_attachment(tex,level,what))return void(seq++);
++    if(tex->samples != VK_SAMPLE_COUNT_1_BIT){if(history_on())history.budget.stop(pass_history::Reason::Unsupported);return;}
+     if (!step_wanted(seq, what)) return void(seq++);
+     // (RX_VK_DUMP_DEPTH_ONLY=1: the passes' colour targets left out, depth only (per-draw dumps of big targets fit))
+     static const bool depth_only = env_on("RX_VK_DUMP_DEPTH_ONLY");
+@@ -349,14 +441,17 @@
+         it.src_w = it.w = std::max(1u, tex->width >> level), it.src_h = it.h = std::max(1u, tex->height >> level);
+         it.depth_bytes = tex->format == VK_FORMAT_D16_UNORM || tex->format == VK_FORMAT_D16_UNORM_S8_UINT ? 2 : 4;
+         it.depth_float = tex->format == VK_FORMAT_D32_SFLOAT || tex->format == VK_FORMAT_D32_SFLOAT_S8_UINT;
++        const uint64_t history_bytes=(uint64_t)it.w*it.h*it.depth_bytes;
++        if(!history_reserve(history_bytes,0))return;
+         if (!create_buffer((uint64_t)it.w * it.h * it.depth_bytes, VK_BUFFER_USAGE_TRANSFER_DST_BIT, true, it.buffer,
+-                           it.buffer_alloc, &it.map))
+-            return;
++                           it.buffer_alloc, &it.map)){if(history_on())history.budget.stop(pass_history::Reason::IO);return;}
++        history_alloc(false,history_bytes);
+         full_barrier(cmd);
+         const VkBufferImageCopy c{0, 0, 0, {(VkImageAspectFlags)(raw_9e5 ? VK_IMAGE_ASPECT_COLOR_BIT : VK_IMAGE_ASPECT_DEPTH_BIT), level,
+                                             std::min(layer, tex->layers - 1), 1}, {0, 0, 0},
+                                   {it.w, it.h, 1}};
+         vkCmdCopyImageToBuffer(cmd, tex->image, VK_IMAGE_LAYOUT_GENERAL, it.buffer, 1, &c);
++        history_copy(history_bytes);
+         host_read_barrier(cmd);
+         full_barrier(cmd);
+         items.push_back(std::move(it));
+@@ -365,6 +460,7 @@
+     VkFormatProperties fp{};
+     vkGetPhysicalDeviceFormatProperties(dev.physical, tex->format, &fp);
+     if (!(fp.optimalTilingFeatures & VK_FORMAT_FEATURE_BLIT_SRC_BIT)) {
++        if(history_on())history.budget.stop(pass_history::Reason::Unsupported);
+         logf("vk: dump %03d %s: tex %#llx format %d not blittable", seq, what, (unsigned long long)tex->gpu, (int)tex->format);
+         seq++;
+         return;
+@@ -387,11 +483,16 @@
+     ci.mipLevels = ci.arrayLayers = 1;
+     ci.samples = VK_SAMPLE_COUNT_1_BIT;
+     ci.usage = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+-    if (!create_image(ci, it.image, it.image_alloc)) return;
++    const uint64_t history_bytes=(uint64_t)it.w*it.h*16;
++    if(!history_reserve(history_bytes,history_bytes))return;
++    if (!create_image(ci, it.image, it.image_alloc)){if(history_on())history.budget.stop(pass_history::Reason::IO);return;}
++    history_alloc(true,history_bytes);
+     if (!create_buffer((uint64_t)it.w * it.h * 16, VK_BUFFER_USAGE_TRANSFER_DST_BIT, true, it.buffer, it.buffer_alloc, &it.map)) {
++        if(history_on())history.budget.stop(pass_history::Reason::IO);
+         destroy_image(it.image, it.image_alloc);
+         return;
+     }
++    history_alloc(false,history_bytes);
+     full_barrier(cmd);
+     barrier(cmd, it.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+     VkImageBlit b{};
+@@ -406,6 +507,7 @@
+     barrier(cmd, it.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+     const VkBufferImageCopy c{0, 0, 0, {VK_IMAGE_ASPECT_COLOR_BIT, 0, 0, 1}, {0, 0, 0}, {it.w, it.h, 1}};
+     vkCmdCopyImageToBuffer(cmd, it.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, it.buffer, 1, &c);
++    history_copy(history_bytes);
+     host_read_barrier(cmd);
+     full_barrier(cmd);
+     items.push_back(std::move(it));
+@@ -424,6 +526,7 @@
+
+ void dump_buffer(VkCommandBuffer cmd, VkBuffer src, VkDeviceSize off, VkDeviceSize n, const char* what) {
+     if (!armed || !src || !n) return;
++    if(history_on()){history.budget.stop(pass_history::Reason::Unsupported);return;}
+     n = std::min<VkDeviceSize>(n, 65536) & ~3ull;
+     if (!n) return;
+     BufItem it;
+@@ -475,6 +578,7 @@
+         destroy_buffer(it.buffer, it.alloc);
+     }
+     buf_items.clear();
++    history_close_if_done();
+ }
+
+ } // namespace mkwvk
+--- a/gpu/vk/vk_dump.h
++++ b/gpu/vk/vk_dump.h
+@@ -30,3 +30,5 @@
+ bool write_png(const char* path, const uint8_t* rgba, uint32_t w, uint32_t h);
+
+ } // namespace mkwvk
++
++namespace mkwvk { bool dump_history_active(); void dump_history_status(); void dump_history_pass(uint32_t,uint32_t,uint64_t,uint64_t,int,int); }
+--- a/gpu/vk/vk_draw.cpp
++++ b/gpu/vk/vk_draw.cpp
+@@ -5252,7 +5252,7 @@
+                 copy_block_attachment(cmd, *pass().tex[i], pass().block_image[i], pass().level[i], pass().layer[i], false);
+         full_barrier(cmd, "barrier (after BC slice stores)");
+     }
+-    if (dump_on() && !dump_mesh_indirect().empty()) {
++    if (dump_on() && !dump_history_active() && !dump_mesh_indirect().empty()) {
+         for (const auto& [key, addr] : dump_mesh_indirect()) {
+             const BufferRef r = gpu_buffer_bind(addr, 16, false);
+             char what[80];
+@@ -5282,6 +5282,7 @@
+                  (unsigned long long)pass().first_prog, (unsigned long long)pass().prog);
+         gprof_end(cmd, label, pass().draws);
+     }
++    if(dump_on())dump_history_pass(pass().width,pass().height,pass().first_prog,pass().prog,pass().draws,pass().clears);
+     if (dump_on())
+         for (int i = 0; i < pass().n; i++)
+             if (pass().color[i] && pass().tex[i]) {
+@@ -7324,7 +7325,7 @@
+         {   // (amd-fix, diagnosis) RX_VK_LOG_MESH_PROGS=1: each mesh program's first draw and every 600th, with what its
+             // indirect arguments hold in guest memory (0 groups: the culling pass before it left nothing)
+             static const bool per_prog = env_on("RX_VK_LOG_MESH_PROGS");
+-            if (dump_on() && d.indirect && dump_mesh_indirect().size() < 256) dump_mesh_indirect().push_back({p.key, d.indirect});
++            if (dump_on() && !dump_history_active() && d.indirect && dump_mesh_indirect().size() < 256) dump_mesh_indirect().push_back({p.key, d.indirect});
+             if (per_prog) {
+                 static std::mutex mm;
+                 static std::unordered_map<uint64_t, uint64_t> seen;
+--- a/gpu/vk/vk_replay.cpp
++++ b/gpu/vk/vk_replay.cpp
+@@ -3148,6 +3148,7 @@
+              "translation %.0f ms in all, %d jobs queued%s",
+              (pskip - l_pskip) / 120.0, (pwaits - l_pwaits) / 120.0, (pwait_ms - l_pwait_ms) / 120.0,
+              shader_translate_ms(), jobs_pending(), libs);
++        dump_history_status();
+         l_pskip = pskip, l_pwaits = pwaits, l_pwait_ms = pwait_ms, l_links = links, l_link_ms = link_ms;
+         {
+             static const char* names[PROF_COUNT] = {"submit", "present", "draw", "descriptors", "texture lookups",
+--- a/gpu/vk/vk_jobs.cpp
++++ b/gpu/vk/vk_jobs.cpp
+@@ -10,6 +10,9 @@
+ #include <vector>
+
+ #include "vk_jobs.h"
++#include "hookshot_env.h"
++#include <cstdint>
++#include <limits>
+ #include "vk_internal.h"
+ #include "vk_draw.h"   // (ub_thread_off)
+
+@@ -24,6 +27,11 @@
+ };
+ std::deque<Entry> queue;
+ std::atomic<int> pending{0};
++std::atomic<int> history_serial{0},history_active{0};
++std::atomic<uint64_t> history_epoch{0};
++bool history_jobs_on(){static const bool v=env_on("RX_VK_OO_PASS_HISTORY");return v;}
++void history_change(){if(!history_jobs_on())return;auto old=history_epoch.load();for(unsigned tries=0;tries<32&&old!=UINT64_MAX;++tries){if(history_epoch.compare_exchange_weak(old,old+1))return;}if(old!=UINT64_MAX)history_epoch.store(UINT64_MAX);}
++
+ bool started = false;
+
+ // (a job that throws: the game ended at once ("approach Malon, crash": an exception escaped a worker, KERNELBASE's RaiseException
+@@ -68,6 +76,7 @@
+         }
+         run_guarded(fn);
+         pending--;
++        history_change();
+         jobs_notify();
+     }
+ }
+@@ -89,6 +98,7 @@
+     std::lock_guard lk(mu);
+     if (!started) start();
+     pending++;
++    history_change();
+     if (urgent) queue.push_front({std::move(fn), flag});
+     else queue.push_back({std::move(fn), flag});
+     work_cv.notify_one();
+@@ -115,13 +125,16 @@
+                     scv.wait(lk, [] { return !sq.empty(); });
+                     fn = std::move(sq.front());
+                     sq.pop_front();
++                    if(history_jobs_on())history_active++;
+                 }
+                 run_guarded(fn);
++                if(history_jobs_on()){history_active--;history_serial--;history_change();}
+                 jobs_notify();
+             }
+         }).detach();
+         logf("vk: compute pipelines are built one at a time");
+     }
++    if(history_jobs_on()){history_serial++;history_change();}
+     sq.push_back(std::move(fn));
+     scv.notify_one();
+ }
+@@ -143,6 +156,7 @@
+                 lk.unlock();
+                 run_guarded(fn);
+                 pending--;
++                history_change();
+                 jobs_notify();
+                 lk.lock();
+                 break;
+@@ -156,6 +170,10 @@
+     return done_cv.wait_for(lk, std::chrono::duration<double, std::milli>(ms),
+                             [&] { return flag.load(std::memory_order_acquire); });
+ }
++void jobs_history_snapshot(uint64_t* epoch,int* normal,int* serial,int* active) {
++ for(unsigned tries=0;tries<8;++tries){const auto a=history_epoch.load();*normal=pending.load();*serial=history_serial.load();*active=history_active.load();const auto b=history_epoch.load();if(a==b){*epoch=b;return;}}
++ *epoch=UINT64_MAX; // unstable observation is explicitly not readiness
++}
+ int jobs_pending() {
+     return pending.load();
+ }
+--- a/gpu/vk/vk_jobs.h
++++ b/gpu/vk/vk_jobs.h
+@@ -2,6 +2,7 @@
+ // at below-normal priority while the replay goes on, after totk-pc-recomp's vk_pipeline.c background builds. A draw
+ // whose program or pipeline is not ready yet is left out of its frame, or waits for it (vk_draw.cpp decides).
+ #pragma once
++#include <cstdint>
+
+ #include <atomic>
+ #include <functional>
+@@ -24,3 +25,6 @@
+ int jobs_pending();
+
+ } // namespace mkwvk
++
++// Default-off pass-history diagnostic accounting; no queue behavior changes.
++namespace mkwvk { void jobs_history_snapshot(uint64_t*,int*,int*,int*); }
+--- /dev/null
++++ b/gpu/vk/pass_history_policy.h
+@@ -0,0 +1,49 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Authored CPU policy; budget counts logical diagnostic resource/copy bytes.
++#pragma once
++#include <cstdint>
++#include <limits>
++namespace mkwvk::pass_history {
++constexpr uint64_t kByteCap=384ull<<20;
++constexpr uint64_t kFileCap=256ull<<10;
++constexpr uint32_t kStepCap=128,kRowCap=512;
++enum class Reason : uint32_t { None,Bytes,Steps,Rows,IO,Repeated,Readiness,Unsupported,Accounting };
++struct Snapshot {
++ uint64_t epoch=0; int normal=0,serial=0,active=0;
++ int64_t translated=0,failed=0,pipelines=0,skips=0,draw_skips=0;
++ double translation_ms=0; bool left_workers=false;
++ bool idle() const { return epoch!=std::numeric_limits<uint64_t>::max() && normal==0 && serial==0 && active==0 && !left_workers; }
++ bool same_work(const Snapshot& b) const {
++  return idle()&&b.idle()&&epoch==b.epoch&&translated==b.translated&&failed==b.failed&&pipelines==b.pipelines&&skips==b.skips&&draw_skips==b.draw_skips&&translation_ms==b.translation_ms;
++ }
++};
++struct Budget {
++ bool used=false,pixels=false,incomplete=false,stopped=false; Reason reason=Reason::None;
++ uint32_t rows=0,attempts=0,admitted=0;
++ uint64_t reserved_buffer=0,reserved_image=0,reserved_copy=0;
++ uint64_t actual_buffer=0,actual_image=0,actual_copy=0;
++ void stop(Reason r) { incomplete=true;stopped=true;if(reason==Reason::None)reason=r; }
++ bool begin(bool want_pixels,const Snapshot& s) {
++  if(used){stop(Reason::Repeated);return false;}used=true;pixels=want_pixels;
++  if(!s.idle())stop(Reason::Readiness);
++  return true;
++ }
++ bool row() { if(rows>=kRowCap){stop(Reason::Rows);return false;}++rows;return true; }
++ bool reserve(uint64_t buffer,uint64_t image,uint64_t copy) {
++  if(!pixels||stopped)return false;
++  if(attempts>=kStepCap){stop(Reason::Steps);return false;}++attempts;
++  if(!buffer||copy!=buffer||image>buffer){stop(Reason::Accounting);return false;}
++  const uint64_t used=reserved_buffer+reserved_image+reserved_copy;
++  if(buffer>kByteCap-used || image>kByteCap-used-buffer || copy>kByteCap-used-buffer-image){stop(Reason::Bytes);return false;}
++  reserved_buffer+=buffer;reserved_image+=image;reserved_copy+=copy;++admitted;return true;
++ }
++ bool commit(uint64_t& actual,uint64_t reserved,uint64_t n) {
++  if(n>reserved || actual>reserved-n){stop(Reason::Accounting);return false;}actual+=n;return true;
++ }
++ bool finish(const Snapshot& begin,const Snapshot& end) {
++  if(actual_buffer!=reserved_buffer||actual_image!=reserved_image||actual_copy!=reserved_copy)stop(Reason::Accounting);
++  if(!begin.same_work(end))stop(Reason::Readiness);
++  return !incomplete;
++ }
++};
++} // namespace mkwvk::pass_history

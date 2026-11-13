@@ -4,6 +4,11 @@ Updated 2026-11-13. This page distinguishes working tools, local observations, a
 
 ## Latest reviewed results
 
+A bounded [foliage pass history](foliage-pass-history.md) now records 55 raster
+passes and 104 attachment rows for one reviewed gameplay frame, with unchanged
+idle compiler observations and zero pass readbacks. The dark leaf-card producer
+is still unknown; this is metadata acquisition, without a quality or FPS claim.
+
 The [startup-continuous selector capture](selector-live-acquisition-observation.md)
 now acquires the exact compute target's owned C0 and current descriptors and
 observes its selected recording complete. Exact pipeline warmup preserves all
