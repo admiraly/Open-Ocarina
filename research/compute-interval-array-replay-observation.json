@@ -1,0 +1,2652 @@
+{
+  "adapter_sha256": "33a786ade6020aa5627f83a6478922e6aaa56f1b8045c6e97af124ddd8db1805",
+  "cache_policy": "Fresh isolated empty writable cache per case; no import or reuse; disk cache not disabled.",
+  "cases": [
+    {
+      "all_static_review_claim_and_prior_pins_match": true,
+      "cache_files_after_terminal": 4,
+      "case": "baseline-once",
+      "complete_outputs": [
+        {
+          "index": 0,
+          "path": "allocation-0.bin",
+          "sha256": "7ac84a212629a1f919996531acfa5ead0d9986b79e14d7760db1d79355e14c99",
+          "size": 4194304
+        },
+        {
+          "index": 1,
+          "path": "allocation-1.bin",
+          "sha256": "c8c124e5499428d93be234a8caebd3075f2fcf4cfe30d5b456953b173afbbec4",
+          "size": 4194304
+        },
+        {
+          "index": 2,
+          "path": "allocation-2.bin",
+          "sha256": "7a7868ef096fc2a7c59de40a25a85129fcc7f4e2430127435cc4c4a8b8b83291",
+          "size": 20971520
+        },
+        {
+          "index": 3,
+          "path": "allocation-3.bin",
+          "sha256": "b9835c045ab988688e4dfe9ed81920b4f04f1b0aa8314a213f7e2c0f1ed80891",
+          "size": 4194304
+        },
+        {
+          "index": 4,
+          "path": "allocation-4.bin",
+          "sha256": "353b062903195217d7b826913a46b8d0c75af1aabde23b06b8f79cfb30c4d107",
+          "size": 20971520
+        },
+        {
+          "index": 5,
+          "path": "allocation-5.bin",
+          "sha256": "b5a3a42b6310e216a9b88caff19531e1c0b6ab0691c9547a20a0d084f6703017",
+          "size": 54525952
+        },
+        {
+          "index": 6,
+          "path": "allocation-6.bin",
+          "sha256": "810da6c191facaa000710c11507dddcdb4e6cdffdb17204c6a5c76a261376054",
+          "size": 4194304
+        },
+        {
+          "index": 7,
+          "path": "allocation-7.bin",
+          "sha256": "323334824a3f64ff80ba0cb8f8602c8f6dd7be3384a32353bbd8e1eb0628c7c2",
+          "size": 4194304
+        },
+        {
+          "index": 8,
+          "path": "allocation-8.bin",
+          "sha256": "8ca83ce8663d0aa715aa5e777be0691ef85a2edaf99b37ed22b12cacff516d8b",
+          "size": 8388608
+        },
+        {
+          "index": 9,
+          "path": "allocation-9.bin",
+          "sha256": "27db8c89cae1f6d265974bdf1b64c8ba3331d8011a4782684c43ed4f709370f6",
+          "size": 4194304
+        },
+        {
+          "index": 10,
+          "path": "allocation-10.bin",
+          "sha256": "1e41d254f20e95c274079bfbf3ec7853daeee10b2a76a926d17f1863b41e26e1",
+          "size": 8388608
+        },
+        {
+          "index": 11,
+          "path": "allocation-11.bin",
+          "sha256": "ff977b45c39ac8b23638bae4bf87ee86d8052112f66a01cba8593b455916b2e5",
+          "size": 4194304
+        },
+        {
+          "index": 12,
+          "path": "allocation-12.bin",
+          "sha256": "858387bcb85c8799d19253808bb927a8bf643320c716857df7e2cc034ff3c36f",
+          "size": 4194304
+        },
+        {
+          "index": 13,
+          "path": "allocation-13.bin",
+          "sha256": "136b41f4e8eadb6284289ac7edb9f9c127a7eeb3c3bb513de01d4e664b2afb4b",
+          "size": 4194304
+        },
+        {
+          "index": 14,
+          "path": "allocation-14.bin",
+          "sha256": "321f4418e4c0346cb0c49a1cd701fb4625477d41f7e4bbf92cbc7244ce11e9f8",
+          "size": 4194304
+        },
+        {
+          "index": 15,
+          "path": "allocation-15.bin",
+          "sha256": "70aaafb2ecd09212934c780bfef176ef08bf9fab00d78f4f1c89b7b8d67d042e",
+          "size": 16777216
+        },
+        {
+          "index": 16,
+          "path": "allocation-16.bin",
+          "sha256": "aa63f8ccf72935dfcbb53cc82e38f8f8dde3632064395c12cbd8a0b7344653de",
+          "size": 25165824
+        },
+        {
+          "index": 17,
+          "path": "allocation-17.bin",
+          "sha256": "46d762b8e28e0c98c5190db97da0435f69798b0e8fc76df41bbbb04b0ada49e5",
+          "size": 4194304
+        },
+        {
+          "index": 18,
+          "path": "allocation-18.bin",
+          "sha256": "0565acac068cffa0fcebc9b5c3f9e6e93c55b43a095bceb6e7ba80d77628a3c9",
+          "size": 4194304
+        },
+        {
+          "index": 19,
+          "path": "allocation-19.bin",
+          "sha256": "6bfcf7c316905bb8bec153b471bbefe50773b6cfb9581832468a816c61d8864b",
+          "size": 4194304
+        },
+        {
+          "index": 20,
+          "path": "allocation-20.bin",
+          "sha256": "5f7082756f67b350856d4f4b672c460943ff7bef7c2d3b11d6e4785c312cb843",
+          "size": 8388608
+        },
+        {
+          "index": 21,
+          "path": "allocation-21.bin",
+          "sha256": "79d440d227908b909a4270a83db0631cf017e602dae9554a1552d6158830a056",
+          "size": 4194304
+        },
+        {
+          "index": 22,
+          "path": "allocation-22.bin",
+          "sha256": "ce53a57a6ffff87f16aff7e76269c2d284d39ac0ab0fa3657e0d787f022fa921",
+          "size": 71303168
+        },
+        {
+          "index": 23,
+          "path": "allocation-23.bin",
+          "sha256": "22a4fbf47411c46078654e2600885a33a3e62a08724a7529a608e2515b598309",
+          "size": 12582912
+        },
+        {
+          "index": 24,
+          "path": "allocation-24.bin",
+          "sha256": "18b3cf6ace9974b67487b9118ec104ae9998afa61df62db3c9495285dc4262c3",
+          "size": 8388608
+        },
+        {
+          "index": 25,
+          "path": "allocation-25.bin",
+          "sha256": "a55259a63244f2a37ba5848d600dad4ea9d7de7c7e833a88ddc7b460bcf04c4a",
+          "size": 167772160
+        },
+        {
+          "index": 26,
+          "path": "allocation-26.bin",
+          "sha256": "51667b8107a6f9371fd5e0ad0f5cdf6b85f4390a6c5cc19bb7f3978110e0d324",
+          "size": 25165824
+        },
+        {
+          "index": 27,
+          "path": "allocation-27.bin",
+          "sha256": "a826f9067d450324ce44a4c681679cc351532ed7cce8d7f3b1b1d150a7a447ad",
+          "size": 8388608
+        },
+        {
+          "index": 28,
+          "path": "allocation-28.bin",
+          "sha256": "8962812da5bcc885fc5f09e8cb90a53ce105d9fa8a60ee8c08ef588730289fa3",
+          "size": 25165824
+        },
+        {
+          "index": 29,
+          "path": "allocation-29.bin",
+          "sha256": "d18f10d867a100ada0270b1eb7cef23178846aa3b4a208b0b2f0ed416cbb425b",
+          "size": 100663296
+        },
+        {
+          "index": 30,
+          "path": "allocation-30.bin",
+          "sha256": "8ea55a535bafe699d5c207660b67ea1516d7324838f347d962e3745be11b8e0f",
+          "size": 37748736
+        },
+        {
+          "index": 31,
+          "path": "allocation-31.bin",
+          "sha256": "8f3fd31ef19b52b95e215fb8667d725cdca3fa424f21f9e79dd5eeabec840900",
+          "size": 4194304
+        },
+        {
+          "index": 32,
+          "path": "allocation-32.bin",
+          "sha256": "64d6f99223c1a764218a7a178a472ec5c2126dd01982c17a184cfc6d5acf2dfd",
+          "size": 8388608
+        },
+        {
+          "index": 33,
+          "path": "allocation-33.bin",
+          "sha256": "7ac11e357c483678465d17fdb1ac5a3c16bc166ac88b13fbe436e88dcf80d3a6",
+          "size": 8388608
+        },
+        {
+          "index": 34,
+          "path": "allocation-34.bin",
+          "sha256": "b1440dc6d6d4d394659ffe90d9486887e35f2571ab274954f9c99c229558781e",
+          "size": 138412032
+        },
+        {
+          "index": 35,
+          "path": "allocation-35.bin",
+          "sha256": "26a0fbc32aa56b86fa46cd2a4095813b5b758015f99746eff891fb314dc3b9d1",
+          "size": 4194304
+        },
+        {
+          "index": 36,
+          "path": "allocation-36.bin",
+          "sha256": "e2f3fe84fb758a81fb7b5646a5fb2a49ac0cc0de1f914a7d21dddcacae52f8e8",
+          "size": 8388608
+        },
+        {
+          "index": 37,
+          "path": "allocation-37.bin",
+          "sha256": "9520362c2131cad3ca25cb4137b260e0818db8221b1b30c516b21fd5b522da22",
+          "size": 29360128
+        },
+        {
+          "index": 38,
+          "path": "allocation-38.bin",
+          "sha256": "f9c0b81dc68297e9606d6339bceccc89283d9601ff6169f2e5e9ba0da94cbf7d",
+          "size": 33554432
+        },
+        {
+          "index": 39,
+          "path": "allocation-39.bin",
+          "sha256": "beba5eb4782ad0344518d756747d14bf6845799ee7b17366beedd8cedfbb5983",
+          "size": 4194304
+        },
+        {
+          "index": 40,
+          "path": "allocation-40.bin",
+          "sha256": "efc28c9191780c31891b9d76105051469a6c6d2ddf50c75e0d28ae3a2b7cec36",
+          "size": 4194304
+        },
+        {
+          "index": 41,
+          "path": "allocation-41.bin",
+          "sha256": "7506dcffabafc85e1a0f21088f3f1f7aaca240488c51148fab8fe71a3ae4e121",
+          "size": 4194304
+        },
+        {
+          "index": 42,
+          "path": "allocation-42.bin",
+          "sha256": "b5877246f07261c93485bfa06bb4b032fea0d9bd09fb0a29d69499c5e8198d59",
+          "size": 8388608
+        },
+        {
+          "index": 43,
+          "path": "allocation-43.bin",
+          "sha256": "b1877b471cb8cd2f435955e5b5fe7b8c1ff1a190adefd8a003fed0f72d869725",
+          "size": 4194304
+        },
+        {
+          "index": 44,
+          "path": "allocation-44.bin",
+          "sha256": "cfbc7559aa7296b2255426b4b6b66df369479fb3b2178912037c2e71a2cd166e",
+          "size": 4194304
+        },
+        {
+          "index": 45,
+          "path": "allocation-45.bin",
+          "sha256": "9534f6f3345ddfdc08d8317c0822e8356069394d3bd8412fdb19aa5f9d0e3833",
+          "size": 20971520
+        },
+        {
+          "index": 46,
+          "path": "allocation-46.bin",
+          "sha256": "af058e9480179f65ff407146b3309fdbd665480d37101b668e90237e18778c09",
+          "size": 12582912
+        },
+        {
+          "index": 47,
+          "path": "allocation-47.bin",
+          "sha256": "8e72cd9c6703326dc329f2f5d7c30f582e5b5e34a8c1db2299de0f888ae4390d",
+          "size": 25165824
+        },
+        {
+          "index": 48,
+          "path": "allocation-48.bin",
+          "sha256": "26b64a0b2f03cb937f1b8bdb34a2a5ffd2cc6bb57730019f25c0037e7d3ea375",
+          "size": 8388608
+        },
+        {
+          "index": 49,
+          "path": "allocation-49.bin",
+          "sha256": "0a16d8ef5b515ed72785e7c04990a9b176c20477d78c4a596994d3ddcf3fe9f5",
+          "size": 12582912
+        },
+        {
+          "index": 50,
+          "path": "allocation-50.bin",
+          "sha256": "9c45a48da708255d0ee95d1a5221c7fcb32c1dadbe30f761371e6f5a34910fb6",
+          "size": 50331648
+        },
+        {
+          "index": 51,
+          "path": "allocation-51.bin",
+          "sha256": "1447531c5f4147900e57062bded68b068555ec866c62029962ffd39c0d1cd7a5",
+          "size": 16777216
+        },
+        {
+          "index": 52,
+          "path": "allocation-52.bin",
+          "sha256": "ef815aff3b3286c4dd147afa37dcdda501ede1ae6bf48514a3117b8824b2da1f",
+          "size": 8388608
+        },
+        {
+          "index": 53,
+          "path": "allocation-53.bin",
+          "sha256": "77fb9fc101650c4544cc580acde14467ea9150fe7d696dc98ae98fa55fb94332",
+          "size": 25165824
+        },
+        {
+          "index": 54,
+          "path": "allocation-54.bin",
+          "sha256": "949195ae32f66911d77aabe284b843788d1ac7cbfa334c82e175cc016d6599a5",
+          "size": 4194304
+        },
+        {
+          "index": 55,
+          "path": "allocation-55.bin",
+          "sha256": "2833daaca69ec3d63b251ff7e2160ef83e682bc078c2dcf001b92cd457aff45c",
+          "size": 4194304
+        },
+        {
+          "index": 56,
+          "path": "allocation-56.bin",
+          "sha256": "46d950d28b8c5205ad446a173e27dcab66aa7a1e24f993393a321d7d2b7a653b",
+          "size": 4194304
+        },
+        {
+          "index": 57,
+          "path": "allocation-57.bin",
+          "sha256": "cfaf6a1eeb908dc4b60431f6d3f2922825d08e2a822ca2710624028468ebad5c",
+          "size": 25165824
+        },
+        {
+          "index": 58,
+          "path": "allocation-58.bin",
+          "sha256": "2985c50269f36396f2b6c0112f79c6c15c4bbf43520383eb61a99bdb082e5150",
+          "size": 2097152
+        },
+        {
+          "index": 59,
+          "path": "allocation-59.bin",
+          "sha256": "0ae9e410ac93d40b4ec73073a303fdcb5fa0921dbc01c81ff1e38a349f82c393",
+          "size": 8784
+        }
+      ],
+      "control_sha256": "a6142f0d91492567b7c162aef2796ec3487c59707b5cea2364ed48c54b98ab65",
+      "equal_to_each_prior_case": [],
+      "error": null,
+      "independent_post_verification_sha256": "ff487aade6dce7ec6a715303dd4299a0429dba9e7b4766e2339197388c4b429e",
+      "known_process_scans_passed_before_launch": true,
+      "native": {
+        "VariablePointers_enabled": false,
+        "actual_subgroup_size": 32,
+        "allocations": [
+          {
+            "first_difference": null,
+            "index": 0,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 1,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 2,
+            "size": 20971520
+          },
+          {
+            "first_difference": null,
+            "index": 3,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 4,
+            "size": 20971520
+          },
+          {
+            "first_difference": null,
+            "index": 5,
+            "size": 54525952
+          },
+          {
+            "first_difference": null,
+            "index": 6,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 7,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 8,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 9,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 10,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 11,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 12,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 13,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 14,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 15,
+            "size": 16777216
+          },
+          {
+            "first_difference": null,
+            "index": 16,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 17,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 18,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 19,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 20,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 21,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 22,
+            "size": 71303168
+          },
+          {
+            "first_difference": null,
+            "index": 23,
+            "size": 12582912
+          },
+          {
+            "first_difference": null,
+            "index": 24,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 25,
+            "size": 167772160
+          },
+          {
+            "first_difference": null,
+            "index": 26,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 27,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 28,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 29,
+            "size": 100663296
+          },
+          {
+            "first_difference": null,
+            "index": 30,
+            "size": 37748736
+          },
+          {
+            "first_difference": null,
+            "index": 31,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 32,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 33,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 34,
+            "size": 138412032
+          },
+          {
+            "first_difference": null,
+            "index": 35,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 36,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 37,
+            "size": 29360128
+          },
+          {
+            "first_difference": null,
+            "index": 38,
+            "size": 33554432
+          },
+          {
+            "first_difference": null,
+            "index": 39,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 40,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 41,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 42,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 43,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 44,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 45,
+            "size": 20971520
+          },
+          {
+            "first_difference": null,
+            "index": 46,
+            "size": 12582912
+          },
+          {
+            "first_difference": null,
+            "index": 47,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 48,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 49,
+            "size": 12582912
+          },
+          {
+            "first_difference": null,
+            "index": 50,
+            "size": 50331648
+          },
+          {
+            "first_difference": null,
+            "index": 51,
+            "size": 16777216
+          },
+          {
+            "first_difference": null,
+            "index": 52,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 53,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 54,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 55,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 56,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 57,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 58,
+            "size": 2097152
+          },
+          {
+            "first_difference": null,
+            "index": 59,
+            "size": 8784
+          }
+        ],
+        "array_replay_profile": 1,
+        "comparison_passed": true,
+        "constructed_alias_pairs_verified": 8,
+        "constructed_null_alias_pairs_verified": 2,
+        "device_id": 22176,
+        "device_uuid": "8680a056080000000300000000000000",
+        "device_vendor": 32902,
+        "dispatch_count": 1,
+        "dispatch_executed": true,
+        "driver_uuid": "542135820eef585924bda292588520e1",
+        "executable_statistics": [
+          {
+            "description": "Number of GEN instructions in the final generated shader executable.",
+            "format": 2,
+            "name": "Instructions",
+            "value": 144485
+          },
+          {
+            "description": "Code size in bytes",
+            "format": 2,
+            "name": "Code size",
+            "value": 2889872
+          },
+          {
+            "description": "Number of instructions in the final generated shader executable which access external units such as the constant cache or the sampler.",
+            "format": 2,
+            "name": "SENDs",
+            "value": 1559
+          },
+          {
+            "description": "Number of loops (not unrolled) in the final generated shader executable.",
+            "format": 2,
+            "name": "Loops",
+            "value": 72
+          },
+          {
+            "description": "Estimate of the number of EU cycles required to execute the final generated executable. This is an estimate only and may vary greatly from actual run-time performance.",
+            "format": 2,
+            "name": "Cycles",
+            "value": 3821821
+          },
+          {
+            "description": "Number of scratch spill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Spills",
+            "value": 6690
+          },
+          {
+            "description": "Number of scratch fill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Fills",
+            "value": 14943
+          },
+          {
+            "description": "Number of bytes of scratch memory required by the generated shader executable. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Scratch Memory Size",
+            "value": 32768
+          },
+          {
+            "description": "Number of GRF registers required by the shader.",
+            "format": 2,
+            "name": "GRF registers",
+            "value": 0
+          },
+          {
+            "description": "Number of push constants ranges provided to the shader.",
+            "format": 2,
+            "name": "Push constant ranges",
+            "value": 0
+          },
+          {
+            "description": "Number of GRF registers in the payload registers dedicated to constants.",
+            "format": 2,
+            "name": "Push constant registers",
+            "value": 0
+          },
+          {
+            "description": "Largest SIMD dispatch width.",
+            "format": 2,
+            "name": "Max dispatch width",
+            "value": 32
+          },
+          {
+            "description": "Maximum number of registers used across the entire shader.",
+            "format": 2,
+            "name": "Max live registers",
+            "value": 560
+          },
+          {
+            "description": "Number of bytes of workgroup shared memory used by this shader including any padding.",
+            "format": 2,
+            "name": "Workgroup Memory Size",
+            "value": 0
+          },
+          {
+            "description": "Non SSA regs after NIR translation to BRW.",
+            "format": 2,
+            "name": "Non SSA regs after NIR",
+            "value": 1372
+          },
+          {
+            "description": "Hash generated from shader source or vkd3d-proton provided.",
+            "format": 2,
+            "name": "Source hash",
+            "value": 14125175244154702039
+          }
+        ],
+        "expected_comparison_performed": true,
+        "experiment_manifest_sha256": "8642b6514100eb2ad3c5b227376e0b560a26290e827c44b97e5077decb00027c",
+        "module_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+        "record_payload_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+        "schema": 1,
+        "shaderStorageBufferArrayNonUniformIndexing_enabled": true,
+        "union_descriptor_count": 23,
+        "union_storage_buffer_count": 17
+      },
+      "native_result_sha256": "953b0701d70dd6094da75b924bc3760813a08143c7063c5ceee93e283eabf084",
+      "post_pin_count": 146,
+      "retry_performed": false,
+      "review_plan_sha256": "bf3abde6801862716ea27ae3bf32d50a2c12351eadd209957216d1c2dce1d4cb",
+      "terminal": {
+        "captured_bytes": {
+          "stderr": 83,
+          "stdout": 6546
+        },
+        "child_reaped": true,
+        "child_resource_limits_overridden": false,
+        "combined_limit_bytes": 67108864,
+        "elapsed_wall_seconds": 20.16787331807427,
+        "process_wall_bound_seconds": 30,
+        "returncode": 0,
+        "stop_reason": null
+      },
+      "terminal_id": "grant-baseline-once-01",
+      "terminal_sha256": "9a31da3d9ea67b7c0bfe25389ef27a081f0e67c328307c567ba734d391e714c1"
+    },
+    {
+      "all_static_review_claim_and_prior_pins_match": true,
+      "cache_files_after_terminal": 4,
+      "case": "baseline-repeat",
+      "complete_outputs": [
+        {
+          "index": 0,
+          "path": "allocation-0.bin",
+          "sha256": "7ac84a212629a1f919996531acfa5ead0d9986b79e14d7760db1d79355e14c99",
+          "size": 4194304
+        },
+        {
+          "index": 1,
+          "path": "allocation-1.bin",
+          "sha256": "c8c124e5499428d93be234a8caebd3075f2fcf4cfe30d5b456953b173afbbec4",
+          "size": 4194304
+        },
+        {
+          "index": 2,
+          "path": "allocation-2.bin",
+          "sha256": "7a7868ef096fc2a7c59de40a25a85129fcc7f4e2430127435cc4c4a8b8b83291",
+          "size": 20971520
+        },
+        {
+          "index": 3,
+          "path": "allocation-3.bin",
+          "sha256": "b9835c045ab988688e4dfe9ed81920b4f04f1b0aa8314a213f7e2c0f1ed80891",
+          "size": 4194304
+        },
+        {
+          "index": 4,
+          "path": "allocation-4.bin",
+          "sha256": "353b062903195217d7b826913a46b8d0c75af1aabde23b06b8f79cfb30c4d107",
+          "size": 20971520
+        },
+        {
+          "index": 5,
+          "path": "allocation-5.bin",
+          "sha256": "b5a3a42b6310e216a9b88caff19531e1c0b6ab0691c9547a20a0d084f6703017",
+          "size": 54525952
+        },
+        {
+          "index": 6,
+          "path": "allocation-6.bin",
+          "sha256": "810da6c191facaa000710c11507dddcdb4e6cdffdb17204c6a5c76a261376054",
+          "size": 4194304
+        },
+        {
+          "index": 7,
+          "path": "allocation-7.bin",
+          "sha256": "323334824a3f64ff80ba0cb8f8602c8f6dd7be3384a32353bbd8e1eb0628c7c2",
+          "size": 4194304
+        },
+        {
+          "index": 8,
+          "path": "allocation-8.bin",
+          "sha256": "8ca83ce8663d0aa715aa5e777be0691ef85a2edaf99b37ed22b12cacff516d8b",
+          "size": 8388608
+        },
+        {
+          "index": 9,
+          "path": "allocation-9.bin",
+          "sha256": "27db8c89cae1f6d265974bdf1b64c8ba3331d8011a4782684c43ed4f709370f6",
+          "size": 4194304
+        },
+        {
+          "index": 10,
+          "path": "allocation-10.bin",
+          "sha256": "1e41d254f20e95c274079bfbf3ec7853daeee10b2a76a926d17f1863b41e26e1",
+          "size": 8388608
+        },
+        {
+          "index": 11,
+          "path": "allocation-11.bin",
+          "sha256": "ff977b45c39ac8b23638bae4bf87ee86d8052112f66a01cba8593b455916b2e5",
+          "size": 4194304
+        },
+        {
+          "index": 12,
+          "path": "allocation-12.bin",
+          "sha256": "858387bcb85c8799d19253808bb927a8bf643320c716857df7e2cc034ff3c36f",
+          "size": 4194304
+        },
+        {
+          "index": 13,
+          "path": "allocation-13.bin",
+          "sha256": "136b41f4e8eadb6284289ac7edb9f9c127a7eeb3c3bb513de01d4e664b2afb4b",
+          "size": 4194304
+        },
+        {
+          "index": 14,
+          "path": "allocation-14.bin",
+          "sha256": "321f4418e4c0346cb0c49a1cd701fb4625477d41f7e4bbf92cbc7244ce11e9f8",
+          "size": 4194304
+        },
+        {
+          "index": 15,
+          "path": "allocation-15.bin",
+          "sha256": "70aaafb2ecd09212934c780bfef176ef08bf9fab00d78f4f1c89b7b8d67d042e",
+          "size": 16777216
+        },
+        {
+          "index": 16,
+          "path": "allocation-16.bin",
+          "sha256": "aa63f8ccf72935dfcbb53cc82e38f8f8dde3632064395c12cbd8a0b7344653de",
+          "size": 25165824
+        },
+        {
+          "index": 17,
+          "path": "allocation-17.bin",
+          "sha256": "46d762b8e28e0c98c5190db97da0435f69798b0e8fc76df41bbbb04b0ada49e5",
+          "size": 4194304
+        },
+        {
+          "index": 18,
+          "path": "allocation-18.bin",
+          "sha256": "0565acac068cffa0fcebc9b5c3f9e6e93c55b43a095bceb6e7ba80d77628a3c9",
+          "size": 4194304
+        },
+        {
+          "index": 19,
+          "path": "allocation-19.bin",
+          "sha256": "6bfcf7c316905bb8bec153b471bbefe50773b6cfb9581832468a816c61d8864b",
+          "size": 4194304
+        },
+        {
+          "index": 20,
+          "path": "allocation-20.bin",
+          "sha256": "5f7082756f67b350856d4f4b672c460943ff7bef7c2d3b11d6e4785c312cb843",
+          "size": 8388608
+        },
+        {
+          "index": 21,
+          "path": "allocation-21.bin",
+          "sha256": "79d440d227908b909a4270a83db0631cf017e602dae9554a1552d6158830a056",
+          "size": 4194304
+        },
+        {
+          "index": 22,
+          "path": "allocation-22.bin",
+          "sha256": "ce53a57a6ffff87f16aff7e76269c2d284d39ac0ab0fa3657e0d787f022fa921",
+          "size": 71303168
+        },
+        {
+          "index": 23,
+          "path": "allocation-23.bin",
+          "sha256": "22a4fbf47411c46078654e2600885a33a3e62a08724a7529a608e2515b598309",
+          "size": 12582912
+        },
+        {
+          "index": 24,
+          "path": "allocation-24.bin",
+          "sha256": "18b3cf6ace9974b67487b9118ec104ae9998afa61df62db3c9495285dc4262c3",
+          "size": 8388608
+        },
+        {
+          "index": 25,
+          "path": "allocation-25.bin",
+          "sha256": "a55259a63244f2a37ba5848d600dad4ea9d7de7c7e833a88ddc7b460bcf04c4a",
+          "size": 167772160
+        },
+        {
+          "index": 26,
+          "path": "allocation-26.bin",
+          "sha256": "51667b8107a6f9371fd5e0ad0f5cdf6b85f4390a6c5cc19bb7f3978110e0d324",
+          "size": 25165824
+        },
+        {
+          "index": 27,
+          "path": "allocation-27.bin",
+          "sha256": "a826f9067d450324ce44a4c681679cc351532ed7cce8d7f3b1b1d150a7a447ad",
+          "size": 8388608
+        },
+        {
+          "index": 28,
+          "path": "allocation-28.bin",
+          "sha256": "8962812da5bcc885fc5f09e8cb90a53ce105d9fa8a60ee8c08ef588730289fa3",
+          "size": 25165824
+        },
+        {
+          "index": 29,
+          "path": "allocation-29.bin",
+          "sha256": "d18f10d867a100ada0270b1eb7cef23178846aa3b4a208b0b2f0ed416cbb425b",
+          "size": 100663296
+        },
+        {
+          "index": 30,
+          "path": "allocation-30.bin",
+          "sha256": "8ea55a535bafe699d5c207660b67ea1516d7324838f347d962e3745be11b8e0f",
+          "size": 37748736
+        },
+        {
+          "index": 31,
+          "path": "allocation-31.bin",
+          "sha256": "8f3fd31ef19b52b95e215fb8667d725cdca3fa424f21f9e79dd5eeabec840900",
+          "size": 4194304
+        },
+        {
+          "index": 32,
+          "path": "allocation-32.bin",
+          "sha256": "64d6f99223c1a764218a7a178a472ec5c2126dd01982c17a184cfc6d5acf2dfd",
+          "size": 8388608
+        },
+        {
+          "index": 33,
+          "path": "allocation-33.bin",
+          "sha256": "7ac11e357c483678465d17fdb1ac5a3c16bc166ac88b13fbe436e88dcf80d3a6",
+          "size": 8388608
+        },
+        {
+          "index": 34,
+          "path": "allocation-34.bin",
+          "sha256": "b1440dc6d6d4d394659ffe90d9486887e35f2571ab274954f9c99c229558781e",
+          "size": 138412032
+        },
+        {
+          "index": 35,
+          "path": "allocation-35.bin",
+          "sha256": "26a0fbc32aa56b86fa46cd2a4095813b5b758015f99746eff891fb314dc3b9d1",
+          "size": 4194304
+        },
+        {
+          "index": 36,
+          "path": "allocation-36.bin",
+          "sha256": "e2f3fe84fb758a81fb7b5646a5fb2a49ac0cc0de1f914a7d21dddcacae52f8e8",
+          "size": 8388608
+        },
+        {
+          "index": 37,
+          "path": "allocation-37.bin",
+          "sha256": "9520362c2131cad3ca25cb4137b260e0818db8221b1b30c516b21fd5b522da22",
+          "size": 29360128
+        },
+        {
+          "index": 38,
+          "path": "allocation-38.bin",
+          "sha256": "f9c0b81dc68297e9606d6339bceccc89283d9601ff6169f2e5e9ba0da94cbf7d",
+          "size": 33554432
+        },
+        {
+          "index": 39,
+          "path": "allocation-39.bin",
+          "sha256": "beba5eb4782ad0344518d756747d14bf6845799ee7b17366beedd8cedfbb5983",
+          "size": 4194304
+        },
+        {
+          "index": 40,
+          "path": "allocation-40.bin",
+          "sha256": "efc28c9191780c31891b9d76105051469a6c6d2ddf50c75e0d28ae3a2b7cec36",
+          "size": 4194304
+        },
+        {
+          "index": 41,
+          "path": "allocation-41.bin",
+          "sha256": "7506dcffabafc85e1a0f21088f3f1f7aaca240488c51148fab8fe71a3ae4e121",
+          "size": 4194304
+        },
+        {
+          "index": 42,
+          "path": "allocation-42.bin",
+          "sha256": "b5877246f07261c93485bfa06bb4b032fea0d9bd09fb0a29d69499c5e8198d59",
+          "size": 8388608
+        },
+        {
+          "index": 43,
+          "path": "allocation-43.bin",
+          "sha256": "b1877b471cb8cd2f435955e5b5fe7b8c1ff1a190adefd8a003fed0f72d869725",
+          "size": 4194304
+        },
+        {
+          "index": 44,
+          "path": "allocation-44.bin",
+          "sha256": "cfbc7559aa7296b2255426b4b6b66df369479fb3b2178912037c2e71a2cd166e",
+          "size": 4194304
+        },
+        {
+          "index": 45,
+          "path": "allocation-45.bin",
+          "sha256": "9534f6f3345ddfdc08d8317c0822e8356069394d3bd8412fdb19aa5f9d0e3833",
+          "size": 20971520
+        },
+        {
+          "index": 46,
+          "path": "allocation-46.bin",
+          "sha256": "af058e9480179f65ff407146b3309fdbd665480d37101b668e90237e18778c09",
+          "size": 12582912
+        },
+        {
+          "index": 47,
+          "path": "allocation-47.bin",
+          "sha256": "8e72cd9c6703326dc329f2f5d7c30f582e5b5e34a8c1db2299de0f888ae4390d",
+          "size": 25165824
+        },
+        {
+          "index": 48,
+          "path": "allocation-48.bin",
+          "sha256": "26b64a0b2f03cb937f1b8bdb34a2a5ffd2cc6bb57730019f25c0037e7d3ea375",
+          "size": 8388608
+        },
+        {
+          "index": 49,
+          "path": "allocation-49.bin",
+          "sha256": "0a16d8ef5b515ed72785e7c04990a9b176c20477d78c4a596994d3ddcf3fe9f5",
+          "size": 12582912
+        },
+        {
+          "index": 50,
+          "path": "allocation-50.bin",
+          "sha256": "9c45a48da708255d0ee95d1a5221c7fcb32c1dadbe30f761371e6f5a34910fb6",
+          "size": 50331648
+        },
+        {
+          "index": 51,
+          "path": "allocation-51.bin",
+          "sha256": "1447531c5f4147900e57062bded68b068555ec866c62029962ffd39c0d1cd7a5",
+          "size": 16777216
+        },
+        {
+          "index": 52,
+          "path": "allocation-52.bin",
+          "sha256": "ef815aff3b3286c4dd147afa37dcdda501ede1ae6bf48514a3117b8824b2da1f",
+          "size": 8388608
+        },
+        {
+          "index": 53,
+          "path": "allocation-53.bin",
+          "sha256": "77fb9fc101650c4544cc580acde14467ea9150fe7d696dc98ae98fa55fb94332",
+          "size": 25165824
+        },
+        {
+          "index": 54,
+          "path": "allocation-54.bin",
+          "sha256": "949195ae32f66911d77aabe284b843788d1ac7cbfa334c82e175cc016d6599a5",
+          "size": 4194304
+        },
+        {
+          "index": 55,
+          "path": "allocation-55.bin",
+          "sha256": "2833daaca69ec3d63b251ff7e2160ef83e682bc078c2dcf001b92cd457aff45c",
+          "size": 4194304
+        },
+        {
+          "index": 56,
+          "path": "allocation-56.bin",
+          "sha256": "46d950d28b8c5205ad446a173e27dcab66aa7a1e24f993393a321d7d2b7a653b",
+          "size": 4194304
+        },
+        {
+          "index": 57,
+          "path": "allocation-57.bin",
+          "sha256": "cfaf6a1eeb908dc4b60431f6d3f2922825d08e2a822ca2710624028468ebad5c",
+          "size": 25165824
+        },
+        {
+          "index": 58,
+          "path": "allocation-58.bin",
+          "sha256": "2985c50269f36396f2b6c0112f79c6c15c4bbf43520383eb61a99bdb082e5150",
+          "size": 2097152
+        },
+        {
+          "index": 59,
+          "path": "allocation-59.bin",
+          "sha256": "0ae9e410ac93d40b4ec73073a303fdcb5fa0921dbc01c81ff1e38a349f82c393",
+          "size": 8784
+        }
+      ],
+      "control_sha256": "a6142f0d91492567b7c162aef2796ec3487c59707b5cea2364ed48c54b98ab65",
+      "equal_to_each_prior_case": [
+        "baseline-once"
+      ],
+      "error": null,
+      "independent_post_verification_sha256": "c74539a3d88d528522be4cd8c2c64c0ad3594ee74a3ba660f088b0671972bf62",
+      "known_process_scans_passed_before_launch": true,
+      "native": {
+        "VariablePointers_enabled": false,
+        "actual_subgroup_size": 32,
+        "allocations": [
+          {
+            "first_difference": null,
+            "index": 0,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 1,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 2,
+            "size": 20971520
+          },
+          {
+            "first_difference": null,
+            "index": 3,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 4,
+            "size": 20971520
+          },
+          {
+            "first_difference": null,
+            "index": 5,
+            "size": 54525952
+          },
+          {
+            "first_difference": null,
+            "index": 6,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 7,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 8,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 9,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 10,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 11,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 12,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 13,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 14,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 15,
+            "size": 16777216
+          },
+          {
+            "first_difference": null,
+            "index": 16,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 17,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 18,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 19,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 20,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 21,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 22,
+            "size": 71303168
+          },
+          {
+            "first_difference": null,
+            "index": 23,
+            "size": 12582912
+          },
+          {
+            "first_difference": null,
+            "index": 24,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 25,
+            "size": 167772160
+          },
+          {
+            "first_difference": null,
+            "index": 26,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 27,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 28,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 29,
+            "size": 100663296
+          },
+          {
+            "first_difference": null,
+            "index": 30,
+            "size": 37748736
+          },
+          {
+            "first_difference": null,
+            "index": 31,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 32,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 33,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 34,
+            "size": 138412032
+          },
+          {
+            "first_difference": null,
+            "index": 35,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 36,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 37,
+            "size": 29360128
+          },
+          {
+            "first_difference": null,
+            "index": 38,
+            "size": 33554432
+          },
+          {
+            "first_difference": null,
+            "index": 39,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 40,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 41,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 42,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 43,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 44,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 45,
+            "size": 20971520
+          },
+          {
+            "first_difference": null,
+            "index": 46,
+            "size": 12582912
+          },
+          {
+            "first_difference": null,
+            "index": 47,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 48,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 49,
+            "size": 12582912
+          },
+          {
+            "first_difference": null,
+            "index": 50,
+            "size": 50331648
+          },
+          {
+            "first_difference": null,
+            "index": 51,
+            "size": 16777216
+          },
+          {
+            "first_difference": null,
+            "index": 52,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 53,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 54,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 55,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 56,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 57,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 58,
+            "size": 2097152
+          },
+          {
+            "first_difference": null,
+            "index": 59,
+            "size": 8784
+          }
+        ],
+        "array_replay_profile": 1,
+        "comparison_passed": true,
+        "constructed_alias_pairs_verified": 8,
+        "constructed_null_alias_pairs_verified": 2,
+        "device_id": 22176,
+        "device_uuid": "8680a056080000000300000000000000",
+        "device_vendor": 32902,
+        "dispatch_count": 1,
+        "dispatch_executed": true,
+        "driver_uuid": "542135820eef585924bda292588520e1",
+        "executable_statistics": [
+          {
+            "description": "Number of GEN instructions in the final generated shader executable.",
+            "format": 2,
+            "name": "Instructions",
+            "value": 144485
+          },
+          {
+            "description": "Code size in bytes",
+            "format": 2,
+            "name": "Code size",
+            "value": 2889872
+          },
+          {
+            "description": "Number of instructions in the final generated shader executable which access external units such as the constant cache or the sampler.",
+            "format": 2,
+            "name": "SENDs",
+            "value": 1559
+          },
+          {
+            "description": "Number of loops (not unrolled) in the final generated shader executable.",
+            "format": 2,
+            "name": "Loops",
+            "value": 72
+          },
+          {
+            "description": "Estimate of the number of EU cycles required to execute the final generated executable. This is an estimate only and may vary greatly from actual run-time performance.",
+            "format": 2,
+            "name": "Cycles",
+            "value": 3821821
+          },
+          {
+            "description": "Number of scratch spill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Spills",
+            "value": 6690
+          },
+          {
+            "description": "Number of scratch fill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Fills",
+            "value": 14943
+          },
+          {
+            "description": "Number of bytes of scratch memory required by the generated shader executable. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Scratch Memory Size",
+            "value": 32768
+          },
+          {
+            "description": "Number of GRF registers required by the shader.",
+            "format": 2,
+            "name": "GRF registers",
+            "value": 0
+          },
+          {
+            "description": "Number of push constants ranges provided to the shader.",
+            "format": 2,
+            "name": "Push constant ranges",
+            "value": 0
+          },
+          {
+            "description": "Number of GRF registers in the payload registers dedicated to constants.",
+            "format": 2,
+            "name": "Push constant registers",
+            "value": 0
+          },
+          {
+            "description": "Largest SIMD dispatch width.",
+            "format": 2,
+            "name": "Max dispatch width",
+            "value": 32
+          },
+          {
+            "description": "Maximum number of registers used across the entire shader.",
+            "format": 2,
+            "name": "Max live registers",
+            "value": 560
+          },
+          {
+            "description": "Number of bytes of workgroup shared memory used by this shader including any padding.",
+            "format": 2,
+            "name": "Workgroup Memory Size",
+            "value": 0
+          },
+          {
+            "description": "Non SSA regs after NIR translation to BRW.",
+            "format": 2,
+            "name": "Non SSA regs after NIR",
+            "value": 1372
+          },
+          {
+            "description": "Hash generated from shader source or vkd3d-proton provided.",
+            "format": 2,
+            "name": "Source hash",
+            "value": 14125175244154702039
+          }
+        ],
+        "expected_comparison_performed": true,
+        "experiment_manifest_sha256": "8642b6514100eb2ad3c5b227376e0b560a26290e827c44b97e5077decb00027c",
+        "module_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+        "record_payload_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+        "schema": 1,
+        "shaderStorageBufferArrayNonUniformIndexing_enabled": true,
+        "union_descriptor_count": 23,
+        "union_storage_buffer_count": 17
+      },
+      "native_result_sha256": "953b0701d70dd6094da75b924bc3760813a08143c7063c5ceee93e283eabf084",
+      "post_pin_count": 210,
+      "retry_performed": false,
+      "review_plan_sha256": "dc1c4724fcbe4a1490ae03f403ff024b8317866f2ca1da49c9981998baaec785",
+      "terminal": {
+        "captured_bytes": {
+          "stderr": 83,
+          "stdout": 6546
+        },
+        "child_reaped": true,
+        "child_resource_limits_overridden": false,
+        "combined_limit_bytes": 67108864,
+        "elapsed_wall_seconds": 16.82721479597967,
+        "process_wall_bound_seconds": 30,
+        "returncode": 0,
+        "stop_reason": null
+      },
+      "terminal_id": "grant-baseline-repeat-01",
+      "terminal_sha256": "eb0630faf59dc7eb5ba28f77b5c374f788a2f56e92788197e825cf9f51e458a1"
+    },
+    {
+      "all_static_review_claim_and_prior_pins_match": true,
+      "cache_files_after_terminal": 4,
+      "case": "array-once",
+      "complete_outputs": [
+        {
+          "index": 0,
+          "path": "allocation-0.bin",
+          "sha256": "7ac84a212629a1f919996531acfa5ead0d9986b79e14d7760db1d79355e14c99",
+          "size": 4194304
+        },
+        {
+          "index": 1,
+          "path": "allocation-1.bin",
+          "sha256": "c8c124e5499428d93be234a8caebd3075f2fcf4cfe30d5b456953b173afbbec4",
+          "size": 4194304
+        },
+        {
+          "index": 2,
+          "path": "allocation-2.bin",
+          "sha256": "7a7868ef096fc2a7c59de40a25a85129fcc7f4e2430127435cc4c4a8b8b83291",
+          "size": 20971520
+        },
+        {
+          "index": 3,
+          "path": "allocation-3.bin",
+          "sha256": "b9835c045ab988688e4dfe9ed81920b4f04f1b0aa8314a213f7e2c0f1ed80891",
+          "size": 4194304
+        },
+        {
+          "index": 4,
+          "path": "allocation-4.bin",
+          "sha256": "353b062903195217d7b826913a46b8d0c75af1aabde23b06b8f79cfb30c4d107",
+          "size": 20971520
+        },
+        {
+          "index": 5,
+          "path": "allocation-5.bin",
+          "sha256": "b5a3a42b6310e216a9b88caff19531e1c0b6ab0691c9547a20a0d084f6703017",
+          "size": 54525952
+        },
+        {
+          "index": 6,
+          "path": "allocation-6.bin",
+          "sha256": "810da6c191facaa000710c11507dddcdb4e6cdffdb17204c6a5c76a261376054",
+          "size": 4194304
+        },
+        {
+          "index": 7,
+          "path": "allocation-7.bin",
+          "sha256": "323334824a3f64ff80ba0cb8f8602c8f6dd7be3384a32353bbd8e1eb0628c7c2",
+          "size": 4194304
+        },
+        {
+          "index": 8,
+          "path": "allocation-8.bin",
+          "sha256": "8ca83ce8663d0aa715aa5e777be0691ef85a2edaf99b37ed22b12cacff516d8b",
+          "size": 8388608
+        },
+        {
+          "index": 9,
+          "path": "allocation-9.bin",
+          "sha256": "27db8c89cae1f6d265974bdf1b64c8ba3331d8011a4782684c43ed4f709370f6",
+          "size": 4194304
+        },
+        {
+          "index": 10,
+          "path": "allocation-10.bin",
+          "sha256": "1e41d254f20e95c274079bfbf3ec7853daeee10b2a76a926d17f1863b41e26e1",
+          "size": 8388608
+        },
+        {
+          "index": 11,
+          "path": "allocation-11.bin",
+          "sha256": "ff977b45c39ac8b23638bae4bf87ee86d8052112f66a01cba8593b455916b2e5",
+          "size": 4194304
+        },
+        {
+          "index": 12,
+          "path": "allocation-12.bin",
+          "sha256": "858387bcb85c8799d19253808bb927a8bf643320c716857df7e2cc034ff3c36f",
+          "size": 4194304
+        },
+        {
+          "index": 13,
+          "path": "allocation-13.bin",
+          "sha256": "136b41f4e8eadb6284289ac7edb9f9c127a7eeb3c3bb513de01d4e664b2afb4b",
+          "size": 4194304
+        },
+        {
+          "index": 14,
+          "path": "allocation-14.bin",
+          "sha256": "321f4418e4c0346cb0c49a1cd701fb4625477d41f7e4bbf92cbc7244ce11e9f8",
+          "size": 4194304
+        },
+        {
+          "index": 15,
+          "path": "allocation-15.bin",
+          "sha256": "70aaafb2ecd09212934c780bfef176ef08bf9fab00d78f4f1c89b7b8d67d042e",
+          "size": 16777216
+        },
+        {
+          "index": 16,
+          "path": "allocation-16.bin",
+          "sha256": "aa63f8ccf72935dfcbb53cc82e38f8f8dde3632064395c12cbd8a0b7344653de",
+          "size": 25165824
+        },
+        {
+          "index": 17,
+          "path": "allocation-17.bin",
+          "sha256": "46d762b8e28e0c98c5190db97da0435f69798b0e8fc76df41bbbb04b0ada49e5",
+          "size": 4194304
+        },
+        {
+          "index": 18,
+          "path": "allocation-18.bin",
+          "sha256": "0565acac068cffa0fcebc9b5c3f9e6e93c55b43a095bceb6e7ba80d77628a3c9",
+          "size": 4194304
+        },
+        {
+          "index": 19,
+          "path": "allocation-19.bin",
+          "sha256": "6bfcf7c316905bb8bec153b471bbefe50773b6cfb9581832468a816c61d8864b",
+          "size": 4194304
+        },
+        {
+          "index": 20,
+          "path": "allocation-20.bin",
+          "sha256": "5f7082756f67b350856d4f4b672c460943ff7bef7c2d3b11d6e4785c312cb843",
+          "size": 8388608
+        },
+        {
+          "index": 21,
+          "path": "allocation-21.bin",
+          "sha256": "79d440d227908b909a4270a83db0631cf017e602dae9554a1552d6158830a056",
+          "size": 4194304
+        },
+        {
+          "index": 22,
+          "path": "allocation-22.bin",
+          "sha256": "ce53a57a6ffff87f16aff7e76269c2d284d39ac0ab0fa3657e0d787f022fa921",
+          "size": 71303168
+        },
+        {
+          "index": 23,
+          "path": "allocation-23.bin",
+          "sha256": "22a4fbf47411c46078654e2600885a33a3e62a08724a7529a608e2515b598309",
+          "size": 12582912
+        },
+        {
+          "index": 24,
+          "path": "allocation-24.bin",
+          "sha256": "18b3cf6ace9974b67487b9118ec104ae9998afa61df62db3c9495285dc4262c3",
+          "size": 8388608
+        },
+        {
+          "index": 25,
+          "path": "allocation-25.bin",
+          "sha256": "a55259a63244f2a37ba5848d600dad4ea9d7de7c7e833a88ddc7b460bcf04c4a",
+          "size": 167772160
+        },
+        {
+          "index": 26,
+          "path": "allocation-26.bin",
+          "sha256": "51667b8107a6f9371fd5e0ad0f5cdf6b85f4390a6c5cc19bb7f3978110e0d324",
+          "size": 25165824
+        },
+        {
+          "index": 27,
+          "path": "allocation-27.bin",
+          "sha256": "a826f9067d450324ce44a4c681679cc351532ed7cce8d7f3b1b1d150a7a447ad",
+          "size": 8388608
+        },
+        {
+          "index": 28,
+          "path": "allocation-28.bin",
+          "sha256": "8962812da5bcc885fc5f09e8cb90a53ce105d9fa8a60ee8c08ef588730289fa3",
+          "size": 25165824
+        },
+        {
+          "index": 29,
+          "path": "allocation-29.bin",
+          "sha256": "d18f10d867a100ada0270b1eb7cef23178846aa3b4a208b0b2f0ed416cbb425b",
+          "size": 100663296
+        },
+        {
+          "index": 30,
+          "path": "allocation-30.bin",
+          "sha256": "8ea55a535bafe699d5c207660b67ea1516d7324838f347d962e3745be11b8e0f",
+          "size": 37748736
+        },
+        {
+          "index": 31,
+          "path": "allocation-31.bin",
+          "sha256": "8f3fd31ef19b52b95e215fb8667d725cdca3fa424f21f9e79dd5eeabec840900",
+          "size": 4194304
+        },
+        {
+          "index": 32,
+          "path": "allocation-32.bin",
+          "sha256": "64d6f99223c1a764218a7a178a472ec5c2126dd01982c17a184cfc6d5acf2dfd",
+          "size": 8388608
+        },
+        {
+          "index": 33,
+          "path": "allocation-33.bin",
+          "sha256": "7ac11e357c483678465d17fdb1ac5a3c16bc166ac88b13fbe436e88dcf80d3a6",
+          "size": 8388608
+        },
+        {
+          "index": 34,
+          "path": "allocation-34.bin",
+          "sha256": "b1440dc6d6d4d394659ffe90d9486887e35f2571ab274954f9c99c229558781e",
+          "size": 138412032
+        },
+        {
+          "index": 35,
+          "path": "allocation-35.bin",
+          "sha256": "26a0fbc32aa56b86fa46cd2a4095813b5b758015f99746eff891fb314dc3b9d1",
+          "size": 4194304
+        },
+        {
+          "index": 36,
+          "path": "allocation-36.bin",
+          "sha256": "e2f3fe84fb758a81fb7b5646a5fb2a49ac0cc0de1f914a7d21dddcacae52f8e8",
+          "size": 8388608
+        },
+        {
+          "index": 37,
+          "path": "allocation-37.bin",
+          "sha256": "9520362c2131cad3ca25cb4137b260e0818db8221b1b30c516b21fd5b522da22",
+          "size": 29360128
+        },
+        {
+          "index": 38,
+          "path": "allocation-38.bin",
+          "sha256": "f9c0b81dc68297e9606d6339bceccc89283d9601ff6169f2e5e9ba0da94cbf7d",
+          "size": 33554432
+        },
+        {
+          "index": 39,
+          "path": "allocation-39.bin",
+          "sha256": "beba5eb4782ad0344518d756747d14bf6845799ee7b17366beedd8cedfbb5983",
+          "size": 4194304
+        },
+        {
+          "index": 40,
+          "path": "allocation-40.bin",
+          "sha256": "efc28c9191780c31891b9d76105051469a6c6d2ddf50c75e0d28ae3a2b7cec36",
+          "size": 4194304
+        },
+        {
+          "index": 41,
+          "path": "allocation-41.bin",
+          "sha256": "7506dcffabafc85e1a0f21088f3f1f7aaca240488c51148fab8fe71a3ae4e121",
+          "size": 4194304
+        },
+        {
+          "index": 42,
+          "path": "allocation-42.bin",
+          "sha256": "b5877246f07261c93485bfa06bb4b032fea0d9bd09fb0a29d69499c5e8198d59",
+          "size": 8388608
+        },
+        {
+          "index": 43,
+          "path": "allocation-43.bin",
+          "sha256": "b1877b471cb8cd2f435955e5b5fe7b8c1ff1a190adefd8a003fed0f72d869725",
+          "size": 4194304
+        },
+        {
+          "index": 44,
+          "path": "allocation-44.bin",
+          "sha256": "cfbc7559aa7296b2255426b4b6b66df369479fb3b2178912037c2e71a2cd166e",
+          "size": 4194304
+        },
+        {
+          "index": 45,
+          "path": "allocation-45.bin",
+          "sha256": "9534f6f3345ddfdc08d8317c0822e8356069394d3bd8412fdb19aa5f9d0e3833",
+          "size": 20971520
+        },
+        {
+          "index": 46,
+          "path": "allocation-46.bin",
+          "sha256": "af058e9480179f65ff407146b3309fdbd665480d37101b668e90237e18778c09",
+          "size": 12582912
+        },
+        {
+          "index": 47,
+          "path": "allocation-47.bin",
+          "sha256": "8e72cd9c6703326dc329f2f5d7c30f582e5b5e34a8c1db2299de0f888ae4390d",
+          "size": 25165824
+        },
+        {
+          "index": 48,
+          "path": "allocation-48.bin",
+          "sha256": "26b64a0b2f03cb937f1b8bdb34a2a5ffd2cc6bb57730019f25c0037e7d3ea375",
+          "size": 8388608
+        },
+        {
+          "index": 49,
+          "path": "allocation-49.bin",
+          "sha256": "0a16d8ef5b515ed72785e7c04990a9b176c20477d78c4a596994d3ddcf3fe9f5",
+          "size": 12582912
+        },
+        {
+          "index": 50,
+          "path": "allocation-50.bin",
+          "sha256": "9c45a48da708255d0ee95d1a5221c7fcb32c1dadbe30f761371e6f5a34910fb6",
+          "size": 50331648
+        },
+        {
+          "index": 51,
+          "path": "allocation-51.bin",
+          "sha256": "1447531c5f4147900e57062bded68b068555ec866c62029962ffd39c0d1cd7a5",
+          "size": 16777216
+        },
+        {
+          "index": 52,
+          "path": "allocation-52.bin",
+          "sha256": "ef815aff3b3286c4dd147afa37dcdda501ede1ae6bf48514a3117b8824b2da1f",
+          "size": 8388608
+        },
+        {
+          "index": 53,
+          "path": "allocation-53.bin",
+          "sha256": "77fb9fc101650c4544cc580acde14467ea9150fe7d696dc98ae98fa55fb94332",
+          "size": 25165824
+        },
+        {
+          "index": 54,
+          "path": "allocation-54.bin",
+          "sha256": "949195ae32f66911d77aabe284b843788d1ac7cbfa334c82e175cc016d6599a5",
+          "size": 4194304
+        },
+        {
+          "index": 55,
+          "path": "allocation-55.bin",
+          "sha256": "2833daaca69ec3d63b251ff7e2160ef83e682bc078c2dcf001b92cd457aff45c",
+          "size": 4194304
+        },
+        {
+          "index": 56,
+          "path": "allocation-56.bin",
+          "sha256": "46d950d28b8c5205ad446a173e27dcab66aa7a1e24f993393a321d7d2b7a653b",
+          "size": 4194304
+        },
+        {
+          "index": 57,
+          "path": "allocation-57.bin",
+          "sha256": "cfaf6a1eeb908dc4b60431f6d3f2922825d08e2a822ca2710624028468ebad5c",
+          "size": 25165824
+        },
+        {
+          "index": 58,
+          "path": "allocation-58.bin",
+          "sha256": "2985c50269f36396f2b6c0112f79c6c15c4bbf43520383eb61a99bdb082e5150",
+          "size": 2097152
+        },
+        {
+          "index": 59,
+          "path": "allocation-59.bin",
+          "sha256": "0ae9e410ac93d40b4ec73073a303fdcb5fa0921dbc01c81ff1e38a349f82c393",
+          "size": 8784
+        }
+      ],
+      "control_sha256": "612ab50d6b6dfbac6f64e6392a840d1a4fcbd97cf9e1e5cbcf83eaf158e309ff",
+      "equal_to_each_prior_case": [
+        "baseline-once",
+        "baseline-repeat"
+      ],
+      "error": null,
+      "independent_post_verification_sha256": "87372cb8d6a639258c214d5923f12fa9a48a04e3867f7b280b78fc8a2d9bf649",
+      "known_process_scans_passed_before_launch": true,
+      "native": {
+        "VariablePointers_enabled": false,
+        "actual_subgroup_size": 32,
+        "allocations": [
+          {
+            "first_difference": null,
+            "index": 0,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 1,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 2,
+            "size": 20971520
+          },
+          {
+            "first_difference": null,
+            "index": 3,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 4,
+            "size": 20971520
+          },
+          {
+            "first_difference": null,
+            "index": 5,
+            "size": 54525952
+          },
+          {
+            "first_difference": null,
+            "index": 6,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 7,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 8,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 9,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 10,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 11,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 12,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 13,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 14,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 15,
+            "size": 16777216
+          },
+          {
+            "first_difference": null,
+            "index": 16,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 17,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 18,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 19,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 20,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 21,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 22,
+            "size": 71303168
+          },
+          {
+            "first_difference": null,
+            "index": 23,
+            "size": 12582912
+          },
+          {
+            "first_difference": null,
+            "index": 24,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 25,
+            "size": 167772160
+          },
+          {
+            "first_difference": null,
+            "index": 26,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 27,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 28,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 29,
+            "size": 100663296
+          },
+          {
+            "first_difference": null,
+            "index": 30,
+            "size": 37748736
+          },
+          {
+            "first_difference": null,
+            "index": 31,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 32,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 33,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 34,
+            "size": 138412032
+          },
+          {
+            "first_difference": null,
+            "index": 35,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 36,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 37,
+            "size": 29360128
+          },
+          {
+            "first_difference": null,
+            "index": 38,
+            "size": 33554432
+          },
+          {
+            "first_difference": null,
+            "index": 39,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 40,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 41,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 42,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 43,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 44,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 45,
+            "size": 20971520
+          },
+          {
+            "first_difference": null,
+            "index": 46,
+            "size": 12582912
+          },
+          {
+            "first_difference": null,
+            "index": 47,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 48,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 49,
+            "size": 12582912
+          },
+          {
+            "first_difference": null,
+            "index": 50,
+            "size": 50331648
+          },
+          {
+            "first_difference": null,
+            "index": 51,
+            "size": 16777216
+          },
+          {
+            "first_difference": null,
+            "index": 52,
+            "size": 8388608
+          },
+          {
+            "first_difference": null,
+            "index": 53,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 54,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 55,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 56,
+            "size": 4194304
+          },
+          {
+            "first_difference": null,
+            "index": 57,
+            "size": 25165824
+          },
+          {
+            "first_difference": null,
+            "index": 58,
+            "size": 2097152
+          },
+          {
+            "first_difference": null,
+            "index": 59,
+            "size": 8784
+          }
+        ],
+        "array_replay_profile": 1,
+        "comparison_passed": true,
+        "constructed_alias_pairs_verified": 8,
+        "constructed_null_alias_pairs_verified": 2,
+        "device_id": 22176,
+        "device_uuid": "8680a056080000000300000000000000",
+        "device_vendor": 32902,
+        "dispatch_count": 1,
+        "dispatch_executed": true,
+        "driver_uuid": "542135820eef585924bda292588520e1",
+        "executable_statistics": [
+          {
+            "description": "Number of GEN instructions in the final generated shader executable.",
+            "format": 2,
+            "name": "Instructions",
+            "value": 89834
+          },
+          {
+            "description": "Code size in bytes",
+            "format": 2,
+            "name": "Code size",
+            "value": 1807200
+          },
+          {
+            "description": "Number of instructions in the final generated shader executable which access external units such as the constant cache or the sampler.",
+            "format": 2,
+            "name": "SENDs",
+            "value": 1514
+          },
+          {
+            "description": "Number of loops (not unrolled) in the final generated shader executable.",
+            "format": 2,
+            "name": "Loops",
+            "value": 72
+          },
+          {
+            "description": "Estimate of the number of EU cycles required to execute the final generated executable. This is an estimate only and may vary greatly from actual run-time performance.",
+            "format": 2,
+            "name": "Cycles",
+            "value": 2568049
+          },
+          {
+            "description": "Number of scratch spill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Spills",
+            "value": 4134
+          },
+          {
+            "description": "Number of scratch fill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Fills",
+            "value": 9032
+          },
+          {
+            "description": "Number of bytes of scratch memory required by the generated shader executable. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+            "format": 2,
+            "name": "Scratch Memory Size",
+            "value": 32768
+          },
+          {
+            "description": "Number of GRF registers required by the shader.",
+            "format": 2,
+            "name": "GRF registers",
+            "value": 0
+          },
+          {
+            "description": "Number of push constants ranges provided to the shader.",
+            "format": 2,
+            "name": "Push constant ranges",
+            "value": 0
+          },
+          {
+            "description": "Number of GRF registers in the payload registers dedicated to constants.",
+            "format": 2,
+            "name": "Push constant registers",
+            "value": 0
+          },
+          {
+            "description": "Largest SIMD dispatch width.",
+            "format": 2,
+            "name": "Max dispatch width",
+            "value": 32
+          },
+          {
+            "description": "Maximum number of registers used across the entire shader.",
+            "format": 2,
+            "name": "Max live registers",
+            "value": 556
+          },
+          {
+            "description": "Number of bytes of workgroup shared memory used by this shader including any padding.",
+            "format": 2,
+            "name": "Workgroup Memory Size",
+            "value": 0
+          },
+          {
+            "description": "Non SSA regs after NIR translation to BRW.",
+            "format": 2,
+            "name": "Non SSA regs after NIR",
+            "value": 1349
+          },
+          {
+            "description": "Hash generated from shader source or vkd3d-proton provided.",
+            "format": 2,
+            "name": "Source hash",
+            "value": 9970401502913428313
+          }
+        ],
+        "expected_comparison_performed": true,
+        "experiment_manifest_sha256": "8642b6514100eb2ad3c5b227376e0b560a26290e827c44b97e5077decb00027c",
+        "module_sha256": "7c6322e1a7b4a84206977fd0a0af165b7dedeb0eb9cbd8fb7c211ec1af77d7bd",
+        "record_payload_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+        "schema": 1,
+        "shaderStorageBufferArrayNonUniformIndexing_enabled": true,
+        "union_descriptor_count": 23,
+        "union_storage_buffer_count": 17
+      },
+      "native_result_sha256": "944abd2bc0ee7f8a56f8988d390098a65bd5e753a22afab0d355240845aa3576",
+      "post_pin_count": 274,
+      "retry_performed": false,
+      "review_plan_sha256": "afad76cc10675d378eafb96ddf3f3e5d81655fcc9b12db4c1f0f26f6f23e4923",
+      "terminal": {
+        "captured_bytes": {
+          "stderr": 83,
+          "stdout": 6543
+        },
+        "child_reaped": true,
+        "child_resource_limits_overridden": false,
+        "combined_limit_bytes": 67108864,
+        "elapsed_wall_seconds": 9.77062136202585,
+        "process_wall_bound_seconds": 30,
+        "returncode": 0,
+        "stop_reason": null
+      },
+      "terminal_id": "grant-array-once-01",
+      "terminal_sha256": "a5559186527b0c64e7de15c00701eed6b12ad55d8474d3547302ae72d27cf93d"
+    }
+  ],
+  "common_compile_observation_sha256": "0a3fe3c8a81083b9a5a3a9f94a3b74ee9b4b0745c3a42c376789b577bbff8bdf",
+  "common_compile_profile_sha256": "d6a343cade4fec41cc005fe3b2eb7fe1ceb333f28fda7c5ae1866a43a4983982",
+  "compiler_controls": {
+    "HS_CS32_MAX_INSTS": null,
+    "HS_FORCE_SIMD8": null,
+    "HS_LARGE_GRF": null,
+    "HS_LARGE_GRF_BIT": null,
+    "HS_PUSH_SHADOW": null,
+    "HS_RA_DEBUG": null,
+    "HS_SPILL_BATCH": "1",
+    "HS_SPILL_PCT": null,
+    "HS_SUBGROUP8": null,
+    "INTEL_DEBUG": null,
+    "RX_VK_NOOPT": null,
+    "RX_VK_WARP64": null,
+    "shader_spilling_rate": "1"
+  },
+  "driver": {
+    "ICD_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+    "device_id": 22176,
+    "device_uuid": "8680a056080000000300000000000000",
+    "driver_uuid": "542135820eef585924bda292588520e1",
+    "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+    "vendor": 32902
+  },
+  "execution": {
+    "actual_subgroup_size_required": 32,
+    "child_rlimit_overrides": false,
+    "count_per_case": 1,
+    "fence_bound_ns": 2000000000,
+    "full_subgroups": true,
+    "grid": [
+      2,
+      1,
+      1
+    ],
+    "local": [
+      64,
+      1,
+      1
+    ],
+    "parent_pipe_bound_bytes": 67108864,
+    "process_bound_seconds": 30
+  },
+  "feature_and_alias_facts": {
+    "VariablePointers_requested": false,
+    "actual_VkBuffer_offset_range_alias_pairs_checked_per_case": 8,
+    "actual_compute_subgroup_size_all3": 32,
+    "actual_null_handle_offset_whole_size_pairs_checked_per_case": 2,
+    "capacity_thresholds_checked_before_logical_device": true,
+    "exact_device_maxima_not_exported": true,
+    "full_subgroups_required": true,
+    "hit_storage_class_preserved": "StorageBuffer",
+    "original_int16_int64_BDA_robustness2_and_null_descriptor_gates_retained": true,
+    "physical_page_table_miss_path_preserved": true,
+    "shaderStorageBufferArrayNonUniformIndexing_enabled_all3": true,
+    "writable_binding6_alias_included": true
+  },
+  "limitations": [
+    "One owned frozen diagnostic input graph, two original runs and one candidate run at actual subgroup32. No other widths/drivers or dispatch corpus admitted.",
+    "The interval selection/provenance proof is for these frozen inputs; actual as-submitted descriptors and native candidate classification remain unestablished.",
+    "Actual descriptor-handle identity was checked in this independent host, not integrated into the live renderer.",
+    "No shader timestamp query was issued. Process elapsed wall includes compilation, resources, submission, waiting and complete export; it is not GPU execution timing. Compiler Cycles is an estimate.",
+    "Complete buffer equality does not establish image-quality, gameplay, stability across scenes, native-feature parity or FPS.",
+    "Known-process scans passed before each launch, with a separate root exclusive lease. The scanner does not exhaustively exclude renamed/unknown background GPU applications. Prior static compile-scan uncertainty remains documented separately."
+  ],
+  "native": {
+    "binary_sha256": "89a60f998c5d6b5975bebbd061b8b6b80d5c25f3fe4f247389b217ecf2a1a8c1",
+    "counted_anchors": [
+      "common23:remove-sampler-float-helper",
+      "common23:remove-buffer-helpers",
+      "common23:remove-image-helpers",
+      "common23:remove-execution-tail",
+      "common23:new-compile-only-magic",
+      "common23:reject-execution-before-input",
+      "common23:keep-sampler-frame-without-objects",
+      "common23:compile-only-before-instance",
+      "common23:third-module-identity",
+      "common23:push-capacity23",
+      "common23:stage-SSBO17",
+      "common23:set-SSBO17",
+      "common23:stage-resources23",
+      "common23:nonuniform-gate-signature",
+      "common23:null-and-nonuniform-feature-gate",
+      "common23:exact-array-alias-contract",
+      "common23:same-memory23-descriptors",
+      "common23:binding13-array8",
+      "common23:alias-storage-type",
+      "common23:alias-null-state",
+      "common23:validate-literal-aliases",
+      "common23:query-nonuniform-before-device",
+      "common23:require-statistics-before-device",
+      "common23:enable-nonuniform-no-variable-pointers",
+      "common23:actual-compute32",
+      "common23:separate-native-result-profile",
+      "common23:all-structured-statistics-retained",
+      "common23:application-identity",
+      "restore02-sampler-float",
+      "restore02-buffer",
+      "restore02-images",
+      "restore02-dispatch-tail",
+      "new-replay-only-ABI",
+      "restore-explicit-execute-mode",
+      "restore-explicit-compile-or-execute-branch",
+      "restore-sampler-objects",
+      "only-original-and-array-modules",
+      "constructed-handle-alias-check",
+      "check-actual-alias-before-command-pool",
+      "runtime-alias-check-receipt",
+      "new-application-identity"
+    ],
+    "diff_sha256": "19045a0194b44d5ef5e218f4801a2bae8e3dce06297b7d75057857cbf900f2de",
+    "execution_tail_retained": true,
+    "flags": [
+      "-std=c11",
+      "-O2",
+      "-DNDEBUG",
+      "-Wall",
+      "-Wextra",
+      "-Werror"
+    ],
+    "source_sha256": "99787c9014fdd3f0d094d978fe89579a35179f102a1b9b6c8d49257e462ad1f1"
+  },
+  "observation_date": "2026-11-13",
+  "original02_profile_sha256": "384a4064fc0aa593e4f9984122fe3f93dfaf089dfed608ee8fb0bacbace658e7",
+  "prepared_profile_sha256": "8642b6514100eb2ad3c5b227376e0b560a26290e827c44b97e5077decb00027c",
+  "prepared_receipt_sha256": "9d882565af79a985b1a9d253d24207c1b8829c30e4752519b9825bbb625a57c4",
+  "preserved02_comparison": {
+    "artifact_sha256": "59f81d594d56af8d5aa542b132a2ed240afb85c4b8f162b81fc9426638f71b71",
+    "new_baseline_once_compared_read_only_against": [
+      {
+        "all60_complete_owners_match": true,
+        "guarded_record_bytes": 8784,
+        "original02_helper_sha256": "6bbf44eeb4f1521bc052d3a6473d5b2ba0656f986d091c9a19f97d39fb0c87dd",
+        "original02_profile_sha256": "384a4064fc0aa593e4f9984122fe3f93dfaf089dfed608ee8fb0bacbace658e7",
+        "original_bytes": 1163919360,
+        "preserved02_case": "baseline32-dispatch-01",
+        "preserved02_result_sha256": "077895e5db733accf85bb5b97ff7996bdc2a15a112478696a82f94a53451aa47"
+      },
+      {
+        "all60_complete_owners_match": true,
+        "guarded_record_bytes": 8784,
+        "original02_helper_sha256": "6bbf44eeb4f1521bc052d3a6473d5b2ba0656f986d091c9a19f97d39fb0c87dd",
+        "original02_profile_sha256": "384a4064fc0aa593e4f9984122fe3f93dfaf089dfed608ee8fb0bacbace658e7",
+        "original_bytes": 1163919360,
+        "preserved02_case": "baseline32-dispatch-02",
+        "preserved02_result_sha256": "077895e5db733accf85bb5b97ff7996bdc2a15a112478696a82f94a53451aa47"
+      }
+    ],
+    "scope": "Only baseline-once separately reopened both preserved02 baseline output sets. New common23 profile/helper identity remains distinct; earlier evidence is not relabeled."
+  },
+  "private_runner_CPU_tests_sha256": "1ed0b31ccf23649f0cc62156987ab3c75b565288b46febb410f6cc1274495718",
+  "private_runner_sha256": "f54e244421205cdb4766272c0618ea515051bd4dcc6d7a2fc3397b01b27d1fd8",
+  "resource_graph": {
+    "alias_descriptor_elements": 8,
+    "guarded_record_sha256": "0ae9e410ac93d40b4ec73073a303fdcb5fa0921dbc01c81ff1e38a349f82c393",
+    "independent_record_owners": 1,
+    "original_bytes": 1163919360,
+    "original_descriptor_elements": 14,
+    "original_owners": 59,
+    "page_root_push_offset": 48,
+    "push_bytes": 88,
+    "record_and_guard_bytes": 8784,
+    "record_descriptor_elements": 1,
+    "record_payload_bytes": 592,
+    "record_payload_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+    "sampled_images": 4,
+    "samplers": 4,
+    "storage_buffer_elements": 17,
+    "total_complete_owners": 60,
+    "total_output_bytes_per_case": 1163928144,
+    "uniform_buffer_elements": 2,
+    "union_descriptor_elements": 23
+  },
+  "result": {
+    "all60_complete_original_and_record_owners_match_across_all3_cases": true,
+    "all_prior_and_input_source_driver_pins_unchanged": true,
+    "array_matched_both_baselines": true,
+    "baseline_repeat_matched_once": true,
+    "original_owners_comparison": "Every original buffer byte is represented by a checked complete-file SHA256, with exact file size and receipt identity.",
+    "record_oracle": "Full independent record+guards equal immutable initial owner; native and Python checks both passed."
+  },
+  "review_index_sha256": "1811f5ae2bfb706d56612dd635d7a567a03eadbb6f407e6d0a64961036dee869",
+  "schema": "open-ocarina.array-union-owned-replay-observation/v1",
+  "scope": "Three separately authorized single-dispatch owned frozen-input observations: original once, original repeat, nonuniform-array candidate once. No runtime speed, live rendering or FPS result.",
+  "source_ledger": {
+    "patches/hookshot/check_binding_provenance.py": "53b54a68256feba6d60a4919c1f530d0d94fcc8bec004ec559e20099feca7d4a",
+    "patches/hookshot/check_dispatch_parameters.py": "ddf942ec838e6578fa3464e3d30288fc9572e4eab30b3d06fae1b4cbd1e96207",
+    "patches/hookshot/check_occurrence_capture.py": "0723a5cb5009d43f39213e420264c801154cc7c24ce6719b797b604ac1ed8f06",
+    "patches/hookshot/check_page_table_patch.py": "ea13eb27b0df1d7cb30410316d7a05f44ba9a4e652260ddc7541062234de3a52",
+    "patches/hookshot/check_sampled_image_capture.py": "130b2c0be1d2b7392ec4448750b1ed82e03c9da7de8fbc5a2a91b94f63f7d42f",
+    "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+    "tools/compute_interval_array_compile.py": "e25f93a7ddba3cfc2a2a5887beabbe2de030f8c5843574b2171945377b94d5a3",
+    "tools/compute_interval_array_lowering.py": "d8c4a899e350408c52b6e1121ce74f244bc182f327b35007e4c7990ed214e13d",
+    "tools/compute_interval_array_replay.py": "33a786ade6020aa5627f83a6478922e6aaa56f1b8045c6e97af124ddd8db1805",
+    "tools/compute_interval_lowering.py": "3176a7e0130b5d722a88fdb2d5ab9512fff4afecf78e10828eb6747b38ca00ca",
+    "tools/compute_interval_replay.py": "9a5e3835c251047f51ba23e9042ac9b821c9e6543adc9f979186d10afcdecb85",
+    "tools/physical_replay.py": "07172fa9b268fc65ffc5a83b1ddd51b11151c23354388dafca411280d4f87b7f",
+    "tools/physical_span_contract.py": "f60dabf565b21b5b883d2784541682c27b88df8520bc16fffe5117d115d6ac33",
+    "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+    "tools/vulkan_physical_replay.c": "0bacac3eda5c93a50b2ff2efdd3a595a0b260bfee371cd7b3e4da85ed70b538d"
+  }
+}

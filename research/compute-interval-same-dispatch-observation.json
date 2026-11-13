@@ -1,0 +1,159 @@
+{
+  "schema": "open-ocarina.compute-interval-same-dispatch-observation/v1",
+  "scope": "MetadataSameDispatch",
+  "status": "CPU metadata record builder; actual observer adapter and replacement hooks unimplemented",
+  "source": {
+    "patch": "patches/hookshot/compute-interval-same-dispatch.patch",
+    "patch_sha256": "d9751bb128ffa1b795d9e4e14baa477417c6c68182199be67d011cdec6662fbb",
+    "added_header": "gpu/vk/compute_interval_same_dispatch.h",
+    "header_sha256": "92c0e6f2028720a3c68a6fca8d0961ba764c6037e2050d39deac3fdf982f3b14",
+    "tests": "tests/test_compute_interval_same_dispatch.py",
+    "tests_sha256": "aed6b842d4260cdfe00bef53062fd610be6513c7c05914c27ba887cb86a66f7b",
+    "language": "C++17",
+    "license": "GPL-3.0-or-later",
+    "dependencies": "C++ standard library only; optional compiler for tests"
+  },
+  "inspected_observer13_source_v2": {
+    "gpu/vk/vk_selector_observer.cpp": "1f5e6179b09488c11767246260fd42595b54601c962158a0b1e99c08941afc82",
+    "gpu/vk/selector_observer.h": "e7e6c9a6481328cb0ca818af554b23eb38ca88b3585bd8f5920b2fa7a6e6836a",
+    "gpu/vk/vk_draw.cpp": "52beaf1b8d00f2f74db727cac5f7cb57ec8baaa62c3110d2e83267facc75141e",
+    "gpu/vk/vk_vma.cpp": "76f67941396266ed089038b3d890ceca372fb9901ce1bb31a9dafc9a77030314"
+  },
+  "preserved_components": {
+    "owned_record_core_sha256": "eec1960f1c3a8df33d0c9ccbb70f8a01037713c912317bb705e87b8aae7bc88b",
+    "extractor_sha256": "a56d4afb5fff767265b34a45d24733f6e9639a29307fd14c3ed4ad5e40397f64",
+    "native_writer_header_sha256": "831d964341723adec64e27fa4cd74f4357ae4f82e8c8d78df1a591b032ed8d09",
+    "live_to_owned_conversion": false,
+    "observer13_certificate_changed": false
+  },
+  "record_math": {
+    "module_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+    "accessor_widths": [
+      4,
+      16
+    ],
+    "binding": 12,
+    "header_bytes": 16,
+    "row_bytes": 48,
+    "nearest_phase": false,
+    "first_match_root_identity_preserved": true,
+    "uint32_array_length_and_byte_shift_wrap_preserved": true,
+    "uint64_endpoint_wrap_preserved": true,
+    "original_storage_roots_rebound_or_relocated": false,
+    "original_root_payload_read": false,
+    "new_original_import_retains_required": false,
+    "new_full_historical_payload_or_physical_root_pin_required": false
+  },
+  "frozen_private_metadata_check": {
+    "manifest_sha256": "4c4b5fcaf73318b8edc08406a58e39a2702544f86183e7d894455e7d363206b9",
+    "ubo_visible_sha256": "778a893b3523a792183d46f8d8e0e0d517e3957b808cdea2be97294b3b008bcf",
+    "metadata_transport_sha256": "42f1bb8525e057ec9ec09cbdbf41a88f3e623f23341a1882cd5c3cca092816eb",
+    "record_bytes": 592,
+    "record_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+    "matches_existing_frozen_record": true,
+    "synthetic_lease_or_order_fields_supplied": false,
+    "actual_prepare_or_record_upload_claimed": false,
+    "producer_denials": [
+      "actual_current_pending_dispatch_cut_missing",
+      "same_dispatch_write_journal_cut_missing",
+      "selected_C0_owner_upload_stream_facts_missing"
+    ]
+  },
+  "cpu_validation": {
+    "authored_tests": 15,
+    "complete_domain_mixed_cases": 120,
+    "gcc_and_clang_ubsan": [
+      {
+        "compiler": "g++",
+        "flags": [
+          "-std=c++17",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-pedantic"
+        ],
+        "binary_sha256": "f62b0bd370ea0d58678e209a901bb051c8d4e7fe0f87368a8ae038d657403be0",
+        "tests": 15,
+        "result": "PASS",
+        "actual_metadata_record_bytes": 592,
+        "actual_metadata_record_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770"
+      },
+      {
+        "compiler": "clang++",
+        "flags": [
+          "-std=c++17",
+          "-O2",
+          "-Wall",
+          "-Wextra",
+          "-Werror",
+          "-pedantic",
+          "-fsanitize=undefined",
+          "-fno-sanitize-recover=undefined"
+        ],
+        "binary_sha256": "6e20b0b53e9ebf2a73612069eb78b30b07ab9ff34fbc2c86e2eb03b756a1a3d1",
+        "tests": 15,
+        "result": "PASS",
+        "actual_metadata_record_bytes": 592,
+        "actual_metadata_record_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770"
+      }
+    ],
+    "private_revision2_report_sha256": "20f2ed49bf414a5753e2e46a0ca87c72309bcea2b1430f2901a4f601ecc58482",
+    "regression_counterexamples_accepted_by_revision1": [
+      "record-prefix-hole",
+      "record-covering-upload-tail",
+      "record-prior-unbound-allocation"
+    ],
+    "regression_counterexamples_rejected_by_revision2": true,
+    "certificate_constants_checked_from_actual_types": true,
+    "full_repository_suite_tests": 851,
+    "full_repository_suite_optional_skips": 5,
+    "full_repository_suite_passed": true,
+    "full_repository_suite_scope": "Clean staged snapshot containing this revision and the array replay observation, excluding unrelated untracked work"
+  },
+  "producer_limits": [
+    "Value consistency does not authenticate actual hooks, journal completeness or source provenance",
+    "Original root validity remains the existing renderer precondition for the SAME original dispatch",
+    "Observer13 lacks the new typed current-info rescan, dispatch-instance bundle and committed stream-used fact",
+    "Raw owner/mapping identities and one serialized pending cut must come from actual source objects, not reconstructed exports",
+    "New record ownership, retention, copied bytes and observed coherent flags or successful checked flush remain required before preparation",
+    "Unknown writer classes cannot be relabeled physical/image-only to obtain a dedicated-buffer exclusion"
+  ],
+  "live_certificate": false,
+  "replacement_admitted": false,
+  "gpu_calls": false,
+  "vendor_source_changed": false,
+  "build_wiring_changed": false,
+  "production_flag_enabled": false,
+  "historical_revision1": {
+    "source": {
+      "patch": "patches/hookshot/compute-interval-same-dispatch.patch",
+      "patch_sha256": "b97dff332429df496d793f1d9850203f0159b5ec6ed1f203f50ecf64b271af59",
+      "added_header": "gpu/vk/compute_interval_same_dispatch.h",
+      "header_sha256": "b3c6304c387de37edc21d87e02b9bcb080761fc07e9c2280cd9d4aa5f6e6b970",
+      "tests": "tests/test_compute_interval_same_dispatch.py",
+      "tests_sha256": "746bc086ed396e346efb2ad2cef934392c60629bdbfebb879fae07b6e078f4f7",
+      "language": "C++17",
+      "license": "GPL-3.0-or-later",
+      "dependencies": "C++ standard library only; optional compiler for tests"
+    },
+    "cpu_validation": {
+      "gcc": "16.2.1",
+      "clang_ubsan": "22.1.8",
+      "gcc_test_binary_sha256": "a14415d78f48c9153bf93f0b8092b283d39e57b9255f89873a5b984dc3ebca20",
+      "clang_ubsan_test_binary_sha256": "8734eeff5ceb7ec3c0c9dff18467c5df7369d93bd0db8de9ff9ecc7a2f41b0a5",
+      "test_transport_source_sha256": "db6da1a1160672eadb68e59c74b28dfffae28b1b98b686da5afc5e352818ca34",
+      "authored_tests": 13,
+      "complete_domain_mixed_cases": 120,
+      "ubsan_tests": 13,
+      "ubsan_failures": 0,
+      "full_suite_tests": 888,
+      "full_suite_optional_skips": 5,
+      "full_suite_passed": true
+    },
+    "preserved_private_bundle": "local/same-dispatch-interval-01",
+    "blocker": "A record could overlap the previously committed stream prefix while missing current descriptor ranges"
+  },
+  "revision": 2,
+  "reservation_requirement": "Actual post-plan append reservation: journal/event/buffer/owner/stream generation/previous-used; preserve previously committed prefix, not only current descriptor ranges"
+}

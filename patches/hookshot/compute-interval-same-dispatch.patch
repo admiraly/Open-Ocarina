@@ -1,0 +1,588 @@
+diff --git a/gpu/vk/compute_interval_same_dispatch.h b/gpu/vk/compute_interval_same_dispatch.h
+new file mode 100644
+--- /dev/null
++++ b/gpu/vk/compute_interval_same_dispatch.h
+@@ -0,0 +1,583 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Independently authored C++17 CPU metadata contract. No renderer/Vulkan calls.
++// This scope never constructs an OwnedFrozenGraph or a live certificate.
++#pragma once
++#include <algorithm>
++#include <array>
++#include <cstdint>
++#include <map>
++#include <optional>
++#include <string>
++#include <vector>
++
++namespace open_ocarina::same_dispatch_intervals {
++using U = uint64_t;
++inline constexpr const char *kModule =
++    "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b";
++inline constexpr U kBdaUsage = 0x00020000;
++inline constexpr U kUniformUsage = 0x10, kStorageUsage = 0x20;
++inline constexpr std::array<uint32_t, 8> kSelectors{
++    {192, 208, 256, 272, 352, 2176, 2192, 2208}};
++using C0Bytes = std::array<uint8_t, 2224>;
++enum class Scope { MetadataSameDispatch };
++enum class Creation { Unknown, VmaAllocationInfo2 };
++enum class StreamPolicy { Unknown, AppendOnlyUntilRecordingSlotCompletion };
++enum class FlushPolicy { Unknown, RegisteredRecordingSubmitFlush };
++enum class CopyPolicy { Unknown, MappedCopyAndStampSerialized };
++enum class WriteKind {
++  Unknown,
++  HostMapped,
++  GpuBuffer,
++  PhysicalAddress,
++  ImageOnly
++};
++enum class JournalState { Unknown, Recording, FailedSubmit, CapacityStopped };
++struct Denial {
++  std::string code;
++};
++inline void deny(std::vector<Denial> &d, const char *code) {
++  if (std::none_of(d.begin(), d.end(),
++                   [code](const Denial &x) { return x.code == code; }))
++    d.push_back({code});
++}
++struct Info {
++  uint32_t binding = 0, element = 0, type = 0;
++  U buffer = 0, offset = 0, range = 0;
++  friend bool operator==(const Info &a, const Info &b) {
++    return a.binding == b.binding && a.element == b.element &&
++           a.type == b.type && a.buffer == b.buffer && a.offset == b.offset &&
++           a.range == b.range;
++  }
++};
++struct Identity {
++  U program = 0, variant = 0;
++  uint32_t nvn_stage = 0, vk_stage = 0, stage_count = 0;
++  std::string module;
++};
++struct Cut {
++  U journal = 0, serial = 0, command_buffer = 0, recording_epoch = 0,
++    recording_part = 0;
++  U dispatch_instance = 0;
++  int slot = -1;
++  U writer = 0, built_generation = 0, current_generation = 0, program = 0;
++  std::vector<Info> current_infos;
++};
++// Raw lifecycle/API observations, not owner_known/no_alias/certificate flags.
++struct Owner {
++  Creation creation = Creation::Unknown;
++  U journal = 0, buffer = 0, allocation = 0, memory = 0,
++    resource_generation = 0, memory_generation = 0;
++  U resource_size = 0, memory_offset = 0, allocation_size = 0, memory_size = 0,
++    mapping = 0, usage = 0;
++  uint32_t dedicated_memory = 0;
++  U current_memory = 0, current_memory_generation = 0;
++  std::optional<uint32_t> memory_property_flags;
++};
++struct Stream {
++  StreamPolicy policy = StreamPolicy::Unknown;
++  FlushPolicy flush = FlushPolicy::Unknown;
++  U journal = 0, recording_epoch = 0, recording_part = 0, command_buffer = 0;
++  int slot = -1;
++  U generation = 0, buffer = 0, allocation = 0, owner_generation = 0,
++    mapping = 0, size = 0, used = 0;
++};
++struct Upload {
++  U journal = 0, event = 0, recording_epoch = 0, stream_generation = 0,
++    owner_generation = 0, buffer = 0, offset = 0, bytes = 0;
++};
++struct Copy {
++  CopyPolicy policy = CopyPolicy::Unknown;
++  U journal = 0, event = 0, owner_generation = 0, mapping = 0, buffer = 0,
++    offset = 0, bytes = 0;
++};
++struct Writes {
++  struct Event {
++    WriteKind kind = WriteKind::Unknown;
++    U journal = 0, event = 0, recording_epoch = 0, buffer = 0, offset = 0,
++      bytes = 0;
++    U submitted_sequence = 0;
++  };
++  U journal = 0, cut_event = 0, completed_sequence = 0, observed_count = 0;
++  JournalState state = JournalState::Unknown;
++  U callback_failures = 0;
++  std::vector<Event> events;
++};
++struct SelectedC0 {
++  Owner owner;
++  Stream stream;
++  Copy copy;
++  std::vector<Upload> uploads;
++};
++struct MetadataSameDispatch {
++  Identity identity;
++  std::vector<Info> infos;
++  std::optional<C0Bytes> c0;
++  // Only VK_WHOLE_SIZE needs an actual resource-size observation. Finite
++  // original ranges retain the original renderer's SAME-dispatch precondition.
++  std::map<U, U> buffer_sizes;
++  std::optional<Cut> cut;
++  std::optional<SelectedC0> selected;
++  std::optional<Writes> writes;
++};
++struct Row {
++  U low = 0, high = 0, base = 0;
++  uint32_t binding = 0, element = 0;
++};
++struct Calculation;
++class Plan {
++  friend Calculation calculate(const MetadataSameDispatch &);
++  MetadataSameDispatch source_;
++  std::array<std::vector<Row>, 2> rows_;
++  std::vector<uint8_t> bytes_;
++
++public:
++  static constexpr Scope scope = Scope::MetadataSameDispatch;
++  static constexpr bool live_certificate = false, replacement_admitted = false;
++  const std::vector<uint8_t> &bytes() const { return bytes_; }
++  const std::array<std::vector<Row>, 2> &rows() const { return rows_; }
++  const std::vector<Info> &original_infos() const { return source_.infos; }
++  const MetadataSameDispatch &metadata() const { return source_; }
++};
++struct Calculation {
++  std::optional<Plan> plan;
++  std::vector<Denial> denials;
++};
++struct RecordUpload {
++  struct Reservation {
++    U journal = 0, event = 0, buffer = 0, owner_generation = 0,
++      stream_generation = 0, previous_used = 0;
++  };
++  struct Flush {
++    U journal = 0, event = 0, buffer = 0, owner_generation = 0, offset = 0,
++      bytes = 0;
++    int result = -1;
++  };
++  Info info;
++  Owner owner;
++  Stream stream;
++  Copy copy;
++  Upload upload;
++  std::vector<uint8_t> copied_bytes;
++  std::optional<Flush> flush;
++  std::optional<Reservation> reservation;
++};
++class Prepared {
++  friend Prepared prepare(const Plan &, const MetadataSameDispatch &,
++                          const std::optional<RecordUpload> &);
++  std::vector<Info> original_;
++  std::optional<Info> record_;
++  std::vector<Denial> denied_;
++
++public:
++  static constexpr Scope scope = Scope::MetadataSameDispatch;
++  static constexpr bool live_certificate = false, replacement_admitted = false;
++  const std::vector<Info> &original_infos() const { return original_; }
++  const std::optional<Info> &record() const { return record_; }
++  const std::vector<Denial> &denials() const { return denied_; }
++  bool metadata_consistent() const {
++    return record_.has_value() && denied_.empty();
++  }
++};
++namespace detail {
++inline bool extent(U offset, U size, U capacity) {
++  return size && offset <= capacity && size <= capacity - offset;
++}
++inline bool overlaps(U a, U n, U b, U m) {
++  return n && m && (a <= b ? b - a < n : a - b < m);
++}
++inline bool same_cut(const Cut &a, const Cut &b) {
++  return a.journal == b.journal && a.command_buffer == b.command_buffer &&
++         a.recording_epoch == b.recording_epoch &&
++         a.recording_part == b.recording_part &&
++         a.dispatch_instance == b.dispatch_instance && a.slot == b.slot &&
++         a.writer == b.writer && a.built_generation == b.built_generation &&
++         a.program == b.program;
++}
++inline U read(const uint8_t *p, unsigned n) {
++  U v = 0;
++  for (unsigned i = 0; i < n; ++i)
++    v |= U(p[i]) << (8 * i);
++  return v;
++}
++inline void put(std::vector<uint8_t> &b, U value, unsigned n) {
++  for (unsigned i = 0; i < n; ++i)
++    b.push_back(uint8_t(value >> (8 * i)));
++}
++inline std::optional<U> range(const Info &v, const std::map<U, U> &sizes,
++                              std::vector<Denial> &d) {
++  if (!v.buffer) {
++    if (v.offset || (v.range != 0 && v.range != UINT64_MAX)) {
++      deny(d, "null_descriptor_encoding_unsupported");
++      return std::nullopt;
++    }
++    return U(0);
++  }
++  if (v.range == UINT64_MAX) {
++    auto s = sizes.find(v.buffer);
++    if (s == sizes.end() || v.offset >= s->second) {
++      deny(d, "whole_size_resource_extent_missing");
++      return std::nullopt;
++    }
++    return s->second - v.offset;
++  }
++  if (!v.range || v.range > UINT64_MAX - v.offset) {
++    deny(d, "finite_descriptor_range_unsupported");
++    return std::nullopt;
++  }
++  return v.range;
++}
++inline bool layout(const MetadataSameDispatch &m, std::vector<Denial> &d) {
++  const auto &i = m.identity;
++  if (i.program != 0xcc62764061c44f6aULL ||
++      i.variant != 0x095931037888515aULL || i.nvn_stage != 5 ||
++      i.vk_stage != 32 || i.stage_count != 1 || i.module != kModule) {
++    deny(d, "original_stage_identity_missing_or_mismatched");
++    return false;
++  }
++  if (m.infos.size() != 10) {
++    deny(d, "exact_pending_buffer_layout_missing");
++    return false;
++  }
++  for (size_t n = 0; n < 10; ++n) {
++    const auto &v = m.infos[n];
++    if (v.binding != (n < 7 ? n : 7) || v.element != (n < 7 ? 0 : n - 7) ||
++        v.type != (n < 2 ? 6 : 7)) {
++      deny(d, "exact_pending_buffer_layout_missing");
++      return false;
++    }
++  }
++  if (!m.c0 || !m.infos[0].buffer || m.infos[0].range != 2224) {
++    deny(d, "owned_descriptor_visible_2224_C0_missing");
++    return false;
++  }
++  return true;
++}
++inline void cut(const MetadataSameDispatch &m, std::vector<Denial> &d) {
++  if (!m.cut) {
++    deny(d, "actual_current_pending_dispatch_cut_missing");
++    return;
++  }
++  const auto &c = *m.cut;
++  if (!c.journal || !c.serial || !c.command_buffer || !c.dispatch_instance ||
++      !c.recording_epoch || !c.recording_part || c.slot < 0 || !c.writer ||
++      !c.program || !c.built_generation ||
++      c.current_generation != c.built_generation ||
++      c.dispatch_instance <= c.built_generation ||
++      c.dispatch_instance > c.serial || c.serial < c.built_generation ||
++      c.current_infos != m.infos)
++    deny(d, "pending_writer_generation_or_same_dispatch_mismatch");
++}
++inline void owner(const Owner &o, const Cut &c, std::vector<Denial> &d,
++                  const char *reason) {
++  if (o.creation != Creation::VmaAllocationInfo2 || o.journal != c.journal ||
++      !o.buffer || !o.allocation || !o.memory || !o.resource_generation ||
++      !o.memory_generation || !o.mapping || o.dedicated_memory != 1 ||
++      o.memory_offset || !extent(0, o.resource_size, o.allocation_size) ||
++      !extent(0, o.allocation_size, o.memory_size) ||
++      o.current_memory != o.memory ||
++      o.current_memory_generation != o.memory_generation ||
++      (o.usage & kBdaUsage))
++    deny(d, reason);
++}
++inline void stream(const Stream &s, const Owner &o, const Cut &c, U offset,
++                   U bytes, std::vector<Denial> &d, const char *reason) {
++  if (s.policy != StreamPolicy::AppendOnlyUntilRecordingSlotCompletion ||
++      s.flush != FlushPolicy::RegisteredRecordingSubmitFlush ||
++      s.journal != c.journal || s.recording_epoch != c.recording_epoch ||
++      s.recording_part != c.recording_part ||
++      s.command_buffer != c.command_buffer || s.slot != c.slot ||
++      !s.generation || s.buffer != o.buffer || s.allocation != o.allocation ||
++      s.owner_generation != o.resource_generation || s.mapping != o.mapping ||
++      s.size != o.resource_size || s.used > s.size ||
++      !extent(offset, bytes, s.used))
++    deny(d, reason);
++}
++inline bool upload(const Upload &u, const Owner &o, const Stream &s,
++                   const Cut &c) {
++  return u.journal == c.journal && u.event && u.event <= c.serial &&
++         u.recording_epoch == c.recording_epoch &&
++         u.stream_generation == s.generation &&
++         u.owner_generation == o.resource_generation && u.buffer == o.buffer &&
++         extent(u.offset, u.bytes, s.used);
++}
++inline bool copy(const Copy &x, const Owner &o, const Cut &c, U offset,
++                 U bytes) {
++  return x.policy == CopyPolicy::MappedCopyAndStampSerialized &&
++         x.journal == c.journal && x.event && x.event <= c.serial &&
++         x.owner_generation == o.resource_generation &&
++         x.mapping == o.mapping && x.buffer == o.buffer && x.offset == offset &&
++         x.bytes == bytes;
++}
++inline void journal(const MetadataSameDispatch &m, std::vector<Denial> &d) {
++  if (!m.writes) {
++    deny(d, "same_dispatch_write_journal_cut_missing");
++    return;
++  }
++  if (!m.cut)
++    return;
++  const auto &w = *m.writes;
++  const auto &c = *m.cut;
++  if (w.state != JournalState::Recording || w.callback_failures)
++    deny(d, "producer_journal_stopped_failed_or_callbacks_missing");
++  if (w.journal != c.journal || w.cut_event != c.serial ||
++      w.observed_count != w.events.size() || w.events.size() > 8192)
++    deny(d, "write_journal_cut_or_count_mismatch");
++  for (const auto &e : w.events)
++    if (e.journal != c.journal || !e.event || e.event > c.serial)
++      deny(d, "write_event_domain_or_cut_mismatch");
++}
++inline void writes(const MetadataSameDispatch &m, const Owner &o, U offset,
++                   U bytes, U uploaded, bool selectors,
++                   std::vector<Denial> &d) {
++  if (!m.writes || !m.cut)
++    return;
++  for (const auto &e : m.writes->events) {
++    if (e.kind == WriteKind::PhysicalAddress || e.kind == WriteKind::ImageOnly)
++      continue; // Dedicated non-BDA BUFFER is not addressable by these classes.
++    if (e.kind != WriteKind::HostMapped && e.kind != WriteKind::GpuBuffer) {
++      deny(d, "unclassified_possible_writer");
++      continue;
++    }
++    if (!e.buffer) {
++      deny(d, "possible_buffer_writer_destination_unknown");
++      continue;
++    }
++    if (e.buffer != o.buffer)
++      continue; // Dedicated memory excludes different-buffer aliases.
++    const U count = e.bytes == UINT64_MAX && e.offset <= o.resource_size
++                        ? o.resource_size - e.offset
++                        : e.bytes;
++    if (!extent(e.offset, count, o.resource_size)) {
++      deny(d, "possible_writer_extent_unresolved");
++      continue;
++    }
++    if (e.kind == WriteKind::GpuBuffer && e.submitted_sequence &&
++        e.submitted_sequence <= m.writes->completed_sequence)
++      continue;
++    if (e.kind == WriteKind::HostMapped &&
++        e.recording_epoch == m.cut->recording_epoch && e.event <= uploaded)
++      continue;
++    bool alias = overlaps(e.offset, count, offset, bytes);
++    if (selectors) {
++      alias = false;
++      for (U s : kSelectors)
++        alias |= overlaps(e.offset, count, offset + s, 16);
++    }
++    if (alias)
++      deny(d, selectors ? "pending_writer_may_change_selectors"
++                        : "pending_writer_may_change_record");
++  }
++}
++inline void selected(const MetadataSameDispatch &m, std::vector<Denial> &d) {
++  if (!m.selected) {
++    deny(d, "selected_C0_owner_upload_stream_facts_missing");
++    return;
++  }
++  if (!m.cut)
++    return;
++  const auto &c = *m.cut;
++  const auto &f = *m.selected;
++  const auto &v = m.infos[0];
++  owner(f.owner, c, d, "C0_dedicated_nonBDA_current_VMA_owner_unproved");
++  if (f.owner.buffer != v.buffer || !(f.owner.usage & kUniformUsage))
++    deny(d, "selected_C0_buffer_or_uniform_usage_mismatch");
++  stream(f.stream, f.owner, c, v.offset, 2224, d,
++         "selected_C0_retained_recording_stream_unproved");
++  if (!copy(f.copy, f.owner, c, v.offset, 2224) ||
++      f.copy.event < c.built_generation)
++    deny(d, "actual_serialized_C0_copy_missing");
++  U selected = 0;
++  if (f.uploads.size() > 4096)
++    deny(d, "C0_upload_stamp_cap");
++  for (const auto &u : f.uploads) {
++    if (!upload(u, f.owner, f.stream, c)) {
++      deny(d, "C0_upload_owner_generation_or_extent_mismatch");
++      continue;
++    }
++    if (u.event <= c.built_generation && u.offset <= v.offset &&
++        extent(v.offset - u.offset, 2224, u.bytes))
++      selected = std::max(selected, u.event);
++    if (u.event > c.built_generation &&
++        overlaps(u.offset, u.bytes, v.offset, 2224))
++      deny(d, "C0_upload_superseded_pending_writer");
++  }
++  if (!selected || selected > f.copy.event)
++    deny(d, "selected_C0_fresh_upload_missing");
++  const auto &writable = m.infos[6];
++  if (writable.buffer == v.buffer) {
++    auto n = range(writable, m.buffer_sizes, d);
++    if (n)
++      for (U s : kSelectors)
++        if (overlaps(writable.offset, *n, v.offset + s, 16))
++          deny(d, "known_binding6_may_write_selectors");
++  }
++  writes(m, f.owner, v.offset, 2224, selected, true, d);
++}
++} // namespace detail
++
++inline Calculation calculate(const MetadataSameDispatch &metadata) {
++  Calculation result;
++  if (!detail::layout(metadata, result.denials))
++    return result;
++  std::array<U, 8> ranges{};
++  for (size_t i = 0; i < 8; ++i) {
++    auto n = detail::range(metadata.infos[i + 2], metadata.buffer_sizes,
++                           result.denials);
++    if (!n)
++      return result;
++    ranges[i] = *n;
++  }
++  Plan p;
++  p.source_ = metadata;
++  for (size_t w = 0; w < 2; ++w) {
++    const uint32_t width = w ? 16 : 4, shift = w ? 4 : 2;
++    struct Claim {
++      U base, end;
++      uint32_t binding, element;
++    };
++    std::array<Claim, 8> claims{};
++    std::vector<U> ends;
++    for (size_t i = 0; i < 8; ++i) {
++      const auto *b = metadata.c0->data() + kSelectors[i];
++      const U guest = detail::read(b, 8), size = detail::read(b + 8, 4),
++              base = guest & ~U(15);
++      const uint32_t count = uint32_t(ranges[i] / width),
++                     bytes = uint32_t(count << shift);
++      const U typed = base + U(bytes), native = guest + size,
++              end = i >= 5 && !size ? typed : std::min(typed, native);
++      claims[i] = {base, end, metadata.infos[i + 2].binding,
++                   metadata.infos[i + 2].element};
++      if (base < end) {
++        ends.push_back(base);
++        ends.push_back(end);
++      }
++    }
++    std::sort(ends.begin(), ends.end());
++    ends.erase(std::unique(ends.begin(), ends.end()), ends.end());
++    auto &rows = p.rows_[w];
++    for (size_t j = 1; j < ends.size(); ++j)
++      for (const auto &x : claims)
++        if (x.base <= ends[j - 1] && ends[j - 1] < x.end) {
++          if (!rows.empty() && rows.back().high == ends[j - 1] &&
++              rows.back().base == x.base && rows.back().binding == x.binding &&
++              rows.back().element == x.element)
++            rows.back().high = ends[j];
++          else
++            rows.push_back(
++                {ends[j - 1], ends[j], x.base, x.binding, x.element});
++          break;
++        }
++  }
++  auto &b = p.bytes_;
++  const auto &rows = p.rows();
++  detail::put(b, rows[0].size(), 4);
++  detail::put(b, rows[1].size(), 4);
++  detail::put(b, 0, 4);
++  detail::put(b, rows[0].size(), 4);
++  for (size_t w = 0; w < 2; ++w)
++    for (const auto &r : rows[w]) {
++      detail::put(b, r.low, 8);
++      detail::put(b, r.high, 8);
++      detail::put(b, r.base, 8);
++      detail::put(b, r.binding, 4);
++      detail::put(b, r.element, 4);
++      detail::put(b, w ? 16 : 4, 4);
++      detail::put(b, r.binding < 7 ? r.binding - 2 : 5 + r.element, 4);
++      detail::put(b, 0, 8);
++    }
++  detail::cut(metadata, result.denials);
++  detail::journal(metadata, result.denials);
++  detail::selected(metadata, result.denials);
++  result.plan = std::move(p);
++  return result;
++}
++inline Prepared prepare(const Plan &plan, const MetadataSameDispatch &current,
++                        const std::optional<RecordUpload> &record) {
++  Prepared out;
++  out.original_ = plan.original_infos();
++  const auto result = calculate(current);
++  out.denied_ = result.denials;
++  if (!result.plan) {
++    deny(out.denied_, "current_metadata_record_calculation_failed");
++    return out;
++  }
++  const auto &before = plan.metadata();
++  if (!before.cut || !current.cut ||
++      !detail::same_cut(*before.cut, *current.cut) ||
++      current.cut->serial < before.cut->serial ||
++      before.infos != current.infos || before.c0 != current.c0 ||
++      plan.bytes() != result.plan->bytes())
++    deny(out.denied_, "same_dispatch_plan_stale_or_original_roots_changed");
++  if (!record) {
++    deny(out.denied_, "new_record_owned_upload_and_retained_stream_missing");
++    return out;
++  }
++  if (!current.cut)
++    return out;
++  const auto &c = *current.cut;
++  const auto &r = *record;
++  // A disjoint hole among today's descriptors may contain an earlier draw's
++  // allocation. Require an actual post-plan append reservation, not merely
++  // bytes inside the stream's current committed extent.
++  if (!r.reservation || !before.cut ||
++      r.reservation->journal != c.journal ||
++      r.reservation->event <= before.cut->serial ||
++      r.reservation->event > r.upload.event ||
++      r.reservation->buffer != r.owner.buffer ||
++      r.reservation->owner_generation != r.owner.resource_generation ||
++      r.reservation->stream_generation != r.stream.generation ||
++      r.reservation->previous_used > r.info.offset ||
++      r.reservation->previous_used > r.stream.used)
++    deny(out.denied_, "record_post_plan_append_reservation_missing_or_mismatched");
++  if (before.selected && r.owner.buffer == before.selected->stream.buffer &&
++      (!r.reservation ||
++       r.info.offset < before.selected->stream.used ||
++       r.stream.generation != before.selected->stream.generation ||
++       r.owner.resource_generation != before.selected->owner.resource_generation ||
++       r.reservation->previous_used < before.selected->stream.used))
++    deny(out.denied_, "record_reservation_overwrites_committed_stream_prefix");
++  if (r.info.binding != 12 || r.info.element || r.info.type != 7 ||
++      !r.info.buffer || r.info.range != plan.bytes().size() ||
++      r.info.buffer != r.owner.buffer || !(r.owner.usage & kStorageUsage))
++    deny(out.denied_, "record_binding12_layout_or_extent_mismatch");
++  detail::owner(r.owner, c, out.denied_,
++                "record_dedicated_nonBDA_current_VMA_owner_unproved");
++  detail::stream(r.stream, r.owner, c, r.info.offset, r.info.range, out.denied_,
++                 "record_retained_recording_stream_or_submit_flush_unproved");
++  if (!detail::upload(r.upload, r.owner, r.stream, c) ||
++      r.upload.offset != r.info.offset || r.upload.bytes != r.info.range ||
++      !detail::copy(r.copy, r.owner, c, r.info.offset, r.info.range) ||
++      r.copy.event != r.upload.event || r.copied_bytes != plan.bytes())
++    deny(out.denied_, "exact_record_upload_bytes_or_completion_stamp_missing");
++  const bool coherent = r.owner.memory_property_flags &&
++                        ((*r.owner.memory_property_flags & 6u) == 6u);
++  bool flushed = false;
++  if (r.flush) {
++    const auto &f = *r.flush;
++    flushed = f.journal == c.journal && f.event >= r.upload.event &&
++              f.event <= c.serial && f.buffer == r.info.buffer &&
++              f.owner_generation == r.owner.resource_generation &&
++              f.result == 0 && f.offset <= r.info.offset &&
++              detail::extent(r.info.offset - f.offset, r.info.range, f.bytes) &&
++              detail::extent(f.offset, f.bytes, r.owner.resource_size);
++    if (!flushed)
++      deny(out.denied_, "record_checked_flush_facts_mismatched");
++  }
++  if (!coherent && !flushed)
++    deny(out.denied_, "record_memory_coherency_or_successful_flush_missing");
++  if (current.selected && r.owner.memory == current.selected->owner.memory &&
++      r.owner.buffer != current.selected->owner.buffer)
++    deny(out.denied_, "dedicated_memory_claim_conflicts_between_buffers");
++  for (const auto &v : current.infos)
++    if (v.buffer == r.info.buffer) {
++      auto n = detail::range(v, current.buffer_sizes, out.denied_);
++      if (n && detail::overlaps(v.offset, *n, r.info.offset, r.info.range))
++        deny(out.denied_, "record_upload_aliases_original_descriptor_range");
++    }
++  detail::writes(current, r.owner, r.info.offset, r.info.range, r.upload.event,
++                 false, out.denied_);
++  if (out.denied_.empty())
++    out.record_ = r.info;
++  return out;
++}
++} // namespace open_ocarina::same_dispatch_intervals

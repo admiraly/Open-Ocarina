@@ -21,9 +21,10 @@ The [descriptor-array alternative](compute-interval-array-compile-observation.md
 has now compiled alongside the original and static-route modules under one
 23-descriptor layout at actual width 32. Compiler instruction/spill counts are
 smaller for the array candidate in this observation; they are not runtime timings.
-Its separate [owned replay preparation](compute-interval-array-replay.md) checks
-actual buffer-handle aliasing and requires complete outputs against two baselines.
-That candidate has not executed yet.
+Its separate [owned replay](compute-interval-array-replay-observation.md) now
+passes all sixty complete buffer/record checks against two original baselines,
+with actual buffer-handle aliasing checked before command recording. Each case
+submitted one dispatch at actual width 32; no GPU time or FPS was measured.
 
 [Native mesh lowering revision 2](native-mesh-warp32-integration.md) requires the
 MAX-absent compiler policy; earlier integrated pilots remain explicitly revision 1.
@@ -141,6 +142,10 @@ live record construction remain absent.
 A [native C++ writer](compute-interval-native-writer.md) now emits the same
 candidate instruction words, retaining distinct generator provenance. That CPU
 component still needs live extraction, record binding and device integration.
+The [same-dispatch metadata builder](compute-interval-same-dispatch.md) now
+calculates the exact frozen record and checks append reservations against the
+previously committed stream prefix. Its value checks do not certify a live
+dispatch; actual producer hooks and device integration remain open.
 
 Follow [the Arc-first decision](strategy.md) and the exit tests in [the roadmap](roadmap.md). Prioritize complete shader capture and contract validation, using targeted CPU reconstruction where it resolves an unknown. Keep private analysis outputs local and publish enough metadata to reproduce the procedure.
 
