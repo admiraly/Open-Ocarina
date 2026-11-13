@@ -329,6 +329,8 @@ jobs:
           ff_inc=$(ls -d "$tools/cpm/ffmpeg/"*/include | head -1)
           dav_inc=$(ls -d "$tools/cpm/dav1d/"*/include | head -1)
           rt64_inc="$RUNNER_TEMP/smoke-work/sa/build/rt64"
+          (cd "$tools" && "$py" -I -B -c "import sys; sys.path.insert(0, 'third_party/a64-kit/lift'); import a64_rtgen; a64_rtgen.write(sys.argv[1])" "$rt64_inc")
+          : > "$rt64_inc/a64_fpx.h"
           "$cc" -c "$tools/host/nn_video.c" -o "$RUNNER_TEMP/nn_video.o" -O2 -Wno-everything -I"$tools/host" -I"$rt64_inc" -I"$ff_inc" -I"$dav_inc" -DHOOKSHOT_DAV1D
           "$cc" -c "$tools/host/dav1d_av1.c" -o "$RUNNER_TEMP/dav1d_av1.o" -O2 -Wno-everything -I"$tools/host" -I"$dav_inc" -DHOOKSHOT_DAV1D
           "$cc" -c "$tools/host/pad_sdl.c" -o "$RUNNER_TEMP/pad_sdl.o" -O2 -Wno-everything -I"$tools/host" -I"$rt64_inc"
