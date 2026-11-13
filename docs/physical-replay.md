@@ -1,8 +1,8 @@
 # Owned physical-memory replay foundation
 
-`tools/physical_replay.py` and `tools/vulkan_physical_replay.c` implement a new, explicitly bounded replay path. The default work is **CPU preparation/build only**. One authorized original compute dispatch has completed as an owned frozen diagnostic at subgroup width 32; it establishes neither historical live equivalence nor repeatability. Raw page-table, allocation, sampled-image and dispatch-parameter capture components are not accepted as ready replay manifests.
+`tools/physical_replay.py` and `tools/vulkan_physical_replay.c` implement a new, explicitly bounded replay path. The default work is **CPU preparation/build only**. Four authorized original compute dispatches have completed on one owned frozen input graph: width 32 twice, then width 16 and width 8 once each. Their complete outputs match; historical live equivalence remains unestablished. Raw page-table, allocation, sampled-image and dispatch-parameter capture components are not accepted as ready replay manifests.
 
-The implementation includes a real optimized native executor: one direct compute dispatch, canonical shared buffer storage, fully relocated page-table addresses, exact pushed bytes with a relocated table root, sampled image uploads/views/samplers, a finite fence wait, and complete canonical-allocation readback/comparison. The executor has completed one independently authored synthetic dispatch and one original compute dispatch. CPU preparation, optimized compilation and native `--check-only` parsing have also been exercised.
+The implementation includes a real optimized native executor: one direct compute dispatch, canonical shared buffer storage, fully relocated page-table addresses, exact pushed bytes with a relocated table root, sampled image uploads/views/samplers, a finite fence wait, and complete canonical-allocation readback/comparison. The executor has completed one independently authored synthetic dispatch and four original compute dispatches. CPU preparation, optimized compilation and native `--check-only` parsing have also been exercised.
 
 ## Distinct evidence scopes
 
@@ -83,12 +83,23 @@ Sampled images are uploaded into owned Vulkan images and transitioned to a read-
 
 `compare` rehashes the saved complete outputs, checks frozen input identity, allocation extents, native implementation and driver/device identity, then compares every canonical allocation byte. It cannot prove historical live equivalence from an owned diagnostic match. No image-quality, frame-rate or game-rendering improvement follows from this foundation alone.
 
-## First runtime observations
+## Runtime observations
 
 The frozen optimized helper completed one authored synthetic dispatch on Intel Arc A770 (`8086:56a0`) with actual subgroup size 32. Both complete 4096-byte allocations matched independently reconstructed CPU oracles, including untouched padding. This exercises physical table/root relocation, shared buffer descriptors, a sampled image, one dispatch and complete readback together.
 
 The same helper then completed one exact-target width-32 frozen diagnostic from the independently checked provenance capture. All 59 owned buffer allocations were saved and rehashed, totaling 1,163,919,360 bytes. Only the writable allocation changed from the frozen initial inputs: 1005 bytes changed, and its entire 4 MiB matched captured AFTER exactly. Binding 6 exposes 40,960 bytes as 128 records of 320 bytes; observed differences lie inside records 0–23, and all bytes outside that descriptor range remain unchanged. Unchanged bytes may also have been written with their initial values; this is a byte comparison rather than complete write instrumentation.
 
-Whole-graph captured AFTER agreement was 56 of 59 allocations. Three live-import input allocations remained equal to their frozen initial bytes but differed from captured AFTER. CPU/temporal capture uncertainty and semantic reconstruction gaps remain separate possible explanations. A single run does not establish repeatability, and these observations establish no frame-rate, rendering-quality or historical live-equivalence result.
+Whole-graph captured AFTER agreement was 56 of 59 allocations. Three live-import input allocations remained equal to their frozen initial bytes but differed from captured AFTER. CPU/temporal capture uncertainty and semantic reconstruction gaps remain separate possible explanations. The width-32 repeat establishes repeatability for the tested owned graph. These observations establish no frame-rate, rendering-quality or historical live-equivalence result.
 
-These two observations used native helper SHA-256 `105a88a8e21fd2151964a57f6b6d8a8e8b5a2aaf5341c2411c551019edf26a7c`. The original diagnostic used plan SHA-256 `36104f021b9f652f194230d3f9ccea0037c4a2af7f6df8c1cd9975d0786db4d3`. Raw outputs and detailed comparisons remain private. The GPU lease was released after each authorized invocation; repeats and alternative subgroup policies require separate authorization.
+The original width-32 baseline was repeated once from fresh allocations initialized from the same frozen artifacts. After complete byte agreement was verified, one width-16 and one width-8 trial ran in sequence. Each alternative was checked before proceeding. All compared the entire 59-allocation graph, including nominally read-only bytes and padding:
+
+| Case | Requested / actual subgroup size | Dispatches | Complete allocation comparison with baseline |
+|---|---|---|---|
+| Original baseline | 32 / 32 | 1 | Reference output retained |
+| Original repeat | 32 / 32 | 1 | All 59 allocations, 1,163,919,360 bytes match |
+| Alternative | 16 / 16 | 1 | All 59 allocations, 1,163,919,360 bytes match |
+| Alternative | 8 / 8 | 1 | All 59 allocations, 1,163,919,360 bytes match |
+
+Width 16 and width 8 were each tested once. The result supports exact byte equality for this fixed graph; it does not establish general subgroup equivalence for other dispatches, captures or shader inputs. No GPU execution time, speedup, game frame rate or rendering-quality result was measured.
+
+All five invocations, including the authored fixture, used native helper SHA-256 `105a88a8e21fd2151964a57f6b6d8a8e8b5a2aaf5341c2411c551019edf26a7c`. The original baseline and repeat used plan SHA-256 `36104f021b9f652f194230d3f9ccea0037c4a2af7f6df8c1cd9975d0786db4d3`; alternatives preserve the same source-manifest identity and complete input artifacts. The sanitized [observation record](../research/physical-replay-observation.json) pins each source, helper, plan, driver, result and comparison artifact, and lists complete output-allocation hashes. Raw inputs, outputs and logs remain private. GPU leases were released after authorized work; further dispatches require separate authorization.
