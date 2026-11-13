@@ -1,0 +1,5377 @@
+{
+  "schema": "open-ocarina.mesh-family-audit/v1",
+  "scope": "CPU-only cached originals; core audit passing is not runtime admission or equivalence",
+  "source_hashes": {
+    "initial_profile": "47254f0e8b406aee598baed559a56d842037eb5ab5bbb0b1b5020c162097fdb3",
+    "core_auditor": "1b8aa9d2af553f5a19fe007facdf4a520682dae3ae290c09d85408659ca7bb61",
+    "resource_auditor": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7",
+    "catalog_tool": "47b73851eabf701b89593dfbc11f6f883635ccfa0efb7faabc254156b84f654f",
+    "baseline_pilot02_cache": "a54a42d5eefea3a364680fe9c500dd10048b8edfd5bbcf2240fc5e7b0b1593f2",
+    "candidate8_pilot02_cache": "845673daa141e39a118e20741ca27ecf0c35f84e1df999c91b117aa61c35bf18",
+    "baseline_pilot02_log": "ab0db5b8de5fe91e49043e9639cd03d22b0e6da65871da08f416a18452c7fb03",
+    "candidate8_pilot02_log": "7e791cb767178d62c0afc77f2da1ec9311bee8b341b70d9c24d9262d0c4227e8"
+  },
+  "unique_mesh_keys": 49,
+  "unique_original_mesh_modules": 46,
+  "all_modules_spirv_val_vulkan13_uniform_layout": true,
+  "passing_unique_modules": 12,
+  "first_refusal_counts": {
+    "Unexpected subgroup builtin inventory": 14,
+    "Only two main-function ballots are supported": 14,
+    "Unsupported call/termination/loop before ballots": 4,
+    "Ballots must share one block": 2
+  },
+  "native_8754_pipeline_derivative_in_program_cache": false,
+  "records": [
+    {
+      "program": "10dc355939390bdc",
+      "variant": "25e16ccd8888766a",
+      "stage_count": 3,
+      "mesh_sha256": "74c5017dcb3b51987ecf6bd730c1fcddc6d6f27ebbebc41b6d6d8fc61963021e",
+      "mesh_words": 61025,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 12,
+        "OpGroupNonUniformBallot": 12,
+        "OpGroupNonUniformShuffle": 12
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 14
+      },
+      "ballot_blocks": 3,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 2,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 6,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 13332,
+        "Output": 21672
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "22063ecfa481a731",
+      "variant": "000007b300000a32",
+      "stage_count": 2,
+      "mesh_sha256": "71ee2069a3965a7c90ff0fb062fe283cd303f79315191bdb17c22f2dcb462c9f",
+      "mesh_words": 11858,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "128"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "128"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 92,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 5140,
+        "Output": 5632
+      },
+      "core_audit_passed": true,
+      "first_refusal": null,
+      "earlier_instrumented_pass_spans_ms": [],
+      "passing_input_contract": {
+        "reachable_input_stores": 0,
+        "physical_accesses": {},
+        "push_constant_variables": 0,
+        "image_descriptors": 0,
+        "unresolved_access_origins": {},
+        "set_mesh_outputs": [
+          {
+            "vertices": {
+              "constant": "128"
+            },
+            "primitives": {
+              "opcode": "OpExtInst",
+              "ext": "UMin",
+              "operands_constants": [
+                null,
+                null,
+                null,
+                [
+                  "128"
+                ]
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "builtin": "PrimitiveTriangleIndicesEXT",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": "Position",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "5"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          }
+        ],
+        "payload_dead_chain": {
+          "declared": 1,
+          "dead_constant_true_selected_workgroup_x": true
+        },
+        "output_store_sites": 40,
+        "descriptors": [
+          {
+            "set": 0,
+            "binding": 0,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 24,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 1,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 72,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 2,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 1,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 3,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 2,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 4,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 7,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 5,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 15,
+            "stores": 0,
+            "length_queries": 0
+          }
+        ]
+      }
+    },
+    {
+      "program": "28dd2baa17ba10e1",
+      "variant": "0000000000000000",
+      "stage_count": 3,
+      "mesh_sha256": "a96efb80471c84ecdb32bda9d90f30e521556ab88f8a533e92ba9afd8e190be7",
+      "mesh_words": 14513,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 4,
+        "OpGroupNonUniformShuffle": 21,
+        "OpGroupNonUniformBroadcast": 32
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "SubgroupLocalInvocationId": 54,
+        "WorkgroupId": 5,
+        "SubgroupLtMask": 2
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 13,
+          "calls": 1,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 3200,
+        "Workgroup": 2708,
+        "Output": 2688
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Only two main-function ballots are supported",
+      "earlier_instrumented_pass_spans_ms": [
+        1.089
+      ]
+    },
+    {
+      "program": "2918fc795610b2d4",
+      "variant": "0117477601c4565c",
+      "stage_count": 2,
+      "mesh_sha256": "7d237fb71e50c7e71df8d3a7dacc6dee4a5d8cbbe90e4133e9c5306d1f1ed4b1",
+      "mesh_words": 15057,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 38,
+          "calls": 1,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 4244,
+        "Output": 5760
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unsupported call/termination/loop before ballots",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "2bcc4174a654992f",
+      "variant": "d3c3b5e25937662e",
+      "stage_count": 3,
+      "mesh_sha256": "a131621f4cb4d41dbe0903de81edda046982bf22ae3909459f084965ccba772f",
+      "mesh_words": 27154,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 10,
+        "OpGroupNonUniformBallot": 10,
+        "OpGroupNonUniformShuffle": 10
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 11
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 10772,
+        "Output": 15624
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "31526778a6b5ade2",
+      "variant": "68bbca23d0ddc006",
+      "stage_count": 3,
+      "mesh_sha256": "3d98fb89bc3aea4d53a5e6aa1e5b4743eab20d84f217064c1153ebc1b7fff013",
+      "mesh_words": 27154,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 10,
+        "OpGroupNonUniformBallot": 10,
+        "OpGroupNonUniformShuffle": 10
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 11
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 10772,
+        "Output": 15624
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "3a131272834635ab",
+      "variant": "d3c3b5e25937662e",
+      "stage_count": 3,
+      "mesh_sha256": "325762295f4c46f16577554a9a252aa9023855c30305df8493cc2d30311d1002",
+      "mesh_words": 35943,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 11,
+        "OpGroupNonUniformBallot": 11,
+        "OpGroupNonUniformShuffle": 11
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 13
+      },
+      "ballot_blocks": 6,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 10,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 12,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 16,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 24,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 30,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 10772,
+        "Output": 15624
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "3b8c07f2eb4bb7d9",
+      "variant": "3f3f5b29054673da",
+      "stage_count": 2,
+      "mesh_sha256": "b0b42b6ab2f6ac696023c1c598826e60ba24846585269605e7149fe0396f1fd9",
+      "mesh_words": 60342,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 11156,
+        "Output": 18048
+      },
+      "core_audit_passed": true,
+      "first_refusal": null,
+      "earlier_instrumented_pass_spans_ms": [
+        1.867
+      ],
+      "passing_input_contract": {
+        "reachable_input_stores": 0,
+        "physical_accesses": {},
+        "push_constant_variables": 0,
+        "image_descriptors": 0,
+        "unresolved_access_origins": {},
+        "set_mesh_outputs": [
+          {
+            "vertices": {
+              "constant": "96"
+            },
+            "primitives": {
+              "opcode": "OpExtInst",
+              "ext": "UMin",
+              "operands_constants": [
+                null,
+                null,
+                null,
+                [
+                  "96"
+                ]
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "builtin": "PrimitiveTriangleIndicesEXT",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1152
+          },
+          {
+            "builtin": "Position",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "0"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "1"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "2"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "4"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "5"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "6"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "7"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "8"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "11"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "12"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          }
+        ],
+        "payload_dead_chain": {
+          "declared": 1,
+          "dead_constant_true_selected_workgroup_x": true
+        },
+        "output_store_sites": 138,
+        "descriptors": [
+          {
+            "set": 0,
+            "binding": 0,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 64,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 1,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 126,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 2,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 38,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 3,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 1,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 4,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 10,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 5,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 12,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 6,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 11,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 7,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 14,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 8,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 3,
+            "loads": 2,
+            "stores": 0,
+            "length_queries": 2
+          }
+        ]
+      }
+    },
+    {
+      "program": "3bde059fb051af1f",
+      "variant": "000007b300000a32",
+      "stage_count": 2,
+      "mesh_sha256": "303d1c9ae4c7829ab3a9939a9e78753888fd8a511d5cfbede652c55eb0226c93",
+      "mesh_words": 20646,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "160"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "160"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 4,
+        "OpGroupNonUniformShuffle": 22,
+        "OpGroupNonUniformBroadcast": 32
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 55,
+        "SubgroupLtMask": 2
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 33,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 8980,
+        "Output": 12160
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Only two main-function ballots are supported",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "3e56f2fd4b0c4e1a",
+      "variant": "0117477601c4565c",
+      "stage_count": 2,
+      "mesh_sha256": "b0ff259b8a72f34d5dc8f6dc9668b7233f81fb28d3531b51005066712f76918e",
+      "mesh_words": 16396,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 66,
+          "calls": 1,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 4244,
+        "Output": 5760
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unsupported call/termination/loop before ballots",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "43ec86f35fd937b9",
+      "variant": "bc2d248909cf8b40",
+      "stage_count": 3,
+      "mesh_sha256": "4c5eee851f4140ff089d4abb0bdd445566c7980ee47669d962778171d143131d",
+      "mesh_words": 222557,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 8,
+        "OpGroupNonUniformAny": 6,
+        "OpGroupNonUniformShuffle": 22,
+        "OpGroupNonUniformBroadcast": 32
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 6,
+        "SubgroupLocalInvocationId": 55,
+        "SubgroupLtMask": 2
+      },
+      "ballot_blocks": 5,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 807,
+          "calls": 76,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 807,
+          "calls": 76,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 807,
+          "calls": 76,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 807,
+          "calls": 76,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 803,
+          "calls": 5,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 3200,
+        "Workgroup": 9236,
+        "Output": 13440
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Only two main-function ballots are supported",
+      "earlier_instrumented_pass_spans_ms": [
+        5.877
+      ]
+    },
+    {
+      "program": "507e946d64f2d55e",
+      "variant": "0000000000000000",
+      "stage_count": 3,
+      "mesh_sha256": "896a2cd7aa8d306ae71583f0173fb3328c5a6d1d562d4b8bd33db640b99a9fd4",
+      "mesh_words": 9048,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {},
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 1
+      },
+      "ballot_blocks": 0,
+      "ballot_prefixes": [],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 3604,
+        "Output": 3528
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "50f7cddcf3bb96bd",
+      "variant": "000007b300000a32",
+      "stage_count": 2,
+      "mesh_sha256": "272ea1425d05f0532c5371e03ac08a1a055239163d0a211addae4f630ae69b3c",
+      "mesh_words": 14896,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "128"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "128"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 1
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 134,
+          "calls": 5,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 5140,
+        "Output": 5632
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Only two main-function ballots are supported",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "51183fe750d5d0c8",
+      "variant": "39a224806a9d98a4",
+      "stage_count": 3,
+      "mesh_sha256": "11d9b5955088877472a0cbb8f9fd663f71824013359a88567cf53c86884cc0ad",
+      "mesh_words": 43558,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 4,
+        "OpGroupNonUniformShuffle": 21,
+        "OpGroupNonUniformBroadcast": 32
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "SubgroupLocalInvocationId": 54,
+        "WorkgroupId": 6,
+        "SubgroupLtMask": 2
+      },
+      "ballot_blocks": 2,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 13,
+          "calls": 1,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 25,
+          "calls": 23,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 3200,
+        "Workgroup": 11540,
+        "Output": 16512
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Only two main-function ballots are supported",
+      "earlier_instrumented_pass_spans_ms": [
+        1.507
+      ]
+    },
+    {
+      "program": "5ba7cf23d6857836",
+      "variant": "000007b300000a32",
+      "stage_count": 2,
+      "mesh_sha256": "34d7cdbb070c198bf21d388bd4bc781dbd27b88729799e9f3fde341425030847",
+      "mesh_words": 15181,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "128"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "128"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 1
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 108,
+          "calls": 3,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 6676,
+        "Output": 7680
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Only two main-function ballots are supported",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "636eed4d5000d1c0",
+      "variant": "116205895b172582",
+      "stage_count": 3,
+      "mesh_sha256": "c08ae51b6712b687528434e00558a36984c438c210d6b1654346016cf6b85941",
+      "mesh_words": 66364,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 10,
+        "OpGroupNonUniformBallot": 10,
+        "OpGroupNonUniformShuffle": 10
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 12
+      },
+      "ballot_blocks": 2,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 4,
+          "calls": 5,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 15892,
+        "Output": 19656
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "68642bb810ee3e7c",
+      "variant": "3f3f5b29054673da",
+      "stage_count": 2,
+      "mesh_sha256": "999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93",
+      "mesh_words": 62106,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 11156,
+        "Output": 18048
+      },
+      "core_audit_passed": true,
+      "first_refusal": null,
+      "earlier_instrumented_pass_spans_ms": [
+        1.958
+      ],
+      "passing_input_contract": {
+        "reachable_input_stores": 0,
+        "physical_accesses": {},
+        "push_constant_variables": 0,
+        "image_descriptors": 0,
+        "unresolved_access_origins": {},
+        "set_mesh_outputs": [
+          {
+            "vertices": {
+              "constant": "96"
+            },
+            "primitives": {
+              "opcode": "OpExtInst",
+              "ext": "UMin",
+              "operands_constants": [
+                null,
+                null,
+                null,
+                [
+                  "96"
+                ]
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "builtin": "PrimitiveTriangleIndicesEXT",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1152
+          },
+          {
+            "builtin": "Position",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "0"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "1"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "2"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "4"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "5"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "6"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "7"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "8"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "11"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "12"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          }
+        ],
+        "payload_dead_chain": {
+          "declared": 1,
+          "dead_constant_true_selected_workgroup_x": true
+        },
+        "output_store_sites": 138,
+        "descriptors": [
+          {
+            "set": 0,
+            "binding": 0,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 64,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 1,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 162,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 2,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 38,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 3,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 1,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 4,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 10,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 5,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 12,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 6,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 11,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 7,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 14,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 8,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 3,
+            "loads": 2,
+            "stores": 0,
+            "length_queries": 2
+          }
+        ]
+      }
+    },
+    {
+      "program": "6afe3fda3f4b1752",
+      "variant": "0000000000000000",
+      "stage_count": 2,
+      "mesh_sha256": "64d0e50c63f0fa5226902f25a11e8f6caf5e0d34f3b17fe5b4f6c07029dffd3c",
+      "mesh_words": 8198,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "SubgroupLocalInvocationId": 1,
+        "WorkgroupId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 42,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 3476,
+        "Output": 4224
+      },
+      "core_audit_passed": true,
+      "first_refusal": null,
+      "earlier_instrumented_pass_spans_ms": [],
+      "passing_input_contract": {
+        "reachable_input_stores": 0,
+        "physical_accesses": {},
+        "push_constant_variables": 0,
+        "image_descriptors": 0,
+        "unresolved_access_origins": {},
+        "set_mesh_outputs": [
+          {
+            "vertices": {
+              "constant": "96"
+            },
+            "primitives": {
+              "opcode": "OpExtInst",
+              "ext": "UMin",
+              "operands_constants": [
+                null,
+                null,
+                null,
+                [
+                  "96"
+                ]
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "builtin": "PrimitiveTriangleIndicesEXT",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1152
+          },
+          {
+            "builtin": "Position",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "5"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          }
+        ],
+        "payload_dead_chain": {
+          "declared": 1,
+          "dead_constant_true_selected_workgroup_x": true
+        },
+        "output_store_sites": 30,
+        "descriptors": [
+          {
+            "set": 0,
+            "binding": 0,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 5,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 1,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 57,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 2,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 7,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 3,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 4,
+            "stores": 0,
+            "length_queries": 0
+          }
+        ]
+      }
+    },
+    {
+      "program": "6b4dea601798c255",
+      "variant": "3f3f5b29054673da",
+      "stage_count": 2,
+      "mesh_sha256": "281721317b38ddc1c4c595d18f0295f37cd31e44e939bffdd3fb6b96735f40b1",
+      "mesh_words": 61608,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 38,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 11156,
+        "Output": 18048
+      },
+      "core_audit_passed": true,
+      "first_refusal": null,
+      "earlier_instrumented_pass_spans_ms": [],
+      "passing_input_contract": {
+        "reachable_input_stores": 0,
+        "physical_accesses": {},
+        "push_constant_variables": 0,
+        "image_descriptors": 0,
+        "unresolved_access_origins": {},
+        "set_mesh_outputs": [
+          {
+            "vertices": {
+              "constant": "96"
+            },
+            "primitives": {
+              "opcode": "OpExtInst",
+              "ext": "UMin",
+              "operands_constants": [
+                null,
+                null,
+                null,
+                [
+                  "96"
+                ]
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "builtin": "PrimitiveTriangleIndicesEXT",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1152
+          },
+          {
+            "builtin": "Position",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "0"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "1"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "2"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "4"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "5"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "6"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "7"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "8"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "11"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "12"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          }
+        ],
+        "payload_dead_chain": {
+          "declared": 1,
+          "dead_constant_true_selected_workgroup_x": true
+        },
+        "output_store_sites": 138,
+        "descriptors": [
+          {
+            "set": 0,
+            "binding": 0,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 74,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 1,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 126,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 2,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 38,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 3,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 1,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 4,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 10,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 5,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 12,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 6,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 11,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 7,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 21,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 8,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 3,
+            "loads": 2,
+            "stores": 0,
+            "length_queries": 2
+          }
+        ]
+      }
+    },
+    {
+      "program": "6b7f79e2ff3a2746",
+      "variant": "0117477601c4565c",
+      "stage_count": 2,
+      "mesh_sha256": "a70af662591e0dc558545d9284be9e80c18a6ba4850e9326870667edb23009da",
+      "mesh_words": 18826,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "160"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "160"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 4,
+        "OpGroupNonUniformShuffle": 22,
+        "OpGroupNonUniformBroadcast": 32
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 55,
+        "SubgroupLtMask": 2
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 33,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 7060,
+        "Output": 9600
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Only two main-function ballots are supported",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "6ea0c171f1a7b6d8",
+      "variant": "68c5baf7584268da",
+      "stage_count": 3,
+      "mesh_sha256": "1a011a1d3beeaaf473a998d535378c8de5854f2d0a4d5a35dce73c810470e624",
+      "mesh_words": 17940,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 5,
+        "OpGroupNonUniformBallot": 5,
+        "OpGroupNonUniformShuffle": 5
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 8
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 7700,
+        "Output": 9576
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "6f0bb6c9afa747de",
+      "variant": "25c0ae5dc76dd4d6",
+      "stage_count": 3,
+      "mesh_sha256": "e44748c73e94bec77efcb0307e171eff8781b96f7d99f3144a1f8467215c2074",
+      "mesh_words": 22292,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 8,
+        "OpGroupNonUniformBallot": 8,
+        "OpGroupNonUniformShuffle": 8
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 9
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 9748,
+        "Output": 13608
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "6f9142def3b6a978",
+      "variant": "0b98fad615c7c316",
+      "stage_count": 3,
+      "mesh_sha256": "178b272a33e42c264774058127e6e36091aa4f7392f1e9d36b475e3a5ef41d56",
+      "mesh_words": 56662,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 12,
+        "OpGroupNonUniformBallot": 12,
+        "OpGroupNonUniformShuffle": 12
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 14
+      },
+      "ballot_blocks": 3,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 2,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 6,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 12308,
+        "Output": 19656
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "7210c04a4d923d4b",
+      "variant": "000005b3000006cc",
+      "stage_count": 2,
+      "mesh_sha256": "755c28b6ef0da6d5cb73468f92f04a47b2bba4f928c224a984d7cd419a1bc390",
+      "mesh_words": 5016,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "128"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "128"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 1
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 11,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 4628,
+        "Output": 5632
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Only two main-function ballots are supported",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "739acd678ae08655",
+      "variant": "9468780bc7b3bd18",
+      "stage_count": 2,
+      "mesh_sha256": "f2b930d9a1d0853cd8246dda540f1f8c7cb716519bfc5491046146ce0fbeaedf",
+      "mesh_words": 37188,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 3,
+        "OpGroupNonUniformShuffle": 1
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 2,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 2,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 40,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 55,
+          "calls": 72,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 9236,
+        "Output": 13440
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Only two main-function ballots are supported",
+      "earlier_instrumented_pass_spans_ms": [
+        1.254
+      ]
+    },
+    {
+      "program": "879fe82ef602ab53",
+      "variant": "000007b300000a32",
+      "stage_count": 2,
+      "mesh_sha256": "ac2e0760edbf3fcda04fe638c97c00df516b40d2fbfe801b20b9efe4720298c5",
+      "mesh_words": 12981,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "128"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "128"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 48,
+          "calls": 1,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 5140,
+        "Output": 5632
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unsupported call/termination/loop before ballots",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "89ca750f9852b7ca",
+      "variant": "0c8f08626a9d98a4",
+      "stage_count": 2,
+      "mesh_sha256": "61c7c1bdd8c1691c20d3be251fc391db9d1c71994a5647bd5239be6769c43fb7",
+      "mesh_words": 42717,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "128"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "128"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 1
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 50,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 13332,
+        "Output": 22016
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Only two main-function ballots are supported",
+      "earlier_instrumented_pass_spans_ms": [
+        1.769
+      ]
+    },
+    {
+      "program": "8a8304edb7bdf4bf",
+      "variant": "001075c3000b893e",
+      "stage_count": 3,
+      "mesh_sha256": "589a7a732e1fd823d6aab663b358cc3efb2cbc4779dda7786576ca52327c417d",
+      "mesh_words": 46130,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 4,
+        "OpGroupNonUniformShuffle": 22,
+        "OpGroupNonUniformBroadcast": 32
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 6,
+        "SubgroupLocalInvocationId": 55,
+        "SubgroupLtMask": 2
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 831,
+          "calls": 1,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 3200,
+        "Workgroup": 3860,
+        "Output": 4224
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Only two main-function ballots are supported",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "8e2f7af4245747ef",
+      "variant": "0000000000000000",
+      "stage_count": 3,
+      "mesh_sha256": "f15034de176f2ef971dc36861db41fc084f76d2d2b5a9bff22fbe8e9ac4e0ddb",
+      "mesh_words": 14513,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 4,
+        "OpGroupNonUniformShuffle": 21,
+        "OpGroupNonUniformBroadcast": 32
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "SubgroupLocalInvocationId": 54,
+        "WorkgroupId": 5,
+        "SubgroupLtMask": 2
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 13,
+          "calls": 1,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 3200,
+        "Workgroup": 2708,
+        "Output": 2688
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Only two main-function ballots are supported",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "90327ab03af95ec5",
+      "variant": "e257a4206f1949ea",
+      "stage_count": 3,
+      "mesh_sha256": "62d7d7f0083553fd7b1bfdce25e5f26f78a4aa320a83c9d1bf2bb70306d00a68",
+      "mesh_words": 59147,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 12,
+        "OpGroupNonUniformBallot": 12,
+        "OpGroupNonUniformShuffle": 12
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 13
+      },
+      "ballot_blocks": 3,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 2,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 6,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 11284,
+        "Output": 17640
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "918adef1afaa39d4",
+      "variant": "564b334c56d4fb56",
+      "stage_count": 3,
+      "mesh_sha256": "fb54ce58b3e70cb020df2506e7fdc9b31b164f175d09f974b8d0e1afb4ea2428",
+      "mesh_words": 61025,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 12,
+        "OpGroupNonUniformBallot": 12,
+        "OpGroupNonUniformShuffle": 12
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 14
+      },
+      "ballot_blocks": 3,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 2,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 6,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 13332,
+        "Output": 21672
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "974ea2c913cc8443",
+      "variant": "0110777601be893e",
+      "stage_count": 3,
+      "mesh_sha256": "d0e5bc00a5087e4ffba9b804187ab413d2ca64ca4c1e610c1246f86114b96b12",
+      "mesh_words": 8953,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "128"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "128"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 2,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 102,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 116,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 3604,
+        "Output": 3584
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Ballots must share one block",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "9d8403e2e566c773",
+      "variant": "000007b300000a32",
+      "stage_count": 2,
+      "mesh_sha256": "2640f02acec522ef9cf7ad53689baa7f4cceaef317c214c3b4ded200afe73a2a",
+      "mesh_words": 11691,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "128"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "128"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 48,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 6676,
+        "Output": 7680
+      },
+      "core_audit_passed": true,
+      "first_refusal": null,
+      "earlier_instrumented_pass_spans_ms": [],
+      "passing_input_contract": {
+        "reachable_input_stores": 0,
+        "physical_accesses": {},
+        "push_constant_variables": 0,
+        "image_descriptors": 0,
+        "unresolved_access_origins": {},
+        "set_mesh_outputs": [
+          {
+            "vertices": {
+              "constant": "128"
+            },
+            "primitives": {
+              "opcode": "OpExtInst",
+              "ext": "UMin",
+              "operands_constants": [
+                null,
+                null,
+                null,
+                [
+                  "128"
+                ]
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "builtin": "PrimitiveTriangleIndicesEXT",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": "Position",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "2"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "5"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          }
+        ],
+        "payload_dead_chain": {
+          "declared": 1,
+          "dead_constant_true_selected_workgroup_x": true
+        },
+        "output_store_sites": 56,
+        "descriptors": [
+          {
+            "set": 0,
+            "binding": 0,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 13,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 1,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 72,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 2,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 2,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 3,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 7,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 4,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 10,
+            "stores": 0,
+            "length_queries": 0
+          }
+        ]
+      }
+    },
+    {
+      "program": "a03bdab95992c48e",
+      "variant": "25c0ae5dc76dd4d6",
+      "stage_count": 3,
+      "mesh_sha256": "e44748c73e94bec77efcb0307e171eff8781b96f7d99f3144a1f8467215c2074",
+      "mesh_words": 22292,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 8,
+        "OpGroupNonUniformBallot": 8,
+        "OpGroupNonUniformShuffle": 8
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 9
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 9748,
+        "Output": 13608
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "a5da9f84b72d1471",
+      "variant": "0000000000000000",
+      "stage_count": 3,
+      "mesh_sha256": "3d9fd0348c7f8c52cebadfc24c0a66d45fe21e1135fd993074aba4d576fe9b4c",
+      "mesh_words": 9050,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {},
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 1
+      },
+      "ballot_blocks": 0,
+      "ballot_prefixes": [],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 3604,
+        "Output": 3528
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "a6a688bae3c9b80c",
+      "variant": "0000000000000000",
+      "stage_count": 2,
+      "mesh_sha256": "e2af7c5addc7ea7156cea8ab187c8d9690eabfd4c85f07fade0a6897919a22d2",
+      "mesh_words": 7887,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "SubgroupLocalInvocationId": 1,
+        "WorkgroupId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 40,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 3476,
+        "Output": 4224
+      },
+      "core_audit_passed": true,
+      "first_refusal": null,
+      "earlier_instrumented_pass_spans_ms": [],
+      "passing_input_contract": {
+        "reachable_input_stores": 0,
+        "physical_accesses": {},
+        "push_constant_variables": 0,
+        "image_descriptors": 0,
+        "unresolved_access_origins": {},
+        "set_mesh_outputs": [
+          {
+            "vertices": {
+              "constant": "96"
+            },
+            "primitives": {
+              "opcode": "OpExtInst",
+              "ext": "UMin",
+              "operands_constants": [
+                null,
+                null,
+                null,
+                [
+                  "96"
+                ]
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "builtin": "PrimitiveTriangleIndicesEXT",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1152
+          },
+          {
+            "builtin": "Position",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "5"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          }
+        ],
+        "payload_dead_chain": {
+          "declared": 1,
+          "dead_constant_true_selected_workgroup_x": true
+        },
+        "output_store_sites": 30,
+        "descriptors": [
+          {
+            "set": 0,
+            "binding": 0,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 5,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 1,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 57,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 2,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 7,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 3,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 4,
+            "stores": 0,
+            "length_queries": 0
+          }
+        ]
+      }
+    },
+    {
+      "program": "ae384cff0ad0f467",
+      "variant": "e257a4206f1949ea",
+      "stage_count": 3,
+      "mesh_sha256": "e6c910d8b50d575a88b1eb3b331b781d9dc5a01f5d5eac0c9fbbf5153a6abd20",
+      "mesh_words": 58312,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 12,
+        "OpGroupNonUniformBallot": 12,
+        "OpGroupNonUniformShuffle": 12
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 14
+      },
+      "ballot_blocks": 3,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 2,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 6,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 11284,
+        "Output": 17640
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "c36a4f3f667c886a",
+      "variant": "0c8f08626a9d98a4",
+      "stage_count": 2,
+      "mesh_sha256": "80c85b1741788401fc68aaa993fdaeeabea98012aab1178d21039ebfa03228ab",
+      "mesh_words": 42932,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "128"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "128"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 16,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 14356,
+        "Output": 22016
+      },
+      "core_audit_passed": true,
+      "first_refusal": null,
+      "earlier_instrumented_pass_spans_ms": [],
+      "passing_input_contract": {
+        "reachable_input_stores": 0,
+        "physical_accesses": {},
+        "push_constant_variables": 0,
+        "image_descriptors": 0,
+        "unresolved_access_origins": {},
+        "set_mesh_outputs": [
+          {
+            "vertices": {
+              "constant": "128"
+            },
+            "primitives": {
+              "opcode": "OpExtInst",
+              "ext": "UMin",
+              "operands_constants": [
+                null,
+                null,
+                null,
+                [
+                  "128"
+                ]
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "builtin": "PrimitiveTriangleIndicesEXT",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": "Position",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "0"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "1"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "3"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "4"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "5"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "6"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "7"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "10"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "11"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          }
+        ],
+        "payload_dead_chain": {
+          "declared": 1,
+          "dead_constant_true_selected_workgroup_x": true
+        },
+        "output_store_sites": 168,
+        "descriptors": [
+          {
+            "set": 0,
+            "binding": 0,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 41,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 1,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 144,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 2,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 19,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 3,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 2,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 4,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 7,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 5,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 6,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 6,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 7,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 7,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 14,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 8,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 3,
+            "loads": 2,
+            "stores": 0,
+            "length_queries": 2
+          }
+        ]
+      }
+    },
+    {
+      "program": "c70332b4adb4aa9f",
+      "variant": "e257a4206f1949ea",
+      "stage_count": 3,
+      "mesh_sha256": "3d98fb89bc3aea4d53a5e6aa1e5b4743eab20d84f217064c1153ebc1b7fff013",
+      "mesh_words": 27154,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 10,
+        "OpGroupNonUniformBallot": 10,
+        "OpGroupNonUniformShuffle": 10
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 11
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 10772,
+        "Output": 15624
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "cb71f79f6129aab8",
+      "variant": "0117477601c4565c",
+      "stage_count": 2,
+      "mesh_sha256": "b8abbf89afa8b581a75d6191234542a4e0d85ecc5d7499fd2e0b0b94c09cf113",
+      "mesh_words": 11144,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 4244,
+        "Output": 5760
+      },
+      "core_audit_passed": true,
+      "first_refusal": null,
+      "earlier_instrumented_pass_spans_ms": [],
+      "passing_input_contract": {
+        "reachable_input_stores": 0,
+        "physical_accesses": {},
+        "push_constant_variables": 0,
+        "image_descriptors": 0,
+        "unresolved_access_origins": {},
+        "set_mesh_outputs": [
+          {
+            "vertices": {
+              "constant": "96"
+            },
+            "primitives": {
+              "opcode": "OpExtInst",
+              "ext": "UMin",
+              "operands_constants": [
+                null,
+                null,
+                null,
+                [
+                  "96"
+                ]
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "builtin": "PrimitiveTriangleIndicesEXT",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1152
+          },
+          {
+            "builtin": "Position",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "0"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "6"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          }
+        ],
+        "payload_dead_chain": {
+          "declared": 1,
+          "dead_constant_true_selected_workgroup_x": true
+        },
+        "output_store_sites": 42,
+        "descriptors": [
+          {
+            "set": 0,
+            "binding": 0,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 22,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 1,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 90,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 2,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 1,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 3,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 8,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 4,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 11,
+            "stores": 0,
+            "length_queries": 0
+          }
+        ]
+      }
+    },
+    {
+      "program": "ccf4f709e0deeac1",
+      "variant": "0117477601c4565c",
+      "stage_count": 2,
+      "mesh_sha256": "2a702d12e3a12d1756bff0144b1e4bdb1dacd3e7a5ac07e6614762eb4ac95959",
+      "mesh_words": 15057,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 38,
+          "calls": 1,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 4244,
+        "Output": 5760
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unsupported call/termination/loop before ballots",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "d13aac3cec1a4bb5",
+      "variant": "54cdbbf9ff884c2e",
+      "stage_count": 3,
+      "mesh_sha256": "0cc73c52067aada49c1f8b4cd1a678610a5ed647b49475476b0d74987c72b6cf",
+      "mesh_words": 63292,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 11,
+        "OpGroupNonUniformBallot": 11,
+        "OpGroupNonUniformShuffle": 11
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 13
+      },
+      "ballot_blocks": 3,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 2,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 6,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 12308,
+        "Output": 19656
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "d4abbcb4c2140609",
+      "variant": "0c8f08626a9d98a4",
+      "stage_count": 2,
+      "mesh_sha256": "a8b0687f33c30e8cb8d329a48e70f416608916fa011987beaa2623086fd90417",
+      "mesh_words": 71873,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "160"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "160"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 4,
+        "OpGroupNonUniformShuffle": 22,
+        "OpGroupNonUniformBroadcast": 32
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 55,
+        "SubgroupLtMask": 2
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 13,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 17300,
+        "Output": 24960
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Only two main-function ballots are supported",
+      "earlier_instrumented_pass_spans_ms": [
+        1.758
+      ]
+    },
+    {
+      "program": "d8e59341cf4f629c",
+      "variant": "0c8f08626a9d98a4",
+      "stage_count": 2,
+      "mesh_sha256": "835aa59799c6ecb621034d946e2fa4eadb1aa2407d293321ae3e3052882bc9b3",
+      "mesh_words": 42939,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "128"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "128"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 16,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 14356,
+        "Output": 22016
+      },
+      "core_audit_passed": true,
+      "first_refusal": null,
+      "earlier_instrumented_pass_spans_ms": [
+        6.336
+      ],
+      "passing_input_contract": {
+        "reachable_input_stores": 0,
+        "physical_accesses": {},
+        "push_constant_variables": 0,
+        "image_descriptors": 0,
+        "unresolved_access_origins": {},
+        "set_mesh_outputs": [
+          {
+            "vertices": {
+              "constant": "128"
+            },
+            "primitives": {
+              "opcode": "OpExtInst",
+              "ext": "UMin",
+              "operands_constants": [
+                null,
+                null,
+                null,
+                [
+                  "128"
+                ]
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "builtin": "PrimitiveTriangleIndicesEXT",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": "Position",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "0"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "1"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "3"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "4"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "5"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "6"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "7"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "10"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          },
+          {
+            "builtin": null,
+            "location": [
+              "11"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 2048
+          }
+        ],
+        "payload_dead_chain": {
+          "declared": 1,
+          "dead_constant_true_selected_workgroup_x": true
+        },
+        "output_store_sites": 168,
+        "descriptors": [
+          {
+            "set": 0,
+            "binding": 0,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 41,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 1,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 144,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 2,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 19,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 3,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 2,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 4,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 7,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 5,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 6,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 6,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 7,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 7,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 14,
+            "stores": 0,
+            "length_queries": 2
+          },
+          {
+            "set": 0,
+            "binding": 8,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 3,
+            "loads": 2,
+            "stores": 0,
+            "length_queries": 2
+          }
+        ]
+      }
+    },
+    {
+      "program": "d905f52b7517c681",
+      "variant": "9468780bc7b3bd18",
+      "stage_count": 2,
+      "mesh_sha256": "00f171a2e237700313e0e8bbeff3d81c3e5bc0c491aecbf500a06414e5aecfdd",
+      "mesh_words": 39636,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 3,
+        "OpGroupNonUniformShuffle": 1
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "SubgroupLocalInvocationId": 3,
+        "WorkgroupId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 2,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 40,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 141,
+          "calls": 72,
+          "loop_merges": 0,
+          "early_exits": 1,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 9236,
+        "Output": 13440
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Only two main-function ballots are supported",
+      "earlier_instrumented_pass_spans_ms": [
+        1.163
+      ]
+    },
+    {
+      "program": "da7a7ab28b8e73d9",
+      "variant": "898930ba2b88c38e",
+      "stage_count": 3,
+      "mesh_sha256": "6e5bcce0721b19fb71b8dad86373749fa6e03794f283f03cfc5d9adc1294a16a",
+      "mesh_words": 10042,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "128"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "128"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 2,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 102,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 116,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 5140,
+        "Output": 5632
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Ballots must share one block",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "e28434e1afe8321a",
+      "variant": "0117477601c4565c",
+      "stage_count": 2,
+      "mesh_sha256": "2135f5b1c22e9bba54edc61d73afd63a20ec139beacfadca66989ee8aca0c1e4",
+      "mesh_words": 15313,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 28,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 4244,
+        "Output": 5760
+      },
+      "core_audit_passed": true,
+      "first_refusal": null,
+      "earlier_instrumented_pass_spans_ms": [],
+      "passing_input_contract": {
+        "reachable_input_stores": 0,
+        "physical_accesses": {},
+        "push_constant_variables": 0,
+        "image_descriptors": 0,
+        "unresolved_access_origins": {},
+        "set_mesh_outputs": [
+          {
+            "vertices": {
+              "constant": "96"
+            },
+            "primitives": {
+              "opcode": "OpExtInst",
+              "ext": "UMin",
+              "operands_constants": [
+                null,
+                null,
+                null,
+                [
+                  "96"
+                ]
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "builtin": "PrimitiveTriangleIndicesEXT",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1152
+          },
+          {
+            "builtin": "Position",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "0"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "6"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          }
+        ],
+        "payload_dead_chain": {
+          "declared": 1,
+          "dead_constant_true_selected_workgroup_x": true
+        },
+        "output_store_sites": 42,
+        "descriptors": [
+          {
+            "set": 0,
+            "binding": 0,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 32,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 1,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 90,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 2,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 1,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 3,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 9,
+            "stores": 0,
+            "length_queries": 1
+          },
+          {
+            "set": 0,
+            "binding": 4,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 15,
+            "stores": 0,
+            "length_queries": 1
+          },
+          {
+            "set": 0,
+            "binding": 5,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 3,
+            "loads": 1,
+            "stores": 0,
+            "length_queries": 1
+          }
+        ]
+      }
+    },
+    {
+      "program": "e3f341ac12c40e2c",
+      "variant": "116205895b172582",
+      "stage_count": 3,
+      "mesh_sha256": "c08ae51b6712b687528434e00558a36984c438c210d6b1654346016cf6b85941",
+      "mesh_words": 66364,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "126"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "126"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformAny": 10,
+        "OpGroupNonUniformBallot": 10,
+        "OpGroupNonUniformShuffle": 10
+      },
+      "subgroup_builtins": [
+        "SubgroupLocalInvocationId"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 2,
+        "SubgroupLocalInvocationId": 12
+      },
+      "ballot_blocks": 2,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        },
+        {
+          "prefix_blocks": 4,
+          "calls": 5,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 256,
+        "Workgroup": 15892,
+        "Output": 19656
+      },
+      "core_audit_passed": false,
+      "first_refusal": "Unexpected subgroup builtin inventory",
+      "earlier_instrumented_pass_spans_ms": []
+    },
+    {
+      "program": "f93c1d64658c850b",
+      "variant": "0117477601c4565c",
+      "stage_count": 2,
+      "mesh_sha256": "a5a8f3edcdf57d4a71b70f76b653a1ec73f0692e2eb727891d4f9cb5c70fe2b4",
+      "mesh_words": 11144,
+      "modes": [
+        [
+          "LocalSize",
+          "32",
+          "1",
+          "1"
+        ],
+        [
+          "OutputVertices",
+          "96"
+        ],
+        [
+          "OutputPrimitivesEXT",
+          "96"
+        ],
+        [
+          "OutputTrianglesEXT"
+        ],
+        [
+          "DenormFlushToZero",
+          "32"
+        ],
+        [
+          "SignedZeroInfNanPreserve",
+          "32"
+        ]
+      ],
+      "group_ops": {
+        "OpGroupNonUniformBallot": 2
+      },
+      "subgroup_builtins": [
+        "SubgroupEqMask",
+        "SubgroupGeMask",
+        "SubgroupGtMask",
+        "SubgroupLeMask",
+        "SubgroupLocalInvocationId",
+        "SubgroupLtMask"
+      ],
+      "reachable_builtin_loads": {
+        "LocalInvocationId": 2,
+        "WorkgroupId": 1,
+        "SubgroupLocalInvocationId": 1,
+        "SubgroupLtMask": 1
+      },
+      "ballot_blocks": 1,
+      "ballot_prefixes": [
+        {
+          "prefix_blocks": 0,
+          "calls": 0,
+          "loop_merges": 0,
+          "early_exits": 0,
+          "cycle": false,
+          "unknown_terminators": []
+        }
+      ],
+      "logical_storage_bytes_without_padding": {
+        "TaskPayloadWorkgroupEXT": 128,
+        "Workgroup": 4244,
+        "Output": 5760
+      },
+      "core_audit_passed": true,
+      "first_refusal": null,
+      "earlier_instrumented_pass_spans_ms": [],
+      "passing_input_contract": {
+        "reachable_input_stores": 0,
+        "physical_accesses": {},
+        "push_constant_variables": 0,
+        "image_descriptors": 0,
+        "unresolved_access_origins": {},
+        "set_mesh_outputs": [
+          {
+            "vertices": {
+              "constant": "96"
+            },
+            "primitives": {
+              "opcode": "OpExtInst",
+              "ext": "UMin",
+              "operands_constants": [
+                null,
+                null,
+                null,
+                [
+                  "96"
+                ]
+              ]
+            }
+          }
+        ],
+        "outputs": [
+          {
+            "builtin": "PrimitiveTriangleIndicesEXT",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1152
+          },
+          {
+            "builtin": "Position",
+            "location": null,
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "0"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          },
+          {
+            "builtin": null,
+            "location": [
+              "6"
+            ],
+            "per_primitive": false,
+            "bytes_without_padding": 1536
+          }
+        ],
+        "payload_dead_chain": {
+          "declared": 1,
+          "dead_constant_true_selected_workgroup_x": true
+        },
+        "output_store_sites": 42,
+        "descriptors": [
+          {
+            "set": 0,
+            "binding": 0,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 22,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 1,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 90,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 2,
+            "descriptor_type": "uniform_buffer",
+            "descriptor_count": 1,
+            "loads": 1,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 3,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 8,
+            "stores": 0,
+            "length_queries": 0
+          },
+          {
+            "set": 0,
+            "binding": 4,
+            "descriptor_type": "storage_buffer",
+            "descriptor_count": 1,
+            "loads": 11,
+            "stores": 0,
+            "length_queries": 0
+          }
+        ]
+      }
+    }
+  ],
+  "cache_abis": {
+    "baseline": {
+      "cache_stamp": "ec85a436a11988a6",
+      "records_scanned": 610,
+      "abi_profile": {
+        "schema": 1,
+        "cache_stamp": "ec85a436a11988a6",
+        "info_bytes": 816,
+        "descriptor_bytes": [
+          8,
+          16,
+          40,
+          28,
+          48,
+          32
+        ],
+        "attribute_bytes": 8,
+        "provenance": {
+          "source_revision": "4cf785a0b143bb34026506c9a3fe4f4bb93c797d",
+          "info_header_sha256": "ce98d18acaa94b23c46ca410405ffe8ee1df8358fd698bc455b3c404208cac8e",
+          "compiler": "clang++ C++20, NDEBUG, x86_64 Linux, Hookshot compatibility container headers"
+        }
+      }
+    },
+    "candidate8": {
+      "cache_stamp": "4919b2c1b8c2f81e",
+      "records_scanned": 584,
+      "abi_profile": {
+        "schema": 1,
+        "cache_stamp": "4919b2c1b8c2f81e",
+        "info_bytes": 816,
+        "descriptor_bytes": [
+          8,
+          16,
+          40,
+          28,
+          48,
+          32
+        ],
+        "attribute_bytes": 8,
+        "provenance": {
+          "source_revision": "4cf785a0b143bb34026506c9a3fe4f4bb93c797d",
+          "info_header_sha256": "ce98d18acaa94b23c46ca410405ffe8ee1df8358fd698bc455b3c404208cac8e",
+          "compiler": "clang++ C++20, NDEBUG, x86_64 Linux, Hookshot compatibility container headers"
+        }
+      }
+    },
+    "source-nightly": {
+      "cache_stamp": "d6c0514818a93a6e",
+      "records_scanned": 590,
+      "abi_profile": {
+        "schema": 1,
+        "cache_stamp": "d6c0514818a93a6e",
+        "info_bytes": 816,
+        "descriptor_bytes": [
+          8,
+          16,
+          40,
+          28,
+          48,
+          32
+        ],
+        "attribute_bytes": 8,
+        "provenance": {
+          "source_revision": "4cf785a0b143bb34026506c9a3fe4f4bb93c797d",
+          "info_header_sha256": "ce98d18acaa94b23c46ca410405ffe8ee1df8358fd698bc455b3c404208cac8e",
+          "compiler": "clang++ C++20, NDEBUG, x86_64 Linux, Hookshot compatibility container headers"
+        }
+      }
+    }
+  }
+}

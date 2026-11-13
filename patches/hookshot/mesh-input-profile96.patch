@@ -1,0 +1,338 @@
+diff --git a/gpu/vk/mesh_input_profile96.h b/gpu/vk/mesh_input_profile96.h
+new file mode 100644
+index 0000000..6b6efc4
+--- /dev/null
++++ b/gpu/vk/mesh_input_profile96.h
+@@ -0,0 +1,165 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Bounded shader-level native mesh inputs; never full graphics replay.
++#pragma once
++#include "mesh_input_capture.h"
++#include <mutex>
++#include <sstream>
++namespace mkwvk::oo_mesh96 {
++inline constexpr uint64_t kProgram=0x68642bb810ee3e7cull,kVariant=0x3f3f5b29054673daull;
++inline constexpr const char* kDigest="999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93";
++inline bool enabled() {
++    static const bool on=[] {
++        const char* profile=std::getenv("RX_VK_OO_MESH_PROFILE");
++        if(!profile||std::string(profile)!="6864-position10-96/v1")return false;
++        const char* flag=std::getenv("RX_VK_OO_MESH_INPUTS");
++        if(!flag||std::string(flag)!="1"||!oo_alloc::config().enabled||
++           !oo_identity::selected(kProgram,kVariant)||!oo_graphics_identity::selected(kProgram,kVariant)||oo_pt::config().digest!=kDigest)return false;
++        for(const char* name:{"mesh-inputs-6864.json","mesh-inputs-6864.json.part","mesh6864-indirect.bin","mesh6864-indirect.bin.part"})
++            if(oo_pt::present(std::filesystem::path(oo_pt::config().directory)/name))return false;
++        return true;
++    }();return on;
++}
++using Binding = oo_mesh::Binding;
++using Layout = oo_mesh::Layout;
++inline std::mutex layout_mutex;
++inline std::vector<Layout> layouts;
++inline void note_layout(Layout layout,uint64_t key,uint64_t variant) {
++    if(!enabled()||key!=kProgram||variant!=kVariant||!layout.handle||layout.bindings.size()>256)return;
++    std::lock_guard lock(layout_mutex);
++    for(auto& kept:layouts)if(kept.handle==layout.handle){kept=std::move(layout);return;}
++    if(layouts.size()<4)layouts.push_back(std::move(layout));
++}
++using Event = oo_mesh::Event;
++inline bool identity(const Event& e) {return e.key==kProgram&&e.variant==kVariant&&e.digest==kDigest&&e.stage_index==0&&e.nvn_stage==7&&e.vk_stage==128&&e.stage_count==2;}
++inline thread_local Event candidate;
++inline void prepare(const Event& e) {if(enabled())candidate=e;}
++inline bool prepared(uint64_t command,uint64_t key,uint64_t variant,const char* digest) {
++    return enabled()&&oo_mesh96::identity(candidate)&&candidate.command==command&&candidate.key==key&&candidate.variant==variant&&digest&&candidate.digest==digest;
++}
++struct Capture {
++    bool selected=false,confirmed=false,layout_valid=false;
++    uint64_t occurrence=0;
++    Event before;
++    Layout layout;
++    std::vector<std::string> failures;
++};
++inline Capture select(uint64_t command,const oo_pt::Request& request,uint64_t occurrence) {
++    Capture c;
++    if(!enabled()||!oo_mesh96::identity(candidate)||candidate.command!=command||candidate.part!=request.recording_part||candidate.logical!=request.logical_value||
++       candidate.key!=request.key||candidate.variant!=request.variant||candidate.digest!=request.shader_digest)return c;
++    c.selected=true;c.before=std::move(candidate);candidate={};c.occurrence=occurrence;
++    const auto& e=c.before;
++    if(!e.indirect||!e.converted||e.rewritten||e.count!=1||e.stride!=12||e.counter||!e.argument_buffer||e.argument_offset>UINT64_MAX-12)
++        c.failures.push_back("unsupported_native_launch_shape");
++    if(!e.fresh_descriptors)c.failures.push_back("fresh_actual_descriptor_writes_missing");
++    if(!e.safe_boundary)c.failures.push_back("unsupported_boundary_or_debug_work");
++    std::lock_guard lock(layout_mutex);
++    for(const auto& layout:layouts)if(layout.handle==e.layout) {
++        c.layout=layout;c.layout_valid=layout.bindings.size()>=9;
++        for(uint32_t i=0;i<9&&c.layout_valid;++i) {
++            const auto& b=layout.bindings[i];
++            c.layout_valid=b.binding==i&&b.type==(i<4?6u:7u)&&b.count==(i==8?3u:1u)&&b.stages==128;
++        }
++    }
++    if(!c.layout_valid)c.failures.push_back("actual_mesh_descriptor_layout_missing_or_changed");
++    return c;
++}
++inline void confirm(Capture& c,const Event& actual) {
++    if(!c.selected)return;
++    const auto& e=c.before;
++    c.confirmed=oo_mesh96::identity(actual)&&actual.command==e.command&&actual.layout==e.layout&&actual.part==e.part&&actual.logical==e.logical&&
++      actual.argument_buffer==e.argument_buffer&&actual.argument_offset==e.argument_offset&&actual.count==e.count&&actual.stride==e.stride&&
++      actual.counter==e.counter&&actual.indirect==e.indirect&&actual.converted==e.converted&&actual.rewritten==e.rewritten&&
++      actual.required_size==e.required_size&&actual.require_full==e.require_full;
++}
++using Payload = oo_mesh::Payload;
++using Slice = oo_mesh::Slice;
++inline bool slice(const oo_alloc::Row& row,const Payload& payload,uint64_t offset,uint64_t size,const std::string& name,std::string& digest) {
++    return payload.invalidated&&payload.bytes&&payload.size==row.size&&size&&offset<=row.size&&size<=row.size-offset&&
++           oo_alloc::save_payload(name,payload.bytes+offset,size,digest);
++}
++inline std::string hex(uint64_t value){char text[17];std::snprintf(text,sizeof text,"%016llx",(unsigned long long)value);return text;}
++inline bool write_completed(const Capture& c,const oo_pt::Request& request,uint64_t completed,
++                            const std::vector<oo_alloc::Row>& rows,const std::vector<Payload>& payloads,
++                            const std::vector<oo_alloc::Descriptor>& descriptors,const std::vector<std::pair<uint64_t,uint64_t>>& lifetimes={},bool null_descriptor_enabled=false) {
++    if(!enabled()||!c.selected||!request.submitted_sequence||completed<request.submitted_sequence||
++       request.key!=c.before.key||request.variant!=c.before.variant||request.shader_digest!=c.before.digest||
++       request.recording_part!=c.before.part||request.logical_value!=c.before.logical||rows.size()!=payloads.size())return false;
++    const auto directory=std::filesystem::path(oo_pt::config().directory),path=directory/"mesh-inputs-6864.json",part=directory/"mesh-inputs-6864.json.part";
++    if(oo_pt::present(path)||oo_pt::present(part))return false;
++    auto failures=c.failures;if(!c.confirmed)failures.push_back("actual_command_site_not_confirmed");
++    auto find=[&](uint64_t handle)->size_t {size_t result=rows.size();for(size_t i=0;i<rows.size();++i)if(rows[i].buffer==handle){if(result!=rows.size())return rows.size();result=i;}return result;};
++    std::string launch_sha;uint32_t grid[3]{};
++    if(failures.empty()) {
++        const size_t index=find(c.before.argument_buffer);
++        if(index==rows.size()||!oo_mesh96::slice(rows[index],payloads[index],c.before.argument_offset,12,"mesh6864-indirect.bin",launch_sha))
++            failures.push_back("exact_gpu_indirect_snapshot_missing");
++        else for(unsigned i=0;i<3;++i)for(unsigned j=0;j<4;++j)grid[i]|=uint32_t(payloads[index].bytes[c.before.argument_offset+4*i+j])<<(8*j);
++    }
++    std::vector<Slice> slices;
++    if(failures.empty())for(uint32_t binding=0;binding<9;++binding)for(uint32_t element=0;element<(binding==8?3u:1u);++element) {
++        const oo_alloc::Descriptor* found=nullptr;bool duplicate=false;
++        for(const auto& descriptor:descriptors)if(descriptor.binding==binding&&descriptor.element==element){if(found)duplicate=true;found=&descriptor;}
++        if(!found||duplicate||found->type!=(binding<4?6u:7u)){failures.push_back("required_mesh_descriptor_missing_or_changed");continue;}
++        if(!found->buffer) {
++            if(binding!=8||element==0) {failures.push_back("unsupported_null_mesh_descriptor_position");continue;}
++            if(!null_descriptor_enabled||found->offset!=0||found->range!=UINT64_MAX) {
++                failures.push_back("null_mesh_descriptor_feature_or_framing_invalid");continue;
++            }
++            Slice s;s.null_descriptor=true;s.binding=binding;s.element=element;s.type=found->type;s.descriptor_range=found->range;
++            slices.push_back(std::move(s));continue;
++        }
++        const size_t index=find(found->buffer);
++        if(index==rows.size()||found->offset>=rows[index].size){failures.push_back("required_mesh_descriptor_owner_unknown");continue;}
++        const uint64_t size=found->range==UINT64_MAX?rows[index].size-found->offset:found->range;
++        Slice s;s.binding=binding;s.element=element;s.type=found->type;s.buffer=found->buffer;s.offset=found->offset;s.size=size;s.row=index;s.descriptor_range=found->range;
++        s.artifact="mesh6864-binding-"+std::to_string(binding)+"-"+std::to_string(element)+".bin";
++        if(!payloads[index].invalidated||!payloads[index].bytes||!s.size||s.offset>rows[index].size||s.size>rows[index].size-s.offset)
++            failures.push_back("required_mesh_descriptor_payload_missing");
++        else slices.push_back(std::move(s));
++    }
++    uint64_t total=12;
++    for(const auto& s:slices) {if(s.size>(1ull<<30)||total>(1ull<<30)-s.size){failures.push_back("exact_mesh_slice_budget_exceeded");break;}total+=s.size;}
++    if(failures.empty())for(auto& s:slices)
++        if(!s.null_descriptor&&!oo_mesh96::slice(rows[s.row],payloads[s.row],s.offset,s.size,s.artifact,s.digest))failures.push_back("required_mesh_descriptor_export_failed");
++    const bool present=failures.empty()&&slices.size()==11&&!launch_sha.empty();
++    auto lifetime=[&](uint64_t buffer)->uint64_t {for(const auto& item:lifetimes)if(item.first==buffer)return item.second;return 0;};
++    std::ostringstream out;
++    out<<"{\"schema\":\"open-ocarina.mesh-input-profile96/v1\",\"profile\":\"6864-position10-96/v1\",\"runtime_execution_authorized\":false,\"equivalence_proven\":false,\"replay_complete\":false,\"mesh_stage_inputs_present\":"<<(present?"true":"false")
++       <<",\"event\":{\"program\":\""<<hex(c.before.key)<<"\",\"variant\":\""<<hex(c.before.variant)<<"\",\"spirv_sha256\":\""<<c.before.digest
++       <<"\",\"stage_index\":0,\"nvn_stage\":7,\"vk_stage\":128,\"recording_part\":"<<request.recording_part<<",\"logical_value\":"<<request.logical_value
++       <<",\"recording_sequence\":"<<request.submitted_sequence<<",\"completed_recording_sequence\":"<<completed<<",\"selected_occurrence\":"<<c.occurrence<<",\"actual_site_confirmed\":"<<(c.confirmed?"true":"false")
++       <<"},\"pipeline_layout_handle\":\""<<hex(c.before.layout)<<"\",\"descriptor_set_layout_flags\":"<<c.layout.flags
++       <<",\"launch\":{\"command\":";
++    if(!c.confirmed)out<<"null";else out<<"\""<<(c.before.indirect?(c.before.counter?"vkCmdDrawMeshTasksIndirectCountEXT":"vkCmdDrawMeshTasksIndirectEXT"):"vkCmdDrawMeshTasksEXT")<<"\"";
++    out<<",\"draw_count\":"<<c.before.count<<",\"stride\":"<<c.before.stride<<",\"converted\":"<<(c.before.converted?"true":"false")
++       <<",\"original_buffer\":\""<<hex(c.before.argument_buffer)<<"\",\"original_buffer_offset\":"<<c.before.argument_offset<<",\"snapshot\":";
++    if(launch_sha.empty())out<<"null";else out<<"{\"path\":\"mesh6864-indirect.bin\",\"size\":12,\"sha256\":\""<<launch_sha<<"\"}";
++    out<<",\"group_count\":";if(launch_sha.empty())out<<"null";else out<<"["<<grid[0]<<","<<grid[1]<<","<<grid[2]<<"]";
++    out<<",\"zero_grid_no_execution\":";
++    if(launch_sha.empty())out<<"null";else out<<((!grid[0]||!grid[1]||!grid[2])?"true":"false");
++    out<<"},\"descriptor_layout\":[";
++    for(size_t i=0;i<c.layout.bindings.size();++i){const auto& b=c.layout.bindings[i];out<<(i?",":"")<<"{\"set\":0,\"binding\":"<<b.binding<<",\"type\":"<<b.type<<",\"count\":"<<b.count<<",\"stage_flags\":"<<b.stages<<"}";}
++    out<<"],\"bindings\":[";
++    for(size_t i=0;i<slices.size();++i){const auto& s=slices[i];out<<(i?",":"")<<"{\"set\":0,\"binding\":"<<s.binding<<",\"element\":"<<s.element<<",\"type\":"<<s.type<<",\"null_descriptor\":"<<(s.null_descriptor?"true":"false")<<",\"range_bytes\":";
++       if(s.null_descriptor)out<<"null";else out<<s.size;
++       out<<",\"buffer_handle\":\""<<hex(s.buffer)<<"\",\"allocation_row\":";
++       if(s.null_descriptor)out<<"null";else out<<s.row;
++       out<<",\"descriptor_range\":"<<s.descriptor_range<<",\"original_buffer_offset\":"<<s.offset<<",\"buffer_lifetime\":";
++       if(!s.null_descriptor&&lifetime(s.buffer))out<<lifetime(s.buffer);else out<<"null";
++       out<<",\"backing_generation\":null,\"snapshot\":";
++       if(s.null_descriptor)out<<"null";else out<<"{\"path\":\""<<s.artifact<<"\",\"size\":"<<s.size<<",\"sha256\":\""<<s.digest<<"\"}";
++       out<<"}";}
++    out<<"],\"features\":{\"nullDescriptor\":"<<(null_descriptor_enabled?"true":"false")<<"},\"subgroup\":{\"required_size\":";if(c.before.required_size)out<<c.before.required_size;else out<<"null";
++    out<<",\"require_full_subgroups\":"<<(c.before.require_full?"true":"false")<<"},\"associations\":[";
++    const char* manifests[]{"manifest.json","allocations.json","binding-provenance.json"};
++    for(unsigned i=0;i<3;++i){const auto digest=oo_dp::artifact_digest(manifests[i]);out<<(i?",":"")<<"{\"path\":\""<<manifests[i]<<"\",\"sha256\":";if(digest.empty())out<<"null";else out<<"\""<<digest<<"\"";out<<"}";}
++    out<<"],\"push_constants_not_used\":true,\"exact_shader_contract\":\"digest-pinned 6864 mesh: logical readonly descriptors, no image or physical-pointer access; no push constants\",\"failures\":[";
++    for(size_t i=0;i<failures.size();++i)out<<(i?",":"")<<"\""<<failures[i]<<"\"";
++    out<<"],\"coverage\":{\"cpu_writers_quiesced\":false,\"import_aliases_proven\":false,\"fragment_resources\":false,\"draw_equivalent_inputs_proven\":false,\"whole_rendering_equivalence\":false},\"capture_position\":\"selected outside-rendering BEFORE copy; actual command confirmation recorded separately in event\",\"launch_role\":\"extra launch input, not a descriptor binding\",\"bounded_replay\":{\"max_window_groups\":32,\"zero_native_dimension_forbids_execution\":true}}\n";
++    const auto text=out.str();FILE* file=std::fopen(part.string().c_str(),"wbx");if(!file)return false;
++    const bool written=std::fwrite(text.data(),1,text.size(),file)==text.size();const bool closed=std::fclose(file)==0;
++    if(!written||!closed){std::remove(part.string().c_str());return false;}
++    std::error_code error;std::filesystem::rename(part,path,error);return !error;
++}
++} // namespace mkwvk::oo_mesh9696
+diff --git a/gpu/vk/vk_draw.cpp b/gpu/vk/vk_draw.cpp
+index eb42cc5..9dba7e7 100644
+--- a/gpu/vk/vk_draw.cpp
++++ b/gpu/vk/vk_draw.cpp
+@@ -51,6 +51,7 @@
+ #include "graphics_identity.h"
+ #include "dispatch_parameters.h"
+ #include "mesh_input_capture.h"
++#include "mesh_input_profile96.h"
+ #include "vk_texture.h"
+ #include "movie_upscale_policy.h"
+ #include "skip_code.h"
+@@ -737,6 +738,11 @@ void ensure_layout(Program& p) {
+         for(const auto& b:bindings)capture.bindings.push_back({b.binding,(uint32_t)b.descriptorType,b.descriptorCount,b.stageFlags});
+         oo_mesh::note_layout(std::move(capture),p.key,p.variant);
+     }
++    if (oo_mesh96::enabled() && p.key==oo_mesh96::kProgram && p.variant==oo_mesh96::kVariant) {
++        oo_mesh96::Layout capture;capture.handle=(uint64_t)(uintptr_t)layout;capture.flags=li.flags;
++        for(const auto& b:bindings)capture.bindings.push_back({b.binding,(uint32_t)b.descriptorType,b.descriptorCount,b.stageFlags});
++        oo_mesh96::note_layout(std::move(capture),p.key,p.variant);
++    }
+     p.push_stages = stages;
+     for (const Stage& st : p.stages) p.uses_render_area |= st.info.uses_render_area;
+     p.uses_push = p.uses_render_area;
+@@ -6063,7 +6069,7 @@ bool mesh_indirect_convert(VkCommandBuffer cmd, const DrawArgs& d) {
+         if (!mesh_ring) {
+             void* unused = nullptr;
+             if (!create_buffer(kMeshRing, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT |
+-                               (oo_mesh::enabled()?VK_BUFFER_USAGE_TRANSFER_SRC_BIT:0), false, mesh_ring,
++                               ((oo_mesh::enabled()||oo_mesh96::enabled())?VK_BUFFER_USAGE_TRANSFER_SRC_BIT:0), false, mesh_ring,
+                                mesh_ring_mem, &unused))
+                 return false;
+         }
+@@ -6772,6 +6778,8 @@ void oo_graphics_identity_record(VkCommandBuffer cmd, const Program& p, const Nv
+     event.vendor = dev.props.vendorID; event.device = dev.props.deviceID; event.driver = dev.props.driverVersion;
+     if (oo_mesh::enabled())
+         memory_mesh_inputs_confirm(cmd,oo_mesh_event(cmd,p,command,converted,rewritten,arguments,argument_offset,count,stride,counter));
++    if (oo_mesh96::enabled())
++        memory_mesh96_inputs_confirm(cmd,oo_mesh_event(cmd,p,command,converted,rewritten,arguments,argument_offset,count,stride,counter));
+     oo_graphics_identity::emit(event);
+ }
+ 
+@@ -7175,6 +7183,19 @@ void draw(VkCommandBuffer cmd, NvnState& s, const DrawArgs& d) {
+                                       Shader::Backend::SPIRV::GUEST_PAGES_PUSH_OFFSET);
+         }
+     }
++    if (oo_mesh96::enabled() && p.mesh && !p.fallback && p.key==oo_mesh96::kProgram && p.variant==oo_mesh96::kVariant) {
++        auto event=oo_mesh_event(cmd,p,d.indirect?oo_graphics_identity::Command::Indirect:oo_graphics_identity::Command::Direct,
++                                 mesh_conv_buf!=VK_NULL_HANDLE,mesh_rewrite,mesh_conv_buf,mesh_conv_off,
++                                 (uint32_t)std::clamp(d.max,1,4096),12,d.count_addr?(VkBuffer)(uintptr_t)1:VK_NULL_HANDLE);
++        event.fresh_descriptors=!same_desc&&dw().prog==&p;
++        event.safe_boundary=!at.has_block_images&&!dump_on()&&!probe_on()&&!gprof_on()&&!stats_frame_now()&&!env_on("RX_VK_GPU_DUMP");
++        if (memory_mesh96_inputs_wanted(cmd,event)) {
++            end_pass(cmd); // transfers must be outside rendering and before this draw's StatsQuery begins
++            memory_allocation_descriptors(cmd,dw().writes);
++            memory_pt_snapshot_record(cmd,p.key,p.variant,event.digest.c_str(),0,0,0,1,texture_frame_no(),
++                                      Shader::Backend::SPIRV::GUEST_PAGES_PUSH_OFFSET);
++        }
++    }
+     {
+         FINE_SCOPE(FT_HAZARD);
+         begin_pass(cmd, at);
+diff --git a/gpu/vk/vk_internal.h b/gpu/vk/vk_internal.h
+index 4a803a3..58a0f0f 100644
+--- a/gpu/vk/vk_internal.h
++++ b/gpu/vk/vk_internal.h
+@@ -155,6 +155,8 @@ void memory_allocation_after(VkCommandBuffer cmd);
+ namespace oo_mesh {struct Event;}
+ bool memory_mesh_inputs_wanted(VkCommandBuffer cmd,const oo_mesh::Event& event);
+ void memory_mesh_inputs_confirm(VkCommandBuffer cmd,const oo_mesh::Event& event);
++bool memory_mesh96_inputs_wanted(VkCommandBuffer cmd,const oo_mesh::Event& event);
++void memory_mesh96_inputs_confirm(VkCommandBuffer cmd,const oo_mesh::Event& event);
+ void memory_pt_snapshot_submitted(VkCommandBuffer cmd, uint64_t part, uint64_t sequence, bool succeeded);
+ void memory_pt_snapshot_collect(uint64_t completed_recording_sequence);
+ void memory_pt_snapshot_discard(VkCommandBuffer cmd, uint64_t recording_part);
+diff --git a/gpu/vk/vk_memory.cpp b/gpu/vk/vk_memory.cpp
+index 0d0a3ce..8ab6098 100644
+--- a/gpu/vk/vk_memory.cpp
++++ b/gpu/vk/vk_memory.cpp
+@@ -32,6 +32,7 @@
+ #include "image_capture.h"
+ #include "dispatch_parameters.h"
+ #include "mesh_input_capture.h"
++#include "mesh_input_profile96.h"
+ #include <vk_mem_alloc.h>
+ #include "vk_texture.h"   // (upload_command_buffer)
+ #include "vk_gprof.h"      // (RX_VK_PASS_TIMING)
+@@ -523,6 +524,7 @@ struct OoPagePending {
+ OoPagePending oo_page_pending;
+ oo_dp::Capture oo_dispatch_pending;
+ oo_mesh::Capture oo_mesh_pending;
++oo_mesh96::Capture oo_mesh96_pending;
+ oo_bind::Snapshot oo_binding_pending;
+ oo_alloc::SelectionCounter oo_capture_selection;
+ std::mutex oo_page_mutex;
+@@ -543,6 +545,18 @@ void memory_mesh_inputs_confirm(VkCommandBuffer cmd,const oo_mesh::Event& event)
+     std::lock_guard lock(oo_page_mutex);
+     if(oo_page_pending.active&&oo_page_pending.command==cmd)oo_mesh::confirm(oo_mesh_pending,event);
+ }
++bool memory_mesh96_inputs_wanted(VkCommandBuffer cmd,const oo_mesh96::Event& event) {
++    if(!oo_mesh96::enabled()||!oo_mesh96::identity(event)||!memory_pt_recording_supported())return false;
++    std::lock_guard lock(oo_page_mutex);
++    if(oo_page_pending.attempted||!cmd||!guest_pages_buffer||!guest_pages_address)return false;
++    if(!oo_capture_selection.observe(true,oo_alloc::selection_config()))return false;
++    oo_mesh96::prepare(event);return true;
++}
++void memory_mesh96_inputs_confirm(VkCommandBuffer cmd,const oo_mesh96::Event& event) {
++    if(!oo_mesh96::enabled())return;
++    std::lock_guard lock(oo_page_mutex);
++    if(oo_page_pending.active&&oo_page_pending.command==cmd)oo_mesh96::confirm(oo_mesh96_pending,event);
++}
+ bool memory_pt_snapshot_enabled() { return oo_pt::config().enabled; }
+ void memory_pt_snapshot_record(VkCommandBuffer cmd,uint64_t key,uint64_t variant,const char* digest,
+                                uint32_t x,uint32_t y,uint32_t z,uint64_t indirect,int64_t present,
+@@ -559,7 +573,8 @@ void memory_pt_snapshot_record(VkCommandBuffer cmd,uint64_t key,uint64_t variant
+     uint64_t recording_part=0,logical_value=0;
+     if(pending.attempted||!cmd||!guest_pages_buffer||!guest_pages_address||
+        !memory_pt_recording_info(cmd,&recording_part,&logical_value)) return;
+-    const bool mesh_selected=oo_mesh::prepared((uint64_t)(uintptr_t)cmd,key,variant,digest);
++    const bool mesh_selected=oo_mesh::prepared((uint64_t)(uintptr_t)cmd,key,variant,digest)||
++                             oo_mesh96::prepared((uint64_t)(uintptr_t)cmd,key,variant,digest);
+     const bool selected=mesh_selected||oo_capture_selection.observe(true,oo_alloc::selection_config());
+     if(oo_capture_selection.observed==1||selected)
+         logf("vk: Open-Ocarina exact capture filter %016llx:%016llx sha256 %s matched occurrence %llu; requested %llu",
+@@ -580,6 +595,7 @@ void memory_pt_snapshot_record(VkCommandBuffer cmd,uint64_t key,uint64_t variant
+     pending.command=cmd;
+     pending.request.mesh=mesh_selected;
+     oo_mesh_pending=oo_mesh::select((uint64_t)(uintptr_t)cmd,pending.request,oo_capture_selection.observed);
++    oo_mesh96_pending=oo_mesh96::select((uint64_t)(uintptr_t)cmd,pending.request,oo_capture_selection.observed);
+     oo_dispatch_pending=oo_dp::select((uint64_t)(uintptr_t)cmd,pending.request,oo_capture_selection.observed);
+     VkBufferMemoryBarrier2 before{VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER_2};
+     before.srcStageMask=VK_PIPELINE_STAGE_2_ALL_COMMANDS_BIT;before.srcAccessMask=VK_ACCESS_2_MEMORY_WRITE_BIT;
+@@ -4827,6 +4843,18 @@ void oo_allocation_record(VkCommandBuffer cmd) { // oo_page_mutex held; no CPU g
+             } else state.failures.push_back("mesh_launch_owner_unknown");
+         }
+     }
++    if(oo_mesh96_pending.selected&&oo_mesh96_pending.before.argument_buffer) {
++        const auto buffer=(VkBuffer)(uintptr_t)oo_mesh96_pending.before.argument_buffer;
++        if(std::none_of(state.rows.begin(),state.rows.end(),[&](const auto& row){return row.buffer==(uint64_t)(uintptr_t)buffer;})) {
++            OoBufferOwner owner;
++            if(memory_allocation_retain_buffer(buffer,&owner)) {
++                const auto count=state.rows.size();
++                add(buffer,owner.allocation,VK_NULL_HANDLE,0,0,owner.usage,{},"mesh6864-launch-input",owner.size);
++                if(state.rows.size()>count)state.retained_renderer_buffers.push_back(buffer);
++                else memory_allocation_release_buffer(buffer);
++            } else state.failures.push_back("mesh_launch_owner_unknown");
++        }
++    }
+     oo_image_prepare(cmd);
+     oo_bind::observe([&](auto& ledger){
+         std::vector<oo_bind::Wanted> wanted;
+@@ -4919,6 +4947,15 @@ void oo_allocation_collect(const oo_pt::Request& request,uint64_t completed,bool
+             logf("vk: Open-Ocarina mesh inputs %s (BEFORE-only, NOT full graphics replay)",exported?"exported":"failed");
+         }catch(const std::exception& error){logf("vk: Open-Ocarina mesh input export failed: %s",error.what());}
+     }
++    if(oo_mesh96_pending.selected) {
++        try {
++            std::vector<std::pair<uint64_t,uint64_t>> lifetimes;
++            for(const auto& object:oo_binding_pending.objects)if(object.known&&object.wanted.kind=="buffer")
++                lifetimes.push_back({object.wanted.handle,object.object.id});
++            const bool exported=oo_mesh96::write_completed(oo_mesh96_pending,request,completed,state.rows,mesh_payloads,state.descriptors,lifetimes,dev.null_descriptor);
++            logf("vk: Open-Ocarina 6864 mesh inputs %s (BEFORE-only, NOT full graphics replay)",exported?"exported":"failed");
++        }catch(const std::exception& error){logf("vk: Open-Ocarina mesh input export failed: %s",error.what());}
++    }
+     oo_allocation_release();
+ }
+ 
