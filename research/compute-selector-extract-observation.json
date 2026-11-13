@@ -1,0 +1,200 @@
+{
+  "schema": "open-ocarina.compute-selector-extract-observation/v1",
+  "date": "2026-11-13",
+  "scope": "CPU-only pending-DW/retained-stream event-registry prototype; actual producer hooks and live certificate remain absent",
+  "extractor_sha256": "a56d4afb5fff767265b34a45d24733f6e9639a29307fd14c3ed4ad5e40397f64",
+  "record_core_sha256": "eec1960f1c3a8df33d0c9ccbb70f8a01037713c912317bb705e87b8aae7bc88b",
+  "prototype_patch_sha256": "f39aa027f5d7d5fa727c5b99e92412993cd87ec29959eec5b028f19fd272b08a",
+  "tests_sha256": "2e6566f13fdbbe76322329dde0e055c4994752048cff648e44fd4ae0466c3aac",
+  "source_probe_tests_sha256": "1a8b0ee2315daa64f2c1adc25dda2f4943817aab1a0bd2a13b73851b9eec525c",
+  "checker_sha256": "0106a11449a9cb15a2c618650d5ff026e12cbe54bda11749fb85669b42a5b76e",
+  "source_api_sha256": {
+    "host/capture_backing.h": "04d09046d4b1175a19e68b0ef500421afc19f40b9b0568aca22463af20347e21",
+    "gpu/vk/vk_draw.cpp": "1f0243d368973d6969cb04c766fb1fa713b578cc4932c0af14f7310f48475b49",
+    "gpu/vk/vk_vma.cpp": "f377d14faea178ed3cf2f2ff4e50eb202291370cd263f808c1c00dc2790fd67c",
+    "gpu/vk/vk_internal.h": "5e582b44784962d97edd475fbd314b8e19359d3378facfa1bb87ec2051f215c2",
+    "gpu/vk/vk_memory.cpp": "798c732c88ac9413cb762c5aa32d814c76774527600123da3cf13bde2f9f9ec7",
+    "gpu/vk/vk_replay.cpp": "32455c2f47ae68cb5335065f3d4ea42badb6ea3d12920fdf2a5de61b11d62492"
+  },
+  "base_twelve_tree": "58ca709617448e06af382c3443dd88dac3ffcb8e",
+  "base_patches": [
+    {
+      "patch": "compute-identity.patch",
+      "sha256": "2f14873edfdb47b1f915e75bc4bbe6683ef6632bc66fcbfa1d918aa1c176f018"
+    },
+    {
+      "patch": "page-table-snapshot.patch",
+      "sha256": "c236b96851bc95426202abec6447e672577fdda747fd8405cc435dae435834ab"
+    },
+    {
+      "patch": "allocation-capture.patch",
+      "sha256": "7d8f23d3824374002472bc4a65f3f078c3306d4c5cd395f97e2a1e083fe49aab"
+    },
+    {
+      "patch": "occurrence-capture.patch",
+      "sha256": "defdda2dced583678e39daea0dc7e671fcc8926df8374a62ad45fe675692b752"
+    },
+    {
+      "patch": "graphics-identity.patch",
+      "sha256": "d2572d167c7427c79ce5b600fdeef67a0738678e5e05cbe1ec21db89d8865e53"
+    },
+    {
+      "patch": "sampled-image-capture.patch",
+      "sha256": "45fd019c2670a0c5c4cb0bfba8decb3701531c8248ec205e2b95ba03969aa362"
+    },
+    {
+      "patch": "dispatch-parameters.patch",
+      "sha256": "ff86fe706725f2c70dc759a6e2d295ebedee12b5b93b4b6e2cf407c58a689d8e"
+    },
+    {
+      "patch": "binding-provenance.patch",
+      "sha256": "af88886fb027b91bea136db0c2bf05865cf510232c50fdcbdd9d238d930009b1"
+    },
+    {
+      "patch": "mesh-input-capture.patch",
+      "sha256": "eea7b1b3181751b6b09811a458626958799f2d9a8511a74fdb8bd49854462f5c"
+    },
+    {
+      "patch": "mesh-warp32-lowering.patch",
+      "sha256": "8d0cc053103ccf90b51e6c55c6e7ee39292636f03b85e16d74bd8d8d1221854b"
+    },
+    {
+      "patch": "mesh-input-profile96.patch",
+      "sha256": "d87391e4c8ff1130b2c918da4d6e38c45420acd0f43b12b6ea47a33a3b27f51b"
+    },
+    {
+      "patch": "mesh-warp32-profile96.patch",
+      "sha256": "e419822c42b800ea406e692a366b5891a21baa030632c8f30ec6af134dc5f116"
+    }
+  ],
+  "validation": {
+    "gcc_targeted_plus_frozen_core_tests": 76,
+    "clang_ubsan_new_tests": 61,
+    "gcc_source_backed_cases": 56,
+    "clang_ubsan_source_backed_cases": 56,
+    "gcc_compiler": "g++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)",
+    "clang_compiler": "clang version 22.1.8 (Fedora 22.1.8-4.fc44)",
+    "gcc_source_harness_sha256": "c83119063aba9ee1d9bcaa7c0085d90f5c0f12bfa45f78a36e7e8da118ac4f41",
+    "clang_source_harness_sha256": "c83119063aba9ee1d9bcaa7c0085d90f5c0f12bfa45f78a36e7e8da118ac4f41",
+    "gcc_binary_sha256": "de6355833557ec703091b85df00490d8b77417e32c8983b2be04bbad2dbcef9f",
+    "clang_ubsan_binary_sha256": "6fcf5ae4d5bc2e86fff97d8e26f09a8132594a71a733038a2494433bba5fcb0e",
+    "gcc_report_sha256": "c763cf11d77ca73229adecd5daaa1f01d9426c3c1b1443cde986b30fd30650b7",
+    "clang_report_sha256": "80ca5c526a174baf0de8a5df678970ad62b615abbe44054f250aca8ec0f0ab69",
+    "gcc_log_sha256": "922f3ecb07c05aeeedfa89349476f361137a7fde625e0af7a7da40d903a869b4",
+    "clang_log_sha256": "cb11681d603e7ca0341dadae71b412ae7c10aa4d2c64dc5d591d5c810eb23c4d"
+  },
+  "actual_struct_shapes": [
+    "DescWriter",
+    "RecordingRes",
+    "RecordingRes::Stream",
+    "HosCaptureBackingInfoV1 (88-byte ABI)"
+  ],
+  "mock_boundary": "Authored CPU mock; actual memory_allocation_retain_buffer and host import functions were not called",
+  "actual_source_lifecycle_hooks_implemented": false,
+  "live_certificate_produced": false,
+  "live_record_core_acceptance": false,
+  "shared_source_mutated": false,
+  "gpu_or_host_renderer_build": false,
+  "unknown_owner_writer_alias_policy": "Reject or invalidate; no input truth flags establish absence of missing events",
+  "cases": [
+    "host_preseal",
+    "reject_gpu_preseal",
+    "reject_cross_record_writer",
+    "lease_late_cross_record",
+    "old_retained_stream",
+    "nulls",
+    "zero_fallback",
+    "imports",
+    "indirect",
+    "lease_late_descriptor_mutation",
+    "lease_late_host",
+    "lease_late_alias",
+    "lease_pin_changed",
+    "lease_import_disjoint",
+    "reject_import_status",
+    "reject_import_abi",
+    "lease_import_changed",
+    "lease_memory_recycled",
+    "lease_new_writer",
+    "lease_reuse",
+    "lease_unknown_owner_write",
+    "lease_unknown_writer",
+    "reject_vma_unknown_block",
+    "reject_vma_short_allocation",
+    "reject_vma_backing_extent",
+    "reject_import_without_lease",
+    "reject_unuploaded_capacity",
+    "reject_upload_superseded",
+    "reject_layout",
+    "reject_duplicate_slot",
+    "reject_foreign_info_pointer",
+    "reject_stage",
+    "reject_module",
+    "reject_unknown_owner",
+    "reject_view_overflow",
+    "reject_null_framing",
+    "reject_binding6_alias",
+    "reject_writer_reset",
+    "reject_writer_generation",
+    "reject_recording_part",
+    "reject_descriptor_mutation",
+    "reject_actual_reset",
+    "reject_stream_mapping",
+    "reject_stream_missing",
+    "reject_pin_missing",
+    "reject_pin_offset",
+    "reject_recycled_handle",
+    "reject_unknown_writer",
+    "reject_selector_host_write",
+    "reject_alias_transfer",
+    "reject_import_invalid",
+    "reject_indirect_missing",
+    "reject_indirect_extent",
+    "reject_direct_copy",
+    "reject_argument_recycled",
+    "reject_zero_grid"
+  ],
+  "missing_production_hooks": [
+    {
+      "site": "DescWriter::reset / build_descriptors return",
+      "required": "generated reset/build epoch, exact Program/stage identity, recording slot and recording-part association"
+    },
+    {
+      "site": "draw_begin_recording / recording_wait / submit completion",
+      "required": "new epoch only after actual slot completion; retain bundle/physical pins until its real submission completes"
+    },
+    {
+      "site": "stream_insert / uniform_range actual upload / retained streams at begin / stream destruction",
+      "required": "register every old/current mapping and actual covering upload generation; cache reuse must name an upload in this recording; revoke stale/recycled mappings"
+    },
+    {
+      "site": "oo_vma_memory_created/freed / oo_register_buffer / destroy_buffer",
+      "required": "always-covered VkDeviceMemory lifecycle and VMA suballocation offset/extent plus physical retain provider"
+    },
+    {
+      "site": "ImportAttempt commit / imported and sparse buffer binds / pool retirement",
+      "required": "real host backing lease validation, exact bind ranges, completed sparse edges, physical imported-buffer retention or rejection"
+    },
+    {
+      "site": "host upload / transfer / storage / physical possible writes",
+      "required": "complete serialized owner+range write journal, including cross-recording aliases; unknown access invalidates leases"
+    },
+    {
+      "site": "actual dispatch and indirect grid copy",
+      "required": "seal after final build, then extract before matching dispatch; indirect requires actual12-byte C0-prefix copy event and retained arguments owner"
+    },
+    {
+      "site": "candidate record generation/binding",
+      "required": "separate reviewed live mode and writer admission; frozen core still rejects LiveAsSubmitted"
+    }
+  ],
+  "live_proof_limits": [
+    "supplied stage identity still requires actual native writer SHA verification",
+    "event generated epochs do not authenticate missing source callbacks",
+    "C0 stream requires actual mapped upload stamp, not capacity alone",
+    "no complete production write journal or real physical retain/import bridge",
+    "Input lease_end_order is the extraction cut; active registry lease is separate and source hooks are absent",
+    "proposed writer rejection has no production command-buffer recovery; never skip full native work",
+    "frozen eec196 record core rejects LiveAsSubmitted and no live-to-owned conversion is provided"
+  ]
+}

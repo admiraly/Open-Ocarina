@@ -112,6 +112,10 @@ across all 59 complete buffers and the guarded record at actual width 32.
 Compiler statistics are mixed; measured execution time remains unknown.
 The [live selector audit](../research/live-selector-inputs.md)
 identifies the owned upload and final descriptor generation needed for integration.
+The [source-backed extraction prototype](compute-selector-extraction-prototype.md)
+now checks pending writers, covering upload stamps and owner/alias events against
+the actual renderer struct shapes. Its providers are mocks; production hooks and
+live record construction remain absent.
 A [native C++ writer](compute-interval-native-writer.md) now emits the same
 candidate instruction words, retaining distinct generator provenance. That CPU
 component still needs live extraction, record binding and device integration.

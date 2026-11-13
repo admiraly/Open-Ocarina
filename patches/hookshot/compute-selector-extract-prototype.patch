@@ -1,0 +1,659 @@
+diff --git a/gpu/vk/compute_interval_records.h b/gpu/vk/compute_interval_records.h
+new file mode 100644
+--- /dev/null
++++ b/gpu/vk/compute_interval_records.h
+@@ -0,0 +1,283 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Independently authored, CPU-only C++17 core. No Vulkan or renderer dependency.
++// Consistency checks on supplied evidence do not authenticate its producer.
++#ifndef OPEN_OCARINA_COMPUTE_INTERVAL_RECORDS_H
++#define OPEN_OCARINA_COMPUTE_INTERVAL_RECORDS_H
++
++#include <algorithm>
++#include <array>
++#include <cstddef>
++#include <cstdint>
++#include <limits>
++#include <stdexcept>
++#include <string>
++#include <vector>
++
++namespace open_ocarina {
++namespace compute_intervals {
++
++constexpr const char* kModuleSha256 =
++    "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b";
++constexpr std::size_t kC0Bytes = 2224;
++constexpr std::uint32_t kRecordBinding = 12;
++constexpr std::uint32_t kMaximumRowsPerWidth = 64;
++constexpr std::size_t kMaximumOwners = 256, kMaximumAdditionalWrites = 1024;
++
++// Live extraction and command-access inventory production remain unimplemented.
++enum class SourceMode { Unspecified, OwnedFrozenGraph, LiveAsSubmitted };
++enum class WriteKind { Storage, Physical, Transfer, Host };
++
++struct Key {
++    std::uint64_t id = 0, generation = 0;
++};
++inline bool operator==(const Key& a, const Key& b) {
++    return a.id == b.id && a.generation == b.generation;
++}
++
++struct Owner {
++    Key allocation, backing;
++    std::uint64_t backing_offset = 0, size = 0;
++    // All recording values must be in the producer's single monotonic domain.
++    std::uint64_t first_recording = 0, retained_through_recording = 0;
++    // Completion prerequisite for reusing this allocation, not its last writer.
++    std::uint64_t reuse_after_completion = 0;
++};
++
++struct OwnedView {
++    Key allocation;
++    std::uint64_t offset = 0, range = 0, view_generation = 0;
++    std::uint64_t recording = 0, descriptor_generation = 0;
++    // A null view has zero owner, offset and range; generation still identifies
++    // the pending descriptor writer that supplied this null value.
++};
++
++struct Root {
++    std::uint32_t binding = 0, element = 0;
++    OwnedView view;
++};
++
++struct WriteSpan {
++    WriteKind kind = WriteKind::Storage;
++    Key allocation;
++    std::uint64_t offset = 0, size = 0;
++    std::uint64_t first_order = 0, last_order = 0;
++};
++
++struct Input {
++    SourceMode mode = SourceMode::Unspecified;
++    std::string module_sha256;
++    std::uint64_t recording = 0, descriptor_generation = 0;
++    std::uint64_t completed_value = 0;
++    std::uint64_t selectors_ready_order = 0, dispatch_order = 0, lease_end_order = 0;
++    std::uint32_t storage_alignment = 16;
++    std::vector<Owner> owners;
++    OwnedView c0;
++    std::array<std::uint8_t, kC0Bytes> c0_bytes{};
++    // Source walk order: five singles, then the three literal table elements.
++    std::array<Root, 8> roots{};
++    // Concrete additional possible writes in the lease, not a completeness flag.
++    // Binding 6's entire range is independently treated as writable below.
++    std::vector<WriteSpan> additional_writes;
++};
++
++struct Row {
++    std::uint64_t low = 0, high = 0, base = 0;
++    std::uint32_t binding = 0, element = 0;
++};
++
++struct Output {
++    std::array<std::vector<Row>, 2> rows;  // width 4, then width 16
++    std::vector<std::uint8_t> bytes;     // explicit LE, no host struct packing
++};
++
++namespace detail {
++inline void require(bool condition, const char* message) {
++    if (!condition) throw std::invalid_argument(message);
++}
++inline std::uint64_t sum(std::uint64_t a, std::uint64_t b) {
++    require(b <= std::numeric_limits<std::uint64_t>::max() - a,
++            "Non-modular owner/view range overflows");
++    return a + b;
++}
++inline bool overlap(std::uint64_t a, std::uint64_t n,
++                    std::uint64_t b, std::uint64_t m) {
++    return n && m && a < sum(b, m) && b < sum(a, n);
++}
++inline const Owner& owner(const Input& input, Key key) {
++    const auto it = std::find_if(input.owners.begin(), input.owners.end(),
++                                [key](const Owner& o) { return o.allocation == key; });
++    require(it != input.owners.end(), "Missing exact owner generation");
++    return *it;
++}
++inline bool is_null(const OwnedView& v) { return v.allocation.id == 0; }
++inline void validate_view(const Input& input, const OwnedView& v, bool nullable) {
++    require(v.view_generation && v.recording == input.recording &&
++            v.descriptor_generation == input.descriptor_generation,
++            "Missing or inconsistent view/descriptor/recording generation");
++    if (is_null(v)) {
++        require(nullable && !v.allocation.generation && !v.offset && !v.range,
++                "Unsupported null view encoding");
++    } else {
++        const auto& o = owner(input, v.allocation);
++        require(v.range && v.offset <= o.size && v.range <= o.size - v.offset,
++                "Descriptor view exceeds true owner extent");
++    }
++}
++inline void validate_owners(const Input& input) {
++    require(!input.owners.empty(), "Owned allocation inventory is missing");
++    require(input.owners.size() <= kMaximumOwners, "Owner inventory exceeds reviewed capacity");
++    for (std::size_t i = 0; i < input.owners.size(); ++i) {
++        const auto& o = input.owners[i];
++        require(o.allocation.id && o.allocation.generation && o.backing.id &&
++                o.backing.generation && o.size, "Missing owned backing identity or extent");
++        sum(o.backing_offset, o.size);
++        require(o.first_recording && o.first_recording <= input.recording &&
++                input.recording <= o.retained_through_recording,
++                "Owner does not cover the recording lifetime");
++        require(o.reuse_after_completion <= input.completed_value,
++                "Owner reused before recorded completion prerequisite");
++        for (std::size_t j = 0; j < i; ++j) {
++            const auto& previous = input.owners[j];
++            require(previous.allocation.id != o.allocation.id,
++                    "Duplicate or competing allocation generations");
++            require(previous.backing.id != o.backing.id ||
++                    previous.backing.generation == o.backing.generation,
++                    "Competing backing generations in one snapshot");
++        }
++    }
++}
++inline std::uint32_t read32(const std::uint8_t* p) {
++    return std::uint32_t(p[0]) | (std::uint32_t(p[1]) << 8) |
++           (std::uint32_t(p[2]) << 16) | (std::uint32_t(p[3]) << 24);
++}
++inline std::uint64_t read64(const std::uint8_t* p) {
++    return std::uint64_t(read32(p)) | (std::uint64_t(read32(p + 4)) << 32);
++}
++constexpr std::array<std::uint32_t, 8> kSelectors{{192,208,256,272,352,2176,2192,2208}};
++
++inline void validate_write(const Input& input, const WriteSpan& write) {
++    require(write.kind == WriteKind::Storage || write.kind == WriteKind::Physical ||
++            write.kind == WriteKind::Transfer || write.kind == WriteKind::Host,
++            "Unknown writer class");
++    require(write.size && write.first_order <= write.last_order &&
++            write.last_order <= input.lease_end_order, "Invalid writer range/order inventory");
++    const auto& writer = owner(input, write.allocation);
++    require(write.offset <= writer.size && write.size <= writer.size - write.offset,
++            "Possible writer exceeds true owner extent");
++    if (write.last_order < input.selectors_ready_order) return;
++    const auto& c0_owner = owner(input, input.c0.allocation);
++    if (!(writer.backing == c0_owner.backing)) return;
++    const auto writer_at = sum(writer.backing_offset, write.offset);
++    const auto c0_at = sum(c0_owner.backing_offset, input.c0.offset);
++    for (const auto selector : kSelectors)
++        require(!overlap(writer_at, write.size, sum(c0_at, selector), 16),
++                "Possible write aliases a leased selector record");
++}
++
++struct Claim {
++    std::uint64_t base, end;
++    std::uint32_t binding, element;
++};
++inline std::array<Claim, 8> claims(const Input& input, std::uint32_t width) {
++    std::array<Claim, 8> result{};
++    for (std::size_t i = 0; i < result.size(); ++i) {
++        const auto* p = input.c0_bytes.data() + kSelectors[i];
++        const auto guest = read64(p);
++        const auto size_word = read32(p + 8);
++        const auto base = guest & ~std::uint64_t(15);
++        const auto bound = is_null(input.roots[i].view) ? 0 : input.roots[i].view.range;
++        // OpArrayLength is U32; its shift happens BEFORE U64 conversion.
++        const auto count32 = static_cast<std::uint32_t>(bound / width);
++        const auto bytes32 = static_cast<std::uint32_t>(count32 << (width == 4 ? 2 : 4));
++        // These two endpoint additions intentionally wrap in U64.
++        const std::uint64_t typed_end = base + std::uint64_t(bytes32);
++        const std::uint64_t nvn_end = guest + std::uint64_t(size_word);
++        const auto end = i >= 5 && !size_word ? typed_end : std::min(typed_end, nvn_end);
++        result[i] = {base, end, input.roots[i].binding, input.roots[i].element};
++    }
++    return result;
++}
++inline std::vector<Row> partition(const std::array<Claim, 8>& candidates) {
++    std::vector<std::uint64_t> endpoints;
++    for (const auto& c : candidates)
++        if (c.base < c.end) {
++            endpoints.push_back(c.base);
++            endpoints.push_back(c.end);
++        }
++    std::sort(endpoints.begin(), endpoints.end());
++    endpoints.erase(std::unique(endpoints.begin(), endpoints.end()), endpoints.end());
++    std::vector<Row> rows;
++    for (std::size_t i = 1; i < endpoints.size(); ++i) {
++        const auto low = endpoints[i - 1], high = endpoints[i];
++        for (const auto& c : candidates) {
++            if (c.base > low || low >= c.end) continue;
++            if (!rows.empty() && rows.back().high == low && rows.back().base == c.base &&
++                rows.back().binding == c.binding && rows.back().element == c.element)
++                rows.back().high = high;
++            else
++                rows.push_back({low, high, c.base, c.binding, c.element});
++            break; // Exact original first-match order; no nearest phase.
++        }
++    }
++    require(rows.size() <= kMaximumRowsPerWidth, "Interval count exceeds reviewed capacity");
++    return rows;
++}
++inline void put32(std::vector<std::uint8_t>& bytes, std::uint32_t value) {
++    for (unsigned i = 0; i < 4; ++i) bytes.push_back(static_cast<std::uint8_t>(value >> (i * 8)));
++}
++inline void put64(std::vector<std::uint8_t>& bytes, std::uint64_t value) {
++    for (unsigned i = 0; i < 8; ++i) bytes.push_back(static_cast<std::uint8_t>(value >> (i * 8)));
++}
++} // namespace detail
++
++inline Output build(const Input& input) {
++    using namespace detail;
++    require(input.mode == SourceMode::OwnedFrozenGraph,
++            "Live routing-input producer is not implemented or admitted");
++    require(input.module_sha256 == kModuleSha256 && input.storage_alignment == 16,
++            "Unsupported module or storage alignment");
++    require(input.recording && input.descriptor_generation && input.selectors_ready_order &&
++            input.selectors_ready_order <= input.dispatch_order &&
++            input.dispatch_order <= input.lease_end_order,
++            "Missing or invalid recording/generation/lease identity");
++    validate_owners(input);
++    require(input.additional_writes.size() <= kMaximumAdditionalWrites,
++            "Writer inventory exceeds reviewed capacity");
++    validate_view(input, input.c0, false);
++    require(input.c0.range == kC0Bytes, "Target C0 descriptor-visible range must be exactly 2224 bytes");
++    for (std::size_t i = 0; i < input.roots.size(); ++i) {
++        const auto& root = input.roots[i];
++        require(root.binding == (i < 5 ? i + 2 : 7) && root.element == (i < 5 ? 0 : i - 5),
++                "Unsupported, duplicate or reordered typed root");
++        validate_view(input, root.view, true);
++    }
++    // Module-specific write inventory: the original direct StorageBuffer root 6.
++    const auto& writable = input.roots[4].view;
++    if (!is_null(writable))
++        validate_write(input, {WriteKind::Storage, writable.allocation, writable.offset,
++                              writable.range, input.dispatch_order, input.lease_end_order});
++    for (const auto& write : input.additional_writes) validate_write(input, write);
++
++    Output output;
++    output.rows[0] = partition(claims(input, 4));
++    output.rows[1] = partition(claims(input, 16));
++    const auto scalar_count = static_cast<std::uint32_t>(output.rows[0].size());
++    put32(output.bytes, scalar_count);
++    put32(output.bytes, static_cast<std::uint32_t>(output.rows[1].size()));
++    put32(output.bytes, 0);
++    put32(output.bytes, scalar_count);
++    for (std::size_t w = 0; w < 2; ++w) {
++        for (const auto& row : output.rows[w]) {
++            put64(output.bytes, row.low); put64(output.bytes, row.high); put64(output.bytes, row.base);
++            put32(output.bytes, row.binding); put32(output.bytes, row.element);
++            put32(output.bytes, w == 0 ? 4 : 16);
++            put32(output.bytes, row.binding < 7 ? row.binding - 2 : 5 + row.element);
++            put32(output.bytes, 0); put32(output.bytes, 0);
++        }
++    }
++    return output;
++}
++
++} // namespace compute_intervals
++} // namespace open_ocarina
++#endif
+diff --git a/gpu/vk/compute_selector_extract.h b/gpu/vk/compute_selector_extract.h
+new file mode 100644
+--- /dev/null
++++ b/gpu/vk/compute_selector_extract.h
+@@ -0,0 +1,366 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Independently authored CPU prototype. Event consistency is not source-hook coverage.
++#ifndef OPEN_OCARINA_COMPUTE_SELECTOR_EXTRACT_H
++#define OPEN_OCARINA_COMPUTE_SELECTOR_EXTRACT_H
++#include "compute_interval_records.h"
++#include <map>
++#include <memory>
++#include <tuple>
++#include <type_traits>
++#include <utility>
++
++namespace open_ocarina::selector_extract {
++namespace ci = compute_intervals;
++using U = std::uint64_t;
++inline void need(bool value, const char* message) { if (!value) throw std::invalid_argument(message); }
++inline U add(U a,U b) { need(b<=UINT64_MAX-a,"range overflow"); return a+b; }
++struct Identity {
++    U program=0,variant=0;std::uint32_t nvn_stage=0,vk_stage=0,stage_count=0;std::string module;
++};
++inline bool target(const Identity& i) {
++    return i.program==0xcc62764061c44f6aULL&&i.variant==0x095931037888515aULL&&
++           i.nvn_stage==5&&i.vk_stage==32&&i.stage_count==1&&i.module==ci::kModuleSha256;
++}
++struct ImportInfo {
++    U lease=0,backing=0,generation=0,offset=0,size=0,mapping=0;
++    std::uint32_t kind=0,invalid_reason=0,abi=0,bytes=0;int result=0;
++    U acquired_event=0,current_generation=0,invalidated_event=0;
++};
++// Future production implementation must retain a real host backing lease and
++// validate it using the actual host ABI. Test implementations own synthetic data.
++struct ImportLease {
++    virtual ~ImportLease()=default;
++    virtual ImportInfo acquired() const=0;
++    virtual ImportInfo current() const=0;
++};
++struct PinInfo { U buffer=0,allocation=0,memory=0,memory_offset=0,size=0; };
++struct Retention {
++    virtual ~Retention()=default;
++    virtual PinInfo current() const=0;
++};
++struct RetainSource {
++    virtual ~RetainSource()=default;
++    virtual std::shared_ptr<Retention> acquire(U buffer)=0;
++};
++struct Record { U id=0,slot=0,part=0,reuse_after=0; };
++struct Writer { U id=0,generation=0,recording=0,part=0; };
++struct Value {
++    std::uint32_t binding=0,element=0,type=0;U buffer=0,offset=0,range=0;
++    friend bool operator==(const Value&a,const Value&b) {
++        return std::tie(a.binding,a.element,a.type,a.buffer,a.offset,a.range)==
++               std::tie(b.binding,b.element,b.type,b.buffer,b.offset,b.range);
++    }
++};
++template<class T> U handle_value(T value) {
++    if constexpr(std::is_pointer_v<T>)return U(reinterpret_cast<std::uintptr_t>(value));
++    else return U(value);
++}
++struct Dispatch {
++    enum class Kind { Direct, Indirect };Kind kind=Kind::Direct;
++    std::array<std::uint32_t,3> direct_grid{{1,1,1}};U arguments=0,arguments_offset=0,grid_copy_event=0;
++};
++class Bundle {
++    friend class Registry;
++    ci::Input input_;Writer writer_;U lease_=0,stream_generation_=0,upload_generation_=0;
++    Dispatch dispatch_;std::vector<std::shared_ptr<Retention>> pins_;std::vector<PinInfo> pin_facts_;
++    std::vector<std::shared_ptr<ImportLease>> imported_backings_;
++public:
++    const ci::Input& input() const { return input_; }
++    Writer writer() const { return writer_; }
++    U lease() const { return lease_; }
++    U stream_generation() const { return stream_generation_; }
++    U upload_generation() const { return upload_generation_; }
++    const Dispatch& dispatch() const { return dispatch_; }
++    // No mutable input accessor or live-to-owned conversion is provided.
++};
++
++// Exact VkWriteDescriptorSet/VkDescriptorBufferInfo member names, without a
++// Vulkan dependency. Read the final pending writer, never reconstruct bindings.
++template<class DW> std::vector<Value> pending_values(const DW& dw) {
++    need(dw.prog,"pending writer has no program");
++    need(dw.writes.size()<=64&&dw.bufs.size()<=256,"pending writer cap");
++    std::vector<Value> result;
++    const auto base=reinterpret_cast<std::uintptr_t>(dw.bufs.data());
++    using Info=typename std::decay_t<decltype(dw.bufs)>::value_type;
++    const auto bytes=dw.bufs.size()*sizeof(Info);
++    for(const auto& w:dw.writes) {
++        if(w.descriptorType!=6&&w.descriptorType!=7)continue;
++        need(w.descriptorCount&&w.descriptorCount<=256&&w.pBufferInfo,"missing pending buffer infos");
++        const auto at=reinterpret_cast<std::uintptr_t>(w.pBufferInfo);
++        need(at>=base&&at-base<=bytes&&(at-base)%sizeof(Info)==0&&
++             w.descriptorCount<=(bytes-(at-base))/sizeof(Info),"descriptor info pointer not in final writer");
++        for(std::uint32_t n=0;n<w.descriptorCount;++n) {
++            const auto& b=w.pBufferInfo[n];
++            result.push_back({w.dstBinding,w.dstArrayElement+n,w.descriptorType,
++                              handle_value(b.buffer),b.offset,b.range});
++        }
++    }
++    std::sort(result.begin(),result.end(),[](const Value&a,const Value&b){return std::tie(a.binding,a.element)<std::tie(b.binding,b.element);});
++    for(std::size_t n=1;n<result.size();++n)
++        need(std::tie(result[n-1].binding,result[n-1].element)!=std::tie(result[n].binding,result[n].element),"duplicate descriptor slot");
++    need(result.size()==10,"exact target uniform/storage descriptor inventory required");
++    std::size_t n=0;
++    for(std::uint32_t b=0;b<8;++b)for(std::uint32_t e=0;e<(b==7?3u:1u);++e,++n)
++        need(result[n].binding==b&&result[n].element==e&&result[n].type==(b<2?6u:7u),"target descriptor layout changed");
++    return result;
++}
++
++class Registry {
++    struct Memory { U handle=0,size=0;ci::Key backing;U backing_offset=0;std::shared_ptr<ImportLease> imported;ImportInfo acquisition;U instance=0; };
++    struct Buffer { U handle=0,allocation=0,memory=0,memory_offset=0,size=0;ci::Key key;U memory_instance=0;const std::uint8_t* mapped=nullptr; };
++    struct Upload { U offset=0,size=0,generation=0; };
++    struct Stream { U buffer=0,allocation=0,size=0,generation=0;const std::uint8_t* mapped=nullptr;ci::Key owner;std::vector<Upload> uploads; };
++    struct Rec { Record key;std::map<U,Stream> streams;U submitted=0; };
++    struct Pending { Writer key;Identity identity;const void* program=nullptr;std::vector<Value> values;U ready=0;std::vector<ci::Key> owners; };
++    struct Write { U event=0,recording=0;ci::WriteKind kind;ci::Key allocation;U offset=0,size=0; };
++    struct Grid { U writer=0,generation=0,destination=0,offset=0,source=0,source_offset=0,event=0;ci::Key source_owner; };
++    struct Lease { Writer writer;ci::Key backing;U c0_at=0;bool invalid=false;
++        std::vector<std::shared_ptr<Retention>> pins;std::vector<std::shared_ptr<ImportLease>> imports; };
++    U serial_=0,completed_=0;bool lost_=false;
++    std::map<U,Memory> memories_;std::map<U,Buffer> buffers_;std::map<U,Rec> recordings_;
++    std::map<U,U> slots_;std::map<U,Pending> writers_;std::map<U,Lease> leases_;std::map<U,Grid> grids_;
++    std::map<std::pair<U,U>,ci::Key> import_backings_;std::vector<Write> writes_;
++    U next() { need(!lost_&&serial_<UINT64_MAX,"registry unavailable/overflow");return ++serial_; }
++    Rec& rec(Record r) {
++        auto i=recordings_.find(r.id);need(i!=recordings_.end()&&i->second.key.slot==r.slot&&
++          i->second.key.part==r.part&&!i->second.submitted,"stale recording slot/part");return i->second;
++    }
++    const Buffer& buffer(U h) const { auto i=buffers_.find(h);need(i!=buffers_.end(),"unknown/destroyed buffer");return i->second; }
++    const Memory& memory(U h) const { auto i=memories_.find(h);need(i!=memories_.end(),"unknown/freed backing");return i->second; }
++    static void import_valid(const Memory& m) {
++        if(!m.imported)return;
++        const auto a=m.acquisition,b=m.imported->current();
++        need(a.result==1&&b.result==1&&a.abi==1&&b.abi==1&&a.bytes==88&&b.bytes==88&&
++          a.lease&&a.backing&&a.generation&&a.mapping&&a.size&&a.acquired_event&&
++          b.current_generation>=a.current_generation&&a.current_generation>=a.generation&&
++          !a.invalidated_event&&!b.invalidated_event&&(a.kind==1||a.kind==2)&&!a.invalid_reason&&
++          !b.invalid_reason&&std::tie(a.lease,a.backing,a.generation,a.offset,a.size,a.mapping,a.kind,a.acquired_event)==
++          std::tie(b.lease,b.backing,b.generation,b.offset,b.size,b.mapping,b.kind,b.acquired_event),"import backing lease changed or unknown");
++    }
++    ci::Owner owner(const Buffer& b,Record r) const {
++        const auto& m=memory(b.memory);import_valid(m);
++        need(b.memory_instance==m.instance,"buffer backing lifecycle generation changed");
++        need(b.memory_offset<=m.size&&b.size<=m.size-b.memory_offset,"buffer escapes backing allocation");
++        return {b.key,m.backing,add(m.backing_offset,b.memory_offset),b.size,r.id,r.id,r.reuse_after};
++    }
++    static bool protected_overlap(U c0,U at,U size) {
++        for(const auto s:ci::detail::kSelectors)if(ci::detail::overlap(add(c0,s),16,at,size))return true;
++        return false;
++    }
++    void possible_write(Record r,ci::WriteKind kind,U h,U offset,U size) {
++        rec(r);need(kind==ci::WriteKind::Host||kind==ci::WriteKind::Transfer||kind==ci::WriteKind::Storage||kind==ci::WriteKind::Physical,"unknown writer class");
++        const auto& b=buffer(h);const auto o=owner(b,r);
++        need(size&&offset<=b.size&&size<=b.size-offset,"writer outside actual owner");
++        need(writes_.size()<ci::kMaximumAdditionalWrites,"writer journal cap");
++        const auto event=next();writes_.push_back({event,r.id,kind,b.key,offset,size});
++        bool conflict=false;
++        for(auto& l:leases_)if(l.second.backing==o.backing&&protected_overlap(l.second.c0_at,add(o.backing_offset,offset),size)) {
++            l.second.invalid=true;conflict=true;
++        }
++        need(!conflict,"proposed writer conflicts with protected selector lease");
++    }
++    void tracked_write(Record r,ci::WriteKind kind,U h,U offset,U size) {
++        try { possible_write(r,kind,h,offset,size); }
++        catch(const std::invalid_argument&) { unknown_writer();throw; }
++    }
++    Pending& pending(Writer w) {
++        auto i=writers_.find(w.id);need(i!=writers_.end()&&i->second.key.generation==w.generation&&
++          i->second.key.recording==w.recording&&i->second.key.part==w.part,"stale descriptor writer generation");return i->second;
++    }
++public:
++    // Single serialized event domain. Real wrappers must hold their registry and
++    // allocation locks; this prototype does not infer events absent from hooks.
++    void unknown_writer() { lost_=true;for(auto& l:leases_)l.second.invalid=true; }
++    void completed(U value) {
++        need(value>=completed_,"completion went backwards");completed_=value;
++        for(auto i=leases_.begin();i!=leases_.end();) {
++            const auto r=recordings_.find(i->second.writer.recording);
++            if(r!=recordings_.end()&&r->second.submitted&&r->second.submitted<=value)i=leases_.erase(i);
++            else ++i;
++        }
++    }
++    Record begin(U slot,U part) {
++        need(slot&&part,"missing slot/recording part");U prerequisite=0;
++        const auto old=slots_.find(slot);
++        if(old!=slots_.end()) { const auto& r=recordings_.at(old->second);need(r.submitted&&r.submitted<=completed_,"recording reused without observed completion");prerequisite=r.submitted; }
++        Record r{next(),slot,part,prerequisite};recordings_.emplace(r.id,Rec{r,{},0});slots_[slot]=r.id;return r;
++    }
++    void submit(Record r,U value) { auto& state=rec(r);need(value&&value>completed_,"invalid submission completion prerequisite");state.submitted=value;next(); }
++    void memory_vma(U handle,U size) {
++        need(handle&&size&&!memories_.count(handle),"duplicate or empty VMA memory lifecycle");
++        memories_.emplace(handle,Memory{handle,size,{next(),1},0,{}, {},next()});
++    }
++    void memory_import(U handle,U size,std::shared_ptr<ImportLease> lease) {
++        need(handle&&size&&lease&&!memories_.count(handle),"unknown/duplicate imported memory");
++        const auto a=lease->acquired();Memory m{handle,size,{},a.offset,lease,a,next()};import_valid(m);need(size<=a.size,"import extent exceeds host lease");
++        auto key=std::make_pair(U(a.kind),a.backing);auto i=import_backings_.find(key);
++        if(i==import_backings_.end())i=import_backings_.emplace(key,ci::Key{next(),a.generation}).first;
++        need(i->second.generation==a.generation,"competing imported backing generations");m.backing=i->second;memories_.emplace(handle,std::move(m));
++    }
++    void memory_free(U handle) { need(memories_.erase(handle)==1,"unknown memory free");next(); }
++private:
++    void bind_buffer(U handle,U allocation,U memory_handle,U offset,U size,const std::uint8_t* mapped=nullptr) {
++        need(handle&&size&&!buffers_.count(handle),"duplicate/empty buffer lifecycle");const auto& m=memory(memory_handle);
++        need(offset<=m.size&&size<=m.size-offset,"VMA/import binding exceeds backing block");
++        buffers_.emplace(handle,Buffer{handle,allocation,memory_handle,offset,size,{next(),1},m.instance,mapped});
++    }
++public:
++    // Consume actual VmaAllocationInfo fields. The block must already have a
++    // real memory-created callback; allocation.size never invents a block size.
++    template<class VmaInfo> void vma_buffer_created(U handle,U allocation,U resource_size,const VmaInfo& info) {
++        need(allocation&&resource_size&&resource_size<=info.size,"invalid VMA allocation info/resource extent");
++        const U mem=handle_value(info.deviceMemory);const auto& m=memory(mem);
++        need(!m.imported,"VMA/import backing class mismatch");
++        need(info.offset<=m.size&&info.size<=m.size-info.offset,"actual VMA allocation exceeds backing block");
++        bind_buffer(handle,allocation,mem,info.offset,resource_size,static_cast<const std::uint8_t*>(info.pMappedData));
++    }
++    // Complete ordinary imported binding only. Partial/sparse/multi-memory
++    // resources need a separate bridge and must not be flattened into this API.
++    void imported_buffer_created(U handle,U memory_handle,U offset,U resource_size) {
++        need(bool(memory(memory_handle).imported),"missing acquired import backing lease");
++        bind_buffer(handle,0,memory_handle,offset,resource_size);
++    }
++    void buffer_destroy(U handle) {need(buffers_.erase(handle)==1,"unknown buffer destroy");next();}
++    void retained_stream(Record r,U handle,U allocation,const std::uint8_t* mapped,U size) {
++        auto& state=rec(r);const auto& b=buffer(handle);
++        need(allocation&&allocation==b.allocation&&mapped&&mapped==b.mapped&&size==b.size,"retained stream owner/mapping mismatch");
++        need(!state.streams.count(handle),"stream registered twice in one recording");
++        state.streams.emplace(handle,Stream{handle,allocation,size,next(),mapped,b.key,{}});
++    }
++    void mapped_upload_completed(Record r,U handle,U offset,U size) {
++        auto& state=rec(r);auto stream=state.streams.find(handle);
++        need(stream!=state.streams.end()&&buffer(handle).key==stream->second.owner,"upload has no current retained stream owner");
++        need(size&&offset<=stream->second.size&&size<=stream->second.size-offset,"upload outside mapped stream");
++        need(stream->second.uploads.size()<4096,"upload stamp cap");
++        const auto o=owner(buffer(handle),r);
++        for(auto& lease:leases_)if(lease.second.backing==o.backing&&protected_overlap(lease.second.c0_at,add(o.backing_offset,offset),size)) {
++            unknown_writer();throw std::invalid_argument("completed upload violated protected selector lease");
++        }
++        stream->second.uploads.push_back({offset,size,next()});
++    }
++    template<class DW> Writer after_build(U writer_id,Record r,const DW& dw,const Identity& identity) {
++        rec(r);need(writer_id&&target(identity),"unreviewed stage identity");
++        Writer w{writer_id,next(),r.id,r.part};Pending p{w,identity,dw.prog,pending_values(dw),next(),{}};
++        for(const auto& v:p.values)p.owners.push_back(v.buffer?buffer(v.buffer).key:ci::Key{});
++        writers_[writer_id]=std::move(p);return w;
++    }
++    void writer_reset(U id) { need(id,"missing writer identity");writers_.erase(id);next(); }
++    void host_write(Record r,U buffer,U offset,U size) {tracked_write(r,ci::WriteKind::Host,buffer,offset,size);}
++    void storage_write(Record r,U buffer,U offset,U size) {tracked_write(r,ci::WriteKind::Storage,buffer,offset,size);}
++    void physical_write(Record r,U buffer,U offset,U size) {tracked_write(r,ci::WriteKind::Physical,buffer,offset,size);}
++    void transfer_write(Record r,U buffer,U offset,U size) {tracked_write(r,ci::WriteKind::Transfer,buffer,offset,size);}
++    U indirect_grid_copy(Record r,Writer w,U source,U source_offset,U destination,U destination_offset,U size) {
++        auto& p=pending(w);need(w.recording==r.id&&size==12,"grid copy identity/extent");
++        const auto& c0=p.values.front();need(destination==c0.buffer&&destination_offset==c0.offset,"grid copy must target C0 bytes0..11");
++        const auto& args=buffer(source);need(source_offset<=args.size&&12<=args.size-source_offset,"indirect arguments escape owner");
++        possible_write(r,ci::WriteKind::Transfer,destination,destination_offset,12);const auto event=serial_;
++        grids_[event]={w.id,w.generation,destination,destination_offset,source,source_offset,event,args.key};return event;
++    }
++    template<class DW,class RecordingRes> Bundle extract(Writer w,const DW& dw,const RecordingRes& actual,Dispatch dispatch,RetainSource& retain) {
++        need(!lost_,"unclassified writer or incomplete registry");auto& p=pending(w);auto& rs=recordings_.at(w.recording);rec(rs.key);
++        need(dw.prog==p.program&&pending_values(dw)==p.values,"pending descriptor writer mutated after seal");
++        for(std::size_t n=0;n<p.values.size();++n)if(p.values[n].buffer)need(buffer(p.values[n].buffer).key==p.owners[n],"descriptor owner generation changed after build");
++        const auto& c0=p.values.front();need(c0.buffer&&c0.range==ci::kC0Bytes,"target C0 exact visible range");
++        const auto stream=rs.streams.find(c0.buffer);need(stream!=rs.streams.end(),"C0 not owned by retained recording stream");
++        const auto& selected=stream->second;need(buffer(c0.buffer).key==selected.owner,"retained stream allocation generation changed");unsigned found=0;
++        // Search ALL retained streams, including the upload stream already outgrown.
++        for(const auto& s:actual.streams)if(handle_value(s.buffer)==c0.buffer) {
++            ++found;need(handle_value(s.alloc)==selected.allocation&&s.mapped==selected.mapped&&s.size==selected.size,"actual retained stream generation/mapping changed");
++        }
++        need(found==1&&c0.offset<=selected.size&&c0.range<=selected.size-c0.offset,"missing/duplicate/short retained C0 stream");
++        U upload_generation=0;
++        for(const auto& upload:selected.uploads)if(ci::detail::overlap(upload.offset,upload.size,c0.offset,c0.range)) {
++            need(upload.generation<=p.ready,"C0 upload superseded sealed descriptor writer");
++            if(upload.offset<=c0.offset&&c0.range<=upload.size-(c0.offset-upload.offset))upload_generation=std::max(upload_generation,upload.generation);
++        }
++        need(upload_generation,"selected C0 range has no covering upload in current recording");
++        Bundle b;b.writer_=w;b.stream_generation_=selected.generation;b.upload_generation_=upload_generation;b.dispatch_=dispatch;
++        auto& in=b.input_;in.mode=ci::SourceMode::LiveAsSubmitted;in.module_sha256=p.identity.module;in.storage_alignment=16;
++        in.recording=w.recording;in.descriptor_generation=w.generation;in.completed_value=completed_;
++        in.selectors_ready_order=p.ready;in.dispatch_order=next();in.lease_end_order=in.dispatch_order;
++        auto retain_owner=[&](const Buffer& object) {
++            auto o=owner(object,rs.key);
++            if(std::none_of(in.owners.begin(),in.owners.end(),[&](const ci::Owner& x){return x.allocation==o.allocation;})) {
++                auto pin=retain.acquire(object.handle);need(bool(pin),"missing physical owner retention");const auto pi=pin->current();
++                need(std::tie(pi.buffer,pi.allocation,pi.memory,pi.memory_offset,pi.size)==std::tie(object.handle,object.allocation,object.memory,object.memory_offset,object.size),"physical owner retention mismatch");
++                in.owners.push_back(o);b.pin_facts_.push_back(pi);b.pins_.push_back(std::move(pin));const auto& m=memory(object.memory);if(m.imported)b.imported_backings_.push_back(m.imported);
++            }
++            return o;
++        };
++        auto view=[&](const Value& v) {
++            const auto generation=next();
++            if(!v.buffer) {need(v.type==7&&!v.offset&&v.range==UINT64_MAX,"unsupported null descriptor framing");return ci::OwnedView{{},0,0,generation,w.recording,w.generation};}
++            const auto& object=buffer(v.buffer);
++            need(v.range&&v.range!=UINT64_MAX&&v.offset<=object.size&&v.range<=object.size-v.offset,"final descriptor outside true owner");
++            const auto o=retain_owner(object);
++            return ci::OwnedView{o.allocation,v.offset,v.range,generation,w.recording,w.generation};
++        };
++        in.c0=view(c0);in.c0.view_generation=upload_generation;std::copy_n(selected.mapped+c0.offset,ci::kC0Bytes,in.c0_bytes.begin());
++        for(std::size_t i=0;i<8;++i) {const auto& v=p.values[i+2];in.roots[i]={v.binding,v.element,view(v)};}
++        const auto c0owner=ci::detail::owner(in,in.c0.allocation);const auto c0at=add(c0owner.backing_offset,in.c0.offset);
++        const auto& writable=in.roots[4].view;
++        if(writable.allocation.id) {const auto& wo=ci::detail::owner(in,writable.allocation);
++            need(!(wo.backing==c0owner.backing)||!protected_overlap(c0at,add(wo.backing_offset,writable.offset),writable.range),"known binding6 writer aliases selector lease");}
++        // CPU recording order is not GPU completion. A pending GPU writer
++        // may execute after this CPU snapshot even if its command was recorded
++        // earlier. Cross-recording host writes are also not ordered by this
++        // writer's ready event. Only observed completion makes them historical.
++        for(const auto& write:writes_) {
++            const auto wr=recordings_.find(write.recording);
++            if(wr!=recordings_.end()&&wr->second.submitted&&wr->second.submitted<=completed_)continue;
++            const bool pending=write.recording!=w.recording||write.kind!=ci::WriteKind::Host||write.event>=p.ready;
++            if(!pending)continue;
++            const auto object=std::find_if(buffers_.begin(),buffers_.end(),[&](const auto& x){return x.second.key==write.allocation;});
++            need(object!=buffers_.end(),"pending writer owner/alias generation is unresolved");
++            const auto wo=owner(object->second,rs.key);
++            need(!(wo.backing==c0owner.backing)||!protected_overlap(c0at,add(wo.backing_offset,write.offset),write.size),
++                 "pending GPU or cross-recording writer aliases selectors");
++        }
++        if(dispatch.kind==Dispatch::Kind::Direct) {
++            need(!dispatch.arguments&&!dispatch.arguments_offset&&!dispatch.grid_copy_event&&
++                 dispatch.direct_grid[0]&&dispatch.direct_grid[1]&&dispatch.direct_grid[2],"direct dispatch has indirect/zero-grid fields");
++        } else {
++            need(dispatch.kind==Dispatch::Kind::Indirect,"unknown dispatch kind");
++            const auto g=grids_.find(dispatch.grid_copy_event);
++            need(g!=grids_.end()&&g->second.writer==w.id&&g->second.generation==w.generation&&
++              g->second.source==dispatch.arguments&&g->second.source_offset==dispatch.arguments_offset&&
++              buffer(dispatch.arguments).key==g->second.source_owner,"indirect dispatch lacks actual matching12-byte grid copy event");
++            (void)retain_owner(buffer(dispatch.arguments));
++        }
++        for(const auto& write:writes_)if(write.recording==w.recording&&write.event>=p.ready) {
++            const auto it=std::find_if(buffers_.begin(),buffers_.end(),[&](const auto& x){return x.second.key==write.allocation;});
++            need(it!=buffers_.end(),"writer owner generation disappeared");const auto o=owner(it->second,rs.key);
++            need(!(o.backing==c0owner.backing)||!protected_overlap(c0at,add(o.backing_offset,write.offset),write.size),"possible write overlaps selector lease");
++            (void)retain_owner(it->second);
++            in.additional_writes.push_back({write.kind,write.allocation,write.offset,write.size,write.event,write.event});
++        }
++        ci::detail::validate_owners(in);ci::detail::validate_view(in,in.c0,false);
++        for(const auto& r:in.roots)ci::detail::validate_view(in,r.view,true);
++        for(const auto& x:in.additional_writes)ci::detail::validate_write(in,x);
++        b.lease_=next();leases_[b.lease_]={w,c0owner.backing,c0at,false,b.pins_,b.imported_backings_};return b;
++    }
++    template<class DW> bool matches_pending(const Bundle& b,const DW& dw) const {
++        if(!valid(b))return false;
++        const auto p=writers_.find(b.writer_.id);
++        try {return p!=writers_.end()&&dw.prog==p->second.program&&pending_values(dw)==p->second.values;}
++        catch(const std::invalid_argument&) {return false;}
++    }
++    bool valid(const Bundle& b) const {
++        if(lost_)return false;
++        const auto l=leases_.find(b.lease_);if(l==leases_.end()||l->second.invalid)return false;
++        const auto p=writers_.find(b.writer_.id);if(p==writers_.end()||p->second.key.generation!=b.writer_.generation)return false;
++        const auto r=recordings_.find(b.writer_.recording);if(r==recordings_.end()||slots_.at(r->second.key.slot)!=r->second.key.id)return false;
++        try {
++            for(const auto& o:b.input_.owners) {const auto i=std::find_if(buffers_.begin(),buffers_.end(),[&](const auto& x){return x.second.key==o.allocation;});if(i==buffers_.end())return false;(void)owner(i->second,r->second.key);}
++            if(b.pins_.size()!=b.pin_facts_.size())return false;
++            for(std::size_t n=0;n<b.pins_.size();++n) {
++                if(!b.pins_[n])return false;
++                const auto a=b.pins_[n]->current(),e=b.pin_facts_[n];
++                if(std::tie(a.buffer,a.allocation,a.memory,a.memory_offset,a.size)!=std::tie(e.buffer,e.allocation,e.memory,e.memory_offset,e.size))return false;
++            }
++        }catch(const std::invalid_argument&){return false;}
++        return true;
++    }
++};
++} // namespace open_ocarina::selector_extract
++#endif
