@@ -23,7 +23,12 @@ on the A770. All 89,984 bytes match two fresh originals and two earlier
 references for the captured origin-128, two-group window; input buffers and
 guards remain unchanged. This complements its paired compiler results. It
 does not establish general equivalence, live integration, warp32 composition,
-native quality or a gameplay FPS improvement.
+native quality or a gameplay FPS improvement. A
+[705-group owned-output comparison](grok-d8-interval-grid.md) now passes
+every group of the same frozen input graph across 23 windows and 69 serial
+mesh draws at actual width 32. Every complete capture matches both originals;
+inputs and guards remain unchanged. This remains output validation without
+live integration or timing.
 
 The [cache-policy correction](mesa-cache-policy.md) now separates compiler settings
 across stage keys, pipeline caches and disk caches. The isolated driver reproduces
