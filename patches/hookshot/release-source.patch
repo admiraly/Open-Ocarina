@@ -150,7 +150,7 @@ index 1244ef2..f9ac6b6 100644
                        Content="NVIDIA DLSS (downloads NVIDIA's SDK under NVIDIA's license)"/>
              <TextBlock Style="{StaticResource Note}" FontSize="12" Margin="26,4,0,0" TextWrapping="Wrap"
 diff --git a/builder/HookshotBuilder/MainWindow.xaml.cs b/builder/HookshotBuilder/MainWindow.xaml.cs
-index a37424e..c2b610f 100644
+index a37424e..ee6ac00 100644
 --- a/builder/HookshotBuilder/MainWindow.xaml.cs
 +++ b/builder/HookshotBuilder/MainWindow.xaml.cs
 @@ -43,6 +43,8 @@ public partial class MainWindow : Window
@@ -279,7 +279,7 @@ index a37424e..c2b610f 100644
          var args = new List<string>();
          if (romfs != null && exefs != null) args.AddRange(new[] { "--romfs", romfs, "--exefs", exefs });
          else if (chosenNup != null) args.AddRange(new[] { "--nup", chosenNup });
-@@ -883,10 +907,125 @@ public partial class MainWindow : Window
+@@ -883,10 +907,128 @@ public partial class MainWindow : Window
          args.AddRange(new[] { "--out", OutPath.Text, "--language", lang.Code });
          if (FsrTick.IsChecked == true) args.Add("--fsr");   // (an --update of the folder keeps it: make_game.py's mark)
          prepareNow = PrepareTick.IsChecked == true;
@@ -388,9 +388,12 @@ index a37424e..c2b610f 100644
 +                RedirectStandardOutput = true,
 +                RedirectStandardError = true,
 +            };
++            if (tools.PythonArgs != null)
++                foreach (var a in tools.PythonArgs)
++                    si.ArgumentList.Add(a);
 +            si.ArgumentList.Add("-I");
 +            si.ArgumentList.Add("-B");
-+            si.ArgumentList.Add(tools.MakeGame);
++            si.ArgumentList.Add(Path.Combine(tools.Root, "nx2", "make_game.py"));
 +            si.ArgumentList.Add("--probe-system");
 +            using var p = Process.Start(si);
 +            if (p == null) return null;
@@ -406,7 +409,7 @@ index a37424e..c2b610f 100644
      const string DlssLicense =
          "NVIDIA DLSS is NVIDIA's, not Hookshot's. With it ticked, the build downloads NVIDIA's DLSS SDK (release v310.9.16) from " +
          "github.com/NVIDIA/DLSS, under NVIDIA's own license, the NVIDIA RTX SDKs license:\n\n" +
-@@ -1370,7 +1509,7 @@ public partial class MainWindow : Window
+@@ -1370,7 +1512,7 @@ public partial class MainWindow : Window
              Application.Current.Shutdown();
              return;
          }
@@ -415,7 +418,7 @@ index a37424e..c2b610f 100644
      }
  
      // ================= the update (Updater.cs): the game started this app with --update <folder> =================
-@@ -1452,7 +1591,7 @@ public partial class MainWindow : Window
+@@ -1452,7 +1594,7 @@ public partial class MainWindow : Window
  
      void CloseWindow(object sender, RoutedEventArgs e)
      {
@@ -424,7 +427,7 @@ index a37424e..c2b610f 100644
          runner?.Cancel();
          Close();
      }
-@@ -1586,3 +1725,30 @@ sealed class StepRow
+@@ -1586,3 +1728,30 @@ sealed class StepRow
          number.Foreground = B("Bad");
      }
  }
@@ -941,7 +944,7 @@ index 3ad0a84..74b59a4 100644
                                 L"This is on GitHub's side: try again in a few minutes, or later today."
                               : L"Could not reach GitHub to get the Hookshot Builder. Check your internet connection and try again.");
 diff --git a/host/hos_update.c b/host/hos_update.c
-index 07198f3..f22f87a 100644
+index 07198f3..c64e21e 100644
 --- a/host/hos_update.c
 +++ b/host/hos_update.c
 @@ -1,5 +1,5 @@
@@ -951,6 +954,15 @@ index 07198f3..f22f87a 100644
     that made the folder (hookshot_version.txt, written by nx2/make_game.py) with --update: it downloads the new release and builds the
     folder again from the game files the folder keeps, and the game closes. A folder with no hookshot_version.txt (built from the
     repository, or before updates came in) is never asked about. HOOKSHOT_NO_UPDATE_CHECK=1 (hookshot_env.txt) turns it off */
+@@ -44,7 +44,7 @@ static int parse_version(const char *s, long v[4]) {
+         if (i < 2 && *s++ != '.') return 0;
+     }
+     if (!*s) return v[3] = 0x7fffffffL, 1;
+-    if (strncmp(s, "-rc.", 4) || !isdigit((unsigned char)s[4])) return 0;
++    if ((strncmp(s, "-rc.", 4) && strncmp(s, "-oo.", 4)) || !isdigit((unsigned char)s[4])) return 0;
+     v[3] = strtol(s + 4, &e, 10);
+     return !*e;
+ }
 @@ -104,8 +104,8 @@ static int newest_tag(const char *body, char *tag, size_t cap) {
  #include <string.h>
  
