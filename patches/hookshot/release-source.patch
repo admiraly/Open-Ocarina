@@ -1,0 +1,144 @@
+diff --git a/builder/HookshotBuilder/MainWindow.xaml.cs b/builder/HookshotBuilder/MainWindow.xaml.cs
+index a37424e..497f6d4 100644
+--- a/builder/HookshotBuilder/MainWindow.xaml.cs
++++ b/builder/HookshotBuilder/MainWindow.xaml.cs
+@@ -1370,7 +1370,7 @@ public partial class MainWindow : Window
+             Application.Current.Shutdown();
+             return;
+         }
+-        Process.Start(new ProcessStartInfo("https://github.com/NotRexed/Hookshot/releases/latest") { UseShellExecute = true });
++        Process.Start(new ProcessStartInfo("https://github.com/admiraly/Open-Ocarina/releases/latest") { UseShellExecute = true });
+     }
+ 
+     // ================= the update (Updater.cs): the game started this app with --update <folder> =================
+diff --git a/builder/HookshotBuilder/Updater.cs b/builder/HookshotBuilder/Updater.cs
+index fc59cfc..7b12efc 100644
+--- a/builder/HookshotBuilder/Updater.cs
++++ b/builder/HookshotBuilder/Updater.cs
+@@ -14,7 +14,7 @@ namespace HookshotBuilder;
+ /// folder keeps).
+ static class Updater
+ {
+-    const string Latest = "https://api.github.com/repos/NotRexed/Hookshot/releases/latest";
++    const string Latest = "https://api.github.com/repos/admiraly/Open-Ocarina/releases/latest";
+     const string Asset = "HookshotBuilder.zip";
+     const string SetupAsset = "HookshotBuilder.exe";            // (the setup, builder/setup/setup.c: a release holds it and its list)
+     const string SetupList = "hookshot-setup.txt";              // (scripts/make_setup_parts.py)
+@@ -38,7 +38,7 @@ static class Updater
+     // ---- the update tracks (the Track menu; by default the track of these tools). host/hos_update.c and
+     // builder/linux/linux_update.py have the same rules ----
+     public const string Release = "release", Candidate = "rc", Nightly = "nightly";
+-    const string Releases = "https://api.github.com/repos/NotRexed/Hookshot/releases";
++    const string Releases = "https://api.github.com/repos/admiraly/Open-Ocarina/releases";
+     static readonly System.Text.RegularExpressions.Regex NightlyName = new(@"-\d+-g[0-9a-f]+(-dirty)?$");
+     static readonly System.Text.RegularExpressions.Regex ReleaseName = new(@"^v(\d+)\.(\d+)\.(\d+)(?:-rc\.(\d+))?$");
+ 
+@@ -93,7 +93,7 @@ static class Updater
+             {
+                 try
+                 {
+-                    var list = await http.GetStringAsync("https://github.com/NotRexed/Hookshot/releases/download/nightly/" + SetupList);
++                    var list = await http.GetStringAsync("https://github.com/admiraly/Open-Ocarina/releases/download/nightly/" + SetupList);
+                     foreach (var line in list.Split('\n'))
+                         if (line.StartsWith("tag ")) return line[4..].Trim();
+                 }
+@@ -152,7 +152,7 @@ static class Updater
+         {
+             try
+             {
+-                var list = await http.GetStringAsync("https://github.com/NotRexed/Hookshot/releases/latest/download/" + SetupList);
++                var list = await http.GetStringAsync("https://github.com/admiraly/Open-Ocarina/releases/latest/download/" + SetupList);
+                 foreach (var line in list.Split('\n'))
+                     if (line.StartsWith("tag ")) return line[4..].Trim();
+             }
+diff --git a/builder/linux/linux_update.py b/builder/linux/linux_update.py
+index e31436f..e5c1fc8 100644
+--- a/builder/linux/linux_update.py
++++ b/builder/linux/linux_update.py
+@@ -23,9 +23,9 @@ import zipfile
+ from part_links import SYSROOT_PART, is_absolute_link, relative_sysroot_link
+ 
+ LIST_NAME = "hookshot-linux.txt"
+-LATEST_LIST = "https://github.com/NotRexed/Hookshot/releases/latest/download/" + LIST_NAME
+-LATEST_API = "https://api.github.com/repos/NotRexed/Hookshot/releases/latest"
+-RELEASES_API = "https://api.github.com/repos/NotRexed/Hookshot/releases?per_page=20"
++LATEST_LIST = "https://github.com/admiraly/Open-Ocarina/releases/latest/download/" + LIST_NAME
++LATEST_API = "https://api.github.com/repos/admiraly/Open-Ocarina/releases/latest"
++RELEASES_API = "https://api.github.com/repos/admiraly/Open-Ocarina/releases?per_page=20"
+ # (the update tracks: the builder's Track choice, by default the track of the build installed. The game's own check,
+ # host/hos_update.c, and the Windows builder, Updater.cs, use the same rules)
+ TRACKS = ("release", "rc", "nightly")
+@@ -130,7 +130,7 @@ def release_of(tag):
+ def list_url(tag=None):
+     if not tag:
+         return LATEST_LIST
+-    return "https://github.com/NotRexed/Hookshot/releases/download/%s/%s" % (release_of(tag), LIST_NAME)
++    return "https://github.com/admiraly/Open-Ocarina/releases/download/%s/%s" % (release_of(tag), LIST_NAME)
+ 
+ 
+ def newest_release(tags):
+diff --git a/builder/py/hookshot_builder/__init__.py b/builder/py/hookshot_builder/__init__.py
+index 168273f..85b7345 100644
+--- a/builder/py/hookshot_builder/__init__.py
++++ b/builder/py/hookshot_builder/__init__.py
+@@ -3,4 +3,4 @@ Qt's DLLs (both signed by their makers), with no executable of Hookshot's own to
+ (builder/setup/setup.c): it reads a release's hookshot-setup.txt, downloads the parts it names, checks each one's SHA-256 and
+ unpacks them into %LOCALAPPDATA%\\HookshotBuilder\\versions\\<tag>."""
+ APP_ID = "NotRexed.Hookshot.Builder"   # (Windows' AppUserModelID: the taskbar groups and shows the window as Hookshot, not Python)
+-REPO = "NotRexed/Hookshot"
++REPO = "admiraly/Open-Ocarina"
+diff --git a/builder/setup/setup.c b/builder/setup/setup.c
+index 3ad0a84..74b59a4 100644
+--- a/builder/setup/setup.c
++++ b/builder/setup/setup.c
+@@ -661,8 +661,8 @@ static const char *manifest_url(void) {
+     if (!tag[0] && HOOKSHOT_SETUP_RELEASE[0] && strlen(HOOKSHOT_SETUP_RELEASE) < sizeof tag) strcpy(tag, HOOKSHOT_SETUP_RELEASE);
+     if (e && *e) snprintf(u, sizeof u, "%s", e);
+     else if (tag[0])
+-        snprintf(u, sizeof u, "https://github.com/NotRexed/Hookshot/releases/download/%s/hookshot-setup.txt", nightly_tag(tag) ? "nightly" : tag);
+-    else snprintf(u, sizeof u, "%s", "https://github.com/NotRexed/Hookshot/releases/latest/download/hookshot-setup.txt");
++        snprintf(u, sizeof u, "https://github.com/admiraly/Open-Ocarina/releases/download/%s/hookshot-setup.txt", nightly_tag(tag) ? "nightly" : tag);
++    else snprintf(u, sizeof u, "%s", "https://github.com/admiraly/Open-Ocarina/releases/latest/download/hookshot-setup.txt");
+     return u;
+ }
+ 
+@@ -715,7 +715,7 @@ static DWORD WINAPI work(LPVOID unused) {
+     if (!ok)
+         fail(g_http_status == 404
+                  ? L"The latest Hookshot release has no setup files yet. Download HookshotBuilder.zip from the releases page for now: "
+-                   L"https://github.com/NotRexed/Hookshot/releases/latest"
++                   L"https://github.com/admiraly/Open-Ocarina/releases/latest"
+              : g_http_status ? L"GitHub's download servers are failing right now (an error 500 or above, tried 8 times over 3 minutes). "
+                                L"This is on GitHub's side: try again in a few minutes, or later today."
+                              : L"Could not reach GitHub to get the Hookshot Builder. Check your internet connection and try again.");
+diff --git a/recomplauncher.json b/recomplauncher.json
+index 9a22072..04fd91e 100644
+--- a/recomplauncher.json
++++ b/recomplauncher.json
+@@ -2,7 +2,7 @@
+   "$schema": "https://recomplauncher.com/schema/recomplauncher.json",
+   "format": 1,
+   "name": "Hookshot",
+-  "repo": "NotRexed/Hookshot",
++  "repo": "admiraly/Open-Ocarina",
+   "game": {
+     "kind": "iso_or_folder",
+     "label": "Your copy of The Legend of Zelda: Ocarina of Time for Nintendo Switch 2, version 131072 (build e0f3ccfa): the .nup file, or the folder that holds its romfs and exefs.",
+diff --git a/scripts/linux/appimage.sh b/scripts/linux/appimage.sh
+index 4044d1a..ca141bd 100755
+--- a/scripts/linux/appimage.sh
++++ b/scripts/linux/appimage.sh
+@@ -23,10 +23,10 @@ PY=$DEPS/python/bin/python3
+ 
+ # ---- the Vulkan back end, built here once (it needs no game) ----
+ VKW=$B/vk-work
+-rm -rf "$VKW/sa/build/hookshot_vk.so"
++rm -rf "$VKW/sa/build/open-ocarina_vk.so"
+ OOT_WORK=$VKW RX_MARCH=x86-64-v3 RX_VK_ONLY=1 RX_RELEASE=1 "$PY" -I nx2/build.py --standalone --jobs "${JOBS:-$(nproc)}"
+-VK=$VKW/sa/build/hookshot_vk.so
+-[ -f "$VK" ] || { echo "hookshot_vk.so was not built"; exit 1; }
++VK=$VKW/sa/build/open-ocarina_vk.so
++[ -f "$VK" ] || { echo "open-ocarina_vk.so was not built"; exit 1; }
+ 
+ # ---- the tools' native helpers, built now: the AppImage is read-only. a64emit with its C++ runtime inside (the one this system
+ # builds with is newer than older systems have), and the stamp build_emit.py checks, so it is not built again ----

@@ -1,0 +1,239 @@
+# Open-Ocarina's downloadable builds, made without game data, from the Hookshot source snapshot on the
+# hookshot-upstream branch (GPL-3.0) with patches/hookshot/variant-name.patch and release-source.patch applied.
+#   linux:   the AppImage builder, as upstream's linux-appimage.yml and scripts/linux/appimage.sh make it.
+#   windows: open-ocarina_vk.dll (llvm-mingw) and the patched source a Windows PC builds the game from.
+#   publish: only when asked (inputs.publish): a prerelease with those files.
+# No game file is read here and no game executable is made: that happens on the PC that owns the game.
+name: Release builds (game-free)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: the version and release tag, such as v2.1.0-oo.1
+        type: string
+        required: true
+      publish:
+        description: publish a prerelease with the built files
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.tag }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  # (the snapshot's tree: Hookshot at 4cf785a0b143bb34026506c9a3fe4f4bb93c797d, docs/variant-name.md)
+  HOOKSHOT_TREE: 80b9c86dd9eb72ee843df56bc3252514693848fa
+  TAG: ${{ inputs.tag }}
+
+jobs:
+  linux:
+    name: Linux AppImage
+    runs-on: ubuntu-latest
+    container: ubuntu:22.04
+    timeout-minutes: 90
+    steps:
+      - name: Package installs without fsync
+        run: echo force-unsafe-io > /etc/dpkg/dpkg.cfg.d/force-unsafe-io
+      # (the packages upstream's linux-appimage.yml installs)
+      - name: System packages
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          retry_packages() {
+            for try in 1 2 3; do
+              if "$@"; then return 0; else package_status=$?; fi
+              if [ "$try" = 3 ]; then return "$package_status"; fi
+              sleep 20
+            done
+          }
+          base_packages() {
+            apt-get update &&
+              apt-get install -y --no-install-recommends software-properties-common gpg-agent
+          }
+          toolchain_packages() {
+            timeout --kill-after=5s 180s add-apt-repository -y --no-update ppa:ubuntu-toolchain-r/test &&
+              apt-get update &&
+              apt-get install -y --no-install-recommends g++-13 libstdc++-13-dev &&
+              apt-get install -y --no-install-recommends git ca-certificates curl xz-utils zstd file unzip python3 \
+              build-essential gcc-12 g++-12 libstdc++-12-dev nasm meson ninja-build cmake pkg-config \
+              libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxi-dev libxss-dev libxfixes-dev libxinerama-dev \
+              libxkbcommon-dev libwayland-dev wayland-protocols libdecor-0-dev libegl-dev libgles-dev libdrm-dev libgbm-dev \
+              libpulse-dev libasound2-dev libpipewire-0.3-dev libudev-dev libdbus-1-dev libxft-dev libfontconfig1-dev zlib1g-dev
+          }
+          retry_packages base_packages
+          retry_packages toolchain_packages
+      - name: Check out the Hookshot snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: hookshot-upstream
+          persist-credentials: false
+      - name: Check out Open-Ocarina
+        uses: actions/checkout@v4
+        with:
+          path: _oo
+          persist-credentials: false
+      - name: Trust the checkout
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: Apply the patches
+        run: |
+          test "$(git rev-parse 'HEAD^{tree}')" = "$HOOKSHOT_TREE"
+          git apply --index _oo/patches/hookshot/variant-name.patch
+          git apply --index _oo/patches/hookshot/release-source.patch
+          git diff --cached --stat | tail -1
+      - name: Dependencies (LLVM, Python, FFmpeg with dav1d, SDL2, Vulkan headers)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: scripts/linux/deps.sh
+      - name: AppImage
+        env:
+          HOOKSHOT_VERSION: ${{ inputs.tag }}
+          HOOKSHOT_UPDATE_RELEASE: latest
+        run: scripts/linux/appimage.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: open-ocarina-linux
+          path: |
+            build-linux/*.AppImage
+            build-linux/*.AppImage.zsync
+            build-linux/parts/hookshot-linux.txt
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: open-ocarina-linux-parts
+          path: build-linux/parts/
+          if-no-files-found: error
+      # (upstream's check that the AppImage builds a game folder from a made-up game: reported, not required yet)
+      - name: A player's build from the AppImage
+        continue-on-error: true
+        run: scripts/linux/check_player_build.sh
+
+  windows:
+    name: Windows back end and source package
+    runs-on: windows-2022
+    timeout-minutes: 60
+    steps:
+      - name: Check out the Hookshot snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: hookshot-upstream
+          persist-credentials: false
+      - name: Check out Open-Ocarina
+        uses: actions/checkout@v4
+        with:
+          path: _oo
+          persist-credentials: false
+      - name: Apply the patches
+        run: |
+          test "$(git rev-parse 'HEAD^{tree}')" = "$HOOKSHOT_TREE"
+          git apply --index _oo/patches/hookshot/variant-name.patch
+          git apply --index _oo/patches/hookshot/release-source.patch
+          git diff --cached --stat | tail -1
+      # (the headers in the CPM cache layout nx2/build.py reads, at the versions upstream's workflow pins)
+      - name: Check out pinned Vulkan headers
+        uses: actions/checkout@v4
+        with:
+          repository: KhronosGroup/Vulkan-Headers
+          ref: 74d8a6cb930c68ef617b202c3ff3c59d919e086b # v1.4.345
+          path: _deps/cpm/vulkanheaders/v1.4.345
+          persist-credentials: false
+      - name: Check out pinned SPIR-V headers
+        uses: actions/checkout@v4
+        with:
+          repository: KhronosGroup/SPIRV-Headers
+          ref: 04f10f650d514df88b76d25e83db360142c7b174 # vulkan-sdk-1.4.341.0
+          path: _deps/cpm/spirv-headers/vulkan-sdk-1.4.341.0
+          persist-credentials: false
+      - name: Check out pinned VulkanMemoryAllocator
+        uses: actions/checkout@v4
+        with:
+          repository: GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
+          ref: 1d8f600fd424278486eade7ed3e877c99f0846b1 # v3.3.0
+          path: _deps/cpm/vulkanmemoryallocator/v3.3.0
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: llvm-mingw
+        run: echo "HOOKSHOT_MINGW=$(python -I scripts/release_parts.py llvm-mingw "$RUNNER_TEMP/llvm")" >> "$GITHUB_ENV"
+      # (the back end alone, no lift, no game: as upstream's vulkan job builds it)
+      - name: open-ocarina_vk.dll
+        env:
+          RX_VK_ONLY: '1'
+          RX_RELEASE: '1'
+        run: |
+          OOT_WORK="$RUNNER_TEMP/vk-work" RX_CPM="$GITHUB_WORKSPACE/_deps/cpm" \
+            python -I nx2/build.py --standalone --jobs "$NUMBER_OF_PROCESSORS"
+          ls -l "$RUNNER_TEMP/vk-work/sa/build/open-ocarina_vk.dll"
+      # (the patched tree as git holds it: tracked source only, nothing from a game, no build output)
+      - name: Source package
+        run: |
+          mkdir -p dist
+          name="Open-Ocarina-$TAG-windows-source"
+          git archive --format=zip --prefix="$name/" -o "dist/$name.zip" "$(git write-tree)"
+          cp "$RUNNER_TEMP/vk-work/sa/build/open-ocarina_vk.dll" dist/
+          cp _oo/docs/windows.md dist/WINDOWS.md
+          ls -l dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: open-ocarina-windows
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    name: Prerelease
+    if: inputs.publish
+    needs: [linux, windows]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: open-ocarina-linux
+          path: dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: open-ocarina-linux-parts
+          path: parts
+      - uses: actions/download-artifact@v4
+        with:
+          name: open-ocarina-windows
+          path: dist
+      # (the parts the Linux updater downloads, named by hookshot-linux.txt: where scripts/linux/appimage.sh said they are)
+      - name: Update parts to linux-parts
+        run: |
+          if ! gh release view linux-parts >/dev/null 2>&1; then
+            gh release create linux-parts --prerelease --latest=false --target "$GITHUB_SHA" --title linux-parts \
+              --notes "The parts the Linux builder's updater downloads, named by each release's hookshot-linux.txt."
+          fi
+          have=$(gh release view linux-parts --json assets --jq '.assets[].name')
+          for f in parts/*; do
+            n=$(basename "$f")
+            [ "$n" = hookshot-linux.txt ] && continue
+            grep -qxF "$n" <<<"$have" && { echo "$n: already there"; continue; }
+            gh release upload linux-parts "$f"
+          done
+      - name: Prerelease
+        run: |
+          find dist -type f | sort
+          files=$(find dist -type f)
+          (cd dist && find . -type f ! -name SHA256SUMS -printf '%P\n' | sort | xargs sha256sum > SHA256SUMS)
+          gh release create "$TAG" --prerelease --latest=false --target "$GITHUB_SHA" --title "Open-Ocarina $TAG" \
+            --notes-file docs/release-notes.md $files dist/SHA256SUMS

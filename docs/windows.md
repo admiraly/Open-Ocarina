@@ -4,9 +4,9 @@ Status: the game-free Windows pieces are built on GitHub; the game itself is bui
 
 ## What GitHub builds
 
-The [Windows build workflow](../.github/workflows/windows.yml) produces one artifact, `open-ocarina-windows`, without any game data:
+The [release workflow](../.github/workflows/release.yml) produces an artifact, `open-ocarina-windows`, without any game data:
 
-- `Open-Ocarina-<version>-windows-source.zip`: Hookshot at the pinned commit with [the variant patch](../patches/hookshot/variant-name.patch) applied, exactly the tracked source.
+- `Open-Ocarina-<version>-windows-source.zip`: the Hookshot snapshot with [the variant patch](../patches/hookshot/variant-name.patch) and [the release patch](../patches/hookshot/release-source.patch) applied, exactly the tracked source.
 - `open-ocarina_vk.dll`: the Vulkan back end compiled from that source with llvm-mingw. It shows the tree compiles for Windows; your own build compiles it again.
 - `SHA256SUMS`.
 
