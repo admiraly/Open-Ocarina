@@ -1,6 +1,6 @@
 # Optional native 6864 lowering overlay
 
-The new `patches/hookshot/mesh-warp32-profile96.patch` is an optional twelfth overlay after the frozen eleven-overlay renderer chain. It extends the existing two-ballot native writer to the exact timed `68642bb810ee3e7c` mesh family. This is CPU/build preparation, experimental and off by default. The frozen V2 patch, capture96 patch, structural writer and original replay/instrumentation tools remain unchanged.
+The new `patches/hookshot/mesh-warp32-profile96.patch` is an optional twelfth overlay after the frozen eleven-overlay renderer chain. It extends the existing two-ballot native writer to the exact timed `68642bb810ee3e7c` mesh family. It remains experimental and off by default. CPU/build preparation now has a separate [paired compiler observation](../research/native-mesh-profile96-codegen-observation.json); the frozen V2 patch, capture96 patch, structural writer and original replay/instrumentation tools remain unchanged.
 
 [Sanitized build metadata](../research/native-mesh-profile96-lowering.json) records all twelve patch hashes, reviewed source hashes, binary identity, CPU comparisons and limitations. The [family inventory](../research/mesh-family-audit.md) explains target priority and why the larger43ec family cannot use this lowering.
 
@@ -31,7 +31,37 @@ The generic production C++ core accepts the exact6864 original without modificat
 
 The previously replayed6864 Python candidate `a41c6df753f30f8c0646ffa45227304e994b3fbaccdcad64927cd57f5e2327e7` was assembled without preserving numeric IDs. Re-disassembling both6864 candidates with raw IDs and assembling both under that same canonicalizing tool produces exactly `a41c…`. This CPU word/ID correspondence supports semantic review; **it does not mean raw43434 was executed**. The native writer is retained unchanged instead of adding an ID renumbering pass merely to reproduce an assembler's numbering.
 
-The existing replay executor admits a41c only. Before live opt-in, raw43434 needs separate reviewed admission/instrumentation and replay, or paired actual compiler GEN IR evidence. Previously matching output from a41c must retain its original identity. The captured launch is67×1×1. The [completed supporting comparison](../research/native-mesh-replay-e5-observation.json) covers all67 workgroups across three windows, with repeated original32 and Python candidate8/16 complete output buffers matching in each window. This does not validate execution of raw43434. Rendering and performance remain unproved.
+The existing replay executor labels its admitted source a41c. Previously matching output from a41c retains that original identity. The captured launch is67×1×1. The [completed supporting comparison](../research/native-mesh-replay-e5-observation.json) covers all67 workgroups across three windows, with repeated original32 and Python candidate8/16 complete output buffers matching in each window. The subsequent [instrumentation correspondence](native-mesh-profile96-instrumentation-correspondence.md) establishes that raw43434 produces the exact same instrumented conditional module under the frozen instrumenter. Paired compiler evidence below separately checks the raw sources. Neither observation is a direct dispatch of uninstrumented raw43434. Rendering and performance remain unproved.
+
+## Paired E5 compiler evidence
+
+[New sanitized metadata](../research/native-mesh-profile96-codegen-observation.json)
+records four sequential, optimized mesh+fragment pipeline compilations: native
+43434… and Python a41c… at requested widths8 and16, using the exact same fragment
+3de1… and E5/native-safe policy. Compiler executable properties confirm mesh8/16
+and fragment8. All four owned processes stopped and reaped; no queue was retrieved,
+no commands submitted and no shader drawn or dispatched. The actual629add renderer
+remains unlaunched by this observation.
+
+Within each width, mesh and fragment GEN Assembly and shader push maps are
+byte-exact, and all fifteen numeric code-generation statistics match. The mesh's
+only Final NIR difference is its exact second-row source_blake3 identity digest,
+crosschecked to the uniquely named UINT64 Source hash statistic. Every other NIR
+byte matches. Fragment NIR matches completely. Twenty-two comparator cases and the
+saved actual D8 pair test those narrow metadata exceptions; unknown fields,
+statistic shape changes, NIR body differences and codegen differences fail.
+
+The reviewed caches were initially empty and isolated per case, with writes
+enabled; disk-cache disabling was not set. No cache was imported or reused between
+cases. This amendment and the source-backed empty-directory evidence are explicit
+in the observation. Compile times are not compared.
+
+This is diagnostic-state codegen evidence. Attachments and retained NVN state are
+associated with the exact capture, but runtime Intel EQ_BIAS depth adjustments,
+the flipped viewport and other effective dynamic state are not reproduced.
+Matching compiler output neither executes raw43434 nor establishes complete
+runtime-pipeline, native-quality or performance acceptance. It remains separate
+from the original a41c replay and the instrumentation correspondence.
 
 ## Cache and pipeline paths
 
@@ -56,4 +86,4 @@ The broader vendor game-free suite reported449pass/9fail/64skip. All nine failin
 
 The isolated renderer is under ignored `local/mesh-warp32-profile96-renderer-build/sa/build/hookshot_vk.so`; receipt, source manifest, comparisons and private logs are under `local/mesh-warp32-profile96-native/`. The reconstructed twelve-overlay tree is `58ca709617448e06af382c3443dd88dac3ffcb8e`. No device, pipeline, game or play test was performed for this new build. No commit or publication was made by this task.
 
-The main remaining objections are raw43434 execution identity and its own full-grid validation, original shared-memory race-freedom limitations, native scene quality and matched ordinary FPS. Completed Python-candidate replay and ID correspondence are supporting evidence, not completion of those requirements.
+The remaining integration boundary is the unmodified629add renderer's actual selected-module evidence and broader rendering/performance validation. The exact [instrumentation correspondence](native-mesh-profile96-instrumentation-correspondence.md) and paired compiler observation relate the native writer to the completed chosen67-group comparison without claiming direct raw43434 execution or adding a redundant ABI. Original shared-memory race-freedom limitations, native scene quality and matched ordinary execution measurements remain separate requirements.

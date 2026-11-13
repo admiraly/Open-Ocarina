@@ -1,0 +1,348 @@
+{
+  "schema": "open-ocarina.native-mesh-profile96-instrumentation-correspondence/v1",
+  "observed_date": "2026-11-13",
+  "method": "CPU-only hash-guarded raw-source preparation and exact module/normalized audit comparison; no Vulkan API calls",
+  "source_pair": {
+    "original_sha256": "999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93",
+    "python_conditional_sha256": "a41c6df753f30f8c0646ffa45227304e994b3fbaccdcad64927cd57f5e2327e7",
+    "native_conditional_sha256": "43434b023ff17ee4b92ed8e49f19c937c86f15cf31a7034161dd11878f944099"
+  },
+  "frozen_sources": {
+    "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+    "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+    "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+  },
+  "execution_sources_unchanged": {
+    "tools/mesh_replay.py": "f75a509df716ffdb89c999c6967003e846622336b6be7afa791669fdd62518a6",
+    "tools/vulkan_mesh_replay.c": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+    "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+    "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+    "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+    "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c",
+    "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+    "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+    "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+  },
+  "original_derivative_sha256": "2d0bd1c6dfb72398a30c6ad4539be01dae27fbc1c92e963de2b2e3db9c381682",
+  "shared_conditional_derivative_sha256": "8e10dad18d4b674df682ee03c00b507457de8c691d4e72f85919ce056128e573",
+  "fresh_artifacts": [
+    {
+      "label": "native434_fresh",
+      "files": {
+        "instrumented.spv": {
+          "sha256": "8e10dad18d4b674df682ee03c00b507457de8c691d4e72f85919ce056128e573",
+          "bytes": 285096
+        },
+        "instrumented.spvasm": {
+          "sha256": "03b976bf6c8b7d963f20007643455fa77100dd00a8d74bb006122e76a528641c",
+          "bytes": 627476
+        },
+        "report.json": {
+          "sha256": "de9b5e2007d395c57e58f03246f6a7f640ef6839e26a8dffc04c462e0e1dbe43",
+          "bytes": 5935
+        },
+        "source.canonical.spv": {
+          "sha256": "a41c6df753f30f8c0646ffa45227304e994b3fbaccdcad64927cd57f5e2327e7",
+          "bytes": 252840
+        },
+        "source.raw-id.spvasm": {
+          "sha256": "1ad2de0d3643205b0855bb5956171d229a8629359d69df42b19dd2673a51e6ff",
+          "bytes": 552343
+        },
+        "source.spv": {
+          "sha256": "43434b023ff17ee4b92ed8e49f19c937c86f15cf31a7034161dd11878f944099",
+          "bytes": 252840
+        }
+      }
+    },
+    {
+      "label": "python_a41c_fresh",
+      "files": {
+        "instrumented.spv": {
+          "sha256": "8e10dad18d4b674df682ee03c00b507457de8c691d4e72f85919ce056128e573",
+          "bytes": 285096
+        },
+        "instrumented.spvasm": {
+          "sha256": "3645693e4dbba78d6bc3f8eeec678e2fd6cb3b72a398a886e62bf062b6e74cb9",
+          "bytes": 638342
+        },
+        "report.json": {
+          "sha256": "f8ae24bd2ae944224e0e4b73f3c899ac433dcdc55c65a89741fc8a01982fc357",
+          "bytes": 5922
+        },
+        "source.spv": {
+          "sha256": "a41c6df753f30f8c0646ffa45227304e994b3fbaccdcad64927cd57f5e2327e7",
+          "bytes": 252840
+        }
+      }
+    },
+    {
+      "label": "original999c_fresh",
+      "files": {
+        "instrumented.spv": {
+          "sha256": "2d0bd1c6dfb72398a30c6ad4539be01dae27fbc1c92e963de2b2e3db9c381682",
+          "bytes": 280680
+        },
+        "instrumented.spvasm": {
+          "sha256": "ac9277a1a1bc12ee7bf6d82edc28fc45ac9833f5e52c35b46eb65f4095052764",
+          "bytes": 617711
+        },
+        "report.json": {
+          "sha256": "c8c7c9998f457c24e1f9b7d4db94c542f583d2ca7f1bf5ac267fee70ca71895a",
+          "bytes": 5932
+        },
+        "source.spv": {
+          "sha256": "999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93",
+          "bytes": 248424
+        }
+      }
+    }
+  ],
+  "SPIRV_tools_versions": {
+    "spirv-as": "SPIRV-Tools v2026.1 unknown hash, 2026-02-16T00:00:00+00:00\nTarget: SPIR-V 1.6",
+    "spirv-dis": "SPIRV-Tools v2026.1 unknown hash, 2026-02-16T00:00:00+00:00\nTarget: SPIR-V 1.5",
+    "spirv-val": "SPIRV-Tools v2026.1 unknown hash, 2026-02-16T00:00:00+00:00\nTargets:\n  SPIR-V 1.0\n  SPIR-V 1.1\n  SPIR-V 1.2\n  SPIR-V 1.3\n  SPIR-V 1.4\n  SPIR-V 1.5\n  SPIR-V 1.6\n  SPIR-V 1.2 (under OpenCL 2.2 Full Profile semantics)\n  SPIR-V 1.0 (under Vulkan 1.0 semantics)\n  SPIR-V 1.3 (under Vulkan 1.1 semantics)\n  SPIR-V 1.4 (under Vulkan 1.1 semantics)\n  SPIR-V 1.5 (under Vulkan 1.2 semantics)\n  SPIR-V 1.6 (under Vulkan 1.3 semantics) SPIR-V 1.6 (under Vulkan 1.4 semantics)"
+  },
+  "checks": {
+    "all_source_and_derivative_modules_SPIRV_validated": true,
+    "target_environment": "vulkan1.3 --uniform-buffer-standard-layout",
+    "raw434_disassemble_reassemble_equals_python_a41c_bytes": true,
+    "raw_canonicalization": "spirv-dis --raw-id; spirv-as --target-env spv1.6; no optimizer or algebraic transform",
+    "instrumented_conditional_modules_byte_identical": true,
+    "instrumented_assembly_text_byte_identical": false,
+    "report_differing_fields": [
+      "input_bindings",
+      "source_module_sha256"
+    ],
+    "input_bindings_difference": "SSA variable ID names only; all descriptor kinds/counts/read/store/length-query metadata identical",
+    "remaining_audit_report_fields_equal": true,
+    "shared_executed_conditional_module_byte_identical": true,
+    "original_executed_instrumented_module_unchanged": true
+  },
+  "unchanged_audit": {
+    "source_kind": "conditional",
+    "output_store_sites": 138,
+    "all_original_output_stores_preserved": true,
+    "all_original_set_mesh_outputs_preserved": true,
+    "all_original_control_barriers_preserved": true,
+    "conditional_original_barriers": 4,
+    "original_source_barriers": 2,
+    "original_input_bindings_readonly": true,
+    "original_push_constant_bytes": 0,
+    "input_bindings_without_SSA_names": [
+      {
+        "set": 0,
+        "binding": 0,
+        "descriptor_type": "uniform_buffer",
+        "descriptor_count": 1,
+        "loads": 64,
+        "stores": 0,
+        "length_queries": 0,
+        "image_reads": 0,
+        "image_writes": 0,
+        "image_queries": 0
+      },
+      {
+        "set": 0,
+        "binding": 1,
+        "descriptor_type": "uniform_buffer",
+        "descriptor_count": 1,
+        "loads": 162,
+        "stores": 0,
+        "length_queries": 0,
+        "image_reads": 0,
+        "image_writes": 0,
+        "image_queries": 0
+      },
+      {
+        "set": 0,
+        "binding": 2,
+        "descriptor_type": "uniform_buffer",
+        "descriptor_count": 1,
+        "loads": 38,
+        "stores": 0,
+        "length_queries": 0,
+        "image_reads": 0,
+        "image_writes": 0,
+        "image_queries": 0
+      },
+      {
+        "set": 0,
+        "binding": 3,
+        "descriptor_type": "uniform_buffer",
+        "descriptor_count": 1,
+        "loads": 1,
+        "stores": 0,
+        "length_queries": 0,
+        "image_reads": 0,
+        "image_writes": 0,
+        "image_queries": 0
+      },
+      {
+        "set": 0,
+        "binding": 4,
+        "descriptor_type": "storage_buffer",
+        "descriptor_count": 1,
+        "loads": 10,
+        "stores": 0,
+        "length_queries": 2,
+        "image_reads": 0,
+        "image_writes": 0,
+        "image_queries": 0
+      },
+      {
+        "set": 0,
+        "binding": 5,
+        "descriptor_type": "storage_buffer",
+        "descriptor_count": 1,
+        "loads": 12,
+        "stores": 0,
+        "length_queries": 2,
+        "image_reads": 0,
+        "image_writes": 0,
+        "image_queries": 0
+      },
+      {
+        "set": 0,
+        "binding": 6,
+        "descriptor_type": "storage_buffer",
+        "descriptor_count": 1,
+        "loads": 11,
+        "stores": 0,
+        "length_queries": 2,
+        "image_reads": 0,
+        "image_writes": 0,
+        "image_queries": 0
+      },
+      {
+        "set": 0,
+        "binding": 7,
+        "descriptor_type": "storage_buffer",
+        "descriptor_count": 1,
+        "loads": 14,
+        "stores": 0,
+        "length_queries": 2,
+        "image_reads": 0,
+        "image_writes": 0,
+        "image_queries": 0
+      },
+      {
+        "set": 0,
+        "binding": 8,
+        "descriptor_type": "storage_buffer",
+        "descriptor_count": 3,
+        "loads": 2,
+        "stores": 0,
+        "length_queries": 2,
+        "image_reads": 0,
+        "image_writes": 0,
+        "image_queries": 0
+      }
+    ],
+    "record_layout": {
+      "stride_bytes": 36864,
+      "stride_words": 9216,
+      "prefix_guard_offset": 0,
+      "prefix_guard_bytes": 64,
+      "lane_counts_offset": 64,
+      "lane_count": 32,
+      "lane_count_stride": 8,
+      "position_offset": 320,
+      "generic_offset": 1856,
+      "generic_locations": [
+        0,
+        1,
+        2,
+        4,
+        5,
+        6,
+        7,
+        8,
+        11,
+        12
+      ],
+      "generic_array_stride": 1536,
+      "triangle_offset": 17216,
+      "triangle_array_stride": 16,
+      "writtenness_offset": 18752,
+      "writtenness_words": 4512,
+      "suffix_guard_offset": 36800,
+      "suffix_guard_bytes": 64,
+      "max_vertices": 96,
+      "max_primitives": 96,
+      "value_sentinel_word": 3452816845,
+      "inner_guard_word": 2703025498,
+      "writtenness_initial_word": 0,
+      "writtenness_written_word": 1
+    },
+    "dead_payload_cleanup": {
+      "present": true,
+      "proved_dead": true,
+      "word_index": 0,
+      "proof": "sole load is false arm of constant-true select choosing WorkgroupId.x"
+    },
+    "workgroup_origin_substitution": {
+      "enabled": true,
+      "operation": "original WorkgroupId load becomes raw WorkgroupId + control.origin",
+      "proof_scope": "read-only logical inputs; no NumWorkgroups/DrawIndex or live task payload; outputs implicit per workgroup",
+      "host_obligations": "origin/window must be inside captured native XYZ grid, positive, at most32 groups and match actual draw; capture/control must not alias each other or any original input"
+    },
+    "capture_descriptor": {
+      "set": 1,
+      "binding": 0,
+      "type": "storage_buffer"
+    },
+    "control_descriptor": {
+      "set": 1,
+      "binding": 1,
+      "type": "storage_buffer",
+      "byte_size": 32,
+      "readonly": true,
+      "layout": "uvec4 originXYZ/reserved0 at0; uvec4 windowXYZ/reserved0 at16"
+    }
+  },
+  "existing_runtime_evidence": {
+    "metadata": "research/native-mesh-replay-e5-observation.json",
+    "metadata_sha256": "749d7a3696c7a02e8853113f551f9d21812663c07c37957ccbfa5d5032bf15a0",
+    "historical_conditional_source_label_unchanged": "a41c6df753f30f8c0646ffa45227304e994b3fbaccdcad64927cd57f5e2327e7",
+    "executed_conditional_module_sha256": "8e10dad18d4b674df682ee03c00b507457de8c691d4e72f85919ce056128e573",
+    "executed_original_module_sha256": "2d0bd1c6dfb72398a30c6ad4539be01dae27fbc1c92e963de2b2e3db9c381682",
+    "raw434_directly_dispatched_in_these_runs": false,
+    "unique_workgroups": 67,
+    "real_cases": 12,
+    "actual_widths_per_window": [
+      32,
+      32,
+      8,
+      16
+    ],
+    "geometry_totals": {
+      "vertices": 6432,
+      "primitives": 4236
+    },
+    "helper_sha256": "b379519f9e24eed0d271f438848ecff560ec82b891b7c97f7f805bfaa938a398",
+    "wrapper_sha256": "f75a509df716ffdb89c999c6967003e846622336b6be7afa791669fdd62518a6",
+    "native_C_sha256": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+    "driver_library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+    "policy": "native-safe"
+  },
+  "conclusion": "Native raw434 has the same validated instrumented logical-output derivative as Python a41c, linking its logical-output lineage to the existing finite67group replay evidence. No repeated identical GPU run is needed for this CPU correspondence.",
+  "limitations": [
+    "Raw434 uninstrumented shader bytes were not directly dispatched in the historical67group comparisons; prior source labels and runtime records remain unchanged.",
+    "Instrumented derivative identity is not a measured raw uninstrumented driver pipeline comparison; that paired GEN task remains separate.",
+    "Same-value shared writes have no general race-freedom proof; historical draw atomicity/backing provenance and universal transformation equivalence remain unproven.",
+    "No final rendering or performance/FPS claim."
+  ],
+  "claims": {
+    "new_GPU_or_Vulkan_device_calls": false,
+    "new_executor_profile_or_ABI": false,
+    "frozen_sources_modified": false,
+    "historical_runs_relabelled": false,
+    "raw434_direct_dispatch_proven": false,
+    "finite_logical_output_lineage_supported": true,
+    "general_race_freedom_proven": false,
+    "historical_draw_reproduced": false,
+    "full_rendering_equivalence": false,
+    "fps_gain": false
+  }
+}

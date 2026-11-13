@@ -1,0 +1,269 @@
+{
+  "schema": "open-ocarina.compute-interval-lowering/v1",
+  "original_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+  "candidate_sha256": "d5148342b4517882b25a48e63700cbfb8695454cc05d131da718509ac2563dc0",
+  "tool_sha256": "3176a7e0130b5d722a88fdb2d5ab9512fff4afecf78e10828eb6747b38ca00ca",
+  "source_auditor_sha256": "f60dabf565b21b5b883d2784541682c27b88df8520bc16fffe5117d115d6ac33",
+  "record_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+  "record_bytes": 592,
+  "layout_plan": {
+    "added_binding": {
+      "set": 0,
+      "binding": 12,
+      "type": "readonly StorageBuffer",
+      "count": 1
+    },
+    "header": {
+      "bytes": 16,
+      "u32_fields": [
+        "count4",
+        "count16",
+        "start4",
+        "start16"
+      ]
+    },
+    "row_stride": 48,
+    "row_fields": [
+      "low:u64",
+      "high:u64",
+      "base:u64",
+      "binding:u32",
+      "element:u32",
+      "width:u32",
+      "route_id:u32",
+      "reserved0:u32",
+      "reserved1:u32"
+    ],
+    "existing_push_bytes_unchanged": true,
+    "new_push_bytes": 0,
+    "pointer_return_or_phi_added": false,
+    "nonuniform_descriptor_index_added": false,
+    "requires_additional_device_features": false,
+    "additional_descriptor_capacity_check_required": true,
+    "record_buffer_must_not_alias_existing_graph": true
+  },
+  "finite_lookup": {
+    "maximum_rows_per_width": 64,
+    "captured_counts": {
+      "4": 6,
+      "16": 6
+    },
+    "emitted_instruction_audit": [
+      {
+        "width": 4,
+        "initial_low": 0,
+        "initial_high": 6,
+        "counter_bits": 32,
+        "midpoint": "low + ((high-low)>>1)",
+        "left_update": "high=mid",
+        "right_update": "low=mid+1",
+        "other_control_flow_cycles": false
+      },
+      {
+        "width": 16,
+        "initial_low": 0,
+        "initial_high": 6,
+        "counter_bits": 32,
+        "midpoint": "low + ((high-low)>>1)",
+        "left_update": "high=mid",
+        "right_update": "low=mid+1",
+        "other_control_flow_cycles": false
+      }
+    ],
+    "method": "lower/upper binary search; left=mid or low=mid+1, high-low strictly decreases on non-hit iterations",
+    "maximum_iterations_under_valid_header": 7,
+    "valid_header_frozen_by_record_digest": true
+  },
+  "width_policy_metadata": {
+    "32": {
+      "spirv_sha256": "d5148342b4517882b25a48e63700cbfb8695454cc05d131da718509ac2563dc0",
+      "requested_subgroup_size": 32,
+      "compiled": false,
+      "executed": false
+    },
+    "16": {
+      "spirv_sha256": "d5148342b4517882b25a48e63700cbfb8695454cc05d131da718509ac2563dc0",
+      "requested_subgroup_size": 16,
+      "compiled": false,
+      "executed": false
+    },
+    "8": {
+      "spirv_sha256": "d5148342b4517882b25a48e63700cbfb8695454cc05d131da718509ac2563dc0",
+      "requested_subgroup_size": 8,
+      "compiled": false,
+      "executed": false
+    }
+  },
+  "preservation": {
+    "untouched_functions": [
+      {
+        "function_id": 332,
+        "sha256": "de875370a3c7eaf3d7a765fb30a74925cc7654cd24285a58e03e73a61db6aa1e"
+      },
+      {
+        "function_id": 491,
+        "sha256": "b72d4cec079eb53e517f0e818a559f86c372d9ed2f4de1aba240f621555e49f4"
+      },
+      {
+        "function_id": 691,
+        "sha256": "31235fd1eacc48c094e863ce0f115d4165f61030ba905f48db635751c3fc485b"
+      },
+      {
+        "function_id": 1050,
+        "sha256": "bf6f6964c8c6e180101ea72fd9e411dec06153175d44b70a805745740a132906"
+      },
+      {
+        "function_id": 1209,
+        "sha256": "bf7906794f31f179b1911dea1b9c0a76fa6b7ad8162e3b0267130947af4313e2"
+      }
+    ],
+    "physical_miss_suffixes": [
+      {
+        "width": 4,
+        "unchanged_binary_words": 166
+      },
+      {
+        "width": 16,
+        "unchanged_binary_words": 166
+      }
+    ],
+    "modified_functions": [
+      107,
+      850
+    ],
+    "header_changes": {
+      "generator_provenance_changed": true,
+      "id_bound": [
+        11181,
+        11330
+      ],
+      "version_and_schema_unchanged": true
+    },
+    "added_global_instruction_opcodes": {
+      "29": 1,
+      "30": 2,
+      "32": 2,
+      "43": 7,
+      "59": 1,
+      "71": 5,
+      "72": 14
+    },
+    "original_globals_preserved_except_added_entry_interface": true,
+    "categories": [
+      "two load-selector prefixes replaced",
+      "one readonly binding12 added",
+      "new independent record types/constants/annotations",
+      "record interface added to main entry declaration"
+    ],
+    "all_other_function_instruction_words_identical": true
+  },
+  "selection_proof": {
+    "4": {
+      "complete_uint64_selection_domain": true,
+      "selection_cells": 13,
+      "maximum_binary_search_iterations": 3,
+      "identity_compared": [
+        "StorageBuffer binding",
+        "descriptor array element",
+        "aligned guest base"
+      ],
+      "typed_index_rule": "uint32(address - aligned_base) >> log2(width)"
+    },
+    "16": {
+      "complete_uint64_selection_domain": true,
+      "selection_cells": 13,
+      "maximum_binary_search_iterations": 3,
+      "identity_compared": [
+        "StorageBuffer binding",
+        "descriptor array element",
+        "aligned guest base"
+      ],
+      "typed_index_rule": "uint32(address - aligned_base) >> log2(width)"
+    }
+  },
+  "limitations": [
+    "Owned frozen graph only; no live as-submitted descriptor atomicity claim",
+    "No Vulkan calls, pipeline compilation, shader execution or performance measurement",
+    "Old replay executor does not support the added binding/layout; this bundle is not execution admission",
+    "All original store/main/image/work instructions and physical MISS suffixes remain binary-word identical"
+  ],
+  "scope": "CPU-only owned frozen graph, no native pipeline compilation or execution admission",
+  "frozen_input_hashes": {
+    "manifest_sha256": "4c4b5fcaf73318b8edc08406a58e39a2702544f86183e7d894455e7d363206b9",
+    "ubo0_allocation_sha256": "2985c50269f36396f2b6c0112f79c6c15c4bbf43520383eb61a99bdb082e5150",
+    "ubo0_visible_sha256": "778a893b3523a792183d46f8d8e0e0d517e3957b808cdea2be97294b3b008bcf",
+    "ubo0_visible_bytes": 2224
+  },
+  "descriptor_classification": {
+    "effective_nearest_candidate_count": 0,
+    "ordinary_singles": [
+      {
+        "binding": 2,
+        "element": 0,
+        "selector_byte_offset": 192,
+        "bound_bytes": 464
+      },
+      {
+        "binding": 3,
+        "element": 0,
+        "selector_byte_offset": 208,
+        "bound_bytes": 16960
+      },
+      {
+        "binding": 4,
+        "element": 0,
+        "selector_byte_offset": 256,
+        "bound_bytes": 64
+      },
+      {
+        "binding": 5,
+        "element": 0,
+        "selector_byte_offset": 272,
+        "bound_bytes": 192
+      },
+      {
+        "binding": 6,
+        "element": 0,
+        "selector_byte_offset": 352,
+        "bound_bytes": 40960
+      }
+    ],
+    "global_table": {
+      "binding": 7,
+      "count": 3,
+      "selector_byte_offset": 2176,
+      "entry_stride": 16,
+      "bound_bytes": [
+        156852224,
+        0,
+        0
+      ]
+    }
+  },
+  "helper_static_instruction_counts": {
+    "original": {
+      "107": {
+        "words": 981,
+        "instructions": 228
+      },
+      "850": {
+        "words": 981,
+        "instructions": 228
+      }
+    },
+    "candidate": {
+      "107": {
+        "words": 553,
+        "instructions": 145
+      },
+      "850": {
+        "words": 553,
+        "instructions": 145
+      }
+    }
+  },
+  "tools": {
+    "tools/compute_interval_lowering.py": "3176a7e0130b5d722a88fdb2d5ab9512fff4afecf78e10828eb6747b38ca00ca",
+    "tests/test_compute_interval_lowering.py": "34a88c6ef051a9820ab1a7d635dda648daf7daac000bae72cafe2e0ec1492156"
+  }
+}

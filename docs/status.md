@@ -26,7 +26,9 @@ The [captured 67-workgroup graph](../research/native-mesh-replay-e5-observation.
 now matches at actual widths 32, 32 repeated, 8 and 16 across every workgroup,
 including the partial tail. Historical snapshot atomicity and general race freedom
 remain unproved. The [native C++ extension](native-mesh-profile96-lowering.md)
-is built but has a distinct raw module that still needs GPU validation.
+is built and remains off by default. Its exact instrumented derivative matches
+the tested conditional module; paired compiler checks also match raw native/Python
+code generation. An isolated game pilot of the new build remains pending.
 
 The [native-network investigation](../research/native-network-restoration.md)
 identifies ten omitted startup programs as movie-upscale networks. Their linear
@@ -34,8 +36,10 @@ fallback, gameplay FSR replacement and hair/foliage sampling remain separate qua
 gaps. No native-quality restoration, accepted gameplay optimization or real 60 FPS
 result is established.
 Four [synthetic cooperative-matrix fixtures](../research/matrix-restoration-observation.json)
-match complete CPU outputs at actual width 32. They establish isolated arithmetic
-and layout cases, without restoring an original network. The
+match complete CPU outputs at actual width 32. The subsequent
+[packed original-layout bridge](matrix-warp-bridge.md) passes identity and layout
+fixtures, while its rounding diagnostic changes negative zeros to positive zeros.
+These establish isolated arithmetic and layout cases, without restoring an original network. The
 [CPU observer primitives](benchmark-observer.md) still need real producer adapters;
 they do not certify a benchmark.
 
@@ -82,6 +86,15 @@ The current investigation uses an Intel Arc A770 on Linux and an existing Hooksh
 | Higher quality or integrated-GPU support | Future target | Device-specific measurements and an explicit quality budget |
 
 ## Next work
+
+The [typed descriptor-array executor](descriptor-array-runtime.md) now passes
+all four synthetic value/pointer and follow-stores configurations, including
+changed writes, shared buffer aliases and complete allocation guards. The
+[actual compute interval prototype](../research/compute-interval-lowering.md)
+preserves typed storage-buffer hits and the original physical miss instructions;
+its complete frozen-input root partition is checked on the CPU. It has not yet
+been compiled or dispatched. The [live selector audit](../research/live-selector-inputs.md)
+identifies the owned upload and final descriptor generation needed for integration.
 
 Follow [the Arc-first decision](strategy.md) and the exit tests in [the roadmap](roadmap.md). Prioritize complete shader capture and contract validation, using targeted CPU reconstruction where it resolves an unknown. Keep private analysis outputs local and publish enough metadata to reproduce the procedure.
 

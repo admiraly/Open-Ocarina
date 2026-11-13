@@ -1,0 +1,432 @@
+{
+  "schema": 1,
+  "status": "CPU-prepared and SPIR-V-validated; executor proposal only",
+  "Vulkan_opened": false,
+  "pipeline_compiled": false,
+  "dispatch_executed": false,
+  "new_fixture_source_and_modules": {
+    "CPU_prepared": true,
+    "Vulkan_opened": false,
+    "assembly_sha256": "54102e8bc3d6fae438e9c7c29c07b329245b074a36ec2aa6c6872dfa84b48d5e",
+    "cases": [
+      {
+        "directory": "follow-off",
+        "follow_stores": false,
+        "plan_sha256": "0ba9c2f84a756e3ba7d441825084fc3cd4476c078184c17c5e4ac81a81131110"
+      },
+      {
+        "directory": "follow-on",
+        "follow_stores": true,
+        "plan_sha256": "805867aeab27dcbb9a046098e29556231eb3d1778428ade16691587147a08d9d"
+      }
+    ],
+    "dispatch_executed": false,
+    "fixture_tool_sha256": "658c8969cd0851ec6196441ce93b9206df9ceea6d9d8ab587ad10aa1bc362e25",
+    "ownership_proof": {
+      "cross_invocation_barrier_required": false,
+      "disjoint_written_bytes_per_allocation": 1792,
+      "immutable_shared_reads_disjoint_from_all_writes": true,
+      "lanes": 64,
+      "mutable_reads_use_own_lane_spans": true,
+      "output_rows_per_lane": 37,
+      "per_lane_base": 256,
+      "per_lane_span_bytes": 64,
+      "typed_store_spans": [
+        [
+          0,
+          4
+        ],
+        [
+          8,
+          16
+        ],
+        [
+          16,
+          32
+        ]
+      ]
+    },
+    "pipeline_compiled": false,
+    "pointer_spirv_sha256": "bf1c2e5a1379ced5b8c068b0b47498384322255bf2cab235c31ce9cc0f027cdc",
+    "schema": 1,
+    "source_sha256": "576f93dcb7d7ea9db78c7f5953d3de2c627d32206263b1fc538c8072c3de9e7b",
+    "tool_versions": {
+      "glslang": "Glslang Version: 11:16.2.0",
+      "spirv_tools": "SPIRV-Tools v2026.1 unknown hash, 2026-02-16T00:00:00+00:00"
+    },
+    "value_spirv_sha256": "aa9816b41e458151632308a64d9df58aee0fcc5df287b70f47e6b067b1c76531"
+  },
+  "CPU_tests_passed": 8,
+  "test_source_sha256": "cf8e2a2a02c0c175347aa108e6eb648da8dcfeac9f9e1246c754bf4117d5eb06",
+  "case_contracts": [
+    {
+      "follow_stores": false,
+      "plan_sha256": "0ba9c2f84a756e3ba7d441825084fc3cd4476c078184c17c5e4ac81a81131110",
+      "local_size": [
+        64,
+        1,
+        1
+      ],
+      "workgroups": [
+        1,
+        1,
+        1
+      ],
+      "required_subgroup_size": 32,
+      "max_dispatches": 1,
+      "fence_timeout_ns": 2000000000,
+      "process_timeout_seconds": 30,
+      "descriptor_counts": [
+        2,
+        2,
+        1,
+        1,
+        1
+      ],
+      "push_constant_bytes": 48,
+      "driver_profile": {
+        "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+        "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+        "name": "cache-safe-e5"
+      },
+      "compiler_policy": {
+        "controlled_options": {
+          "HS_CS32_MAX_INSTS": null,
+          "HS_FORCE_SIMD8": null,
+          "HS_LARGE_GRF": null,
+          "HS_LARGE_GRF_BIT": null,
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_SUBGROUP8": null,
+          "INTEL_DEBUG": null,
+          "RX_VK_NOOPT": null,
+          "RX_VK_WARP64": null,
+          "shader_spilling_rate": "1"
+        },
+        "disk_cache_disabled": true,
+        "name": "native-safe"
+      },
+      "required_features": [
+        "variablePointersStorageBuffer",
+        "shaderStorageBufferArrayNonUniformIndexing",
+        "shaderInt64",
+        "bufferDeviceAddress",
+        "robustBufferAccess",
+        "robustBufferAccess2",
+        "subgroupSizeControl",
+        "computeFullSubgroups"
+      ],
+      "ownership_proof": {
+        "cross_invocation_barrier_required": false,
+        "disjoint_written_bytes_per_allocation": 1792,
+        "immutable_shared_reads_disjoint_from_all_writes": true,
+        "lanes": 64,
+        "mutable_reads_use_own_lane_spans": true,
+        "output_rows_per_lane": 37,
+        "per_lane_base": 256,
+        "per_lane_span_bytes": 64,
+        "typed_store_spans": [
+          [
+            0,
+            4
+          ],
+          [
+            8,
+            16
+          ],
+          [
+            16,
+            32
+          ]
+        ]
+      },
+      "allocations": [
+        {
+          "name": "shared",
+          "bytes": 8320,
+          "payload_offset": 64,
+          "payload_bytes": 8192,
+          "initial_sha256": "b0e5a2aaf7328f8aa610a8dea7f97db724e9fb2aadc719ba624ce93148e871d9",
+          "expected_sha256": "ed26cb510200b4fe34b0f2b021b5d5f30b544d1c534e332932da85cad5164f19",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "short",
+          "bytes": 138,
+          "payload_offset": 64,
+          "payload_bytes": 10,
+          "initial_sha256": "995c793005641755472c39eb09b0a617e4ed8776a2029fdce706960328db3de6",
+          "expected_sha256": "995c793005641755472c39eb09b0a617e4ed8776a2029fdce706960328db3de6",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "zero_prefix",
+          "bytes": 160,
+          "payload_offset": 64,
+          "payload_bytes": 32,
+          "initial_sha256": "4134a3f7421b1ac495b2deaa5f7fd9d87cacabdfc141ce9e8ec9aa153b3b12e9",
+          "expected_sha256": "4134a3f7421b1ac495b2deaa5f7fd9d87cacabdfc141ce9e8ec9aa153b3b12e9",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "mapped_elsewhere",
+          "bytes": 8320,
+          "payload_offset": 64,
+          "payload_bytes": 8192,
+          "initial_sha256": "2c40d6c60b29ea657dafdeb069a30fd471800642407fca2a0760bca752947e08",
+          "expected_sha256": "2c40d6c60b29ea657dafdeb069a30fd471800642407fca2a0760bca752947e08",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "physical",
+          "bytes": 8320,
+          "payload_offset": 64,
+          "payload_bytes": 8192,
+          "initial_sha256": "d0f1baff27e17504af6106cbb81e9bcd68851b5333fcc126ee648a308c0ac615",
+          "expected_sha256": "d0f1baff27e17504af6106cbb81e9bcd68851b5333fcc126ee648a308c0ac615",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "ordinary_miss",
+          "bytes": 4224,
+          "payload_offset": 64,
+          "payload_bytes": 4096,
+          "initial_sha256": "04276e493ec41ccada14ff9d7c9c117e929799b31774a73ef2fc92b97022f583",
+          "expected_sha256": "04276e493ec41ccada14ff9d7c9c117e929799b31774a73ef2fc92b97022f583",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "records",
+          "bytes": 480,
+          "payload_offset": 64,
+          "payload_bytes": 352,
+          "initial_sha256": "f10f81499299127cb3f96c9ab0d212bd0368e2e31d79d17ac1d41d63bd786a9e",
+          "expected_sha256": "f10f81499299127cb3f96c9ab0d212bd0368e2e31d79d17ac1d41d63bd786a9e",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "queries",
+          "bytes": 5760,
+          "payload_offset": 64,
+          "payload_bytes": 5632,
+          "initial_sha256": "329d0a1f180f1eaf657eecb64cb988a1ef5805c0e8d4705e98ae76806c74dfa0",
+          "expected_sha256": "329d0a1f180f1eaf657eecb64cb988a1ef5805c0e8d4705e98ae76806c74dfa0",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "results",
+          "bytes": 38080,
+          "payload_offset": 64,
+          "payload_bytes": 37952,
+          "initial_sha256": "d95805f1b2dc73f20deb640d41092f1fb4b9508697278f5317d78c2c0a98b13d",
+          "expected_sha256": "f603e22cd617c0f535543bf8ac9b642af30e9331e901fdf77ca6ed328c53e050",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "page_table",
+          "bytes": 656,
+          "payload_offset": 64,
+          "payload_bytes": 528,
+          "initial_sha256": "7943ff58fe77be5659e88fe115b77caa4a3d782c30b784995a6d55e66568c5cc",
+          "expected_sha256": "7943ff58fe77be5659e88fe115b77caa4a3d782c30b784995a6d55e66568c5cc",
+          "comparison": "exact-all-bytes-after-host-relocation"
+        }
+      ],
+      "CPU_complete_comparison_smoke": {
+        "match": true,
+        "compared_allocations": 10,
+        "compared_bytes": 74458,
+        "failures": []
+      }
+    },
+    {
+      "follow_stores": true,
+      "plan_sha256": "805867aeab27dcbb9a046098e29556231eb3d1778428ade16691587147a08d9d",
+      "local_size": [
+        64,
+        1,
+        1
+      ],
+      "workgroups": [
+        1,
+        1,
+        1
+      ],
+      "required_subgroup_size": 32,
+      "max_dispatches": 1,
+      "fence_timeout_ns": 2000000000,
+      "process_timeout_seconds": 30,
+      "descriptor_counts": [
+        2,
+        2,
+        1,
+        1,
+        1
+      ],
+      "push_constant_bytes": 48,
+      "driver_profile": {
+        "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+        "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+        "name": "cache-safe-e5"
+      },
+      "compiler_policy": {
+        "controlled_options": {
+          "HS_CS32_MAX_INSTS": null,
+          "HS_FORCE_SIMD8": null,
+          "HS_LARGE_GRF": null,
+          "HS_LARGE_GRF_BIT": null,
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_SUBGROUP8": null,
+          "INTEL_DEBUG": null,
+          "RX_VK_NOOPT": null,
+          "RX_VK_WARP64": null,
+          "shader_spilling_rate": "1"
+        },
+        "disk_cache_disabled": true,
+        "name": "native-safe"
+      },
+      "required_features": [
+        "variablePointersStorageBuffer",
+        "shaderStorageBufferArrayNonUniformIndexing",
+        "shaderInt64",
+        "bufferDeviceAddress",
+        "robustBufferAccess",
+        "robustBufferAccess2",
+        "subgroupSizeControl",
+        "computeFullSubgroups"
+      ],
+      "ownership_proof": {
+        "cross_invocation_barrier_required": false,
+        "disjoint_written_bytes_per_allocation": 1792,
+        "immutable_shared_reads_disjoint_from_all_writes": true,
+        "lanes": 64,
+        "mutable_reads_use_own_lane_spans": true,
+        "output_rows_per_lane": 37,
+        "per_lane_base": 256,
+        "per_lane_span_bytes": 64,
+        "typed_store_spans": [
+          [
+            0,
+            4
+          ],
+          [
+            8,
+            16
+          ],
+          [
+            16,
+            32
+          ]
+        ]
+      },
+      "allocations": [
+        {
+          "name": "shared",
+          "bytes": 8320,
+          "payload_offset": 64,
+          "payload_bytes": 8192,
+          "initial_sha256": "b0e5a2aaf7328f8aa610a8dea7f97db724e9fb2aadc719ba624ce93148e871d9",
+          "expected_sha256": "c683654494cfff2812cd5a23ec2e83746f17e9a6846b8b9315d8376491539041",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "short",
+          "bytes": 138,
+          "payload_offset": 64,
+          "payload_bytes": 10,
+          "initial_sha256": "995c793005641755472c39eb09b0a617e4ed8776a2029fdce706960328db3de6",
+          "expected_sha256": "995c793005641755472c39eb09b0a617e4ed8776a2029fdce706960328db3de6",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "zero_prefix",
+          "bytes": 160,
+          "payload_offset": 64,
+          "payload_bytes": 32,
+          "initial_sha256": "4134a3f7421b1ac495b2deaa5f7fd9d87cacabdfc141ce9e8ec9aa153b3b12e9",
+          "expected_sha256": "4134a3f7421b1ac495b2deaa5f7fd9d87cacabdfc141ce9e8ec9aa153b3b12e9",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "mapped_elsewhere",
+          "bytes": 8320,
+          "payload_offset": 64,
+          "payload_bytes": 8192,
+          "initial_sha256": "2c40d6c60b29ea657dafdeb069a30fd471800642407fca2a0760bca752947e08",
+          "expected_sha256": "2c40d6c60b29ea657dafdeb069a30fd471800642407fca2a0760bca752947e08",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "physical",
+          "bytes": 8320,
+          "payload_offset": 64,
+          "payload_bytes": 8192,
+          "initial_sha256": "d0f1baff27e17504af6106cbb81e9bcd68851b5333fcc126ee648a308c0ac615",
+          "expected_sha256": "82c61d06a4f7e84bf776f28364a87ed2dab3c21ea901d7e291a9fd109992d92e",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "ordinary_miss",
+          "bytes": 4224,
+          "payload_offset": 64,
+          "payload_bytes": 4096,
+          "initial_sha256": "04276e493ec41ccada14ff9d7c9c117e929799b31774a73ef2fc92b97022f583",
+          "expected_sha256": "04276e493ec41ccada14ff9d7c9c117e929799b31774a73ef2fc92b97022f583",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "records",
+          "bytes": 480,
+          "payload_offset": 64,
+          "payload_bytes": 352,
+          "initial_sha256": "f10f81499299127cb3f96c9ab0d212bd0368e2e31d79d17ac1d41d63bd786a9e",
+          "expected_sha256": "f10f81499299127cb3f96c9ab0d212bd0368e2e31d79d17ac1d41d63bd786a9e",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "queries",
+          "bytes": 5760,
+          "payload_offset": 64,
+          "payload_bytes": 5632,
+          "initial_sha256": "329d0a1f180f1eaf657eecb64cb988a1ef5805c0e8d4705e98ae76806c74dfa0",
+          "expected_sha256": "329d0a1f180f1eaf657eecb64cb988a1ef5805c0e8d4705e98ae76806c74dfa0",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "results",
+          "bytes": 38080,
+          "payload_offset": 64,
+          "payload_bytes": 37952,
+          "initial_sha256": "d95805f1b2dc73f20deb640d41092f1fb4b9508697278f5317d78c2c0a98b13d",
+          "expected_sha256": "3882a0d68be66ef14fdbbe057350185f34540f09531732c18db3f40480549452",
+          "comparison": "exact-all-bytes"
+        },
+        {
+          "name": "page_table",
+          "bytes": 656,
+          "payload_offset": 64,
+          "payload_bytes": 528,
+          "initial_sha256": "7943ff58fe77be5659e88fe115b77caa4a3d782c30b784995a6d55e66568c5cc",
+          "expected_sha256": "7943ff58fe77be5659e88fe115b77caa4a3d782c30b784995a6d55e66568c5cc",
+          "comparison": "exact-all-bytes-after-host-relocation"
+        }
+      ],
+      "CPU_complete_comparison_smoke": {
+        "match": true,
+        "compared_allocations": 10,
+        "compared_bytes": 74458,
+        "failures": []
+      }
+    }
+  ],
+  "limitations": [
+    "No runtime executor is implemented or authorized by this preparation.",
+    "All prepared shader/input/expected files are independently authored synthetic data.",
+    "Native descriptor classification, candidates, second guest window, atomics/subword helpers and renderer integration remain unknown or outside this fixture."
+  ]
+}

@@ -1,0 +1,224 @@
+{
+  "schema": "open-ocarina.matrix-original-warp32-preparation/v1",
+  "profile": "open-ocarina.matrix-original-warp32/v1",
+  "header_magic": "OOMATW32",
+  "scope": "CPU-only preparation of independently authored single-logical-warp32 packed-fragment bridge; no Vulkan runtime phase executed",
+  "review_plan_sha256": "7cc5763ea2edfbccba0da82dea095639c07d94818682eb503f72ad727525c7c6",
+  "source_sha256": {
+    "tools/matrix_warp_bridge.py": "28f35436b7ef7e7b3076da773c054b62b32b73790ea109872f956c4b1c753cf1",
+    "src/probes/matrix_warp_bridge.c": "0e6ac830bbd85f88ce402faaafc37fd4240aaa945734302c4fcf6272e3cb9a55",
+    "tests/test_matrix_warp_bridge.py": "d06ef8b748e9aac947358e67009fa7a79ec5f2595ca0b6a6c5e3f825fe75994a"
+  },
+  "dependency_sha256": {
+    "tools/matrix_warp_bridge.py": "28f35436b7ef7e7b3076da773c054b62b32b73790ea109872f956c4b1c753cf1",
+    "src/probes/matrix_warp_bridge.c": "0e6ac830bbd85f88ce402faaafc37fd4240aaa945734302c4fcf6272e3cb9a55",
+    "tools/matrix_restore_probe.py": "80a97bd7289c85d1ceaf5c145d948caf216cc75af556dd3e246399cc8e3e2e37",
+    "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+    "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+    "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c"
+  },
+  "imported_integer_oracle_sha256": "80a97bd7289c85d1ceaf5c145d948caf216cc75af556dd3e246399cc8e3e2e37",
+  "parent_matrix03_plan_sha256": "3ce51b8a74ad5dd1efbe5652a2f124df9c13e3451c4149db2921c914b17af19f",
+  "parent_matrix03_preparation_sha256": "44a977938e1b121cc1128b785c25592ba7c9d86d41253aa9b7546d095780c3c8",
+  "parent_matrix03_observation_sha256": "600b98290c2064fcd04108efea267c7e635e89fb643c74d6dda5283115ef8a53",
+  "parent_matrix03_artifacts_and_metadata_rechecked_unchanged": true,
+  "shader": {
+    "source_sha256": "3403043a5faa1e82230fd7a52be6a828082f8bd5b63ba322b5d37fb9e0472118",
+    "spirv_sha256": "3d44ca34d2f755b1a1179ca015079ee406493876908441f1903ba76814771f49",
+    "spirv_bytes": 8240,
+    "build_flags": [
+      "-V",
+      "--target-env",
+      "vulkan1.3",
+      "-Os"
+    ],
+    "spirv_validation_target": "vulkan1.3",
+    "spirv_validation_passed": true,
+    "shared_array_declared_bytes": 2304,
+    "barrier_scope": "subgroup",
+    "barrier_shared_memory_acquire_release": true,
+    "control_path": "Constant two-M and two-K loops; shared barriers execute for the entire single required subgroup",
+    "native_pipeline_compiled": false
+  },
+  "helper": {
+    "source_sha256": "0e6ac830bbd85f88ce402faaafc37fd4240aaa945734302c4fcf6272e3cb9a55",
+    "binary_sha256": "78b414cdbd132221b6a89f76ac777027098eaf2ff63c5c09884dbbf201fa77bb",
+    "build_flags": [
+      "-std=c11",
+      "-O2",
+      "-DNDEBUG",
+      "-Wall",
+      "-Wextra",
+      "-Werror"
+    ],
+    "cpu_validator_checks_every_input_and_reference_word": true,
+    "cpu_validation_returns_before_vkCreateInstance": true
+  },
+  "compiler_versions": {
+    "cc": "cc (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)",
+    "glslangValidator": "Glslang Version: 11:16.2.0",
+    "spirv-val": "SPIRV-Tools v2026.1 unknown hash, 2026-02-16T00:00:00+00:00"
+  },
+  "layout_proof": {
+    "logical_lanes": 32,
+    "required_physical_subgroup_size": 32,
+    "workgroup": [
+      32,
+      1,
+      1
+    ],
+    "logical_warps": 1,
+    "disjoint_shared_elements": {
+      "A": 256,
+      "B": 128,
+      "C": 128
+    },
+    "tile_elements_per_uniform_phase": 128,
+    "tile_writes_per_lane": 4,
+    "tile_owner_rule": "index modulo 32",
+    "m_iterations": 2,
+    "k_chunk_iterations": 2,
+    "matrix_calls_per_dispatch": 4,
+    "uniformity_scope": "Only this independently authored fixture's constant-bounded collective path"
+  },
+  "source_layout_evidence": {
+    "description": "Documented original A4/B2/C2 packing and public software-shuffle addresses; independently simulated on CPU against the hash-pinned logical checkpoint oracle",
+    "game_instructions_or_source_embedded": false,
+    "original_console_hardware_arithmetic_certified": false
+  },
+  "cases": [
+    {
+      "name": "identity",
+      "bundle_sha256": "4f70cb29b07592b59856d36da156e46eb53bf69600517183d8238369cedfadc9",
+      "exact_safe_reference": true,
+      "expected_packed_output_words": 64,
+      "expected_packed_output_bytes": 256,
+      "expected_output_sha256": "61de80a072716adde2ccd4e67f076a1a5233513cf7bffc5326839496e1300c5d",
+      "expected_half_classes": {
+        "positive_zero": 0,
+        "negative_zero": 0,
+        "subnormal": 0,
+        "normal": 128,
+        "infinity": 0,
+        "nan": 0
+      },
+      "native_cpu_validated": true,
+      "gpu_executed": false
+    },
+    {
+      "name": "layout",
+      "bundle_sha256": "a15533e93f24c3c5831942cbb01480702dc5d1f45e4dc46fb97825aac297efe9",
+      "exact_safe_reference": true,
+      "expected_packed_output_words": 64,
+      "expected_packed_output_bytes": 256,
+      "expected_output_sha256": "d9d96de8d03d96cf40998ebf9bf68ab86ce40a2759842003e26fe1f43cc4b7a4",
+      "expected_half_classes": {
+        "positive_zero": 0,
+        "negative_zero": 0,
+        "subnormal": 0,
+        "normal": 128,
+        "infinity": 0,
+        "nan": 0
+      },
+      "native_cpu_validated": true,
+      "gpu_executed": false
+    },
+    {
+      "name": "rounding",
+      "bundle_sha256": "72a83f6ff05c13b94aff4c1333e10881d7d6aaa9d4bff61c5d863fe06d02403b",
+      "exact_safe_reference": false,
+      "expected_packed_output_words": 64,
+      "expected_packed_output_bytes": 256,
+      "expected_output_sha256": "a7321cbffb4f5af3f5476880c6b3dc6d09203e945170b95c4a9853e976021aa8",
+      "expected_half_classes": {
+        "positive_zero": 32,
+        "negative_zero": 32,
+        "subnormal": 32,
+        "normal": 32,
+        "infinity": 0,
+        "nan": 0
+      },
+      "native_cpu_validated": true,
+      "gpu_executed": false
+    }
+  ],
+  "driver_profile_for_future_review": {
+    "name": "cache-safe-e5",
+    "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+    "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3"
+  },
+  "driver_policy_for_future_review": {
+    "name": "native-safe",
+    "controlled_options": {
+      "HS_CS32_MAX_INSTS": null,
+      "HS_SPILL_BATCH": "1",
+      "HS_PUSH_SHADOW": "1",
+      "shader_spilling_rate": "1",
+      "INTEL_DEBUG": null,
+      "HS_SPILL_PCT": null,
+      "HS_RA_DEBUG": null,
+      "HS_FORCE_SIMD8": null,
+      "HS_LARGE_GRF": null,
+      "HS_SUBGROUP8": null,
+      "HS_LARGE_GRF_BIT": null,
+      "RX_VK_WARP64": null,
+      "RX_VK_NOOPT": null
+    },
+    "full_environment_snapshot": false,
+    "profile_scope": "MAX absent; no global compute fallback opt-in"
+  },
+  "bounds": {
+    "logical_warps": 1,
+    "local_size": [
+      32,
+      1,
+      1
+    ],
+    "required_and_permitted_actual_subgroup_width": 32,
+    "dispatch": [
+      1,
+      1,
+      1
+    ],
+    "maximum_dispatch_calls_per_invocation": 1,
+    "input_words_per_lane": 8,
+    "output_words_per_lane": 2,
+    "readonly_input_payload_bytes": 1024,
+    "complete_output_payload_bytes": 256,
+    "prefix_and_suffix_guard_bytes_each": 256,
+    "fence_timeout_ns": 2000000000,
+    "process_timeout_seconds": 30
+  },
+  "validation": {
+    "focused_tests_passed": 16,
+    "full_suite_tests_passed": 618,
+    "all_three_cpu_fixture_validations_passed": true,
+    "linker_trap_prevents_real_vkCreateInstance_in_test": true,
+    "shared_reconstruction_random_word_layout_test": true,
+    "independent_original_software_shuffle_addressing_test": true,
+    "packed_identity_corner_goldens_test": true,
+    "all_shared_cells_single_writer_and_complete": true,
+    "all_padded_tile_address_expressions_in_bounds": true,
+    "signed_zero_and_half_subnormal_classifications_tested_on_cpu": true,
+    "malformed_old_profile_or_narrowed_width_rejected_before_vulkan": true
+  },
+  "execution": {
+    "vulkan_instance_created": false,
+    "physical_device_queried": false,
+    "logical_device_created": false,
+    "native_pipeline_compiled": false,
+    "gpu_dispatched": false,
+    "game_inputs_or_weights_used": false,
+    "renderer_or_driver_changed": false
+  },
+  "limitations": [
+    "Padded KHR matrix arithmetic is not proven equivalent to original software or console arithmetic.",
+    "Only one uniform, local32, required-SG32 logical warp is supported by this fixture.",
+    "No general 32/64/128-invocation workgroup, control-flow or production shader bridge is established.",
+    "NaN payload/signaling behavior is not an oracle contract.",
+    "No game program, weights, assets or renderer policy changed.",
+    "SPIR-V validation and CPU proofs do not establish actual subgroup-32 native pipeline acceptance or output correctness for this bridge.",
+    "The earlier row-major SG32 observations do not constitute packed-bridge execution evidence.",
+    "No native network restoration, quality improvement or FPS gain is established."
+  ]
+}

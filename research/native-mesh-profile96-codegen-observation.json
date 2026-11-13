@@ -1,0 +1,693 @@
+{
+  "schema": "open-ocarina.native-mesh-profile96-codegen-observation/v1",
+  "date": "2026-11-13",
+  "scope": "Full mesh+fragment pipeline compilation under one explicit diagnostic fixed state; no shader dispatch or rendering",
+  "program": "68642bb810ee3e7c",
+  "variant": "3f3f5b29054673da",
+  "original_mesh_sha256": "999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93",
+  "native_mesh_sha256": "43434b023ff17ee4b92ed8e49f19c937c86f15cf31a7034161dd11878f944099",
+  "proven_Python_mesh_sha256": "a41c6df753f30f8c0646ffa45227304e994b3fbaccdcad64927cd57f5e2327e7",
+  "common_fragment_sha256": "3de1d79c321db3863dbb07de0d3fa0cdb126d72c07c2f1d70f0514eda3611b10",
+  "driver_library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+  "driver_icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+  "helper_source_sha256": "a5f64c5492306f1a140ccc5cf8b11e51d4ec47c5592c1208b9193d2a3aae01ac",
+  "helper_binary_sha256": "268c1e91aca6654d3cb495f20cdf59b67802452d0e12b2a1c589fc52d334d97f",
+  "frozen_graphics_wrapper_sha256": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+  "frozen_compile_probe_import_sha256": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+  "private_plan_sha256": "90ace3c2eca48c440b03c26d0f50f08d81ef0c0e11fe60ba63f9f3a01c697ba4",
+  "private_freeze_sha256": "50a006e450144dad4bdf8c1251f6f0a890f96ea1ce799eaab7ac6e29597ab691",
+  "private_runner_sha256": "bf855aacc3b3db7e1b8787a3b5bfc43f8d63ebae7debeb4f8bd43c223075ef0d",
+  "private_observation_sha256": "25e94f87f4a4913322077ec61844099bdd1c000c2c5e9e97fef0b555107477b1",
+  "private_comparison_sha256": "eec19f960d34490a5dafb202ab671ded35f7d891e760d6e7186f0c74f345ee01",
+  "compiler_controls": {
+    "HS_PUSH_SHADOW": "1",
+    "HS_SPILL_BATCH": "1",
+    "shader_spilling_rate": "1",
+    "HS_CS32_MAX_INSTS": null,
+    "HS_FORCE_SIMD8": null,
+    "HS_SUBGROUP8": null,
+    "HS_SPILL_PCT": null,
+    "HS_LARGE_GRF": null,
+    "HS_LARGE_GRF_BIT": null,
+    "HS_RA_DEBUG": null,
+    "INTEL_DEBUG": null,
+    "RX_VK_WARP64": null,
+    "RX_VK_NOOPT": null
+  },
+  "cache_policy": "Parent amended wording to the reviewed fresh EMPTY ISOLATED per-case caches, writes enabled, not disabled. No cache import or reuse; no compile-time performance comparison.",
+  "preparation_validation": {
+    "four_cpu_SPIRV_validations_passed": true,
+    "local_size": [
+      32,
+      1,
+      1
+    ],
+    "logical_shared_bytes": 11412,
+    "logical_task_payload_bytes": 128,
+    "logical_shared_plus_payload_bytes": 11540,
+    "descriptor_bindings": 26,
+    "descriptor_count": 28,
+    "descriptor_mode": "push",
+    "shared_pipeline_push_range_bytes": 88,
+    "reflected_stage_push_bytes": [
+      0,
+      0
+    ],
+    "helper_flags": [
+      "-std=c11",
+      "-O2",
+      "-DNDEBUG",
+      "-Wall",
+      "-Wextra",
+      "-Werror"
+    ],
+    "comparator_cpu_cases_passed": 22,
+    "actual_saved_D8_pair_regression_passed": true,
+    "source_identity_exception": "Only exact Source hash UINT64 identity statistic and one exact second-header-row source_blake3 digest may differ; first64bits crosschecked. Every codegen statistic and every other NIR byte must match.",
+    "statistics_source_description_and_format_pinned": true,
+    "unknown_stat_name_type_count_or_metadata_format_rejected": true
+  },
+  "diagnostic_state": {
+    "alpha_to_coverage": false,
+    "color_format": 122,
+    "color_write_mask": 15,
+    "cull_mode": 0,
+    "depth_compare_op": 2,
+    "depth_format": 126,
+    "depth_test": true,
+    "depth_write": false,
+    "extent": [
+      1536,
+      864
+    ],
+    "front_face": 0,
+    "samples": 1
+  },
+  "diagnostic_state_limits": [
+    "Attachments and retained NVN state match the exact captured occurrence; complete effective dynamic state is not recovered.",
+    "Retained NVN depth comparison maps to Vulkan EQUAL, whereas runtime Intel EQ_BIAS may use LEQUAL and negative depth bias. The helper omits that bias.",
+    "The helper uses a positive viewport; the runtime uses a flipped viewport.",
+    "No runtime indirect argument or captured resource is executed in this diagnostic."
+  ],
+  "cases": [
+    {
+      "case": "python8",
+      "compile_completed": true,
+      "mesh_sha256": "a41c6df753f30f8c0646ffa45227304e994b3fbaccdcad64927cd57f5e2327e7",
+      "fragment_sha256": "3de1d79c321db3863dbb07de0d3fa0cdb126d72c07c2f1d70f0514eda3611b10",
+      "requested_mesh_width": 8,
+      "actual_compiler_executables": [
+        {
+          "index": 0,
+          "stage_flags": 128,
+          "name": "mesh",
+          "actual_compiler_subgroup_size": 8,
+          "numeric_codegen_statistics": {
+            "Code size": 1554464,
+            "Cycles": 2093649,
+            "Fills": 5634,
+            "GRF registers": 0,
+            "Instructions": 77601,
+            "Loops": 144,
+            "Max dispatch width": 8,
+            "Max live registers": 312,
+            "Non SSA regs after NIR": 2416,
+            "Push constant ranges": 0,
+            "Push constant registers": 0,
+            "SENDs": 1424,
+            "Scratch Memory Size": 16384,
+            "Spills": 3149,
+            "Workgroup Memory Size": 11412
+          },
+          "source_identity_hash_statistic": 1957409030052446534
+        },
+        {
+          "index": 1,
+          "stage_flags": 16,
+          "name": "SIMD8 fragment",
+          "actual_compiler_subgroup_size": 8,
+          "numeric_codegen_statistics": {
+            "Code size": 15648,
+            "Cycles": 8221,
+            "Fills": 0,
+            "GRF registers": 0,
+            "Instructions": 1005,
+            "Loops": 0,
+            "Max dispatch width": 8,
+            "Max live registers": 95,
+            "Non SSA regs after NIR": 287,
+            "Push constant ranges": 4,
+            "Push constant registers": 11,
+            "SENDs": 41,
+            "Scratch Memory Size": 0,
+            "Spills": 0,
+            "Workgroup Memory Size": 0
+          },
+          "source_identity_hash_statistic": 10865569414379229494
+        }
+      ],
+      "optimization_disabled": false,
+      "descriptor_mode": "push",
+      "push_constant_range_bytes": 88,
+      "ICD_file_identity_and_hash_attested": true,
+      "all_frozen_pins_match_after": true,
+      "owned_process_stopped_reaped_and_absent": true,
+      "cache": {
+        "enabled": true,
+        "disable_environment_variable_present": false,
+        "initially_empty_isolated_directory": true,
+        "initial_empty_evidence": "Frozen runner creates each directory without exist_ok before helper invocation; preflight checks require unused cases; no cache input imported.",
+        "writes_allowed": true,
+        "reused_between_cases": false,
+        "files_written": 5
+      },
+      "private_artifact_sha256": {
+        "compiler_result": "ba52c4f5392b1d6d0642d94b20e6d403349674a641a3b901481563f1980f8fc0",
+        "process_maps": "76f3b52cc90a2aabe19bcc28dca64fba24d60c20adc283ef8c5fb5a26fbb5dee",
+        "run_result": "2f39d432a42031be2b167dd0bc76f3f1a810d6bfe324ffe4ca060c82446a2d4c",
+        "stderr": "e16f2dd90c394840f8a1afc5d7ca2770c09ca90780a94c55359a14604c15b489"
+      },
+      "representation_sha256": {
+        "exe-0-repr-0.bin": "d795db2dd5e497977b4e7ed29d2ef40c7c331bfe5136976f83dc1021a1bda625",
+        "exe-0-repr-1.bin": "991fc1825d5b239f3b5791cc2c305516814784ee3324f17f0b5b4a972a51b60a",
+        "exe-0-repr-2.bin": "027ed3c613fb0435bc72b7822dae170955e35efc22f99dd8911a7cfabf98c9bf",
+        "exe-1-repr-0.bin": "6f4cfba247e8b449aec75e95330cb8fc98693df568f1c16ad28015e51e7f60e1",
+        "exe-1-repr-1.bin": "d55e2eabee8b7267de6ddeabfee8be8860b9ac55386b4cc5daa26fe1402f8f2e",
+        "exe-1-repr-2.bin": "6f6785e1f7b507c64c47eb9767df8ba55cd2cc0b609eb81c7823a6f816f4f4b5"
+      }
+    },
+    {
+      "case": "native8",
+      "compile_completed": true,
+      "mesh_sha256": "43434b023ff17ee4b92ed8e49f19c937c86f15cf31a7034161dd11878f944099",
+      "fragment_sha256": "3de1d79c321db3863dbb07de0d3fa0cdb126d72c07c2f1d70f0514eda3611b10",
+      "requested_mesh_width": 8,
+      "actual_compiler_executables": [
+        {
+          "index": 0,
+          "stage_flags": 128,
+          "name": "mesh",
+          "actual_compiler_subgroup_size": 8,
+          "numeric_codegen_statistics": {
+            "Code size": 1554464,
+            "Cycles": 2093649,
+            "Fills": 5634,
+            "GRF registers": 0,
+            "Instructions": 77601,
+            "Loops": 144,
+            "Max dispatch width": 8,
+            "Max live registers": 312,
+            "Non SSA regs after NIR": 2416,
+            "Push constant ranges": 0,
+            "Push constant registers": 0,
+            "SENDs": 1424,
+            "Scratch Memory Size": 16384,
+            "Spills": 3149,
+            "Workgroup Memory Size": 11412
+          },
+          "source_identity_hash_statistic": 13679924894022831165
+        },
+        {
+          "index": 1,
+          "stage_flags": 16,
+          "name": "SIMD8 fragment",
+          "actual_compiler_subgroup_size": 8,
+          "numeric_codegen_statistics": {
+            "Code size": 15648,
+            "Cycles": 8221,
+            "Fills": 0,
+            "GRF registers": 0,
+            "Instructions": 1005,
+            "Loops": 0,
+            "Max dispatch width": 8,
+            "Max live registers": 95,
+            "Non SSA regs after NIR": 287,
+            "Push constant ranges": 4,
+            "Push constant registers": 11,
+            "SENDs": 41,
+            "Scratch Memory Size": 0,
+            "Spills": 0,
+            "Workgroup Memory Size": 0
+          },
+          "source_identity_hash_statistic": 10865569414379229494
+        }
+      ],
+      "optimization_disabled": false,
+      "descriptor_mode": "push",
+      "push_constant_range_bytes": 88,
+      "ICD_file_identity_and_hash_attested": true,
+      "all_frozen_pins_match_after": true,
+      "owned_process_stopped_reaped_and_absent": true,
+      "cache": {
+        "enabled": true,
+        "disable_environment_variable_present": false,
+        "initially_empty_isolated_directory": true,
+        "initial_empty_evidence": "Frozen runner creates each directory without exist_ok before helper invocation; preflight checks require unused cases; no cache input imported.",
+        "writes_allowed": true,
+        "reused_between_cases": false,
+        "files_written": 5
+      },
+      "private_artifact_sha256": {
+        "compiler_result": "370606fb72bb42f4c48cbd2b91413fa2ddcf9bf3c08e04e69cca563c2aaa10c1",
+        "process_maps": "3ff8cf0f92485b646435b30e02c13a56cf9d854b53528ddc413fe27eff17e1b2",
+        "run_result": "c8aa29ec8c4900f312f9f74eff8aae699fe581df6ef01820d5111c6e89d48029",
+        "stderr": "e16f2dd90c394840f8a1afc5d7ca2770c09ca90780a94c55359a14604c15b489"
+      },
+      "representation_sha256": {
+        "exe-0-repr-0.bin": "12ce2628c33b5482fe47fd9da77ed508ee85df3a9542ca1d020e74d27b4ac6ba",
+        "exe-0-repr-1.bin": "991fc1825d5b239f3b5791cc2c305516814784ee3324f17f0b5b4a972a51b60a",
+        "exe-0-repr-2.bin": "027ed3c613fb0435bc72b7822dae170955e35efc22f99dd8911a7cfabf98c9bf",
+        "exe-1-repr-0.bin": "6f4cfba247e8b449aec75e95330cb8fc98693df568f1c16ad28015e51e7f60e1",
+        "exe-1-repr-1.bin": "d55e2eabee8b7267de6ddeabfee8be8860b9ac55386b4cc5daa26fe1402f8f2e",
+        "exe-1-repr-2.bin": "6f6785e1f7b507c64c47eb9767df8ba55cd2cc0b609eb81c7823a6f816f4f4b5"
+      }
+    },
+    {
+      "case": "python16",
+      "compile_completed": true,
+      "mesh_sha256": "a41c6df753f30f8c0646ffa45227304e994b3fbaccdcad64927cd57f5e2327e7",
+      "fragment_sha256": "3de1d79c321db3863dbb07de0d3fa0cdb126d72c07c2f1d70f0514eda3611b10",
+      "requested_mesh_width": 16,
+      "actual_compiler_executables": [
+        {
+          "index": 0,
+          "stage_flags": 128,
+          "name": "mesh",
+          "actual_compiler_subgroup_size": 16,
+          "numeric_codegen_statistics": {
+            "Code size": 2163248,
+            "Cycles": 3233053,
+            "Fills": 10585,
+            "GRF registers": 0,
+            "Instructions": 107996,
+            "Loops": 144,
+            "Max dispatch width": 16,
+            "Max live registers": 598,
+            "Non SSA regs after NIR": 2416,
+            "Push constant ranges": 0,
+            "Push constant registers": 0,
+            "SENDs": 1446,
+            "Scratch Memory Size": 32768,
+            "Spills": 4346,
+            "Workgroup Memory Size": 11412
+          },
+          "source_identity_hash_statistic": 1957409030052446534
+        },
+        {
+          "index": 1,
+          "stage_flags": 16,
+          "name": "SIMD8 fragment",
+          "actual_compiler_subgroup_size": 8,
+          "numeric_codegen_statistics": {
+            "Code size": 15648,
+            "Cycles": 8221,
+            "Fills": 0,
+            "GRF registers": 0,
+            "Instructions": 1005,
+            "Loops": 0,
+            "Max dispatch width": 8,
+            "Max live registers": 95,
+            "Non SSA regs after NIR": 287,
+            "Push constant ranges": 4,
+            "Push constant registers": 11,
+            "SENDs": 41,
+            "Scratch Memory Size": 0,
+            "Spills": 0,
+            "Workgroup Memory Size": 0
+          },
+          "source_identity_hash_statistic": 10865569414379229494
+        }
+      ],
+      "optimization_disabled": false,
+      "descriptor_mode": "push",
+      "push_constant_range_bytes": 88,
+      "ICD_file_identity_and_hash_attested": true,
+      "all_frozen_pins_match_after": true,
+      "owned_process_stopped_reaped_and_absent": true,
+      "cache": {
+        "enabled": true,
+        "disable_environment_variable_present": false,
+        "initially_empty_isolated_directory": true,
+        "initial_empty_evidence": "Frozen runner creates each directory without exist_ok before helper invocation; preflight checks require unused cases; no cache input imported.",
+        "writes_allowed": true,
+        "reused_between_cases": false,
+        "files_written": 5
+      },
+      "private_artifact_sha256": {
+        "compiler_result": "59c115ca1d022015367f494b6631725b9fd9432af817ad0cf787e200f07912de",
+        "process_maps": "6e92009195a8959bc31a3f5f8ab4474d968c68a57f5c30f3689c7a271a83cd1c",
+        "run_result": "2c52f2189527b93866d49dd5a19acf45dfffc96c1ec6bc4065941f6d23f228b3",
+        "stderr": "e16f2dd90c394840f8a1afc5d7ca2770c09ca90780a94c55359a14604c15b489"
+      },
+      "representation_sha256": {
+        "exe-0-repr-0.bin": "8106fa98fb0b733a00a5c2f9145cd288fb09e384ba9836f37ad639e22fa8f2bb",
+        "exe-0-repr-1.bin": "991fc1825d5b239f3b5791cc2c305516814784ee3324f17f0b5b4a972a51b60a",
+        "exe-0-repr-2.bin": "89e1c4b8f9ad78c33ff88a9c1f07ef0ec22017b8f28b1b084b4959b79ab3c6ac",
+        "exe-1-repr-0.bin": "6f4cfba247e8b449aec75e95330cb8fc98693df568f1c16ad28015e51e7f60e1",
+        "exe-1-repr-1.bin": "d55e2eabee8b7267de6ddeabfee8be8860b9ac55386b4cc5daa26fe1402f8f2e",
+        "exe-1-repr-2.bin": "6f6785e1f7b507c64c47eb9767df8ba55cd2cc0b609eb81c7823a6f816f4f4b5"
+      }
+    },
+    {
+      "case": "native16",
+      "compile_completed": true,
+      "mesh_sha256": "43434b023ff17ee4b92ed8e49f19c937c86f15cf31a7034161dd11878f944099",
+      "fragment_sha256": "3de1d79c321db3863dbb07de0d3fa0cdb126d72c07c2f1d70f0514eda3611b10",
+      "requested_mesh_width": 16,
+      "actual_compiler_executables": [
+        {
+          "index": 0,
+          "stage_flags": 128,
+          "name": "mesh",
+          "actual_compiler_subgroup_size": 16,
+          "numeric_codegen_statistics": {
+            "Code size": 2163248,
+            "Cycles": 3233053,
+            "Fills": 10585,
+            "GRF registers": 0,
+            "Instructions": 107996,
+            "Loops": 144,
+            "Max dispatch width": 16,
+            "Max live registers": 598,
+            "Non SSA regs after NIR": 2416,
+            "Push constant ranges": 0,
+            "Push constant registers": 0,
+            "SENDs": 1446,
+            "Scratch Memory Size": 32768,
+            "Spills": 4346,
+            "Workgroup Memory Size": 11412
+          },
+          "source_identity_hash_statistic": 13679924894022831165
+        },
+        {
+          "index": 1,
+          "stage_flags": 16,
+          "name": "SIMD8 fragment",
+          "actual_compiler_subgroup_size": 8,
+          "numeric_codegen_statistics": {
+            "Code size": 15648,
+            "Cycles": 8221,
+            "Fills": 0,
+            "GRF registers": 0,
+            "Instructions": 1005,
+            "Loops": 0,
+            "Max dispatch width": 8,
+            "Max live registers": 95,
+            "Non SSA regs after NIR": 287,
+            "Push constant ranges": 4,
+            "Push constant registers": 11,
+            "SENDs": 41,
+            "Scratch Memory Size": 0,
+            "Spills": 0,
+            "Workgroup Memory Size": 0
+          },
+          "source_identity_hash_statistic": 10865569414379229494
+        }
+      ],
+      "optimization_disabled": false,
+      "descriptor_mode": "push",
+      "push_constant_range_bytes": 88,
+      "ICD_file_identity_and_hash_attested": true,
+      "all_frozen_pins_match_after": true,
+      "owned_process_stopped_reaped_and_absent": true,
+      "cache": {
+        "enabled": true,
+        "disable_environment_variable_present": false,
+        "initially_empty_isolated_directory": true,
+        "initial_empty_evidence": "Frozen runner creates each directory without exist_ok before helper invocation; preflight checks require unused cases; no cache input imported.",
+        "writes_allowed": true,
+        "reused_between_cases": false,
+        "files_written": 5
+      },
+      "private_artifact_sha256": {
+        "compiler_result": "ec56ef617352af00cd130e8c5f72331421959cb98ed90815ff3bfd18ab3802a3",
+        "process_maps": "3a893a8a1c178857b62c5c9715f2aa25fab01e321cbf58a6db39e0ddb699406d",
+        "run_result": "09efb080bd7e5e9b2090657637f242ea745c2c98e49e0a07be34f28425d80aa9",
+        "stderr": "e16f2dd90c394840f8a1afc5d7ca2770c09ca90780a94c55359a14604c15b489"
+      },
+      "representation_sha256": {
+        "exe-0-repr-0.bin": "ee986836990ced5b881fb6b13f582742bd54242cb4076bb5b8b379e21cc1dbc2",
+        "exe-0-repr-1.bin": "991fc1825d5b239f3b5791cc2c305516814784ee3324f17f0b5b4a972a51b60a",
+        "exe-0-repr-2.bin": "89e1c4b8f9ad78c33ff88a9c1f07ef0ec22017b8f28b1b084b4959b79ab3c6ac",
+        "exe-1-repr-0.bin": "6f4cfba247e8b449aec75e95330cb8fc98693df568f1c16ad28015e51e7f60e1",
+        "exe-1-repr-1.bin": "d55e2eabee8b7267de6ddeabfee8be8860b9ac55386b4cc5daa26fe1402f8f2e",
+        "exe-1-repr-2.bin": "6f6785e1f7b507c64c47eb9767df8ba55cd2cc0b609eb81c7823a6f816f4f4b5"
+      }
+    }
+  ],
+  "paired_comparisons": [
+    {
+      "requested_mesh_width": 8,
+      "diagnostic_codegen_match": true,
+      "executables": [
+        {
+          "index": 0,
+          "name": "mesh",
+          "representations": [
+            {
+              "name": "Final NIR",
+              "native_sha256": "12ce2628c33b5482fe47fd9da77ed508ee85df3a9542ca1d020e74d27b4ac6ba",
+              "native_source_metadata": {
+                "line_byte_span": [
+                  25,
+                  137
+                ],
+                "line_index": 1,
+                "source_hash_uint64": 13679924894022831165,
+                "value_byte_span": [
+                  41,
+                  135
+                ]
+              },
+              "python_sha256": "d795db2dd5e497977b4e7ed29d2ef40c7c331bfe5136976f83dc1021a1bda625",
+              "python_source_metadata": {
+                "line_byte_span": [
+                  25,
+                  137
+                ],
+                "line_index": 1,
+                "source_hash_uint64": 1957409030052446534,
+                "value_byte_span": [
+                  41,
+                  135
+                ]
+              },
+              "raw_equal": false,
+              "source_identity_metadata_only_difference": true,
+              "source_statistic_crosscheck": true
+            },
+            {
+              "name": "Shader push map",
+              "native_sha256": "991fc1825d5b239f3b5791cc2c305516814784ee3324f17f0b5b4a972a51b60a",
+              "python_sha256": "991fc1825d5b239f3b5791cc2c305516814784ee3324f17f0b5b4a972a51b60a",
+              "raw_equal": true
+            },
+            {
+              "name": "GEN Assembly",
+              "native_sha256": "027ed3c613fb0435bc72b7822dae170955e35efc22f99dd8911a7cfabf98c9bf",
+              "python_sha256": "027ed3c613fb0435bc72b7822dae170955e35efc22f99dd8911a7cfabf98c9bf",
+              "raw_equal": true
+            }
+          ],
+          "stage_flags": 128,
+          "statistics": {
+            "all_codegen_statistics_equal": true,
+            "source_identity_statistic": {
+              "name": "Source hash",
+              "native_value": 13679924894022831165,
+              "python_value": 1957409030052446534,
+              "source_confirmed_description": "Hash generated from shader source or vkd3d-proton provided.",
+              "source_confirmed_format": "VK_PIPELINE_EXECUTABLE_STATISTIC_FORMAT_UINT64_KHR",
+              "values_equal": false
+            }
+          },
+          "subgroup_size": 8
+        },
+        {
+          "index": 1,
+          "name": "SIMD8 fragment",
+          "representations": [
+            {
+              "name": "Final NIR",
+              "native_sha256": "6f4cfba247e8b449aec75e95330cb8fc98693df568f1c16ad28015e51e7f60e1",
+              "python_sha256": "6f4cfba247e8b449aec75e95330cb8fc98693df568f1c16ad28015e51e7f60e1",
+              "raw_equal": true,
+              "source_identity_metadata_only_difference": false,
+              "source_statistic_crosscheck": true
+            },
+            {
+              "name": "Shader push map",
+              "native_sha256": "d55e2eabee8b7267de6ddeabfee8be8860b9ac55386b4cc5daa26fe1402f8f2e",
+              "python_sha256": "d55e2eabee8b7267de6ddeabfee8be8860b9ac55386b4cc5daa26fe1402f8f2e",
+              "raw_equal": true
+            },
+            {
+              "name": "GEN Assembly",
+              "native_sha256": "6f6785e1f7b507c64c47eb9767df8ba55cd2cc0b609eb81c7823a6f816f4f4b5",
+              "python_sha256": "6f6785e1f7b507c64c47eb9767df8ba55cd2cc0b609eb81c7823a6f816f4f4b5",
+              "raw_equal": true
+            }
+          ],
+          "stage_flags": 16,
+          "statistics": {
+            "all_codegen_statistics_equal": true,
+            "source_identity_statistic": {
+              "name": "Source hash",
+              "native_value": 10865569414379229494,
+              "python_value": 10865569414379229494,
+              "source_confirmed_description": "Hash generated from shader source or vkd3d-proton provided.",
+              "source_confirmed_format": "VK_PIPELINE_EXECUTABLE_STATISTIC_FORMAT_UINT64_KHR",
+              "values_equal": true
+            }
+          },
+          "subgroup_size": 8
+        }
+      ]
+    },
+    {
+      "requested_mesh_width": 16,
+      "diagnostic_codegen_match": true,
+      "executables": [
+        {
+          "index": 0,
+          "name": "mesh",
+          "representations": [
+            {
+              "name": "Final NIR",
+              "native_sha256": "ee986836990ced5b881fb6b13f582742bd54242cb4076bb5b8b379e21cc1dbc2",
+              "native_source_metadata": {
+                "line_byte_span": [
+                  25,
+                  137
+                ],
+                "line_index": 1,
+                "source_hash_uint64": 13679924894022831165,
+                "value_byte_span": [
+                  41,
+                  135
+                ]
+              },
+              "python_sha256": "8106fa98fb0b733a00a5c2f9145cd288fb09e384ba9836f37ad639e22fa8f2bb",
+              "python_source_metadata": {
+                "line_byte_span": [
+                  25,
+                  137
+                ],
+                "line_index": 1,
+                "source_hash_uint64": 1957409030052446534,
+                "value_byte_span": [
+                  41,
+                  135
+                ]
+              },
+              "raw_equal": false,
+              "source_identity_metadata_only_difference": true,
+              "source_statistic_crosscheck": true
+            },
+            {
+              "name": "Shader push map",
+              "native_sha256": "991fc1825d5b239f3b5791cc2c305516814784ee3324f17f0b5b4a972a51b60a",
+              "python_sha256": "991fc1825d5b239f3b5791cc2c305516814784ee3324f17f0b5b4a972a51b60a",
+              "raw_equal": true
+            },
+            {
+              "name": "GEN Assembly",
+              "native_sha256": "89e1c4b8f9ad78c33ff88a9c1f07ef0ec22017b8f28b1b084b4959b79ab3c6ac",
+              "python_sha256": "89e1c4b8f9ad78c33ff88a9c1f07ef0ec22017b8f28b1b084b4959b79ab3c6ac",
+              "raw_equal": true
+            }
+          ],
+          "stage_flags": 128,
+          "statistics": {
+            "all_codegen_statistics_equal": true,
+            "source_identity_statistic": {
+              "name": "Source hash",
+              "native_value": 13679924894022831165,
+              "python_value": 1957409030052446534,
+              "source_confirmed_description": "Hash generated from shader source or vkd3d-proton provided.",
+              "source_confirmed_format": "VK_PIPELINE_EXECUTABLE_STATISTIC_FORMAT_UINT64_KHR",
+              "values_equal": false
+            }
+          },
+          "subgroup_size": 16
+        },
+        {
+          "index": 1,
+          "name": "SIMD8 fragment",
+          "representations": [
+            {
+              "name": "Final NIR",
+              "native_sha256": "6f4cfba247e8b449aec75e95330cb8fc98693df568f1c16ad28015e51e7f60e1",
+              "python_sha256": "6f4cfba247e8b449aec75e95330cb8fc98693df568f1c16ad28015e51e7f60e1",
+              "raw_equal": true,
+              "source_identity_metadata_only_difference": false,
+              "source_statistic_crosscheck": true
+            },
+            {
+              "name": "Shader push map",
+              "native_sha256": "d55e2eabee8b7267de6ddeabfee8be8860b9ac55386b4cc5daa26fe1402f8f2e",
+              "python_sha256": "d55e2eabee8b7267de6ddeabfee8be8860b9ac55386b4cc5daa26fe1402f8f2e",
+              "raw_equal": true
+            },
+            {
+              "name": "GEN Assembly",
+              "native_sha256": "6f6785e1f7b507c64c47eb9767df8ba55cd2cc0b609eb81c7823a6f816f4f4b5",
+              "python_sha256": "6f6785e1f7b507c64c47eb9767df8ba55cd2cc0b609eb81c7823a6f816f4f4b5",
+              "raw_equal": true
+            }
+          ],
+          "stage_flags": 16,
+          "statistics": {
+            "all_codegen_statistics_equal": true,
+            "source_identity_statistic": {
+              "name": "Source hash",
+              "native_value": 10865569414379229494,
+              "python_value": 10865569414379229494,
+              "source_confirmed_description": "Hash generated from shader source or vkd3d-proton provided.",
+              "source_confirmed_format": "VK_PIPELINE_EXECUTABLE_STATISTIC_FORMAT_UINT64_KHR",
+              "values_equal": true
+            }
+          },
+          "subgroup_size": 8
+        }
+      ]
+    }
+  ],
+  "result": {
+    "all_four_compiles_completed": true,
+    "one_pipeline_per_process": true,
+    "all_GEN_Assembly_and_push_maps_byte_exact_within_each_width": true,
+    "all15_numeric_codegen_statistics_exact_within_each_width": true,
+    "mesh_Final_NIR_differs_only_in_checked_source_identity_metadata": true,
+    "fragment_Final_NIR_byte_exact": true,
+    "actual_compiler_mesh_widths_verified": [
+      8,
+      8,
+      16,
+      16
+    ],
+    "actual_compiler_fragment_width": 8,
+    "all_processes_stopped_and_reaped": true,
+    "GPU_lease_released": true
+  },
+  "acceptance": {
+    "queue_retrieval": false,
+    "command_buffers_created": false,
+    "shader_dispatch_executed": false,
+    "render_executed": false,
+    "raw434_GPU_output_execution_proven": false,
+    "live_renderer629_executed": false,
+    "actual_full_runtime_pipeline_acceptance": false,
+    "full_native_quality_acceptance": false,
+    "performance_run": false,
+    "performance_gain_established": false
+  },
+  "old_helpers_sources_profiles_plan01_plan02_and_raw_IR_preserved": true,
+  "references": [
+    "docs/native-mesh-profile96-lowering.md",
+    "research/native-mesh-profile96-lowering.json",
+    "research/native-mesh-profile96-instrumentation-correspondence.json",
+    "research/native-mesh-replay-e5-observation.json",
+    "docs/mesa-cache-policy.md"
+  ]
+}

@@ -1,0 +1,440 @@
+{
+  "schema": "open-ocarina.matrix-original-warp32-observation/v1",
+  "profile": "open-ocarina.matrix-original-warp32/v1",
+  "header_magic": "OOMATW32",
+  "scope": "One properties phase, one optimized pipeline compile phase and three bounded single-original-warp32 synthetic dispatches",
+  "reviewed_plan_sha256": "7cc5763ea2edfbccba0da82dea095639c07d94818682eb503f72ad727525c7c6",
+  "preparation_receipt_sha256": "4a74dc9d6966a443d2f91ec6f0241a6b1cbdeed41cd1d93bfece5dbea4478ede",
+  "helper_source_sha256": "0e6ac830bbd85f88ce402faaafc37fd4240aaa945734302c4fcf6272e3cb9a55",
+  "helper_binary_sha256": "78b414cdbd132221b6a89f76ac777027098eaf2ff63c5c09884dbbf201fa77bb",
+  "wrapper_sha256": "28f35436b7ef7e7b3076da773c054b62b32b73790ea109872f956c4b1c753cf1",
+  "shader_source_sha256": "3403043a5faa1e82230fd7a52be6a828082f8bd5b63ba322b5d37fb9e0472118",
+  "shader_spirv_sha256": "3d44ca34d2f755b1a1179ca015079ee406493876908441f1903ba76814771f49",
+  "oracle_sha256": "80a97bd7289c85d1ceaf5c145d948caf216cc75af556dd3e246399cc8e3e2e37",
+  "dependency_sha256": {
+    "tools/matrix_warp_bridge.py": "28f35436b7ef7e7b3076da773c054b62b32b73790ea109872f956c4b1c753cf1",
+    "src/probes/matrix_warp_bridge.c": "0e6ac830bbd85f88ce402faaafc37fd4240aaa945734302c4fcf6272e3cb9a55",
+    "tools/matrix_restore_probe.py": "80a97bd7289c85d1ceaf5c145d948caf216cc75af556dd3e246399cc8e3e2e37",
+    "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+    "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+    "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c"
+  },
+  "all_frozen_source_helper_module_inputs_and_dependencies_rechecked_unchanged": true,
+  "driver_profile": {
+    "name": "cache-safe-e5",
+    "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+    "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3"
+  },
+  "driver_policy": {
+    "name": "native-safe",
+    "controlled_options": {
+      "HS_CS32_MAX_INSTS": null,
+      "HS_SPILL_BATCH": "1",
+      "HS_PUSH_SHADOW": "1",
+      "shader_spilling_rate": "1",
+      "INTEL_DEBUG": null,
+      "HS_SPILL_PCT": null,
+      "HS_RA_DEBUG": null,
+      "HS_FORCE_SIMD8": null,
+      "HS_LARGE_GRF": null,
+      "HS_SUBGROUP8": null,
+      "HS_LARGE_GRF_BIT": null,
+      "RX_VK_WARP64": null,
+      "RX_VK_NOOPT": null
+    },
+    "full_environment_snapshot": false,
+    "profile_scope": "MAX absent; no global compute fallback opt-in"
+  },
+  "disk_shader_cache_disabled": true,
+  "child_resource_limits_changed": false,
+  "retry_fallback_or_narrowing_used": false,
+  "helper_build_flags": [
+    "-std=c11",
+    "-O2",
+    "-DNDEBUG",
+    "-Wall",
+    "-Wextra",
+    "-Werror"
+  ],
+  "shader_build_flags": [
+    "-V",
+    "--target-env",
+    "vulkan1.3",
+    "-Os"
+  ],
+  "pipeline_optimization_disabled": false,
+  "pipeline_capture_statistics_flag": true,
+  "device": {
+    "name": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "vendor_id": 32902,
+    "device_id": 22176,
+    "driver": "Mesa 26.2.4"
+  },
+  "property_gate_evidence": {
+    "evidence": "Successful frozen helper admission assertions; minimum limits below are enforced bounds rather than raw numerical property readings",
+    "subgroup_default": 32,
+    "subgroup_min": 8,
+    "subgroup_max": 32,
+    "required_compute_width": 32,
+    "cooperative_shape": {
+      "M": 8,
+      "N": 8,
+      "K": 16,
+      "A": "float16",
+      "B": "float16",
+      "C": "float32",
+      "result": "float32",
+      "scope": "subgroup",
+      "saturating_accumulation": false
+    },
+    "minimum_declared_shared_bytes": 2304,
+    "minimum_compute_invocations_and_x_size": 32,
+    "minimum_storage_buffer_range": 1024,
+    "minimum_storage_descriptors_per_stage_and_set": 2,
+    "required_features": [
+      "robustBufferAccess",
+      "shaderFloat16",
+      "vulkanMemoryModel",
+      "subgroupSizeControl",
+      "computeFullSubgroups",
+      "cooperativeMatrix",
+      "pipelineExecutableInfo"
+    ],
+    "required_subgroup_size_compute_stage_and_basic_compute_operations": true
+  },
+  "observations": [
+    {
+      "phase": "properties",
+      "case": "identity",
+      "terminal_exit_status": 0,
+      "report_sha256": "ca780825517e250a3f3dc0ea9ff587b91f13ae78462ebe8283cc2152dd7edc92",
+      "result": {
+        "profile": "open-ocarina.matrix-original-warp32/v1",
+        "phase": "properties",
+        "requested_width": 32,
+        "advertised_shape": true,
+        "subgroup_min": 8,
+        "subgroup_max": 32,
+        "subgroup_default": 32,
+        "pipeline_compiled": false,
+        "gpu_executed": false,
+        "device": "Intel(R) Arc(tm) A770 Graphics (DG2)"
+      }
+    },
+    {
+      "phase": "compile",
+      "case": "identity",
+      "terminal_exit_status": 0,
+      "report_sha256": "c09f9a852057f02d7119dcd2ba94d31bbd7e1464729b69c76322c668e805bcb5",
+      "result": {
+        "profile": "open-ocarina.matrix-original-warp32/v1",
+        "phase": "compile",
+        "requested_width": 32,
+        "actual_width": 32,
+        "width_source": "pipeline_executable_properties",
+        "pipeline_compiled": true,
+        "gpu_executed": false,
+        "dispatches": 0,
+        "output_checked": false,
+        "guards_and_inputs_unchanged": null,
+        "full_output_word_count": 64,
+        "mismatches_with_software_reference": 0,
+        "safe_exact_fixture": true,
+        "fence_timeout_ns": 2000000000,
+        "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "driver": "Mesa 26.2.4"
+      }
+    },
+    {
+      "phase": "dispatch",
+      "case": "identity",
+      "terminal_exit_status": 0,
+      "report_sha256": "bcde40d906cda4865c42d6848dd25f3e4c00e43d46c1456e2e21633df40cb119",
+      "result": {
+        "profile": "open-ocarina.matrix-original-warp32/v1",
+        "phase": "dispatch",
+        "requested_width": 32,
+        "actual_width": 32,
+        "width_source": "pipeline_executable_properties",
+        "pipeline_compiled": true,
+        "gpu_executed": true,
+        "dispatches": 1,
+        "output_checked": true,
+        "guards_and_inputs_unchanged": true,
+        "full_output_word_count": 64,
+        "mismatches_with_software_reference": 0,
+        "safe_exact_fixture": true,
+        "fence_timeout_ns": 2000000000,
+        "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "driver": "Mesa 26.2.4",
+        "classification": {
+          "mismatched_packed_words": 0,
+          "mismatched_half_elements": 0,
+          "zero_sign_only_half_mismatches": 0,
+          "actual_half_classes": {
+            "positive_zero": 0,
+            "negative_zero": 0,
+            "subnormal": 0,
+            "normal": 128,
+            "infinity": 0,
+            "nan": 0
+          },
+          "software_reference_half_classes": {
+            "positive_zero": 0,
+            "negative_zero": 0,
+            "subnormal": 0,
+            "normal": 128,
+            "infinity": 0,
+            "nan": 0
+          },
+          "actual_sha256": "61de80a072716adde2ccd4e67f076a1a5233513cf7bffc5326839496e1300c5d",
+          "software_reference_sha256": "61de80a072716adde2ccd4e67f076a1a5233513cf7bffc5326839496e1300c5d",
+          "nan_payload_or_signaling_equivalence_claim": false
+        }
+      },
+      "input_bundle_sha256": "4f70cb29b07592b59856d36da156e46eb53bf69600517183d8238369cedfadc9",
+      "complete_input_payload_bytes": 1024,
+      "complete_output_payload_bytes": 256,
+      "complete_output_packed_words": 64,
+      "complete_output_half_elements": 128,
+      "all_output_bits_match_software_reference": true
+    },
+    {
+      "phase": "dispatch",
+      "case": "layout",
+      "terminal_exit_status": 0,
+      "report_sha256": "c1538731b5fe090aa508f9971341053fa8ab284fa5ede41f8e00453cd3070aea",
+      "result": {
+        "profile": "open-ocarina.matrix-original-warp32/v1",
+        "phase": "dispatch",
+        "requested_width": 32,
+        "actual_width": 32,
+        "width_source": "pipeline_executable_properties",
+        "pipeline_compiled": true,
+        "gpu_executed": true,
+        "dispatches": 1,
+        "output_checked": true,
+        "guards_and_inputs_unchanged": true,
+        "full_output_word_count": 64,
+        "mismatches_with_software_reference": 0,
+        "safe_exact_fixture": true,
+        "fence_timeout_ns": 2000000000,
+        "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "driver": "Mesa 26.2.4",
+        "classification": {
+          "mismatched_packed_words": 0,
+          "mismatched_half_elements": 0,
+          "zero_sign_only_half_mismatches": 0,
+          "actual_half_classes": {
+            "positive_zero": 0,
+            "negative_zero": 0,
+            "subnormal": 0,
+            "normal": 128,
+            "infinity": 0,
+            "nan": 0
+          },
+          "software_reference_half_classes": {
+            "positive_zero": 0,
+            "negative_zero": 0,
+            "subnormal": 0,
+            "normal": 128,
+            "infinity": 0,
+            "nan": 0
+          },
+          "actual_sha256": "d9d96de8d03d96cf40998ebf9bf68ab86ce40a2759842003e26fe1f43cc4b7a4",
+          "software_reference_sha256": "d9d96de8d03d96cf40998ebf9bf68ab86ce40a2759842003e26fe1f43cc4b7a4",
+          "nan_payload_or_signaling_equivalence_claim": false
+        }
+      },
+      "input_bundle_sha256": "a15533e93f24c3c5831942cbb01480702dc5d1f45e4dc46fb97825aac297efe9",
+      "complete_input_payload_bytes": 1024,
+      "complete_output_payload_bytes": 256,
+      "complete_output_packed_words": 64,
+      "complete_output_half_elements": 128,
+      "all_output_bits_match_software_reference": true
+    },
+    {
+      "phase": "dispatch",
+      "case": "rounding",
+      "terminal_exit_status": 0,
+      "report_sha256": "329c493af2656a6bf4faa981a7f7cdb1239a1256e49130a8b9c3700295f9f4a7",
+      "result": {
+        "profile": "open-ocarina.matrix-original-warp32/v1",
+        "phase": "dispatch",
+        "requested_width": 32,
+        "actual_width": 32,
+        "width_source": "pipeline_executable_properties",
+        "pipeline_compiled": true,
+        "gpu_executed": true,
+        "dispatches": 1,
+        "output_checked": true,
+        "guards_and_inputs_unchanged": true,
+        "full_output_word_count": 64,
+        "mismatches_with_software_reference": 16,
+        "safe_exact_fixture": false,
+        "fence_timeout_ns": 2000000000,
+        "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+        "driver": "Mesa 26.2.4",
+        "classification": {
+          "mismatched_packed_words": 16,
+          "mismatched_half_elements": 32,
+          "zero_sign_only_half_mismatches": 32,
+          "actual_half_classes": {
+            "positive_zero": 64,
+            "negative_zero": 0,
+            "subnormal": 32,
+            "normal": 32,
+            "infinity": 0,
+            "nan": 0
+          },
+          "software_reference_half_classes": {
+            "positive_zero": 32,
+            "negative_zero": 32,
+            "subnormal": 32,
+            "normal": 32,
+            "infinity": 0,
+            "nan": 0
+          },
+          "actual_sha256": "f81dbe61a3911556281e7e0131383b758a77a67bf0211538a721082781c01a3f",
+          "software_reference_sha256": "a7321cbffb4f5af3f5476880c6b3dc6d09203e945170b95c4a9853e976021aa8",
+          "nan_payload_or_signaling_equivalence_claim": false
+        }
+      },
+      "input_bundle_sha256": "72a83f6ff05c13b94aff4c1333e10881d7d6aaa9d4bff61c5d863fe06d02403b",
+      "complete_input_payload_bytes": 1024,
+      "complete_output_payload_bytes": 256,
+      "complete_output_packed_words": 64,
+      "complete_output_half_elements": 128,
+      "all_output_bits_match_software_reference": false
+    }
+  ],
+  "safe_fixture_result": {
+    "cases": [
+      "identity",
+      "layout"
+    ],
+    "complete_packed_output_words_per_case": 64,
+    "complete_half_elements_per_case": 128,
+    "total_packed_words": 128,
+    "total_half_elements": 256,
+    "all_output_bytes_and_hashes_match_software_reference": true,
+    "mismatched_packed_words": 0,
+    "mismatched_half_elements": 0
+  },
+  "rounding_diagnostic": {
+    "result": "Finite diagnostic differs from the software checkpoint reference only in zero signs",
+    "detail_metadata_sha256": "1a66f107551175f1f860ce0143b38e70719c10a2c561947502b131a2849db3c6",
+    "complete_packed_words": 64,
+    "complete_half_elements": 128,
+    "mismatched_packed_words": 16,
+    "mismatched_half_elements": 32,
+    "zero_sign_only_half_mismatches": 32,
+    "reference_half_hex": "8000",
+    "actual_half_hex": "0000",
+    "reference_mismatched_packed_word_hex": "80008000",
+    "actual_mismatched_packed_word_hex": "00000000",
+    "mismatched_rows": [
+      1,
+      5,
+      9,
+      13
+    ],
+    "mismatched_lanes": [
+      4,
+      5,
+      6,
+      7,
+      20,
+      21,
+      22,
+      23
+    ],
+    "all_columns_of_mismatched_rows": true,
+    "both_D_words_of_mismatched_lanes": true,
+    "minimum_half_subnormal_hex": "0001",
+    "minimum_half_subnormal_reference_count": 32,
+    "minimum_half_subnormal_exact_matches": 32,
+    "normal_and_preexisting_positive_zero_half_elements_match": true,
+    "all_half_elements_classified": 128,
+    "actual_half_classes": {
+      "positive_zero": 64,
+      "negative_zero": 0,
+      "subnormal": 32,
+      "normal": 32,
+      "infinity": 0,
+      "nan": 0
+    },
+    "software_reference_half_classes": {
+      "positive_zero": 32,
+      "negative_zero": 32,
+      "subnormal": 32,
+      "normal": 32,
+      "infinity": 0,
+      "nan": 0
+    },
+    "zero_sign_cause_isolated": false,
+    "driver_bug_established": false,
+    "acceptable_production_error_established": false,
+    "bit_exact_arithmetic_equivalence_pass": false
+  },
+  "safety_and_bounds": {
+    "processes_terminal": 5,
+    "dispatch_processes": 3,
+    "exclusive_leases_released": true,
+    "required_and_actual_compute_width": 32,
+    "width_evidence": "Pipeline executable properties; helper also rejects any stage mask other than compute",
+    "workgroup": [
+      32,
+      1,
+      1
+    ],
+    "logical_warps_per_workgroup": 1,
+    "dispatch_grid": [
+      1,
+      1,
+      1
+    ],
+    "dispatch_calls_per_process": 1,
+    "matrix_calls_per_dispatch_from_constant_fixture_loops": 4,
+    "readonly_input_payload_bytes_per_dispatch": 1024,
+    "complete_output_payload_bytes_per_dispatch": 256,
+    "prefix_and_suffix_guard_bytes_each": 256,
+    "guarded_buffers_per_dispatch": 2,
+    "all_input_bytes_unchanged": true,
+    "all_guard_bytes_unchanged": true,
+    "all_192_packed_words_and_384_halves_compared": true,
+    "fence_timeout_ns": 2000000000,
+    "process_timeout_seconds": 30
+  },
+  "frozen_parent_matrix03": {
+    "reviewed_plan_sha256": "3ce51b8a74ad5dd1efbe5652a2f124df9c13e3451c4149db2921c914b17af19f",
+    "preparation_receipt_sha256": "44a977938e1b121cc1128b785c25592ba7c9d86d41253aa9b7546d095780c3c8",
+    "observation_receipt_sha256": "600b98290c2064fcd04108efea267c7e635e89fb643c74d6dda5283115ef8a53",
+    "all_frozen_artifacts_sources_and_metadata_rechecked_unchanged": true
+  },
+  "validation": {
+    "focused_tests_passed_at_preparation": 16,
+    "full_suite_tests_passed_at_preparation": 618,
+    "new_GPU_work_for_this_metadata_task": false,
+    "new_source_version_implemented": false,
+    "renderer_or_driver_policy_changed": false
+  },
+  "limits": {
+    "compiled_machine_ir_or_actual_dpas_instruction_proof": false,
+    "general_original_arithmetic_equivalence": false,
+    "native_original_network_restored": false,
+    "general_32_64_128_invocation_workgroup_support": false,
+    "original_game_control_flow_uniformity_proven": false,
+    "quality_or_hair_aa_improvement_proven": false,
+    "scene_rendering_equivalence_proven": false,
+    "FPS_or_GPU_cost_claim": false,
+    "NaN_payload_or_signaling_contract": false
+  },
+  "interpretation": [
+    "The two safe finite fixtures demonstrate their original packed lane layout through this one-warp shared-memory bridge.",
+    "The rounding fixture establishes an observed negative-zero to positive-zero difference; these whole-bridge outputs do not isolate its cause.",
+    "All 32 minimum-half-subnormal reference values survived exactly, without establishing broader underflow or exceptional-value behavior.",
+    "No production shader, network weights, game input or renderer policy changed.",
+    "Process durations are excluded from shader/GPU performance evidence."
+  ]
+}
