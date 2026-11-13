@@ -1,0 +1,338 @@
+{
+  "schema": "open-ocarina.matrix-restoration-preparation/v1",
+  "scope": "CPU-only preparation; independently authored synthetic fixtures; no runtime Vulkan phase executed",
+  "plan_sha256": "3ce51b8a74ad5dd1efbe5652a2f124df9c13e3451c4149db2921c914b17af19f",
+  "source_sha256": {
+    "tools/matrix_restore_probe.py": "80a97bd7289c85d1ceaf5c145d948caf216cc75af556dd3e246399cc8e3e2e37",
+    "tools/matrix_restore_native.py": "d53d7d3569a2625d63efd2826f003bf0dae85618ccfc86f28c99653c2d42c539",
+    "src/probes/matrix_restore_native.c": "2b0b93d4b583660a5c82ec37952f9465e7a1442d3b6ee90a6c5214740e6ecfbb",
+    "tests/test_matrix_restore_probe.py": "8273556eabe130d42b70b64fdaa92447e0564087c79f2beb0b2828e6bf926df0",
+    "tests/test_matrix_restore_native.py": "72989eb615f83c130f4d61f83cd6114bc248dac7a76a27c4ea76c26893088ef0"
+  },
+  "inspected_software_lowering": {
+    "source": "emit_spirv_warp.cpp",
+    "sha256": "dd70de41fe60e74a4d2ccc6aec9178f32d245378dfbfa61b83ecce2f28a8d4ea",
+    "function": "DefineSoftwareMatrixFunction",
+    "schedule": "Ordered FP32 fused operations, half-RNE checkpoints after K8 and K16",
+    "original_console_arithmetic_certified": false,
+    "nan_payload_or_signaling_certified": false
+  },
+  "helper": {
+    "source_sha256": "2b0b93d4b583660a5c82ec37952f9465e7a1442d3b6ee90a6c5214740e6ecfbb",
+    "binary_sha256": "a147b0f9d785aded7d70cae057a208fb98b44527ae4d92dc31c54dcd6539ea38",
+    "build_flags": [
+      "-std=c11",
+      "-O2",
+      "-DNDEBUG",
+      "-Wall",
+      "-Wextra",
+      "-Werror"
+    ],
+    "compiler_version": "cc (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)"
+  },
+  "modules": {
+    "khr_m8n8k16": {
+      "source_sha256": "cfbb231b3eb85810c7742d3266725ad7cd9bc2129e7464156e883347cb7ffa3d",
+      "spirv_sha256": "7520d5114f5aa80fc59386a995e375f6859c6b33baf148654989cd25f8fd6ca1",
+      "spirv_bytes": 2252
+    },
+    "khr_m16_checkpoints_padded": {
+      "source_sha256": "7a09c19cc9e4cb89613366868202b76ccad22a8b67c7835a3dd51a1bba4eef67",
+      "spirv_sha256": "e56811496a5a65f476c2650593aef89ba216f74e0a88a8d93908420754678ec8",
+      "spirv_bytes": 5736
+    }
+  },
+  "counterexamples": {
+    "final_half_cast_is_not_checkpoint_equivalent": {
+      "checkpoint_half": 0,
+      "final_only_half": 4096
+    },
+    "positive_zero_padding_changes_negative_zero": {
+      "checkpoint_half": 32768,
+      "padded_sequential_half": 0
+    },
+    "native_reduction_order_cannot_be_assumed": {
+      "ordered_half": 0,
+      "reordered_half": 15360
+    }
+  },
+  "driver_profile_for_future_review": {
+    "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+    "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3"
+  },
+  "driver_policy_for_future_review": {
+    "name": "native-safe",
+    "controlled_options": {
+      "HS_CS32_MAX_INSTS": null,
+      "HS_SPILL_BATCH": "1",
+      "HS_PUSH_SHADOW": "1",
+      "shader_spilling_rate": "1",
+      "INTEL_DEBUG": null,
+      "HS_SPILL_PCT": null,
+      "HS_RA_DEBUG": null,
+      "HS_FORCE_SIMD8": null,
+      "HS_LARGE_GRF": null,
+      "HS_SUBGROUP8": null,
+      "HS_LARGE_GRF_BIT": null,
+      "RX_VK_WARP64": null,
+      "RX_VK_NOOPT": null
+    },
+    "full_environment_snapshot": false,
+    "profile_scope": "MAX absent; no global compute fallback opt-in"
+  },
+  "cpu_validation_count": 18,
+  "validation": {
+    "focused_tests_passed": 25,
+    "full_suite_tests_passed": 578,
+    "all_half_encodings_tested": 65536,
+    "finite_float32_to_half_samples": 3000,
+    "independent_optional_host_fmaf_samples": 1000,
+    "cpu_native_validation_guard": "Linker-wrapped vkCreateInstance exits before any Vulkan loader call; all eighteen CPU validation cases return without reaching that trap",
+    "glslang_version": "16.2.0",
+    "spirv_tools_version": "2026.1",
+    "shader_flags": [
+      "-V",
+      "--target-env",
+      "vulkan1.3",
+      "-Os"
+    ],
+    "spirv_validation_passed": true
+  },
+  "execution": {
+    "vulkan_instance_created": false,
+    "physical_device_queried": false,
+    "pipeline_compiled": false,
+    "gpu_dispatched": false,
+    "e5_matrix_shape_confirmed": false,
+    "required_subgroup_width_compiled": {
+      "8": false,
+      "16": false,
+      "32": false
+    },
+    "game_inputs_used": false
+  },
+  "future_bounds": {
+    "workgroup": [
+      32,
+      1,
+      1
+    ],
+    "dispatch": [
+      1,
+      1,
+      1
+    ],
+    "maximum_dispatches_per_invocation": 1,
+    "fence_timeout_ns": 2000000000,
+    "process_timeout_seconds": 30,
+    "guard_prefix_and_suffix_bytes_per_buffer": 256,
+    "original_warp32_integration": false,
+    "exact_native_rounding_claim": false
+  },
+  "cases": [
+    {
+      "name": "base-identity-sg8",
+      "kind": "base",
+      "fixture": "identity",
+      "width": 8,
+      "bundle": "base-identity-sg8.fixture",
+      "module": "shaders/khr_m8n8k16.spv",
+      "exact_safe_reference": true,
+      "bundle_sha256": "5594b7effd59ab83208ea70ccf89421bfc50d4971cc0fb2add5bb691a2297949",
+      "module_sha256": "7520d5114f5aa80fc59386a995e375f6859c6b33baf148654989cd25f8fd6ca1"
+    },
+    {
+      "name": "base-layout-sg8",
+      "kind": "base",
+      "fixture": "layout",
+      "width": 8,
+      "bundle": "base-layout-sg8.fixture",
+      "module": "shaders/khr_m8n8k16.spv",
+      "exact_safe_reference": true,
+      "bundle_sha256": "a2dc177f1bc23c784229d777cfd8fbe3bc4514c250c8e43e0951b948580b7d32",
+      "module_sha256": "7520d5114f5aa80fc59386a995e375f6859c6b33baf148654989cd25f8fd6ca1"
+    },
+    {
+      "name": "base-rounding-sg8",
+      "kind": "base",
+      "fixture": "rounding",
+      "width": 8,
+      "bundle": "base-rounding-sg8.fixture",
+      "module": "shaders/khr_m8n8k16.spv",
+      "exact_safe_reference": false,
+      "bundle_sha256": "ac6b1423e26582e7f811bcefac9149714332ff22bcd0f8feef20f074c613ad45",
+      "module_sha256": "7520d5114f5aa80fc59386a995e375f6859c6b33baf148654989cd25f8fd6ca1"
+    },
+    {
+      "name": "base-identity-sg16",
+      "kind": "base",
+      "fixture": "identity",
+      "width": 16,
+      "bundle": "base-identity-sg16.fixture",
+      "module": "shaders/khr_m8n8k16.spv",
+      "exact_safe_reference": true,
+      "bundle_sha256": "3cd1f31ef8f36ae4e63d2497fb1017d2797915391ae66b7b813fcd5d99411886",
+      "module_sha256": "7520d5114f5aa80fc59386a995e375f6859c6b33baf148654989cd25f8fd6ca1"
+    },
+    {
+      "name": "base-layout-sg16",
+      "kind": "base",
+      "fixture": "layout",
+      "width": 16,
+      "bundle": "base-layout-sg16.fixture",
+      "module": "shaders/khr_m8n8k16.spv",
+      "exact_safe_reference": true,
+      "bundle_sha256": "53914da2cb0df4dcbe0fe9a12eb711e05401394e26aff3fbcf343d296037ef68",
+      "module_sha256": "7520d5114f5aa80fc59386a995e375f6859c6b33baf148654989cd25f8fd6ca1"
+    },
+    {
+      "name": "base-rounding-sg16",
+      "kind": "base",
+      "fixture": "rounding",
+      "width": 16,
+      "bundle": "base-rounding-sg16.fixture",
+      "module": "shaders/khr_m8n8k16.spv",
+      "exact_safe_reference": false,
+      "bundle_sha256": "38c3ace1f3411b304a3f861ebb9d99f0081450563fc9f86d0c9dca050982d7d1",
+      "module_sha256": "7520d5114f5aa80fc59386a995e375f6859c6b33baf148654989cd25f8fd6ca1"
+    },
+    {
+      "name": "base-identity-sg32",
+      "kind": "base",
+      "fixture": "identity",
+      "width": 32,
+      "bundle": "base-identity-sg32.fixture",
+      "module": "shaders/khr_m8n8k16.spv",
+      "exact_safe_reference": true,
+      "bundle_sha256": "e013756de1965a63f4e897054d3ebcdfafbd42ddd38b3ead1206ac0e7bcdf820",
+      "module_sha256": "7520d5114f5aa80fc59386a995e375f6859c6b33baf148654989cd25f8fd6ca1"
+    },
+    {
+      "name": "base-layout-sg32",
+      "kind": "base",
+      "fixture": "layout",
+      "width": 32,
+      "bundle": "base-layout-sg32.fixture",
+      "module": "shaders/khr_m8n8k16.spv",
+      "exact_safe_reference": true,
+      "bundle_sha256": "299a9fa8dd0e1cf71296baa06d39d37d8f30bd2d6d125c9456949f6e14a57f90",
+      "module_sha256": "7520d5114f5aa80fc59386a995e375f6859c6b33baf148654989cd25f8fd6ca1"
+    },
+    {
+      "name": "base-rounding-sg32",
+      "kind": "base",
+      "fixture": "rounding",
+      "width": 32,
+      "bundle": "base-rounding-sg32.fixture",
+      "module": "shaders/khr_m8n8k16.spv",
+      "exact_safe_reference": false,
+      "bundle_sha256": "05172f8a3eeb1f30912a015eca4b6169944848a5ad06520f679e2829b7fb66c7",
+      "module_sha256": "7520d5114f5aa80fc59386a995e375f6859c6b33baf148654989cd25f8fd6ca1"
+    },
+    {
+      "name": "checkpoint-identity-sg8",
+      "kind": "checkpoint",
+      "fixture": "identity",
+      "width": 8,
+      "bundle": "checkpoint-identity-sg8.fixture",
+      "module": "shaders/khr_m16_checkpoints_padded.spv",
+      "exact_safe_reference": true,
+      "bundle_sha256": "190b658b08480b16c82d4ccdf3fa734ef7df03497a374e0fb94032844ead01a5",
+      "module_sha256": "e56811496a5a65f476c2650593aef89ba216f74e0a88a8d93908420754678ec8"
+    },
+    {
+      "name": "checkpoint-layout-sg8",
+      "kind": "checkpoint",
+      "fixture": "layout",
+      "width": 8,
+      "bundle": "checkpoint-layout-sg8.fixture",
+      "module": "shaders/khr_m16_checkpoints_padded.spv",
+      "exact_safe_reference": true,
+      "bundle_sha256": "8899d1104814dfc4cf95686d2f3817232bfd30f0ee7fdd263f9691c151e42aa1",
+      "module_sha256": "e56811496a5a65f476c2650593aef89ba216f74e0a88a8d93908420754678ec8"
+    },
+    {
+      "name": "checkpoint-rounding-sg8",
+      "kind": "checkpoint",
+      "fixture": "rounding",
+      "width": 8,
+      "bundle": "checkpoint-rounding-sg8.fixture",
+      "module": "shaders/khr_m16_checkpoints_padded.spv",
+      "exact_safe_reference": false,
+      "bundle_sha256": "c94323a2d4f2c488b136e72a7de4e35f6f77fe8b67fa87cbe3f6ebd88d081922",
+      "module_sha256": "e56811496a5a65f476c2650593aef89ba216f74e0a88a8d93908420754678ec8"
+    },
+    {
+      "name": "checkpoint-identity-sg16",
+      "kind": "checkpoint",
+      "fixture": "identity",
+      "width": 16,
+      "bundle": "checkpoint-identity-sg16.fixture",
+      "module": "shaders/khr_m16_checkpoints_padded.spv",
+      "exact_safe_reference": true,
+      "bundle_sha256": "524c7f5f4369c9963ab853fa6762665a6523b22b7b86f2d7817e3b7a06e9661c",
+      "module_sha256": "e56811496a5a65f476c2650593aef89ba216f74e0a88a8d93908420754678ec8"
+    },
+    {
+      "name": "checkpoint-layout-sg16",
+      "kind": "checkpoint",
+      "fixture": "layout",
+      "width": 16,
+      "bundle": "checkpoint-layout-sg16.fixture",
+      "module": "shaders/khr_m16_checkpoints_padded.spv",
+      "exact_safe_reference": true,
+      "bundle_sha256": "94f28ca83011df6d4e9e1b399c2072b993662aa199183550500aa3c441de7870",
+      "module_sha256": "e56811496a5a65f476c2650593aef89ba216f74e0a88a8d93908420754678ec8"
+    },
+    {
+      "name": "checkpoint-rounding-sg16",
+      "kind": "checkpoint",
+      "fixture": "rounding",
+      "width": 16,
+      "bundle": "checkpoint-rounding-sg16.fixture",
+      "module": "shaders/khr_m16_checkpoints_padded.spv",
+      "exact_safe_reference": false,
+      "bundle_sha256": "6eb72d77bfcdbb8242d23f658198baa5092c67268ed0edb7ef581ff702a1a8ca",
+      "module_sha256": "e56811496a5a65f476c2650593aef89ba216f74e0a88a8d93908420754678ec8"
+    },
+    {
+      "name": "checkpoint-identity-sg32",
+      "kind": "checkpoint",
+      "fixture": "identity",
+      "width": 32,
+      "bundle": "checkpoint-identity-sg32.fixture",
+      "module": "shaders/khr_m16_checkpoints_padded.spv",
+      "exact_safe_reference": true,
+      "bundle_sha256": "3a1f9d919c0c01f3d4a011726bc83158672b7edd44d199e0d38030a69f608c0e",
+      "module_sha256": "e56811496a5a65f476c2650593aef89ba216f74e0a88a8d93908420754678ec8"
+    },
+    {
+      "name": "checkpoint-layout-sg32",
+      "kind": "checkpoint",
+      "fixture": "layout",
+      "width": 32,
+      "bundle": "checkpoint-layout-sg32.fixture",
+      "module": "shaders/khr_m16_checkpoints_padded.spv",
+      "exact_safe_reference": true,
+      "bundle_sha256": "cd75038f7f6e9b831439faefc34cd62530f057890bea2e4d010d1c81fe7a32d0",
+      "module_sha256": "e56811496a5a65f476c2650593aef89ba216f74e0a88a8d93908420754678ec8"
+    },
+    {
+      "name": "checkpoint-rounding-sg32",
+      "kind": "checkpoint",
+      "fixture": "rounding",
+      "width": 32,
+      "bundle": "checkpoint-rounding-sg32.fixture",
+      "module": "shaders/khr_m16_checkpoints_padded.spv",
+      "exact_safe_reference": false,
+      "bundle_sha256": "ffb01e4aefb3fef660caea29d6fc31dd397f3bba06093f406eb50e97a7f9233d",
+      "module_sha256": "e56811496a5a65f476c2650593aef89ba216f74e0a88a8d93908420754678ec8"
+    }
+  ],
+  "limits": [
+    "No original shader, network weights or game inputs.",
+    "Required subgroup width must be confirmed from the compiled executable.",
+    "Rounding cases report differences from software checkpoints, not certified DPAS equivalence.",
+    "The original logical warp32 mapping is not integrated or narrowed."
+  ]
+}

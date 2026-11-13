@@ -335,7 +335,7 @@
     "game_speed_setting": 0,
     "frame_clock": "per-frame",
     "fps_cap": 60,
-    "menu_script_frames": [
+    "menu_script_seconds": [
       4,
       6,
       8,
@@ -344,6 +344,9 @@
       14,
       16
     ],
+    "menu_script_literal": "4:A,6:A,8:A,10:A,12:A,14:A,16:A",
+    "script_clock_units": "Seconds, advanced at 60 native presents per scripted second; not literal frame ordinals or wall time",
+    "script_units_metadata_correction": "The earlier metadata field mislabeled these unchanged script times as frames. Capture, launch environment and payload bytes are unchanged.",
     "exclusive_and_persistent_requested": true,
     "live_device_suppression_independently_tested": false,
     "deterministic_camera_or_workload_certificate": false
