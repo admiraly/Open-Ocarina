@@ -15,3 +15,7 @@ Upstream merge status has not been revalidated here. The affected Mesa file carr
 A local C regression allocated a graph with 92,683 nodes and added interference between its last two nodes twice. Before the change, the first node's adjacency array held two entries; afterward it held one. The privately rebuilt Vulkan driver compiled and reached gameplay. The known-working installed driver was preserved.
 
 This does not prove a frame-rate improvement, solve spilling, or enable additional physical registers. Do not apply unrelated large-GRF changes or globally narrow the game's subgroups on the strength of this fix.
+
+## Private compiler-policy cache identity proposal
+
+`hs-compiler-cache-policy.patch` replaces an incomplete compute-only environment key with a shared framed policy encoder across shader stages, ANV state, UUIDs and disk-cache namespace. It applies to the exact private source hashes checked by `check_hs_compiler_cache_policy.py`; it is not a general upstream Mesa patch. CPU production-function tests pass. An isolated driver build, startup UUID checks, one authored fixture and fixed compute byte comparisons have completed; broader renderer/quality/performance validation remains pending. See [the source audit and scope](../../docs/mesa-cache-policy.md).

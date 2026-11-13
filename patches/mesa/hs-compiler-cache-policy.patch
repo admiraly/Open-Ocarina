@@ -1,0 +1,233 @@
+From: Open-Ocarina contributors
+Subject: [PATCH] Isolate private HS compiler policies in every ANV cache identity
+License: MIT (see LICENSE.MIT)
+
+Applies to the hash-pinned private Mesa 26.2.4 source described by the checker.
+This changes cache identity only; it does not authorize compiler overrides or
+change the driver's existing dispatch-width selection behavior.
+
+diff --git a/src/vulkan/runtime/vk_pipeline.c b/src/vulkan/runtime/vk_pipeline.c
+--- a/src/vulkan/runtime/vk_pipeline.c
++++ b/src/vulkan/runtime/vk_pipeline.c
+@@ -22,6 +22,7 @@
+  */
+ 
+ #include "vk_pipeline.h"
++#include "util/hs_compiler_options.h"
+ 
+ #include "vk_alloc.h"
+ #include "vk_common_entrypoints.h"
+@@ -247,6 +248,9 @@
+                                      blake3_hash stage_blake3)
+ {
+    VK_FROM_HANDLE(vk_shader_module, module, info->module);
++   struct mesa_blake3 ctx;
++   _mesa_blake3_init(&ctx);
++   hs_compiler_options_blake3_update(&ctx, info->stage);
+ 
+    const nir_shader *builtin_nir = get_builtin_nir(info);
+    if (builtin_nir != NULL) {
+@@ -259,7 +263,8 @@
+       blob_init(&blob);
+       nir_serialize(&blob, builtin_nir, false);
+       assert(!blob.out_of_memory);
+-      _mesa_blake3_compute(blob.data, blob.size, stage_blake3);
++      _mesa_blake3_update(&ctx, blob.data, blob.size);
++      _mesa_blake3_final(&ctx, stage_blake3);
+       blob_finish(&blob);
+       return;
+    }
+@@ -269,10 +274,6 @@
+    const VkPipelineShaderStageModuleIdentifierCreateInfoEXT *iinfo =
+       vk_find_struct_const(info->pNext, PIPELINE_SHADER_STAGE_MODULE_IDENTIFIER_CREATE_INFO_EXT);
+ 
+-   struct mesa_blake3 ctx;
+-
+-   _mesa_blake3_init(&ctx);
+-
+    /* Hash pipeline flags that might affect compilation */
+    pipeline_flags &= (VK_PIPELINE_CREATE_2_VIEW_INDEX_FROM_DEVICE_INDEX_BIT_KHR |
+                       VK_PIPELINE_CREATE_2_UNALIGNED_DISPATCH_BIT_MESA);
+@@ -282,20 +283,6 @@
+ 
+    assert(util_bitcount(info->stage) == 1);
+    _mesa_blake3_update(&ctx, &info->stage, sizeof(info->stage));
+-
+-   /* Local patch: the lane width HS_FORCE_SIMD8 gives compute shaders is part
+-    * of their key, so a change of mode does not load the other mode's code.
+-    */
+-   if (info->stage == VK_SHADER_STAGE_COMPUTE_BIT) {
+-      const char *hs_mode = getenv("HS_FORCE_SIMD8");
+-      if (hs_mode == NULL)
+-         hs_mode = "none";
+-      _mesa_blake3_update(&ctx, hs_mode, strlen(hs_mode));
+-
+-      const char *hs_max = getenv("HS_CS32_MAX_INSTS");
+-      if (hs_max != NULL)
+-         _mesa_blake3_update(&ctx, hs_max, strlen(hs_max));
+-   }
+ 
+    if (module) {
+       _mesa_blake3_update(&ctx, module->hash, sizeof(module->hash));
+diff --git a/src/intel/vulkan/anv_physical_device.c b/src/intel/vulkan/anv_physical_device.c
+--- a/src/intel/vulkan/anv_physical_device.c
++++ b/src/intel/vulkan/anv_physical_device.c
+@@ -3,6 +3,7 @@
+  */
+ 
+ #include "anv_private.h"
++#include "util/hs_compiler_options.h"
+ #include "anv_api_version.h"
+ #include "anv_measure.h"
+ 
+@@ -2578,6 +2579,10 @@
+    bool always_use_bindless = device->instance->drirc.features.always_bindless;
+    _mesa_blake3_update(&blake3_ctx, &always_use_bindless,
+                      sizeof(always_use_bindless));
++   hs_compiler_options_blake3_update(&blake3_ctx, 0);
++   hs_compiler_effective_blake3_update(
++      &blake3_ctx, brw_get_compiler_config_value(device->compiler),
++      device->compiler->spilling_rate);
+    _mesa_blake3_final(&blake3_ctx, blake3);
+    memcpy(device->pipeline_cache_uuid, blake3, VK_UUID_SIZE);
+ 
+@@ -2596,11 +2601,20 @@
+                                device->info.pci_device_id);
+    assert(len == sizeof(renderer) - 2);
+ 
+-   char timestamp[BLAKE3_HEX_LEN];
+-   _mesa_blake3_format(timestamp, device->driver_build_sha1);
+-
+    const uint64_t driver_flags =
+       brw_get_compiler_config_value(device->compiler);
++   struct mesa_blake3 ctx;
++   uint8_t namespace_hash[BLAKE3_KEY_LEN];
++   _mesa_blake3_init(&ctx);
++   _mesa_blake3_update(&ctx, device->driver_build_sha1,
++                       sizeof(device->driver_build_sha1));
++   hs_compiler_options_blake3_update(&ctx, 0);
++   hs_compiler_effective_blake3_update(
++      &ctx, driver_flags, device->compiler->spilling_rate);
++   _mesa_blake3_final(&ctx, namespace_hash);
++
++   char timestamp[BLAKE3_HEX_LEN];
++   _mesa_blake3_format(timestamp, namespace_hash);
+    device->vk.disk_cache = disk_cache_create(renderer, timestamp, driver_flags);
+ #endif
+ }
+diff --git a/src/intel/vulkan/anv_shader_compile.c b/src/intel/vulkan/anv_shader_compile.c
+--- a/src/intel/vulkan/anv_shader_compile.c
++++ b/src/intel/vulkan/anv_shader_compile.c
+@@ -3,6 +3,7 @@
+  */
+ 
+ #include "anv_private.h"
++#include "util/hs_compiler_options.h"
+ #include "anv_nir.h"
+ #include "anv_shader.h"
+ 
+@@ -245,8 +246,10 @@
+    const bool indirect_descriptors = device->indirect_descriptors;
+    _mesa_blake3_update(&ctx, &indirect_descriptors, sizeof(indirect_descriptors));
+ 
+-   const int spilling_rate = device->compiler->spilling_rate;
+-   _mesa_blake3_update(&ctx, &spilling_rate, sizeof(spilling_rate));
++   hs_compiler_options_blake3_update(&ctx, 0);
++   hs_compiler_effective_blake3_update(
++      &ctx, brw_get_compiler_config_value(device->compiler),
++      device->compiler->spilling_rate);
+ 
+    const uint8_t afs = device->instance->drirc.debug.assume_full_subgroups;
+    _mesa_blake3_update(&ctx, &afs, sizeof(afs));
+@@ -743,6 +746,12 @@
+ {
+    struct mesa_blake3 blake3_ctx;
+    _mesa_blake3_init(&blake3_ctx);
++   struct anv_physical_device *pdevice =
++      container_of(device, struct anv_physical_device, vk);
++   hs_compiler_options_blake3_update(&blake3_ctx, stages);
++   hs_compiler_effective_blake3_update(
++      &blake3_ctx, brw_get_compiler_config_value(pdevice->compiler),
++      pdevice->compiler->spilling_rate);
+ 
+    anv_foreach_vk_stage(stage, stages) {
+       union brw_any_prog_key key;
+diff --git a/src/util/hs_compiler_options.h b/src/util/hs_compiler_options.h
+new file mode 100644
+--- /dev/null
++++ b/src/util/hs_compiler_options.h
+@@ -0,0 +1,74 @@
++/* SPDX-License-Identifier: MIT
++ * Copyright 2026 Open-Ocarina contributors
++ *
++ * Cache identity for the private HS compiler policy. This conservatively
++ * distinguishes raw startup option spelling as well as presence. Compiler
++ * options must be fixed before Mesa initialization and remain immutable for
++ * the process lifetime: existing compiler readers cache several getenv values.
++ */
++#ifndef HS_COMPILER_OPTIONS_H
++#define HS_COMPILER_OPTIONS_H
++
++#include <stdint.h>
++#include <stdlib.h>
++#include <string.h>
++#include "util/mesa-blake3.h"
++
++static inline void
++hs_compiler_key_u64(struct mesa_blake3 *ctx, uint64_t value)
++{
++   uint8_t encoded[8];
++   for (unsigned i = 0; i < sizeof(encoded); i++)
++      encoded[i] = value >> (8 * i);
++   _mesa_blake3_update(ctx, encoded, sizeof(encoded));
++}
++
++/* scope is a Vulkan shader-stage mask, or zero for device-wide identity.
++ * Every option is encoded in every scope. Do not add stage-specific omissions.
++ */
++static inline void
++hs_compiler_options_blake3_update(struct mesa_blake3 *ctx, uint32_t scope)
++{
++   static const char domain[] = "anv-hs-compiler-policy-v1";
++   static const char *const names[] = {
++      "HS_FORCE_SIMD8",
++      "HS_CS32_MAX_INSTS",
++      "HS_SPILL_BATCH",
++      "HS_SPILL_PCT",
++      "HS_LARGE_GRF",
++      "HS_SUBGROUP8",
++      "shader_spilling_rate",
++   };
++
++   _mesa_blake3_update(ctx, domain, sizeof(domain));
++   hs_compiler_key_u64(ctx, scope);
++   hs_compiler_key_u64(ctx, sizeof(names) / sizeof(names[0]));
++   for (unsigned i = 0; i < sizeof(names) / sizeof(names[0]); i++) {
++      const char *value = getenv(names[i]);
++      const uint8_t present = value != NULL;
++      const uint64_t size = present ? strlen(value) : 0;
++      hs_compiler_key_u64(ctx, strlen(names[i]));
++      _mesa_blake3_update(ctx, names[i], strlen(names[i]));
++      _mesa_blake3_update(ctx, &present, sizeof(present));
++      hs_compiler_key_u64(ctx, size);
++      if (present)
++         _mesa_blake3_update(ctx, value, size);
++   }
++}
++
++/* The effective drirc value may differ even when getenv spelling is identical.
++ * Include it, and Mesa's existing compiler debug/SIMD configuration, in ANV
++ * state, UUIDs and the disk-cache namespace as well as the raw startup policy.
++ */
++static inline void
++hs_compiler_effective_blake3_update(struct mesa_blake3 *ctx,
++                                   uint64_t compiler_config,
++                                   int32_t spilling_rate)
++{
++   static const char domain[] = "anv-hs-effective-policy-v1";
++   _mesa_blake3_update(ctx, domain, sizeof(domain));
++   hs_compiler_key_u64(ctx, compiler_config);
++   hs_compiler_key_u64(ctx, (uint32_t)spilling_rate);
++}
++
++#endif /* HS_COMPILER_OPTIONS_H */

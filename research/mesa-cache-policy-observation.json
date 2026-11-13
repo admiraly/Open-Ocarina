@@ -1,0 +1,1075 @@
+{
+  "schema": "open-ocarina.mesa-cache-policy-observation/v1",
+  "date": "2026-11-13",
+  "scope": "New isolated cache-policy driver: physical-only startup identities, one authored physical fixture, four original compute invocations on one owned frozen graph, plus a separately reported primary-agent authored mesh32 mapping. No renderer/performance validation.",
+  "implementation": {
+    "patch_sha256": "a14f1d19c157544aee851f1f48284d6eeb2f5e7dbfb8150c1919c320f4dc787f",
+    "candidate_source_sha256": {
+      "src/vulkan/runtime/vk_pipeline.c": "06a4a8f952e0db4a2ad32feac20add2f6d9e77ffa3e493e2fd4ed53846479b93",
+      "src/intel/vulkan/anv_physical_device.c": "6aca0565bfe57322a5a873b9ba2e10afb93f11b53cbce6c6d66a43713597fc49",
+      "src/intel/vulkan/anv_shader_compile.c": "7d3b69e78052d8265c4c3649ede02237457e6b8095315a8399c0e3367bf9d4b9",
+      "src/util/hs_compiler_options.h": "706a1cbe4885bc66d5cb0385ef16376e64c6cf27aa14fa114163a8b22d242de3"
+    },
+    "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+    "elf_build_id": "05fee58a93a8230fbc4d5e80fc4bab875832695e",
+    "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+    "build_receipt_sha256": "fa192d81317b47649f64da4105aa20136c55c2f554307b01425d4062027513d3",
+    "full_source_manifest_sha256": "143773214298d319f660ada9d9b5187f206be568c75be78a5fbdb1f89cd02969",
+    "compiler": {
+      "cc": "cc (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)",
+      "cxx": "c++ (GCC) 16.2.1 20260819 (Red Hat 16.2.1-2)",
+      "meson": "1.11.2",
+      "ninja": "1.13.2",
+      "maximum_workers": 4,
+      "optimization": "2",
+      "b_ndebug": "true",
+      "buildtype": "debugoptimized",
+      "debug": true,
+      "b_lto": false
+    },
+    "meson_options_match_prior_except_private_install_prefix": true,
+    "old_source_build_and_library_unchanged": true,
+    "protected_original_manifest_sha256": "83f0baff29acc16bcad852a6a421406a960134915e6b3d80757e8cd3f649220b"
+  },
+  "queried_device": {
+    "vendor_id": 32902,
+    "device_id": 22176,
+    "device_name": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "api_version": 4211042,
+    "api_version_components": [
+      1,
+      4,
+      354
+    ],
+    "driver_version": 109060100,
+    "driver_name": "Intel open-source Mesa driver",
+    "driver_info": "Mesa 26.2.4",
+    "device_uuid": "8680a056080000000300000000000000",
+    "driver_uuid": "542135820eef585924bda292588520e1",
+    "safe3_min_subgroup_size": 8,
+    "safe3_max_subgroup_size": 32,
+    "required_subgroup_stages": 224,
+    "max_push_descriptors": 32,
+    "max_compute_invocations": 1024,
+    "r32_uint_optimal_features": 117895,
+    "features": {
+      "robustBufferAccess": 1,
+      "shaderInt16": 1,
+      "shaderInt64": 1,
+      "samplerAnisotropy": 1,
+      "shaderStorageBufferArrayDynamicIndexing": 1,
+      "shaderImageGatherExtended": 1,
+      "bufferDeviceAddress": 1,
+      "uniformBufferStandardLayout": 1,
+      "subgroupSizeControl": 1,
+      "computeFullSubgroups": 1,
+      "robustBufferAccess2": 1,
+      "nullDescriptor": 1,
+      "pipelineExecutableInfo": 1
+    },
+    "extensions": {
+      "push_descriptor": 1,
+      "pipeline_executable_properties": 1,
+      "robustness2": 1,
+      "shader_object": 1
+    }
+  },
+  "physical_properties": {
+    "fresh_processes": 18,
+    "logical_devices_created": 0,
+    "shader_or_pipeline_creations": 0,
+    "dispatches": 0,
+    "unique_codegen_profiles": 14,
+    "all_distinct_codegen_profiles_have_distinct_pipeline_and_shader_binary_uuid": true,
+    "same_codegen_profiles_and_excluded_runtime_controls_keep_uuid": true,
+    "helper_source_sha256": "3d1e8121fbbbd4f02e6c5a9595b5270268f1b8d1e2282243e91eaea3807f6d0b",
+    "helper_binary_sha256": "b3a0e6a1d62e64ffc2e1159d364df14d03f3725d2be0d8954c279618fb00bde3",
+    "test_artifact_sha256": "76f8b24df1b07fc2b4d039a04bf0aca41d2c37b33fe80e1300eaaa2c7591b6bd",
+    "rows": [
+      {
+        "case": "safe3",
+        "policy": {
+          "HS_FORCE_SIMD8": null,
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "70506e8d5b5adf7368e0030d12d8ce2e",
+        "shader_binary_uuid": "a5d90017887bbece48c7d87dfeb4de38",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "12ff1532d237d5d2a21e43d5036ee2df9022c5aa03595ac748f3bab4961a6923",
+        "launch_artifact_sha256": "0a18d5d41596bc5260c783581b4d45c7f8ea805dee918808a4a9361b4410545f",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "safe3-repeat",
+        "policy": {
+          "HS_FORCE_SIMD8": null,
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "70506e8d5b5adf7368e0030d12d8ce2e",
+        "shader_binary_uuid": "a5d90017887bbece48c7d87dfeb4de38",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "12ff1532d237d5d2a21e43d5036ee2df9022c5aa03595ac748f3bab4961a6923",
+        "launch_artifact_sha256": "7d2d97cde20a2326d96bd7bf6968db66e726cfa8f0687e3215affe432e63a006",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "force-empty",
+        "policy": {
+          "HS_FORCE_SIMD8": "",
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "45c7e63630f6e22b669b34a53fe2773b",
+        "shader_binary_uuid": "a43f05a08b7247cae154195fa0aeb8ed",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "48d1b8a237a89b0aa7d565945477cc3c40f280f50962a016824768b316f8faeb",
+        "launch_artifact_sha256": "1229f0fabfe4a8486a56f3e9aa28d5dbd7ae204d1013f60502b48eaf8e2bb258",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "force-none",
+        "policy": {
+          "HS_FORCE_SIMD8": "none",
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "bd7ff5aa4245b61aacd0351c1b37ad7f",
+        "shader_binary_uuid": "9d9f7418c509fda8cc6eb0c3e8096c42",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "b59e2953cc675dcf0889377f9096ea260343cbf5ae1dbad9fabf6367548eb4f9",
+        "launch_artifact_sha256": "eab3806b458d3f6646bc5781f37f1233267b03f28a4efb7611851a299a497553",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "max-empty",
+        "policy": {
+          "HS_FORCE_SIMD8": null,
+          "HS_CS32_MAX_INSTS": "",
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "b0d8477486e47332a2a2c92484aab470",
+        "shader_binary_uuid": "ffab54e2c62855122696be13950f27b4",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "34d9fbc6ef3cfb85540ed5dcde9da087e4d50d713f3624084b0c7520c2721663",
+        "launch_artifact_sha256": "829ba57bba8e8ddb21454d56a3b1103a85cc6e1c9b232513e92513f83aebd480",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "max-zero",
+        "policy": {
+          "HS_FORCE_SIMD8": null,
+          "HS_CS32_MAX_INSTS": "0",
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "f13b6f468e871055de46d272a11bd5d1",
+        "shader_binary_uuid": "703a727c06f60f9382fd95bcc113b8f3",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "06bfd361d2422b54ff6053434da25a7e4135baa783f0acbd4db875ef3ba752fb",
+        "launch_artifact_sha256": "ff41db90cbff37b4a64830293b85be3fd9afb2c9a7794bb99b431188eac4f1c4",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "max-100000",
+        "policy": {
+          "HS_FORCE_SIMD8": null,
+          "HS_CS32_MAX_INSTS": "100000",
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "9dd9f1726264dc2091964f80294afc5c",
+        "shader_binary_uuid": "396ee36a1bed592968d29b8a674b1d3f",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "6e8b68d77fc66b64337c141d15a2a17aa66bc03a553c3237c7b39b964746060f",
+        "launch_artifact_sha256": "b88d2d79600e9a070eedccad5f9a11bf571c912fb353e7e68e6479a562354157",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "old-concat-left",
+        "policy": {
+          "HS_FORCE_SIMD8": "cs",
+          "HS_CS32_MAX_INSTS": "1",
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "d30065c893563643cf0264720d6483ae",
+        "shader_binary_uuid": "40e323b82d77ff10d030d74cd0118098",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "5b7691f3db253864c366651a7fe758b6facd77922fb34e99766eb004cb80c684",
+        "launch_artifact_sha256": "c73f6c2dcb145f42db7186201f6a90e4dc90e290ac493a0619eeab9d5a081c10",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "old-concat-right",
+        "policy": {
+          "HS_FORCE_SIMD8": "cs1",
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "b9222ed9acc7cd17e9496ed27f991306",
+        "shader_binary_uuid": "8fc32078d165fdef9fab8b0eee44d287",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "53e65a6484065b3e8b74415bdf52e03e284d9000b7f39468d2147439ccd04a31",
+        "launch_artifact_sha256": "b51acc4ff1532c7cbc21f046b5e92dd775e469035dc7073f746e3c9376c1eeb9",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "batch-absent",
+        "policy": {
+          "HS_FORCE_SIMD8": null,
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": null,
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "173bf2278e525e3ec57dfd084a6e6beb",
+        "shader_binary_uuid": "1c53f39daf0e9e2b0e04217b858814a0",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "1da9d4df08db825d616b410fd5e1cd58e8b08d0b0c993290138eb04dd5fe69c0",
+        "launch_artifact_sha256": "d23e87ba90a83ac74fd5d43ca907bc6465752e86d40f12464e99e6402269881f",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "batch-empty",
+        "policy": {
+          "HS_FORCE_SIMD8": null,
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "ec72fff0e55d8e25eb1edb463f0055c6",
+        "shader_binary_uuid": "db547e31f53b863b913d5eb310c3eda6",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "4800565a8c85c5dfbe1894120e490d34fbfe754a17e03a46c84fa4fc03bc40ef",
+        "launch_artifact_sha256": "b50d5122a472aed0ea2fbbc7fe0868c61c9915dd257298bc639c9023e5dd0507",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "spill-pct1",
+        "policy": {
+          "HS_FORCE_SIMD8": null,
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": "1",
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "c4c71ec3c488ae3234e155986e52e1e3",
+        "shader_binary_uuid": "bdf2c1588cdd01fdc6d2b2b8c87c9c1b",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "ff7a8e3c0b191c000ddd53221a7c79cbd584a1f34f6746b983355262276a8be7",
+        "launch_artifact_sha256": "053fe49163a7edded4b371cf1768c5f438824e7763cfc78780a94ed88c1ff368",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "large-grf1",
+        "policy": {
+          "HS_FORCE_SIMD8": null,
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": "1",
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "f016c059d79a7d677152d461cda75a3c",
+        "shader_binary_uuid": "5e4130e1bad6c2a3369ffb9332482405",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "06baaf542c0ae6e08cac7bfaee0bbeec7cd1a9db586e733958594850a9fcb660",
+        "launch_artifact_sha256": "928d83d5acb18d053146e257d75d13eb4a6b89be5dfb3f7a9c522ef86799bd22",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "subgroup8-1",
+        "policy": {
+          "HS_FORCE_SIMD8": null,
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": "1",
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "9f8de3d21fc14ce3caecd7d9988cc78f",
+        "shader_binary_uuid": "dad350bfed91336530fca1e3e893e9fc",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 8,
+        "properties_artifact_sha256": "cef702816e27f0d2ca7a4b8fb0f7a5a3474f2b20038201080941d6f9cb7de2ee",
+        "launch_artifact_sha256": "0dc20e5ebc32c874c82d82cf28845a1a24d7e6a47b7417179f11e1b4396197dc",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "rate2",
+        "policy": {
+          "HS_FORCE_SIMD8": null,
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "2"
+        },
+        "pipeline_cache_uuid": "6e98069d641f5d6aeefa84a33e448aa9",
+        "shader_binary_uuid": "515d4b0ccf934a5d43680a578f576525",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "80cef0b3a45b145fcd6b3673a12dfc265482abfc9e33d929d4eed9516e29700f",
+        "launch_artifact_sha256": "e794ba129552707842597a39098210ad4fa495cac5c9fd815c24335a488b2916",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "runtime-shadow-absent",
+        "policy": {
+          "HS_FORCE_SIMD8": null,
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "70506e8d5b5adf7368e0030d12d8ce2e",
+        "shader_binary_uuid": "a5d90017887bbece48c7d87dfeb4de38",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "12ff1532d237d5d2a21e43d5036ee2df9022c5aa03595ac748f3bab4961a6923",
+        "launch_artifact_sha256": "c4252b645802e26cbdd777259760621ca4a82d75d55adfae05c05cf3862c7960",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": null,
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "runtime-ra-log1",
+        "policy": {
+          "HS_FORCE_SIMD8": null,
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "70506e8d5b5adf7368e0030d12d8ce2e",
+        "shader_binary_uuid": "a5d90017887bbece48c7d87dfeb4de38",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "12ff1532d237d5d2a21e43d5036ee2df9022c5aa03595ac748f3bab4961a6923",
+        "launch_artifact_sha256": "523e039fc8195ef357940ca2fc8bdca071fab2c4b64d1fbb425a127ea32611b7",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": "1",
+          "HS_LARGE_GRF_BIT": null
+        }
+      },
+      {
+        "case": "runtime-large-grf-bit1",
+        "policy": {
+          "HS_FORCE_SIMD8": null,
+          "HS_CS32_MAX_INSTS": null,
+          "HS_SPILL_BATCH": "1",
+          "HS_SPILL_PCT": null,
+          "HS_LARGE_GRF": null,
+          "HS_SUBGROUP8": null,
+          "shader_spilling_rate": "1"
+        },
+        "pipeline_cache_uuid": "70506e8d5b5adf7368e0030d12d8ce2e",
+        "shader_binary_uuid": "a5d90017887bbece48c7d87dfeb4de38",
+        "api_version": 4211042,
+        "driver_version": 109060100,
+        "min_subgroup_size": 8,
+        "max_subgroup_size": 32,
+        "properties_artifact_sha256": "12ff1532d237d5d2a21e43d5036ee2df9022c5aa03595ac748f3bab4961a6923",
+        "launch_artifact_sha256": "bd06987ee6c9c2f0f26e2436c0a8986c50a3acd64eaddeddf9e3764fc2159e2f",
+        "runtime_controls": {
+          "HS_PUSH_SHADOW": "1",
+          "HS_RA_DEBUG": null,
+          "HS_LARGE_GRF_BIT": "1"
+        }
+      }
+    ]
+  },
+  "synthetic_fixture": {
+    "native_helper_sha256": "105a88a8e21fd2151964a57f6b6d8a8e8b5a2aaf5341c2411c551019edf26a7c",
+    "plan_sha256": "5a317d52cc15abaad9f0173321dc477a98b436e4a9f74e45a885843e67184ccf",
+    "actual_subgroup_size": 32,
+    "dispatch_count": 1,
+    "complete_allocations": [
+      {
+        "allocation_index": 0,
+        "complete_bytes": 4096,
+        "matches_independently_constructed_cpu_oracle": true,
+        "sha256": "c68862b97577bec0879a91d84f0911ac4e1dbda8b0b35af2e35495d5f5488df6"
+      },
+      {
+        "allocation_index": 1,
+        "complete_bytes": 4096,
+        "matches_independently_constructed_cpu_oracle": true,
+        "sha256": "2085efe5021f6be31f76a31568d98b25fe0714446b46132f455634e7380d75e9"
+      }
+    ],
+    "compiler_environment": {
+      "HS_SPILL_BATCH": "1",
+      "shader_spilling_rate": "1",
+      "HS_CS32_MAX_INSTS": null,
+      "HS_FORCE_SIMD8": null,
+      "HS_SUBGROUP8": null,
+      "HS_SPILL_PCT": null,
+      "HS_LARGE_GRF": null
+    },
+    "runtime_environment": {
+      "HS_PUSH_SHADOW": null,
+      "HS_RA_DEBUG": null,
+      "HS_LARGE_GRF_BIT": null,
+      "INTEL_DEBUG": null
+    },
+    "property_profile_runtime_shadow": {
+      "HS_PUSH_SHADOW": "1"
+    },
+    "full_independent_cpu_oracles_passed": true,
+    "result_artifact_sha256": "0df30df652fbf0fc4231d7813b5f315071c522b7640b3f98e3b0ac7c91e090b9",
+    "oracle_verification_artifact_sha256": "5a4e1c63dfc351e08c5f29782244a4a8c98c81ab9c46e0c173ae60bd38633ca3"
+  },
+  "original_compute": {
+    "mode": "frozen-diagnostic",
+    "program": "cc62764061c44f6a",
+    "variant": "095931037888515a",
+    "spirv_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+    "source_manifest_sha256": "4c4b5fcaf73318b8edc08406a58e39a2702544f86183e7d894455e7d363206b9",
+    "native_helper_sha256": "105a88a8e21fd2151964a57f6b6d8a8e8b5a2aaf5341c2411c551019edf26a7c",
+    "local_size": [
+      64,
+      1,
+      1
+    ],
+    "direct_group_count": [
+      2,
+      1,
+      1
+    ],
+    "cases": [
+      {
+        "requested_width": 32,
+        "actual_width": 32,
+        "dispatch_count": 1,
+        "complete_allocations": 59,
+        "complete_bytes": 1163919360,
+        "plan_sha256": "36104f021b9f652f194230d3f9ccea0037c4a2af7f6df8c1cd9975d0786db4d3",
+        "source_manifest_sha256": "4c4b5fcaf73318b8edc08406a58e39a2702544f86183e7d894455e7d363206b9",
+        "result_sha256": "3f882d42eb3ba97e219e12eb812ce462b42fb77729687d5782bef1c52a0f15bc",
+        "cross_driver_all_file_hashes_equal": true,
+        "cross_driver_comparison_sha256": "405b468c3c8b69242c30aaf21c5ddfe781a19f6203d65668bb6c20068343d73a",
+        "writable_output_sha256": "323334824a3f64ff80ba0cb8f8602c8f6dd7be3384a32353bbd8e1eb0628c7c2",
+        "within_driver_full_graph_comparison_passed": null,
+        "id": "baseline32"
+      },
+      {
+        "requested_width": 32,
+        "actual_width": 32,
+        "dispatch_count": 1,
+        "complete_allocations": 59,
+        "complete_bytes": 1163919360,
+        "plan_sha256": "36104f021b9f652f194230d3f9ccea0037c4a2af7f6df8c1cd9975d0786db4d3",
+        "source_manifest_sha256": "4c4b5fcaf73318b8edc08406a58e39a2702544f86183e7d894455e7d363206b9",
+        "result_sha256": "3f882d42eb3ba97e219e12eb812ce462b42fb77729687d5782bef1c52a0f15bc",
+        "cross_driver_all_file_hashes_equal": true,
+        "cross_driver_comparison_sha256": "405b468c3c8b69242c30aaf21c5ddfe781a19f6203d65668bb6c20068343d73a",
+        "writable_output_sha256": "323334824a3f64ff80ba0cb8f8602c8f6dd7be3384a32353bbd8e1eb0628c7c2",
+        "within_driver_full_graph_comparison_passed": true,
+        "within_driver_comparison_sha256": "65bc46f8d3070fd13aaac1f556b8dbb5f9faa5e4efe884b3debd6ab0b1282024",
+        "id": "repeat32"
+      },
+      {
+        "requested_width": 16,
+        "actual_width": 16,
+        "dispatch_count": 1,
+        "complete_allocations": 59,
+        "complete_bytes": 1163919360,
+        "plan_sha256": "f866f68c39a8c715d8191766db39c467271c2a8f1e0c3555570d0eb5f3243922",
+        "source_manifest_sha256": "4c4b5fcaf73318b8edc08406a58e39a2702544f86183e7d894455e7d363206b9",
+        "result_sha256": "a6e91867d3f5b7b55268891f8c1bc7c2b125fab30b51c57dcece508b10d00995",
+        "cross_driver_all_file_hashes_equal": true,
+        "cross_driver_comparison_sha256": "0ce3dff34ae3fe56ed273d3d29bb46f83c6e68a14e1e46297b96b929ef337f00",
+        "writable_output_sha256": "323334824a3f64ff80ba0cb8f8602c8f6dd7be3384a32353bbd8e1eb0628c7c2",
+        "within_driver_full_graph_comparison_passed": true,
+        "within_driver_comparison_sha256": "de5ba29e4f0591e6370b9344c2b3f74ee24f0347a64889719e93f334c58317af",
+        "id": "required16"
+      },
+      {
+        "requested_width": 8,
+        "actual_width": 8,
+        "dispatch_count": 1,
+        "complete_allocations": 59,
+        "complete_bytes": 1163919360,
+        "plan_sha256": "cb85323b541c7a51a7d467dd0e95f931560731681096b56e76ce9feb3ee948f7",
+        "source_manifest_sha256": "4c4b5fcaf73318b8edc08406a58e39a2702544f86183e7d894455e7d363206b9",
+        "result_sha256": "0374e1848958dbfeb46d734f79eb2a255e3406e042c62babbabcb09a712d8b9f",
+        "cross_driver_all_file_hashes_equal": true,
+        "cross_driver_comparison_sha256": "1563d204b3bb79a9d148472389ae5c96597448fc43d0a7b88ad8d32adcc4e296",
+        "writable_output_sha256": "323334824a3f64ff80ba0cb8f8602c8f6dd7be3384a32353bbd8e1eb0628c7c2",
+        "within_driver_full_graph_comparison_passed": true,
+        "within_driver_comparison_sha256": "ee3cd568a775ebecd95b220b4e38a2fc407f0fc3bc9f4ee0f975af3de8d159ad",
+        "id": "required8"
+      }
+    ],
+    "within_new_driver_three_complete_graph_comparisons_passed": true,
+    "cross_driver_four_complete_file_hash_comparisons_passed": true,
+    "cross_driver_reference_library_sha256": "5ea19ac96aa52d061ecf2b8e23df7ed3d7d3b36c7d2ae7fe62f01c5a9b610aaa",
+    "cross_driver_comparison_is_cpu_only_hash_equality": true,
+    "complete_allocations_per_case": 59,
+    "complete_bytes_per_case": 1163919360,
+    "complete_output_graph_sha256": "a0a06318d88ea9f57e224fc1565bd7f1b3d25f5bafc4c577f084a2cf59550ab2",
+    "output_graph_digest_encoding": "SHA256 of UTF8 JSON ordered rows {id,size,sha256}, sorted object keys, separators comma/colon, no newline.",
+    "complete_allocation_metadata": [
+      {
+        "id": "buffer-0",
+        "size": 4194304,
+        "sha256": "7ac84a212629a1f919996531acfa5ead0d9986b79e14d7760db1d79355e14c99"
+      },
+      {
+        "id": "buffer-2",
+        "size": 4194304,
+        "sha256": "c8c124e5499428d93be234a8caebd3075f2fcf4cfe30d5b456953b173afbbec4"
+      },
+      {
+        "id": "buffer-5",
+        "size": 20971520,
+        "sha256": "7a7868ef096fc2a7c59de40a25a85129fcc7f4e2430127435cc4c4a8b8b83291"
+      },
+      {
+        "id": "buffer-7",
+        "size": 4194304,
+        "sha256": "b9835c045ab988688e4dfe9ed81920b4f04f1b0aa8314a213f7e2c0f1ed80891"
+      },
+      {
+        "id": "buffer-10",
+        "size": 20971520,
+        "sha256": "353b062903195217d7b826913a46b8d0c75af1aabde23b06b8f79cfb30c4d107"
+      },
+      {
+        "id": "buffer-12",
+        "size": 54525952,
+        "sha256": "b5a3a42b6310e216a9b88caff19531e1c0b6ab0691c9547a20a0d084f6703017"
+      },
+      {
+        "id": "buffer-14",
+        "size": 4194304,
+        "sha256": "810da6c191facaa000710c11507dddcdb4e6cdffdb17204c6a5c76a261376054"
+      },
+      {
+        "id": "buffer-16",
+        "size": 4194304,
+        "sha256": "323334824a3f64ff80ba0cb8f8602c8f6dd7be3384a32353bbd8e1eb0628c7c2"
+      },
+      {
+        "id": "buffer-19",
+        "size": 8388608,
+        "sha256": "8ca83ce8663d0aa715aa5e777be0691ef85a2edaf99b37ed22b12cacff516d8b"
+      },
+      {
+        "id": "buffer-22",
+        "size": 4194304,
+        "sha256": "27db8c89cae1f6d265974bdf1b64c8ba3331d8011a4782684c43ed4f709370f6"
+      },
+      {
+        "id": "buffer-24",
+        "size": 8388608,
+        "sha256": "1e41d254f20e95c274079bfbf3ec7853daeee10b2a76a926d17f1863b41e26e1"
+      },
+      {
+        "id": "buffer-26",
+        "size": 4194304,
+        "sha256": "ff977b45c39ac8b23638bae4bf87ee86d8052112f66a01cba8593b455916b2e5"
+      },
+      {
+        "id": "buffer-28",
+        "size": 4194304,
+        "sha256": "858387bcb85c8799d19253808bb927a8bf643320c716857df7e2cc034ff3c36f"
+      },
+      {
+        "id": "buffer-30",
+        "size": 4194304,
+        "sha256": "136b41f4e8eadb6284289ac7edb9f9c127a7eeb3c3bb513de01d4e664b2afb4b"
+      },
+      {
+        "id": "buffer-32",
+        "size": 4194304,
+        "sha256": "321f4418e4c0346cb0c49a1cd701fb4625477d41f7e4bbf92cbc7244ce11e9f8"
+      },
+      {
+        "id": "buffer-34",
+        "size": 16777216,
+        "sha256": "70aaafb2ecd09212934c780bfef176ef08bf9fab00d78f4f1c89b7b8d67d042e"
+      },
+      {
+        "id": "buffer-36",
+        "size": 25165824,
+        "sha256": "aa63f8ccf72935dfcbb53cc82e38f8f8dde3632064395c12cbd8a0b7344653de"
+      },
+      {
+        "id": "buffer-38",
+        "size": 4194304,
+        "sha256": "46d762b8e28e0c98c5190db97da0435f69798b0e8fc76df41bbbb04b0ada49e5"
+      },
+      {
+        "id": "buffer-40",
+        "size": 4194304,
+        "sha256": "0565acac068cffa0fcebc9b5c3f9e6e93c55b43a095bceb6e7ba80d77628a3c9"
+      },
+      {
+        "id": "buffer-42",
+        "size": 4194304,
+        "sha256": "6bfcf7c316905bb8bec153b471bbefe50773b6cfb9581832468a816c61d8864b"
+      },
+      {
+        "id": "buffer-44",
+        "size": 8388608,
+        "sha256": "5f7082756f67b350856d4f4b672c460943ff7bef7c2d3b11d6e4785c312cb843"
+      },
+      {
+        "id": "buffer-46",
+        "size": 4194304,
+        "sha256": "79d440d227908b909a4270a83db0631cf017e602dae9554a1552d6158830a056"
+      },
+      {
+        "id": "buffer-47",
+        "size": 71303168,
+        "sha256": "ce53a57a6ffff87f16aff7e76269c2d284d39ac0ab0fa3657e0d787f022fa921"
+      },
+      {
+        "id": "buffer-49",
+        "size": 12582912,
+        "sha256": "22a4fbf47411c46078654e2600885a33a3e62a08724a7529a608e2515b598309"
+      },
+      {
+        "id": "buffer-51",
+        "size": 8388608,
+        "sha256": "18b3cf6ace9974b67487b9118ec104ae9998afa61df62db3c9495285dc4262c3"
+      },
+      {
+        "id": "buffer-54",
+        "size": 167772160,
+        "sha256": "a55259a63244f2a37ba5848d600dad4ea9d7de7c7e833a88ddc7b460bcf04c4a"
+      },
+      {
+        "id": "buffer-55",
+        "size": 25165824,
+        "sha256": "51667b8107a6f9371fd5e0ad0f5cdf6b85f4390a6c5cc19bb7f3978110e0d324"
+      },
+      {
+        "id": "buffer-57",
+        "size": 8388608,
+        "sha256": "a826f9067d450324ce44a4c681679cc351532ed7cce8d7f3b1b1d150a7a447ad"
+      },
+      {
+        "id": "buffer-59",
+        "size": 25165824,
+        "sha256": "8962812da5bcc885fc5f09e8cb90a53ce105d9fa8a60ee8c08ef588730289fa3"
+      },
+      {
+        "id": "buffer-62",
+        "size": 100663296,
+        "sha256": "d18f10d867a100ada0270b1eb7cef23178846aa3b4a208b0b2f0ed416cbb425b"
+      },
+      {
+        "id": "buffer-64",
+        "size": 37748736,
+        "sha256": "8ea55a535bafe699d5c207660b67ea1516d7324838f347d962e3745be11b8e0f"
+      },
+      {
+        "id": "buffer-67",
+        "size": 4194304,
+        "sha256": "8f3fd31ef19b52b95e215fb8667d725cdca3fa424f21f9e79dd5eeabec840900"
+      },
+      {
+        "id": "buffer-69",
+        "size": 8388608,
+        "sha256": "64d6f99223c1a764218a7a178a472ec5c2126dd01982c17a184cfc6d5acf2dfd"
+      },
+      {
+        "id": "buffer-71",
+        "size": 8388608,
+        "sha256": "7ac11e357c483678465d17fdb1ac5a3c16bc166ac88b13fbe436e88dcf80d3a6"
+      },
+      {
+        "id": "buffer-73",
+        "size": 138412032,
+        "sha256": "b1440dc6d6d4d394659ffe90d9486887e35f2571ab274954f9c99c229558781e"
+      },
+      {
+        "id": "buffer-76",
+        "size": 4194304,
+        "sha256": "26a0fbc32aa56b86fa46cd2a4095813b5b758015f99746eff891fb314dc3b9d1"
+      },
+      {
+        "id": "buffer-78",
+        "size": 8388608,
+        "sha256": "e2f3fe84fb758a81fb7b5646a5fb2a49ac0cc0de1f914a7d21dddcacae52f8e8"
+      },
+      {
+        "id": "buffer-80",
+        "size": 29360128,
+        "sha256": "9520362c2131cad3ca25cb4137b260e0818db8221b1b30c516b21fd5b522da22"
+      },
+      {
+        "id": "buffer-82",
+        "size": 33554432,
+        "sha256": "f9c0b81dc68297e9606d6339bceccc89283d9601ff6169f2e5e9ba0da94cbf7d"
+      },
+      {
+        "id": "buffer-84",
+        "size": 4194304,
+        "sha256": "beba5eb4782ad0344518d756747d14bf6845799ee7b17366beedd8cedfbb5983"
+      },
+      {
+        "id": "buffer-86",
+        "size": 4194304,
+        "sha256": "efc28c9191780c31891b9d76105051469a6c6d2ddf50c75e0d28ae3a2b7cec36"
+      },
+      {
+        "id": "buffer-88",
+        "size": 4194304,
+        "sha256": "7506dcffabafc85e1a0f21088f3f1f7aaca240488c51148fab8fe71a3ae4e121"
+      },
+      {
+        "id": "buffer-90",
+        "size": 8388608,
+        "sha256": "b5877246f07261c93485bfa06bb4b032fea0d9bd09fb0a29d69499c5e8198d59"
+      },
+      {
+        "id": "buffer-92",
+        "size": 4194304,
+        "sha256": "b1877b471cb8cd2f435955e5b5fe7b8c1ff1a190adefd8a003fed0f72d869725"
+      },
+      {
+        "id": "buffer-94",
+        "size": 4194304,
+        "sha256": "cfbc7559aa7296b2255426b4b6b66df369479fb3b2178912037c2e71a2cd166e"
+      },
+      {
+        "id": "buffer-96",
+        "size": 20971520,
+        "sha256": "9534f6f3345ddfdc08d8317c0822e8356069394d3bd8412fdb19aa5f9d0e3833"
+      },
+      {
+        "id": "buffer-98",
+        "size": 12582912,
+        "sha256": "af058e9480179f65ff407146b3309fdbd665480d37101b668e90237e18778c09"
+      },
+      {
+        "id": "buffer-100",
+        "size": 25165824,
+        "sha256": "8e72cd9c6703326dc329f2f5d7c30f582e5b5e34a8c1db2299de0f888ae4390d"
+      },
+      {
+        "id": "buffer-102",
+        "size": 8388608,
+        "sha256": "26b64a0b2f03cb937f1b8bdb34a2a5ffd2cc6bb57730019f25c0037e7d3ea375"
+      },
+      {
+        "id": "buffer-104",
+        "size": 12582912,
+        "sha256": "0a16d8ef5b515ed72785e7c04990a9b176c20477d78c4a596994d3ddcf3fe9f5"
+      },
+      {
+        "id": "buffer-106",
+        "size": 50331648,
+        "sha256": "9c45a48da708255d0ee95d1a5221c7fcb32c1dadbe30f761371e6f5a34910fb6"
+      },
+      {
+        "id": "buffer-108",
+        "size": 16777216,
+        "sha256": "1447531c5f4147900e57062bded68b068555ec866c62029962ffd39c0d1cd7a5"
+      },
+      {
+        "id": "buffer-110",
+        "size": 8388608,
+        "sha256": "ef815aff3b3286c4dd147afa37dcdda501ede1ae6bf48514a3117b8824b2da1f"
+      },
+      {
+        "id": "buffer-112",
+        "size": 25165824,
+        "sha256": "77fb9fc101650c4544cc580acde14467ea9150fe7d696dc98ae98fa55fb94332"
+      },
+      {
+        "id": "buffer-114",
+        "size": 4194304,
+        "sha256": "949195ae32f66911d77aabe284b843788d1ac7cbfa334c82e175cc016d6599a5"
+      },
+      {
+        "id": "buffer-116",
+        "size": 4194304,
+        "sha256": "2833daaca69ec3d63b251ff7e2160ef83e682bc078c2dcf001b92cd457aff45c"
+      },
+      {
+        "id": "buffer-118",
+        "size": 4194304,
+        "sha256": "46d950d28b8c5205ad446a173e27dcab66aa7a1e24f993393a321d7d2b7a653b"
+      },
+      {
+        "id": "buffer-120",
+        "size": 25165824,
+        "sha256": "cfaf6a1eeb908dc4b60431f6d3f2922825d08e2a822ca2710624028468ebad5c"
+      },
+      {
+        "id": "buffer-121",
+        "size": 2097152,
+        "sha256": "2985c50269f36396f2b6c0112f79c6c15c4bbf43520383eb61a99bdb082e5150"
+      }
+    ],
+    "compiler_environment": {
+      "HS_SPILL_BATCH": "1",
+      "shader_spilling_rate": "1",
+      "HS_CS32_MAX_INSTS": null,
+      "HS_FORCE_SIMD8": null,
+      "HS_SUBGROUP8": null,
+      "HS_SPILL_PCT": null,
+      "HS_LARGE_GRF": null
+    },
+    "runtime_environment": {
+      "HS_PUSH_SHADOW": null,
+      "HS_RA_DEBUG": null,
+      "HS_LARGE_GRF_BIT": null,
+      "INTEL_DEBUG": null
+    },
+    "captured_after_matching_complete_allocations": 56,
+    "captured_after_total_allocations": 59,
+    "captured_after_whole_graph_agreement": false,
+    "writable_after_match": {
+      "id": "buffer-16",
+      "complete_bytes": 4194304,
+      "full_file_match": true,
+      "sha256": "323334824a3f64ff80ba0cb8f8602c8f6dd7be3384a32353bbd8e1eb0628c7c2"
+    },
+    "unchanged_input_after_differences": [
+      {
+        "id": "buffer-0",
+        "complete_bytes": 4194304,
+        "matches_frozen_initial": true,
+        "changed_bytes_versus_captured_after": 3184,
+        "first_difference_versus_captured_after": 1164600
+      },
+      {
+        "id": "buffer-2",
+        "complete_bytes": 4194304,
+        "matches_frozen_initial": true,
+        "changed_bytes_versus_captured_after": 31,
+        "first_difference_versus_captured_after": 553417
+      },
+      {
+        "id": "buffer-7",
+        "complete_bytes": 4194304,
+        "matches_frozen_initial": true,
+        "changed_bytes_versus_captured_after": 6,
+        "first_difference_versus_captured_after": 1327640
+      }
+    ]
+  },
+  "freeze_receipts": {
+    "property_and_synthetic_sha256": "9dfcafdc32cb4f7d927e387a6208a395486d2596383821d905351a0c0f8f86e9",
+    "original_compute_sha256": "6e090177271b8d60c641e3babf1031da2e538ca8c2aaa69bf753a27ef103a973"
+  },
+  "limits": [
+    "Physical-only policy cases query startup UUIDs; they do not compile shaders under forced/narrowed settings or directly test every stage cache hit/miss path.",
+    "One fixed owned compute graph:32 repeated once;16/8 tested once each. This does not establish general shader/subgroup equivalence.",
+    "Cross-driver checks explicitly compare complete saved file hashes across different binaries; they are not a compatible-performance comparison or a weakening of the same-driver verifier.",
+    "The three unchanged inputs disagree with captured AFTER; historical CPU/temporal atomicity and original full device-state equivalence remain unproven.",
+    "This record includes no game-derived native-mesh, live-renderer, image-quality, GPU-time, speedup or FPS validation.",
+    "Property safe3 uses runtime SHADOW=1; the unchanged physical replay wrapper uses runtime SHADOW absent. The compiler policy is the same.",
+    "Old-driver observations remain historical records and are not relabeled as tests of the new library.",
+    "Compiler options must remain immutable after process startup."
+  ],
+  "gpu_lease_released": true,
+  "separate_authored_mesh_mapping": {
+    "executed_by": "primary agent under a separate exclusive GPU lease",
+    "synthetic_only": true,
+    "build_report_sha256": "4008aa610c16c078865a2a4f414eb5b902e80c4b32b5f3f22fb5661e6decdf13",
+    "execution_report_sha256": "a03850cb79de8dc1b001b329e7cfe37ea48d26ba14877d5b8d1f663b63d5f204",
+    "helper_source_sha256": "3322c25b11aa8d3de0af9ab1d2b6503853bbbd287102c5acbf03d5d475fc2df1",
+    "helper_binary_sha256": "b20ee3990bb5e4e8db2397b64e59d795cc41a6634c17b574194ecc1d2ad61ac3",
+    "authored_shader_source_sha256": "050b7c0814093c5be8944ad547ece44b013216462b9251ca094e507ff73d351c",
+    "shader_spirv_sha256": "3dec7d029c694e13d178c6d4466d9b9839d7260b6660b7394e33b7f4ad2c84d6",
+    "driver_library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+    "requested_width": 32,
+    "actual_width": 32,
+    "mesh_draw_calls": 1,
+    "workgroups": [
+      1,
+      1,
+      1
+    ],
+    "local_size": [
+      32,
+      1,
+      1
+    ],
+    "output_words": 224,
+    "output_bytes": 896,
+    "all_words_match_reported_cpu_oracle": true,
+    "oracle_tuple_per_lane": [
+      "lane",
+      0,
+      0,
+      "lane",
+      "lane",
+      32,
+      0
+    ],
+    "output_sha256": "ee3ad33deb8d802d8ffed9b83c59cf5fcb52b7f1a3d09d2ebcaf2c1c25fcdc03",
+    "emitted_vertices": 0,
+    "emitted_primitives": 0,
+    "attachments": 0,
+    "pipeline_optimization_disabled": false,
+    "real_shader_equivalence": false,
+    "scope": "Separately reported authored mesh invocation mapping; this agent read the pinned reports and did not execute this draw."
+  }
+}
