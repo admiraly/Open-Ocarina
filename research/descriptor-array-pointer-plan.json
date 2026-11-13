@@ -1,0 +1,146 @@
+{
+  "alignment": 16,
+  "counts": [
+    3,
+    3,
+    2
+  ],
+  "descriptor_bindings": [
+    {
+      "binding": 0,
+      "count": 2,
+      "typed_alias_widths": [
+        4,
+        8,
+        16
+      ]
+    },
+    {
+      "binding": 1,
+      "count": 2,
+      "typed_alias_widths": [
+        4,
+        8,
+        16
+      ]
+    }
+  ],
+  "descriptors": [
+    {
+      "binding": 0,
+      "bound_bytes": 10,
+      "device": 0,
+      "element": 0,
+      "guest": 68719480828,
+      "kind": "single",
+      "size_word": 0
+    },
+    {
+      "binding": 1,
+      "bound_bytes": 64,
+      "device": 0,
+      "element": 1,
+      "guest": 68719480816,
+      "kind": "single",
+      "size_word": 64
+    },
+    {
+      "binding": 0,
+      "bound_bytes": 32,
+      "device": 0,
+      "element": 1,
+      "guest": 68719484928,
+      "kind": "table",
+      "size_word": 0
+    }
+  ],
+  "device_feature_support_queried": false,
+  "future_compile_requirements": [
+    "Query and enable every declared optional feature.",
+    "Match original robustBufferAccess/robustBufferAccess2 and reported robustness alignment.",
+    "Bind every element of both fixed-count arrays; match all typed alias ranges.",
+    "Verify uploaded per-width intervals against as-submitted descriptor ranges and words."
+  ],
+  "limitations": [
+    "Already-classified synthetic views, not native descriptor creation.",
+    "CPU integer-address agreement does not prove GPU access validity, robustness or alias behavior.",
+    "Feature support and descriptor limits must be queried only after the parent grants device access."
+  ],
+  "pipeline_compile_authorized": false,
+  "required_features": [
+    "shaderInt64",
+    "bufferDeviceAddress",
+    "variablePointersStorageBuffer",
+    "shaderStorageBufferArrayNonUniformIndexing"
+  ],
+  "rows": [
+    {
+      "base": 68719480816,
+      "binding": 0,
+      "element": 0,
+      "high": 68719480824,
+      "low": 68719480816
+    },
+    {
+      "base": 68719480816,
+      "binding": 1,
+      "element": 1,
+      "high": 68719480880,
+      "low": 68719480824
+    },
+    {
+      "base": 68719484928,
+      "binding": 0,
+      "element": 1,
+      "high": 68719484960,
+      "low": 68719484928
+    },
+    {
+      "base": 68719480816,
+      "binding": 0,
+      "element": 0,
+      "high": 68719480824,
+      "low": 68719480816
+    },
+    {
+      "base": 68719480816,
+      "binding": 1,
+      "element": 1,
+      "high": 68719480880,
+      "low": 68719480824
+    },
+    {
+      "base": 68719484928,
+      "binding": 0,
+      "element": 1,
+      "high": 68719484960,
+      "low": 68719484928
+    },
+    {
+      "base": 68719480816,
+      "binding": 1,
+      "element": 1,
+      "high": 68719480880,
+      "low": 68719480816
+    },
+    {
+      "base": 68719484928,
+      "binding": 0,
+      "element": 1,
+      "high": 68719484960,
+      "low": 68719484928
+    }
+  ],
+  "schema": 1,
+  "starts": [
+    0,
+    3,
+    6
+  ],
+  "synthetic": true,
+  "widths": [
+    4,
+    8,
+    16
+  ]
+}
