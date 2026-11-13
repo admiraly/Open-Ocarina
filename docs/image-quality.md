@@ -29,6 +29,8 @@ The inspected baseline is Hookshot commit `4cf785a0b143bb34026506c9a3fe4f4bb93c7
 
 Detailed evidence and uncertainties are in [the hair investigation](../research/hair-aliasing.md).
 
+The later native-renderer pilot also exposes a separate movie-quality omission: ten exact programs from the NDVE movie-upscale asset are skipped, then a linear compute upscale replaces the chain. The gameplay FSR replacement is a different boundary. The [native-network restoration investigation](../research/native-network-restoration.md) records exact keys, metadata and the queried Arc matrix capabilities; neither omission should be hidden by an otherwise correct scene screenshot.
+
 ## Correctness before enhancement
 
 First classify the artifact: broken geometry/material or missing pass; inadequate alpha/mipmap/coverage handling; incorrect reconstruction inputs/history; or ordinary undersampling of a correctly rendered feature. Restore missing native behavior before compensating for it with blur.

@@ -1,0 +1,905 @@
+{
+  "schema": 1,
+  "purpose": "Native-network omission inventory; CPU-only source/asset analysis and physical-device queries, no queue/device/pipeline/dispatch created",
+  "reference_log_sha256": "ab0db5b8de5fe91e49043e9639cd03d22b0e6da65871da08f416a18452c7fb03",
+  "reference_renderer_sha256": "29bdc49d929d60464b93d8c257d1363c171129af5db7e6ff5607a45e88a063a2",
+  "reference_host_sha256": "4eb32b56a91869b5d7ac1673f0ca1e3c0841e893a8a34f728ec85344a312cb30",
+  "reference_freeze_sha256": "70c9e64942c7f97d6d94e16614cbaa02a9ee71209f8d79fdee0dc5e5bfb3ba94",
+  "source_upstream_commit": "4cf785a0b143bb34026506c9a3fe4f4bb93c797d",
+  "source_gate": "gpu/vk/vk_shader.cpp translate_into uses_cooperative_matrix gate; existing renderer derivative read-only",
+  "asset_compressed_sha256": "405b7d96ac787c5f3eaf79f3c47605ca38dacbbf2d34fe116e24beee4f655922",
+  "asset_decoded_sha256": "27f940cb2f52b8f8df822b686a2fd4f938d8df4fca9cbf68b0b4bfeeac3e1399",
+  "movie_upscale_asset_classification": "Each listed key is matched by exact runtime control/code FNV to the NDVE movie-upscale container; classification is not inferred solely from a generic rejection phrase.",
+  "observed_networks": [
+    {
+      "program": "e409733c45530d75",
+      "asset": "Movie/Ndve/Ndve-Nvn2-vid_seq5.dat.zs",
+      "container": "NDVE",
+      "container_program_index": 2,
+      "nvn_stage": 5,
+      "native_control_code_sha256": "1d660217708e2a99339df4ac6814d2843c5ad83f9c20dd7b429cb529aee41afa",
+      "native_code_area_bytes": 22528,
+      "declared_native_instruction_bytes": 22400,
+      "statically_encoded_hmma_16816_f16_instructions": 72,
+      "hmma_count_scope": "declared native body excluding always-false predicate; not a reachability or runtime execution count",
+      "workgroup": [
+        32,
+        1,
+        1
+      ],
+      "shared_memory_bytes": 3360,
+      "declared_local_memory_per_thread": 0,
+      "observed_grid": [
+        900,
+        1,
+        1
+      ],
+      "diagnostic_images": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25"
+        }
+      ],
+      "diagnostic_ssbo_sizes": [
+        16588800,
+        4608,
+        32
+      ],
+      "diagnostic_ubo_sizes": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "diagnostic_interface_scope": "Observed bound slots from rejection logging, not exact live shader-use reflection; dummy/stale slots may appear.",
+      "diagnostic_texture_shape_counts": [
+        {
+          "width": 4,
+          "height": 4,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 14
+        },
+        {
+          "width": 960,
+          "height": 540,
+          "depth": 1,
+          "nvn_format": "0xd",
+          "bound_slots": 1
+        },
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 1
+        }
+      ],
+      "default_keep_list_member": false,
+      "classification": "exact native stage found in NDVE movie-upscale container"
+    },
+    {
+      "program": "8306877b7dc8784b",
+      "asset": "Movie/Ndve/Ndve-Nvn2-vid_seq5.dat.zs",
+      "container": "NDVE",
+      "container_program_index": 3,
+      "nvn_stage": 5,
+      "native_control_code_sha256": "ae7474c921cc15dbdec5f0a2a3bd4fda9549556d2c7e30a2dafd4fa8d96e6f5f",
+      "native_code_area_bytes": 11776,
+      "declared_native_instruction_bytes": 11648,
+      "statically_encoded_hmma_16816_f16_instructions": 36,
+      "hmma_count_scope": "declared native body excluding always-false predicate; not a reachability or runtime execution count",
+      "workgroup": [
+        32,
+        1,
+        1
+      ],
+      "shared_memory_bytes": 2592,
+      "declared_local_memory_per_thread": 0,
+      "observed_grid": [
+        720,
+        1,
+        1
+      ],
+      "diagnostic_images": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25"
+        }
+      ],
+      "diagnostic_ssbo_sizes": [
+        16588800,
+        16588800,
+        4608,
+        32
+      ],
+      "diagnostic_ubo_sizes": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "diagnostic_interface_scope": "Observed bound slots from rejection logging, not exact live shader-use reflection; dummy/stale slots may appear.",
+      "diagnostic_texture_shape_counts": [
+        {
+          "width": 4,
+          "height": 4,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 14
+        },
+        {
+          "width": 960,
+          "height": 540,
+          "depth": 1,
+          "nvn_format": "0xd",
+          "bound_slots": 1
+        },
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 1
+        }
+      ],
+      "default_keep_list_member": false,
+      "classification": "exact native stage found in NDVE movie-upscale container"
+    },
+    {
+      "program": "de3c10dba4ff39d3",
+      "asset": "Movie/Ndve/Ndve-Nvn2-vid_seq5.dat.zs",
+      "container": "NDVE",
+      "container_program_index": 4,
+      "nvn_stage": 5,
+      "native_control_code_sha256": "4fd351e438fcd5a36328dff48ffc73edcfd1cc4bf3ad08658bd969ba9fcaaace",
+      "native_code_area_bytes": 6144,
+      "declared_native_instruction_bytes": 6016,
+      "statically_encoded_hmma_16816_f16_instructions": 32,
+      "hmma_count_scope": "declared native body excluding always-false predicate; not a reachability or runtime execution count",
+      "workgroup": [
+        32,
+        2,
+        1
+      ],
+      "shared_memory_bytes": 3072,
+      "declared_local_memory_per_thread": 0,
+      "observed_grid": [
+        97,
+        1,
+        1
+      ],
+      "diagnostic_images": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25"
+        }
+      ],
+      "diagnostic_ssbo_sizes": [
+        8294400,
+        16588800,
+        4096,
+        64
+      ],
+      "diagnostic_ubo_sizes": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "diagnostic_interface_scope": "Observed bound slots from rejection logging, not exact live shader-use reflection; dummy/stale slots may appear.",
+      "diagnostic_texture_shape_counts": [
+        {
+          "width": 4,
+          "height": 4,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 14
+        },
+        {
+          "width": 960,
+          "height": 540,
+          "depth": 1,
+          "nvn_format": "0xd",
+          "bound_slots": 1
+        },
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 1
+        }
+      ],
+      "default_keep_list_member": false,
+      "classification": "exact native stage found in NDVE movie-upscale container"
+    },
+    {
+      "program": "a41c78faa56ccf7d",
+      "asset": "Movie/Ndve/Ndve-Nvn2-vid_seq5.dat.zs",
+      "container": "NDVE",
+      "container_program_index": 5,
+      "nvn_stage": 5,
+      "native_control_code_sha256": "e3be22716410f665bcbf3802ed556eacb813fd27e64da882744ffd74c74ed9fa",
+      "native_code_area_bytes": 47104,
+      "declared_native_instruction_bytes": 47104,
+      "statically_encoded_hmma_16816_f16_instructions": 576,
+      "hmma_count_scope": "declared native body excluding always-false predicate; not a reachability or runtime execution count",
+      "workgroup": [
+        32,
+        1,
+        1
+      ],
+      "shared_memory_bytes": 4320,
+      "declared_local_memory_per_thread": 0,
+      "observed_grid": [
+        120,
+        1,
+        1
+      ],
+      "diagnostic_images": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25"
+        }
+      ],
+      "diagnostic_ssbo_sizes": [
+        8294400,
+        8294400,
+        18432,
+        64
+      ],
+      "diagnostic_ubo_sizes": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "diagnostic_interface_scope": "Observed bound slots from rejection logging, not exact live shader-use reflection; dummy/stale slots may appear.",
+      "diagnostic_texture_shape_counts": [
+        {
+          "width": 4,
+          "height": 4,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 14
+        },
+        {
+          "width": 960,
+          "height": 540,
+          "depth": 1,
+          "nvn_format": "0xd",
+          "bound_slots": 1
+        },
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 1
+        }
+      ],
+      "default_keep_list_member": false,
+      "classification": "exact native stage found in NDVE movie-upscale container"
+    },
+    {
+      "program": "e959b9b1451491c0",
+      "asset": "Movie/Ndve/Ndve-Nvn2-vid_seq5.dat.zs",
+      "container": "NDVE",
+      "container_program_index": 6,
+      "nvn_stage": 5,
+      "native_control_code_sha256": "23e77f4d0a6d52d128498db0afc475c1822a61f36ddcb551dd883fc6ccd1d023",
+      "native_code_area_bytes": 44288,
+      "declared_native_instruction_bytes": 44160,
+      "statically_encoded_hmma_16816_f16_instructions": 464,
+      "hmma_count_scope": "declared native body excluding always-false predicate; not a reachability or runtime execution count",
+      "workgroup": [
+        32,
+        4,
+        1
+      ],
+      "shared_memory_bytes": 5120,
+      "declared_local_memory_per_thread": 0,
+      "observed_grid": [
+        70,
+        1,
+        1
+      ],
+      "diagnostic_images": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25"
+        }
+      ],
+      "diagnostic_ssbo_sizes": [
+        4147200,
+        8294400,
+        16384,
+        128
+      ],
+      "diagnostic_ubo_sizes": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "diagnostic_interface_scope": "Observed bound slots from rejection logging, not exact live shader-use reflection; dummy/stale slots may appear.",
+      "diagnostic_texture_shape_counts": [
+        {
+          "width": 4,
+          "height": 4,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 14
+        },
+        {
+          "width": 960,
+          "height": 540,
+          "depth": 1,
+          "nvn_format": "0xd",
+          "bound_slots": 1
+        },
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 1
+        }
+      ],
+      "default_keep_list_member": false,
+      "classification": "exact native stage found in NDVE movie-upscale container"
+    },
+    {
+      "program": "5a4d7378db437fed",
+      "asset": "Movie/Ndve/Ndve-Nvn2-vid_seq5.dat.zs",
+      "container": "NDVE",
+      "container_program_index": 7,
+      "nvn_stage": 5,
+      "native_control_code_sha256": "ec4ce9e893af324782eba27bbff1895fc0809a352ec3812b0788e2a4c3b9ed50",
+      "native_code_area_bytes": 18944,
+      "declared_native_instruction_bytes": 18944,
+      "statically_encoded_hmma_16816_f16_instructions": 144,
+      "hmma_count_scope": "declared native body excluding always-false predicate; not a reachability or runtime execution count",
+      "workgroup": [
+        32,
+        4,
+        1
+      ],
+      "shared_memory_bytes": 21600,
+      "declared_local_memory_per_thread": 0,
+      "observed_grid": [
+        60,
+        1,
+        1
+      ],
+      "diagnostic_images": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25"
+        }
+      ],
+      "diagnostic_ssbo_sizes": [
+        4147200,
+        4147200,
+        73728,
+        128
+      ],
+      "diagnostic_ubo_sizes": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "diagnostic_interface_scope": "Observed bound slots from rejection logging, not exact live shader-use reflection; dummy/stale slots may appear.",
+      "diagnostic_texture_shape_counts": [
+        {
+          "width": 4,
+          "height": 4,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 14
+        },
+        {
+          "width": 960,
+          "height": 540,
+          "depth": 1,
+          "nvn_format": "0xd",
+          "bound_slots": 1
+        },
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 1
+        }
+      ],
+      "default_keep_list_member": false,
+      "classification": "exact native stage found in NDVE movie-upscale container"
+    },
+    {
+      "program": "8b73eaee02efc5e4",
+      "asset": "Movie/Ndve/Ndve-Nvn2-vid_seq5.dat.zs",
+      "container": "NDVE",
+      "container_program_index": 8,
+      "nvn_stage": 5,
+      "native_control_code_sha256": "f9851c42a50ebc65374ab9e65c2c4e6947e0b9dee857e7643f72b216a03ae679",
+      "native_code_area_bytes": 69120,
+      "declared_native_instruction_bytes": 68992,
+      "statically_encoded_hmma_16816_f16_instructions": 768,
+      "hmma_count_scope": "declared native body excluding always-false predicate; not a reachability or runtime execution count",
+      "workgroup": [
+        32,
+        2,
+        1
+      ],
+      "shared_memory_bytes": 3072,
+      "declared_local_memory_per_thread": 0,
+      "observed_grid": [
+        85,
+        1,
+        1
+      ],
+      "diagnostic_images": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25"
+        }
+      ],
+      "diagnostic_ssbo_sizes": [
+        8294400,
+        4147200,
+        16384,
+        64,
+        8294400
+      ],
+      "diagnostic_ubo_sizes": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "diagnostic_interface_scope": "Observed bound slots from rejection logging, not exact live shader-use reflection; dummy/stale slots may appear.",
+      "diagnostic_texture_shape_counts": [
+        {
+          "width": 4,
+          "height": 4,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 14
+        },
+        {
+          "width": 960,
+          "height": 540,
+          "depth": 1,
+          "nvn_format": "0xd",
+          "bound_slots": 1
+        },
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 1
+        }
+      ],
+      "default_keep_list_member": false,
+      "classification": "exact native stage found in NDVE movie-upscale container"
+    },
+    {
+      "program": "14140d4c1dbe754f",
+      "asset": "Movie/Ndve/Ndve-Nvn2-vid_seq5.dat.zs",
+      "container": "NDVE",
+      "container_program_index": 9,
+      "nvn_stage": 5,
+      "native_control_code_sha256": "5a725cede7ecf5516f72d100996ddb12c43261f432d7793ed1849815c8599e05",
+      "native_code_area_bytes": 4096,
+      "declared_native_instruction_bytes": 4096,
+      "statically_encoded_hmma_16816_f16_instructions": 16,
+      "hmma_count_scope": "declared native body excluding always-false predicate; not a reachability or runtime execution count",
+      "workgroup": [
+        32,
+        1,
+        1
+      ],
+      "shared_memory_bytes": 1280,
+      "declared_local_memory_per_thread": 0,
+      "observed_grid": [
+        8100,
+        1,
+        1
+      ],
+      "diagnostic_images": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25"
+        }
+      ],
+      "diagnostic_ssbo_sizes": [
+        16588800,
+        8294400,
+        16384,
+        64,
+        16588800
+      ],
+      "diagnostic_ubo_sizes": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "diagnostic_interface_scope": "Observed bound slots from rejection logging, not exact live shader-use reflection; dummy/stale slots may appear.",
+      "diagnostic_texture_shape_counts": [
+        {
+          "width": 4,
+          "height": 4,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 14
+        },
+        {
+          "width": 960,
+          "height": 540,
+          "depth": 1,
+          "nvn_format": "0xd",
+          "bound_slots": 1
+        },
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 1
+        }
+      ],
+      "default_keep_list_member": false,
+      "classification": "exact native stage found in NDVE movie-upscale container"
+    },
+    {
+      "program": "4c2c129fe950b041",
+      "asset": "Movie/Ndve/Ndve-Nvn2-vid_seq5.dat.zs",
+      "container": "NDVE",
+      "container_program_index": 10,
+      "nvn_stage": 5,
+      "native_control_code_sha256": "b9e8f9538d46ea4d40c7608e50952f082e00e1ad65062916011a18dcaf4c274c",
+      "native_code_area_bytes": 19200,
+      "declared_native_instruction_bytes": 19072,
+      "statically_encoded_hmma_16816_f16_instructions": 108,
+      "hmma_count_scope": "declared native body excluding always-false predicate; not a reachability or runtime execution count",
+      "workgroup": [
+        32,
+        1,
+        1
+      ],
+      "shared_memory_bytes": 2592,
+      "declared_local_memory_per_thread": 0,
+      "observed_grid": [
+        5400,
+        1,
+        1
+      ],
+      "diagnostic_images": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x3d"
+        }
+      ],
+      "diagnostic_ssbo_sizes": [
+        16588800,
+        16588800,
+        4608,
+        32,
+        16588800
+      ],
+      "diagnostic_ubo_sizes": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "diagnostic_interface_scope": "Observed bound slots from rejection logging, not exact live shader-use reflection; dummy/stale slots may appear.",
+      "diagnostic_texture_shape_counts": [
+        {
+          "width": 4,
+          "height": 4,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 13
+        },
+        {
+          "width": 960,
+          "height": 540,
+          "depth": 1,
+          "nvn_format": "0xd",
+          "bound_slots": 1
+        },
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 2
+        }
+      ],
+      "default_keep_list_member": false,
+      "classification": "exact native stage found in NDVE movie-upscale container"
+    },
+    {
+      "program": "3f6f2b1d671badcd",
+      "asset": "Movie/Ndve/Ndve-Nvn2-vid_seq5.dat.zs",
+      "container": "NDVE",
+      "container_program_index": 1,
+      "nvn_stage": 5,
+      "native_control_code_sha256": "82d304720e91e0315171c812a94e20bfc39393294e1ff9b3e8a723755cce433e",
+      "native_code_area_bytes": 6656,
+      "declared_native_instruction_bytes": 6528,
+      "statically_encoded_hmma_16816_f16_instructions": 46,
+      "hmma_count_scope": "declared native body excluding always-false predicate; not a reachability or runtime execution count",
+      "workgroup": [
+        128,
+        1,
+        1
+      ],
+      "shared_memory_bytes": 4608,
+      "declared_local_memory_per_thread": 0,
+      "observed_grid": [
+        80,
+        180,
+        1
+      ],
+      "diagnostic_images": [
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x3d"
+        },
+        {
+          "width": 2560,
+          "height": 1440,
+          "depth": 1,
+          "nvn_format": "0x38"
+        }
+      ],
+      "diagnostic_ssbo_sizes": [
+        16588800,
+        16588800,
+        12288,
+        32,
+        16588800
+      ],
+      "diagnostic_ubo_sizes": [
+        256,
+        256,
+        256,
+        256,
+        256,
+        256,
+        256
+      ],
+      "diagnostic_interface_scope": "Observed bound slots from rejection logging, not exact live shader-use reflection; dummy/stale slots may appear.",
+      "diagnostic_texture_shape_counts": [
+        {
+          "width": 4,
+          "height": 4,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 11
+        },
+        {
+          "width": 512,
+          "height": 512,
+          "depth": 1,
+          "nvn_format": "0x3d",
+          "bound_slots": 1
+        },
+        {
+          "width": 960,
+          "height": 540,
+          "depth": 1,
+          "nvn_format": "0xd",
+          "bound_slots": 1
+        },
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x25",
+          "bound_slots": 2
+        },
+        {
+          "width": 1920,
+          "height": 1080,
+          "depth": 1,
+          "nvn_format": "0x3d",
+          "bound_slots": 1
+        }
+      ],
+      "default_keep_list_member": false,
+      "classification": "exact native stage found in NDVE movie-upscale container"
+    }
+  ],
+  "device_cooperative_matrix_query": {
+    "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "vendor_id": 32902,
+    "device_id": 22176,
+    "driver_name": "Intel open-source Mesa driver",
+    "driver_info": "Mesa 26.2.4",
+    "api_version": 4211042,
+    "subgroup_size": 32,
+    "subgroup_min": 8,
+    "subgroup_max": 32,
+    "subgroup_stages": 16383,
+    "required_subgroup_stages": 224,
+    "khr_extension": true,
+    "nv_extension": false,
+    "khr_feature": 1,
+    "nv_feature": 0,
+    "shader_float16": 1,
+    "vulkan_memory_model": 1,
+    "vulkan_memory_model_device_scope": 1,
+    "khr_shapes": [
+      {
+        "M": 8,
+        "N": 8,
+        "K": 16,
+        "A": 0,
+        "B": 0,
+        "C": 1,
+        "result": 1,
+        "scope": 3,
+        "saturating": 0,
+        "A_type": "float16",
+        "B_type": "float16",
+        "C_type": "float32",
+        "result_type": "float32",
+        "scope_name": "subgroup"
+      },
+      {
+        "M": 8,
+        "N": 8,
+        "K": 16,
+        "A": 1000141000,
+        "B": 1000141000,
+        "C": 1,
+        "result": 1,
+        "scope": 3,
+        "saturating": 0,
+        "A_type": "bfloat16",
+        "B_type": "bfloat16",
+        "C_type": "float32",
+        "result_type": "float32",
+        "scope_name": "subgroup"
+      },
+      {
+        "M": 8,
+        "N": 8,
+        "K": 32,
+        "A": 3,
+        "B": 3,
+        "C": 5,
+        "result": 5,
+        "scope": 3,
+        "saturating": 0,
+        "A_type": "sint8",
+        "B_type": "sint8",
+        "C_type": "sint32",
+        "result_type": "sint32",
+        "scope_name": "subgroup"
+      },
+      {
+        "M": 8,
+        "N": 8,
+        "K": 32,
+        "A": 7,
+        "B": 7,
+        "C": 9,
+        "result": 9,
+        "scope": 3,
+        "saturating": 0,
+        "A_type": "uint8",
+        "B_type": "uint8",
+        "C_type": "uint32",
+        "result_type": "uint32",
+        "scope_name": "subgroup"
+      }
+    ],
+    "requested_console_shape": {
+      "M": 16,
+      "N": 8,
+      "K": 16,
+      "A": "float16",
+      "B": "float16",
+      "C": "float16",
+      "result": "float16",
+      "scope": "subgroup"
+    },
+    "requested_console_shape_available": false,
+    "query_source_sha256": "9779418ca6ff931603c5a6f984a36edea7d607e6f7cae97f9dfeb51d6f819075",
+    "query_binary_sha256": "fab8a1e8066230cebc2f62e974cc239ba0a822b97620e64f9e758decb399c5e8",
+    "query_api_boundary": [
+      "vkCreateInstance",
+      "vkEnumeratePhysicalDevices",
+      "vkEnumerateDeviceExtensionProperties",
+      "vkGetPhysicalDeviceProperties2",
+      "vkGetPhysicalDeviceFeatures2",
+      "vkGetPhysicalDeviceCooperativeMatrixPropertiesKHR",
+      "vkDestroyInstance"
+    ],
+    "logical_device_created": false,
+    "queue_obtained_or_submitted": false,
+    "pipeline_created": false,
+    "shader_executed": false
+  },
+  "driver_library_sha256": "5ea19ac96aa52d061ecf2b8e23df7ed3d7d3b36c7d2ae7fe62f01c5a9b610aaa",
+  "limitations": [
+    "No network restored or GPU shader executed.",
+    "Bound-slot diagnostics do not establish every actual read/write or complete replay inputs.",
+    "Native HMMA static counts are opcode-family observations, not neural layer/algorithm reconstruction.",
+    "The ten startup movie-network omissions are separate from the later gameplay FSR replacement."
+  ],
+  "inspected_source_sha256": {
+    "gpu/vk/vk_shader.cpp": "021bab7dce55e2742476daad73a0c6afc86c8a6697e464ae62fc6789878f45e3",
+    "gpu/vk/vk_draw.cpp": "1721229162d75b5ecc8732e0eca0ee0504968b9d4e5fdf85f630b667e81863f0",
+    "gpu/vk/vk_coopmat.cpp": "8dea55f688b6c47c8506a8743442d566a911856abfc5b272d652d89408918c15",
+    "gpu/vk/eden/shader_recompiler/backend/spirv/emit_spirv_warp.cpp": "dd70de41fe60e74a4d2ccc6aec9178f32d245378dfbfa61b83ecce2f28a8d4ea",
+    "nx2/shader_census.py": "7b231b8ec607c26a5073b3faea6cc7403726cf8e7556211443eb4f01c7379d5b"
+  },
+  "frozen_shader_and_draw_source_verified": true,
+  "source_census_parser_sha256": "7b231b8ec607c26a5073b3faea6cc7403726cf8e7556211443eb4f01c7379d5b"
+}
