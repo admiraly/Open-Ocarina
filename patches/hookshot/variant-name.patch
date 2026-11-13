@@ -1,0 +1,442 @@
+diff --git a/builder/linux/hookshot_builder.py b/builder/linux/hookshot_builder.py
+index 59703fd..b8172b1 100644
+--- a/builder/linux/hookshot_builder.py
++++ b/builder/linux/hookshot_builder.py
+@@ -300,7 +300,10 @@ def desktop_exec(path):
+     return '"%s"' % escaped.replace("%", "%%")
+ 
+ 
+-APP_ID = "io.github.NotRexed.Hookshot"   # (the game's window names itself so: host/posix/display_sdl.c's HOS_APP_ID)
++APP_ID = "io.github.OpenOcarina.OpenOcarina"   # (the game's window names itself so: host/posix/display_sdl.c's HOS_APP_ID)
++MENU_NAME = "Open-Ocarina"                     # (the applications menu's entry: the variant's name, host/hos.h's HOS_VARIANT_NAME)
++MENU_FILE = "open-ocarina.desktop"
++OLD_MENU_FILE = "hookshot.desktop"             # (the entry this builder wrote before the variant had its own name)
+ 
+ 
+ def add_to_menu(folder):
+@@ -313,10 +316,18 @@ def add_to_menu(folder):
+         shutil.copyfile(src, icon)
+     apps = os.path.join(os.environ.get("XDG_DATA_HOME") or os.path.expanduser("~/.local/share"), "applications")
+     os.makedirs(apps, exist_ok=True)
+-    with open(os.path.join(apps, "hookshot.desktop"), "w", encoding="utf-8") as f:
+-        f.write("[Desktop Entry]\nType=Application\nName=Hookshot\nComment=The Legend of Zelda: Ocarina of Time, built from your copy\n"
++    old = os.path.join(apps, OLD_MENU_FILE)
++    try:   # (only the entry this builder wrote: another program's file of that name stays)
++        with open(old, encoding="utf-8") as f:
++            previous = f.read()
++        if "Name=Hookshot\n" in previous and "StartupWMClass=io.github.NotRexed.Hookshot\n" in previous:
++            os.remove(old)
++    except OSError:
++        pass
++    with open(os.path.join(apps, MENU_FILE), "w", encoding="utf-8") as f:
++        f.write("[Desktop Entry]\nType=Application\nName=%s\nComment=The Legend of Zelda: Ocarina of Time, built from your copy\n"
+                 "Exec=%s\nPath=%s\nIcon=%s\nCategories=Game;\nTerminal=false\nStartupWMClass=%s\n"
+-                % (desktop_exec(os.path.join(folder, "hookshot")), folder, icon, APP_ID))
++                % (MENU_NAME, desktop_exec(os.path.join(folder, "hookshot")), folder, icon, APP_ID))
+ 
+ 
+ def free_gb(path):
+diff --git a/gpu/vk/menu_i18n.h b/gpu/vk/menu_i18n.h
+index 22142e8..cad0526 100644
+--- a/gpu/vk/menu_i18n.h
++++ b/gpu/vk/menu_i18n.h
+@@ -424,7 +424,7 @@ inline constexpr Entry kpt_BR[] = {
+     {"Sharper still; can ring on edges.", "Ainda mais nítido; pode criar halos nas bordas."},
+     {"Sharper.", "Mais nítido."},
+     {"Sharpness", "Nitidez"},
+-    {"Shows \"Playing Hookshot\" and the time played in your Discord status, while Discord runs on this PC.", "Mostra \"Jogando Hookshot\" e o tempo de jogo no seu status do Discord, enquanto o Discord roda neste PC."},
++    {"Shows \"Playing Open-Ocarina\" and the time played in your Discord status, while Discord runs on this PC.", "Mostra \"Jogando Open-Ocarina\" e o tempo de jogo no seu status do Discord, enquanto o Discord roda neste PC."},
+     {"Silences the game while another window has the focus. The sound comes back when you switch to the game.", "Silencia o jogo enquanto outra janela está em foco. O som volta quando você volta ao jogo."},
+     {"Six made frames", "Seis quadros gerados"},
+     {"Small", "Pequeno"},
+@@ -957,7 +957,7 @@ inline constexpr Entry kes_419[] = {
+     {"Sharper.", "Más nítido."},
+     {"Sharpness", "Nitidez"},
+     {"Shift", "Mayús"},
+-    {"Shows \"Playing Hookshot\" and the time played in your Discord status, while Discord runs on this PC.", "Muestra \"Jugando a Hookshot\" y el tiempo de juego en tu estado de Discord, mientras Discord esté abierto en esta PC."},
++    {"Shows \"Playing Open-Ocarina\" and the time played in your Discord status, while Discord runs on this PC.", "Muestra \"Jugando a Open-Ocarina\" y el tiempo de juego en tu estado de Discord, mientras Discord esté abierto en esta PC."},
+     {"Silences the game while another window has the focus. The sound comes back when you switch to the game.", "Silencia el juego mientras otra ventana está activa. El sonido vuelve cuando regresas al juego."},
+     {"Six made frames", "Seis cuadros generados"},
+     {"Small", "Pequeño"},
+@@ -1493,7 +1493,7 @@ inline constexpr Entry kes[] = {
+     {"Sharper.", "Más nítido."},
+     {"Sharpness", "Nitidez"},
+     {"Shift", "Mayús"},
+-    {"Shows \"Playing Hookshot\" and the time played in your Discord status, while Discord runs on this PC.", "Muestra \"Jugando a Hookshot\" y el tiempo de juego en tu estado de Discord, mientras Discord esté abierto en este PC."},
++    {"Shows \"Playing Open-Ocarina\" and the time played in your Discord status, while Discord runs on this PC.", "Muestra \"Jugando a Open-Ocarina\" y el tiempo de juego en tu estado de Discord, mientras Discord esté abierto en este PC."},
+     {"Silences the game while another window has the focus. The sound comes back when you switch to the game.", "Silencia el juego mientras otra ventana está activa. El sonido vuelve al volver al juego."},
+     {"Six made frames", "Seis fotogramas generados"},
+     {"Small", "Pequeño"},
+@@ -2026,7 +2026,7 @@ inline constexpr Entry kfr[] = {
+     {"Sharper.", "Plus net."},
+     {"Sharpness", "Netteté"},
+     {"Shift", "Maj"},
+-    {"Shows \"Playing Hookshot\" and the time played in your Discord status, while Discord runs on this PC.", "Affiche \"Playing Hookshot\" et le temps de jeu dans votre statut Discord, quand Discord tourne sur ce PC."},
++    {"Shows \"Playing Open-Ocarina\" and the time played in your Discord status, while Discord runs on this PC.", "Affiche \"Playing Open-Ocarina\" et le temps de jeu dans votre statut Discord, quand Discord tourne sur ce PC."},
+     {"Silences the game while another window has the focus. The sound comes back when you switch to the game.", "Coupe le son du jeu quand une autre fenêtre a le focus. Le son revient quand vous revenez au jeu."},
+     {"Six made frames", "Six images générées"},
+     {"Small", "Petite"},
+@@ -2554,7 +2554,7 @@ inline constexpr Entry kde[] = {
+     {"Sharper.", "Schärfer."},
+     {"Sharpness", "Schärfe"},
+     {"Shift", "Umschalt"},
+-    {"Shows \"Playing Hookshot\" and the time played in your Discord status, while Discord runs on this PC.", "Zeigt \"Playing Hookshot\" und die Spielzeit im eigenen Discord-Status, während Discord auf diesem PC läuft."},
++    {"Shows \"Playing Open-Ocarina\" and the time played in your Discord status, while Discord runs on this PC.", "Zeigt \"Playing Open-Ocarina\" und die Spielzeit im eigenen Discord-Status, während Discord auf diesem PC läuft."},
+     {"Silences the game while another window has the focus. The sound comes back when you switch to the game.", "Schaltet das Spiel stumm, solange ein anderes Fenster den Fokus hat. Der Ton kommt zurück, sobald man zum Spiel wechselt."},
+     {"Six made frames", "Sechs erzeugte Frames"},
+     {"Small", "Klein"},
+@@ -3082,7 +3082,7 @@ inline constexpr Entry kit[] = {
+     {"Sharper.", "Più nitido."},
+     {"Sharpness", "Nitidezza"},
+     {"Shift", "Maiusc"},
+-    {"Shows \"Playing Hookshot\" and the time played in your Discord status, while Discord runs on this PC.", "Mostra \"Sta giocando a Hookshot\" e il tempo di gioco nel tuo stato di Discord, mentre Discord è aperto su questo PC."},
++    {"Shows \"Playing Open-Ocarina\" and the time played in your Discord status, while Discord runs on this PC.", "Mostra \"Sta giocando a Open-Ocarina\" e il tempo di gioco nel tuo stato di Discord, mentre Discord è aperto su questo PC."},
+     {"Silences the game while another window has the focus. The sound comes back when you switch to the game.", "Silenzia il gioco mentre un'altra finestra è attiva. L'audio torna quando si torna al gioco."},
+     {"Six made frames", "Sei fotogrammi generati"},
+     {"Small", "Piccolo"},
+@@ -3603,7 +3603,7 @@ inline constexpr Entry knl[] = {
+     {"Sharper still; can ring on edges.", "Nog scherper; kan halo's geven op randen."},
+     {"Sharper.", "Scherper."},
+     {"Sharpness", "Scherpte"},
+-    {"Shows \"Playing Hookshot\" and the time played in your Discord status, while Discord runs on this PC.", "Toont \"Playing Hookshot\" en de speeltijd in je Discord-status, terwijl Discord op deze pc draait."},
++    {"Shows \"Playing Open-Ocarina\" and the time played in your Discord status, while Discord runs on this PC.", "Toont \"Playing Open-Ocarina\" en de speeltijd in je Discord-status, terwijl Discord op deze pc draait."},
+     {"Silences the game while another window has the focus. The sound comes back when you switch to the game.", "Zet het spel stil zolang een ander venster de focus heeft. Het geluid komt terug als je naar het spel teruggaat."},
+     {"Six made frames", "Zes gegenereerde frames"},
+     {"Small", "Klein"},
+@@ -4131,7 +4131,7 @@ inline constexpr Entry kpl[] = {
+     {"Sharper still; can ring on edges.", "Jeszcze ostrzejszy; może dawać obwódki na krawędziach."},
+     {"Sharper.", "Ostrzejszy."},
+     {"Sharpness", "Ostrość"},
+-    {"Shows \"Playing Hookshot\" and the time played in your Discord status, while Discord runs on this PC.", "Pokazuje w twoim statusie Discord, że grasz w Hookshot, i czas gry, gdy Discord działa na tym komputerze."},
++    {"Shows \"Playing Open-Ocarina\" and the time played in your Discord status, while Discord runs on this PC.", "Pokazuje w twoim statusie Discord, że grasz w Open-Ocarina, i czas gry, gdy Discord działa na tym komputerze."},
+     {"Silences the game while another window has the focus. The sound comes back when you switch to the game.", "Wycisza grę, gdy aktywne jest inne okno. Dźwięk wraca po powrocie do gry."},
+     {"Six made frames", "Sześć generowanych klatek"},
+     {"Small", "Małe"},
+@@ -4666,7 +4666,7 @@ inline constexpr Entry kru[] = {
+     {"Sharper still; can ring on edges.", "Ещё чётче; на краях возможны ореолы."},
+     {"Sharper.", "Чётче."},
+     {"Sharpness", "Резкость"},
+-    {"Shows \"Playing Hookshot\" and the time played in your Discord status, while Discord runs on this PC.", "Показывает в вашем статусе Discord, что вы играете в Hookshot, и время игры, пока Discord запущен на этом ПК."},
++    {"Shows \"Playing Open-Ocarina\" and the time played in your Discord status, while Discord runs on this PC.", "Показывает в вашем статусе Discord, что вы играете в Open-Ocarina, и время игры, пока Discord запущен на этом ПК."},
+     {"Silences the game while another window has the focus. The sound comes back when you switch to the game.", "Отключает звук игры, пока активно другое окно. Звук возвращается при переходе к игре."},
+     {"Six made frames", "Шесть созданных кадров"},
+     {"Small", "Малый"},
+@@ -5204,7 +5204,7 @@ inline constexpr Entry kja[] = {
+     {"Sharper still; can ring on edges.", "さらに鮮明です。エッジに縁取りが出ることがあります。"},
+     {"Sharper.", "より鮮明です。"},
+     {"Sharpness", "シャープネス"},
+-    {"Shows \"Playing Hookshot\" and the time played in your Discord status, while Discord runs on this PC.", "このPCでDiscordを起動しているとき、Discordのステータスに「Hookshotをプレイ中」とプレイ時間を表示します。"},
++    {"Shows \"Playing Open-Ocarina\" and the time played in your Discord status, while Discord runs on this PC.", "このPCでDiscordを起動しているとき、Discordのステータスに「Open-Ocarinaをプレイ中」とプレイ時間を表示します。"},
+     {"Silences the game while another window has the focus. The sound comes back when you switch to the game.", "ほかのウィンドウがアクティブな間はゲームを消音します。ゲームに戻ると音が戻ります。"},
+     {"Six made frames", "生成フレーム6枚"},
+     {"Small", "小"},
+@@ -5742,7 +5742,7 @@ inline constexpr Entry kko[] = {
+     {"Sharper still; can ring on edges.", "더욱 선명하지만 가장자리에 링잉이 생길 수 있습니다."},
+     {"Sharper.", "더 선명합니다."},
+     {"Sharpness", "선명도"},
+-    {"Shows \"Playing Hookshot\" and the time played in your Discord status, while Discord runs on this PC.", "이 PC에서 Discord가 실행 중이면 Discord 상태에 Hookshot 플레이 중임과 플레이 시간을 표시합니다."},
++    {"Shows \"Playing Open-Ocarina\" and the time played in your Discord status, while Discord runs on this PC.", "이 PC에서 Discord가 실행 중이면 Discord 상태에 Open-Ocarina 플레이 중임과 플레이 시간을 표시합니다."},
+     {"Silences the game while another window has the focus. The sound comes back when you switch to the game.", "다른 창이 활성화된 동안 게임을 음소거합니다. 게임으로 돌아오면 소리가 돌아옵니다."},
+     {"Six made frames", "생성 프레임 6개"},
+     {"Small", "작음"},
+@@ -6279,7 +6279,7 @@ inline constexpr Entry kzh_Hans[] = {
+     {"Sharper still; can ring on edges.", "更加清晰；边缘可能出现光晕。"},
+     {"Sharper.", "更清晰。"},
+     {"Sharpness", "锐度"},
+-    {"Shows \"Playing Hookshot\" and the time played in your Discord status, while Discord runs on this PC.", "在此电脑上运行Discord时，在Discord状态中显示“正在玩Hookshot”及游戏时长。"},
++    {"Shows \"Playing Open-Ocarina\" and the time played in your Discord status, while Discord runs on this PC.", "在此电脑上运行Discord时，在Discord状态中显示“正在玩Open-Ocarina”及游戏时长。"},
+     {"Silences the game while another window has the focus. The sound comes back when you switch to the game.", "当其他窗口处于活动状态时将游戏静音。切回游戏后声音恢复。"},
+     {"Six made frames", "6个生成帧"},
+     {"Small", "小"},
+@@ -6814,7 +6814,7 @@ inline constexpr Entry kzh_Hant[] = {
+     {"Sharper still; can ring on edges.", "更加清晰；邊緣可能出現光暈。"},
+     {"Sharper.", "更清晰。"},
+     {"Sharpness", "銳利度"},
+-    {"Shows \"Playing Hookshot\" and the time played in your Discord status, while Discord runs on this PC.", "在此電腦上執行Discord時，在Discord狀態中顯示「正在玩Hookshot」及遊戲時間。"},
++    {"Shows \"Playing Open-Ocarina\" and the time played in your Discord status, while Discord runs on this PC.", "在此電腦上執行Discord時，在Discord狀態中顯示「正在玩Open-Ocarina」及遊戲時間。"},
+     {"Silences the game while another window has the focus. The sound comes back when you switch to the game.", "當其他視窗處於使用中時將遊戲靜音。切回遊戲後聲音恢復。"},
+     {"Six made frames", "6個生成畫格"},
+     {"Small", "小"},
+diff --git a/gpu/vk/vk_main.cpp b/gpu/vk/vk_main.cpp
+index 46f1c00..58e3992 100644
+--- a/gpu/vk/vk_main.cpp
++++ b/gpu/vk/vk_main.cpp
+@@ -2,6 +2,7 @@
+ // wants where the GPU has them: mesh shaders, host memory import, graphics pipeline libraries), the window's
+ // swapchain, and the rx_* table (vk_api.h). The NVN replay itself is vk_replay.cpp.
+ #include "vk_paths.h"
++#include "vk_variant.h"
+ #include "vk_loader.h"
+ 
+ #include <atomic>
+@@ -1335,7 +1336,7 @@ bool started_up() {
+                         CloseHandle(input);
+                     }
+ #endif
+-                    SetConsoleTitleA("Hookshot");
++                    SetConsoleTitleA(HOS_VARIANT_NAME);
+                     console = CreateFileA("CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
+                     if (console == INVALID_HANDLE_VALUE) console = nullptr;
+                 }
+@@ -1537,10 +1538,10 @@ const MkwVkRenderer* mkwvk_init(const MkwVkHost* h) {
+ #ifdef _WIN32
+         std::thread([name = std::string(dev.props.deviceName)] {
+             const std::string text = "Your graphics card (" + name + ") or its driver has no mesh shader support, which Ocarina of Time "
+-                "uses for foliage, grass and many effects, so parts of the picture will be missing or broken.\n\nHookshot needs a GPU "
++                "uses for foliage, grass and many effects, so parts of the picture will be missing or broken.\n\n" HOS_VARIANT_NAME " needs a GPU "
+                 "with mesh shaders: NVIDIA GeForce RTX 20 series or newer, AMD Radeon RX 6000 series or newer, or Intel Arc. If your "
+                 "card is one of those, update its driver.";
+-            MessageBoxA(nullptr, text.c_str(), "Hookshot: graphics card", MB_OK | MB_ICONWARNING | MB_TOPMOST);
++            MessageBoxA(nullptr, text.c_str(), HOS_VARIANT_NAME ": graphics card", MB_OK | MB_ICONWARNING | MB_TOPMOST);
+         }).detach();
+ #endif
+     }
+diff --git a/gpu/vk/vk_menu.cpp b/gpu/vk/vk_menu.cpp
+index 2682a53..beb566b 100644
+--- a/gpu/vk/vk_menu.cpp
++++ b/gpu/vk/vk_menu.cpp
+@@ -29,6 +29,7 @@
+ #include <vector>
+ 
+ #include "vk_paths.h"
++#include "vk_variant.h"
+ #include "vk_menu.h"
+ #include "vk_menu_hit.h"
+ #include "vk_fps.h"    // (the FPS counter's levels and numbers)
+@@ -1167,7 +1168,7 @@ Row rows[] = {
+     {TAB_GAMEPLAY, "Menu language", &opts.menu_lang, 0, i18n::lang_count(), 1, tx_menu_lang, "The language of this menu.",
+      hn_menu_lang, false, true},
+     {TAB_GAMEPLAY, "Discord status", &opts.discord, 0, 1, 1, tx_onoff,
+-     "Shows \"Playing Hookshot\" and the time played in your Discord status, while Discord runs on this PC.", nullptr, false,
++     "Shows \"Playing Open-Ocarina\" and the time played in your Discord status, while Discord runs on this PC.", nullptr, false,
+      true},
+     {TAB_GAMEPLAY, "Skip opening", &opts.skip_opening, 0, 1, 1, tx_onoff,
+      "Skips the new-game opening (the story movie and Navi waking Link) and leaves later cutscenes, the Deku Tree "
+@@ -2936,7 +2937,7 @@ void draw_options(ui::Ctx& c) {
+     }
+     {   // (which build, at the banner's left, so a report can say it without opening the log; the release alone when the whole
+         // line would run into the tabs)
+-        std::string ver = std::string("Hookshot ") + HOOKSHOT_VERSION;
++        std::string ver = std::string(HOS_VARIANT_NAME) + " " + HOOKSHOT_VERSION;
+         const float room = (c.w - total) * 0.5f - 60 * s - c.safe, px = 15 * s;
+         const auto width = [&](float p) { return ui::size_of(c.f.body, p, ver.c_str()).x; };
+         if (width(px) > room && ver.find(" (") != std::string::npos) ver.resize(ver.find(" ("));
+diff --git a/gpu/vk/vk_variant.h b/gpu/vk/vk_variant.h
+new file mode 100644
+index 0000000..06bf4bf
+--- /dev/null
++++ b/gpu/vk/vk_variant.h
+@@ -0,0 +1,7 @@
++// (this variant's own name: the window, the applications menu's entry, the Insert menu's banner, the log's first line,
++// Discord's status, the console's title and the message boxes. The executable, its folders and the HOS_ environment
++// prefix keep their names: scripts and the builder use them)
++#pragma once
++#ifndef HOS_VARIANT_NAME
++#define HOS_VARIANT_NAME "Open-Ocarina"
++#endif
+diff --git a/host/discord_rpc.c b/host/discord_rpc.c
+index c847e32..50503bc 100644
+--- a/host/discord_rpc.c
++++ b/host/discord_rpc.c
+@@ -16,6 +16,7 @@
+    Handshake 0, Frame 1, Close 2, Ping 3, Pong 4. The handshake {"v":1,"client_id":...} is answered by a Ready frame; a
+    SET_ACTIVITY frame by a frame; a Ping is echoed as a Pong. */
+ #include "hos_paths.h"   /* (first: hos_game_path_a, and windows.h on Windows) */
++#include "hos.h"         /* (HOS_VARIANT_NAME) */
+ #include <stdint.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -225,9 +226,10 @@ static int send_activity(Ipc p, long long started) {
+     version[strcspn(version, " +")] = 0;   /* ("v2.0.12 (source ...)": the release alone) */
+     snprintf(json, sizeof json,
+              "{\"cmd\":\"SET_ACTIVITY\",\"nonce\":\"%u\",\"args\":{\"pid\":%lu,\"activity\":{\"details\":\"Ocarina of Time\","
+-             "\"state\":\"Hookshot %s\",\"timestamps\":{\"start\":%lld},\"assets\":{\"large_image\":\"%s\",\"large_text\":"
+-             "\"Hookshot %s\"}}}}",
+-             ++nonce, process_id(), version, started, HOOKSHOT_DISCORD_IMAGE_DEFAULT, version);
++             "\"state\":\"%s %s\",\"timestamps\":{\"start\":%lld},\"assets\":{\"large_image\":\"%s\",\"large_text\":"
++             "\"%s %s\"}}}}",
++             ++nonce, process_id(), HOS_VARIANT_NAME, version, started, HOOKSHOT_DISCORD_IMAGE_DEFAULT,
++             HOS_VARIANT_NAME, version);
+     if (!write_frame(p, OP_FRAME, json)) return 0;
+     uint32_t op = 0;
+     const int r = read_frame(p, &op, answer, sizeof answer, 2000);
+diff --git a/host/display.c b/host/display.c
+index 3391060..cc864b6 100644
+--- a/host/display.c
++++ b/host/display.c
+@@ -457,7 +457,7 @@ static DWORD WINAPI display_main(void *p) {
+     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+     wc.hIcon = LoadIconA(wc.hInstance, MAKEINTRESOURCEA(1));   /* (nx2/make_icon.py; none in a build without the picture) */
+     wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+-    wc.lpszClassName = "Hookshot";
++    wc.lpszClassName = HOS_VARIANT_NAME;
+     RegisterClassA(&wc);
+     dpi_aware_thread();
+     extern float hos_aspect_ratio;
+@@ -470,7 +470,7 @@ static DWORD WINAPI display_main(void *p) {
+     RECT r = {0, 0, win_w, win_h};
+     AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
+     const int noactivate = env_on("HOS_WINDOW_NOACTIVATE");
+-    hwnd = CreateWindowA("Hookshot", HOS_GAME_TITLE, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
++    hwnd = CreateWindowA(HOS_VARIANT_NAME, HOS_GAME_TITLE, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
+                          CW_USEDEFAULT, r.right - r.left, r.bottom - r.top, NULL, NULL, wc.hInstance, NULL);
+     if (!hwnd) display_start_failed("CreateWindowA");
+     if (window_dpi(hwnd) != 96) {
+diff --git a/host/hos.h b/host/hos.h
+index b7143d1..26f6323 100644
+--- a/host/hos.h
++++ b/host/hos.h
+@@ -50,7 +50,8 @@ extern const char hos_main_build_id[];                 /* (gen/hos_image.c: main
+ /* (oot-recomp) MKW's own hooks at fixed guest addresses (its frame pacer in nvn_native.c / nn_vi.c, its idle loop in
+    hos_thread.c) run only when the lifted main is Mario Kart World's: any other game has other code there */
+ int hos_game_is_mkw(void);
+-#define HOS_GAME_TITLE "Hookshot"
++#include "../gpu/vk/vk_variant.h"   /* (HOS_VARIANT_NAME: this variant's own name, also seen by the Vulkan back end) */
++#define HOS_GAME_TITLE HOS_VARIANT_NAME
+ void hos_commit(uint64_t addr, uint64_t size);         /* (mkw_glue.c) guest pages made usable by host APIs */
+ int hos_mem_region(uint64_t addr, uint64_t size);      /* (hos_mem.c) the control bridge: 0 if not wholly in mapped guest memory */
+ #if defined(A64_WRITE_TRACK) && !defined(__EMSCRIPTEN__)
+diff --git a/host/hos_main.c b/host/hos_main.c
+index 73a7342..554a7f3 100644
+--- a/host/hos_main.c
++++ b/host/hos_main.c
+@@ -410,7 +410,7 @@ static const char *saves_dir(const char *beside) {
+         snprintf(note, sizeof note, "%.*s" SEP_S "saves-moved.txt", sep ? (int)(sep - beside) : 0, beside);
+         FILE *f = fopen(note, "w");
+         if (f) {
+-            fprintf(f, "Hookshot's saves are now in\n%s\n\nThey moved there from the user folder that was here.\n", dir);
++            fprintf(f, "%s's saves are now in\n%s\n\nThey moved there from the user folder that was here.\n", HOS_VARIANT_NAME, dir);
+             fclose(f);
+         }
+         hos_log("saves: moved from %s to %s", beside, dir);
+@@ -1692,7 +1692,7 @@ static void memory_notice(void) {
+     int hos_sdl_load(void);
+     hos_sdl_load();   /* (host/posix MessageBoxA shows it through the SDL already loaded) */
+ #endif
+-    MessageBoxA(NULL, text, "Hookshot", MB_OK | MB_ICONWARNING);
++    MessageBoxA(NULL, text, HOS_VARIANT_NAME, MB_OK | MB_ICONWARNING);
+ }
+ #endif
+ #ifdef _WIN32
+@@ -1719,13 +1719,13 @@ static int narrow_paths_ok(int argc, char **argv) {
+     if (!quiet) {
+         wchar_t text[MAX_PATH * 2 + 640];
+         _snwprintf(text, sizeof text / sizeof text[0],
+-                   L"Hookshot can't open its files in this folder:\n\n%ls\n\n"
+-                   L"%ls\n\nMove the game folder somewhere with a shorter name of plain letters and digits (for example C:\\Games\\Hookshot), "
++                   HOS_VARIANT_NAME L" can't open its files in this folder:\n\n%ls\n\n"
++                   L"%ls\n\nMove the game folder somewhere with a shorter name of plain letters and digits (for example C:\\Games\\Open-Ocarina), "
+                    L"or update Windows.",
+                    w, GetACP() == CP_UTF8 ? L"The path is too long."
+                                           : L"Its name has characters this Windows can only give the game from Windows 10 version 1903 on.");
+         text[sizeof text / sizeof text[0] - 1] = 0;
+-        MessageBoxW(NULL, text, L"Hookshot", MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
++        MessageBoxW(NULL, text, HOS_VARIANT_NAME, MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
+     }
+     return 0;
+ }
+@@ -1789,7 +1789,7 @@ static int game_main(int argc, char **argv) {
+             if (freopen(path, "w", stderr)) setvbuf(stderr, NULL, _IONBF, 0);
+         }
+     }
+-    hos_log("hookshot %s", HOOKSHOT_VERSION);   /* (the log's first line: which build a report comes from) */
++    hos_log("%s %s", HOS_VARIANT_NAME, HOOKSHOT_VERSION);   /* (the log's first line: which build a report comes from) */
+     removed_switch_notes();
+     void hos_control_start(const char *version);
+     hos_control_start(HOOKSHOT_VERSION);   /* (HOS_CONTROL=<socket>: the control bridge, host/control.c) */
+diff --git a/host/mf_av1.c b/host/mf_av1.c
+index 66473f4..1a012fb 100644
+--- a/host/mf_av1.c
++++ b/host/mf_av1.c
+@@ -77,9 +77,9 @@ static int set_output_nv12(MfAv1 *m) {
+    intro never ends. Said once, on its own thread (the game goes on), with the way to the Store page. HOS_AV1_MISSING=1: as if it were missing */
+ static DWORD WINAPI av1_missing_notice(LPVOID unused) {
+     (void)unused;
+-    if (MessageBoxA(NULL, "Hookshot's movies need Microsoft's free AV1 Video Extension, which this PC does not have. Without it they show a green "
++    if (MessageBoxA(NULL, HOS_VARIANT_NAME "'s movies need Microsoft's free AV1 Video Extension, which this PC does not have. Without it they show a green "
+                           "screen and the game can stop at a black screen.\n\nOpen its Microsoft Store page now? Install it, then restart the game.",
+-                    "Hookshot", MB_YESNO | MB_ICONINFORMATION | MB_TOPMOST) == IDYES)
++                    HOS_VARIANT_NAME, MB_YESNO | MB_ICONINFORMATION | MB_TOPMOST) == IDYES)
+         ShellExecuteA(NULL, "open", "ms-windows-store://pdp/?ProductId=9MVZQVXJBQ9V", NULL, NULL, SW_SHOWNORMAL);
+     return 0;
+ }
+diff --git a/host/mkw_glue.c b/host/mkw_glue.c
+index 233d544..6e16a70 100644
+--- a/host/mkw_glue.c
++++ b/host/mkw_glue.c
+@@ -43,11 +43,11 @@ void hos_commit(uint64_t addr, uint64_t size) {
+ DWORD WINAPI hos_out_of_memory_box(LPVOID unused) {
+     (void)unused;
+     MessageBoxA(NULL,
+-                "Windows has run out of memory (RAM plus the page file), so Hookshot may close.\n\n"
++                "Windows has run out of memory (RAM plus the page file), so " HOS_VARIANT_NAME " may close.\n\n"
+                 "Close other programs, and in Windows' System > About > Advanced system settings > Performance > Advanced > Virtual "
+                 "memory, choose \"Automatically manage paging file size\" (or give it at least 16 GB). A lower Quality preset in the "
+                 "Insert menu also uses less memory.",
+-                "Hookshot: out of memory", MB_OK | MB_ICONWARNING | MB_TOPMOST);
++                HOS_VARIANT_NAME ": out of memory", MB_OK | MB_ICONWARNING | MB_TOPMOST);
+     return 0;
+ }
+ 
+diff --git a/host/nn_video.c b/host/nn_video.c
+index 5c32a2c..a2f0c35 100644
+--- a/host/nn_video.c
++++ b/host/nn_video.c
+@@ -68,7 +68,7 @@ static DWORD WINAPI av1_notice(LPVOID unused) {
+     (void)unused;
+     if (MessageBoxA(NULL, "The game's movies need Microsoft's free \"AV1 Video Extension\", which this PC doesn't have, so they "
+                           "show black (the sound plays).\n\nOpen its page in the Microsoft Store now? Install it, then start the game again.",
+-                    "Hookshot", MB_YESNO | MB_ICONINFORMATION | MB_SETFOREGROUND) == IDYES)
++                    HOS_VARIANT_NAME, MB_YESNO | MB_ICONINFORMATION | MB_SETFOREGROUND) == IDYES)
+         ShellExecuteA(NULL, "open", "ms-windows-store://pdp/?ProductId=9MVZQVXJBQ9V", NULL, NULL, SW_SHOWNORMAL);
+     return 0;
+ }
+diff --git a/host/posix/display_sdl.c b/host/posix/display_sdl.c
+index f6da1cc..56b61ce 100644
+--- a/host/posix/display_sdl.c
++++ b/host/posix/display_sdl.c
+@@ -13,7 +13,7 @@
+ #include "../hos_sdl.h"
+ 
+ /* (the window's app id: the applications menu's entry names it as its StartupWMClass, builder/linux/hookshot_builder.py) */
+-#define HOS_APP_ID "io.github.NotRexed.Hookshot"
++#define HOS_APP_ID "io.github.OpenOcarina.OpenOcarina"
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -221,7 +221,7 @@ int hos_display_init(void) {
+     }
+     const char *env_class = getenv("HOS_WM_CLASS");
+     const char *app_id = (env_class && env_class[0]) ? env_class : HOS_APP_ID;
+-    hos_sdl_identity(window_title("Hookshot"), app_id);
++    hos_sdl_identity(window_title(HOS_VARIANT_NAME), app_id);
+     hos_sdl_hint("SDL_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR", "0");
+     hos_sdl_hint("SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS", "1");
+     /* (bundled SDL tries x11 before wayland. NVIDIA's X11 surface has no mailbox, and an immediate
+diff --git a/host/posix/win32_posix.c b/host/posix/win32_posix.c
+index 0ee415d..3c26ee6 100644
+--- a/host/posix/win32_posix.c
++++ b/host/posix/win32_posix.c
+@@ -3,6 +3,7 @@
+ #define _GNU_SOURCE
+ #include <windows.h>
+ #include <mmsystem.h>
++#include "../../gpu/vk/vk_variant.h"   /* (HOS_VARIANT_NAME: a message box's default caption) */
+ 
+ #include <dirent.h>
+ #include <dlfcn.h>
+@@ -1243,12 +1244,12 @@ DWORD GetWindowThreadProcessId(HWND w, DWORD *pid) {
+ }
+ int MessageBoxA(HWND w, LPCSTR text, LPCSTR caption, UINT type) {
+     (void)w, (void)type;
+-    fprintf(stderr, "%s: %s\n", caption ? caption : "Hookshot", text ? text : "");
++    fprintf(stderr, "%s: %s\n", caption ? caption : HOS_VARIANT_NAME, text ? text : "");
+     typedef int (*ShowFn)(uint32_t, const char *, const char *, void *);   /* (SDL3's and SDL2's alike; its result unread) */
+     void *sdl = dlopen("libSDL3.so.0", RTLD_NOW | RTLD_NOLOAD);
+     if (!sdl) sdl = dlopen("libSDL2-2.0.so.0", RTLD_NOW | RTLD_NOLOAD);
+     ShowFn show = sdl ? (ShowFn)dlsym(sdl, "SDL_ShowSimpleMessageBox") : NULL;
+-    if (show) show(0x10, caption ? caption : "Hookshot", text ? text : "", NULL);
++    if (show) show(0x10, caption ? caption : HOS_VARIANT_NAME, text ? text : "", NULL);
+     return 1;
+ }
+ 
