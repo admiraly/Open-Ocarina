@@ -1,0 +1,1788 @@
+{
+  "schema": "open-ocarina.compute-interval-timing-observation/v1",
+  "finding": "The interval candidate had lower measured isolated-dispatch median latency in both observed batches. This is not normal-frame FPS, live integration or an accepted gameplay optimization.",
+  "identity": {
+    "cpu_freeze_sha256": "234d15d8d12e2f8fc23259e2d1a6c22879c48a73943ca2376f1b7d49da1580eb",
+    "adapter_sha256": "af3e1c99124250318eb899024406117b0dff5d02f837349bf2b1ea9c30ef612c",
+    "native_source_sha256": "854a2b7e76caf6b68b34df412eff95e317cc0510ee6a87b1900c07989d344d3f",
+    "native_binary_sha256": "c8a17b55e415a7d108a0420b0a6b7f6acbb87e87c063d9cf968cd98621bfb0a3",
+    "native_diff_sha256": "139dc28328650ee724035a1cb82f5d6719217b734d8455d8dbcc06002b29282a",
+    "profile_sha256": "067ec44d3efd4ce0367904c1ff44d096c159a3f767cd3210721d0e346323f50d",
+    "plan_sha256": "f4ae54d1882d06e8236c7324d0667feb3907a8ddc49374816ebe59a3276d4dc4",
+    "handoff_sha256": "4b231c9b986f67dba4c20d558241e3ccc1894fc5a1caa76b65af01772a5c7689",
+    "driver": {
+      "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+      "library_name": "libvulkan_intel.so",
+      "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+    },
+    "original_module_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+    "candidate_module_sha256": "d5148342b4517882b25a48e63700cbfb8695454cc05d131da718509ac2563dc0",
+    "original_owned_graph_manifest_sha256": "4c4b5fcaf73318b8edc08406a58e39a2702544f86183e7d894455e7d363206b9",
+    "record_payload_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+    "record_guarded_sha256": "0ae9e410ac93d40b4ec73073a303fdcb5fa0921dbc01c81ff1e38a349f82c393"
+  },
+  "protocol": {
+    "batches": 2,
+    "native_target_dispatches_total": 40,
+    "timed_samples_total": 32,
+    "untimed_warmups_total": 8,
+    "actual_widths": [
+      32,
+      32
+    ],
+    "per_batch_schedule": "Two original warmups, two candidate warmups, then ABBA repeated four times; A original, B candidate.",
+    "original_complete_buffer_owners": 59,
+    "original_complete_buffer_bytes": 1163919360,
+    "extra_guarded_record_bytes": 8784,
+    "grid": [
+      2,
+      1,
+      1
+    ],
+    "local_size": [
+      64,
+      1,
+      1
+    ],
+    "push_bytes": 88,
+    "shared_resource_graph_within_each_batch": true,
+    "fresh_process_resources_and_cache_each_batch": true,
+    "reset_before_every_target_dispatch": {
+      "owner_index": 7,
+      "bytes": 4194304,
+      "source": "Frozen initial owner bytes"
+    },
+    "oracle_after_every_target_dispatch": {
+      "owners": 60,
+      "original_bytes": 1163919360,
+      "record_and_guard_bytes": 8784,
+      "source": "Pinned complete profile-02 original baseline outputs"
+    },
+    "timestamp_bracket": {
+      "start_stage": "TOP_OF_PIPE",
+      "end_stage": "BOTTOM_OF_PIPE",
+      "only_API_command_between_timestamps": "vkCmdDispatch",
+      "prior_host_visibility_barrier_destination": "ALL_COMMANDS",
+      "query_reset_before_bracket": true,
+      "query_results_after_completed_fence": true,
+      "query_results_WAIT_flag": false
+    },
+    "fence_seconds": 2,
+    "whole_process_seconds": 120,
+    "minimum_timestamp_wrap_horizon_seconds": 120,
+    "compile_and_shader_cache_setup_outside_intervals": true,
+    "image_upload_separately_fenced_before_targets": true,
+    "policy": {
+      "HS_SPILL_BATCH": "1",
+      "shader_spilling_rate": "1",
+      "HS_PUSH_SHADOW": null,
+      "HS_CS32_MAX_INSTS": null,
+      "other_HS_VK_MESA_INTEL_overrides": "cleared"
+    },
+    "pipeline_optimization_disabled": false,
+    "retries": 0,
+    "adaptive_samples": false,
+    "sampled_image_inputs": 4,
+    "sampler_inputs": 4,
+    "untimed_warmup_timestamp_fields": "Zero placeholders; no timestamp queries were recorded for warmups."
+  },
+  "descriptive_statistics_method": "Median, minimum and maximum of all eight saved timed nanosecond values per module per batch, divided by 1000000. No filtering; warmups were untimed by the fixed protocol. No confidence interval or population/general-performance inference.",
+  "batches": [
+    {
+      "batch": 1,
+      "process_terminal": "exit0",
+      "evidence_sha256": {
+        "result": "db488cb10f2969c21b954baa1ab9aca3b241f13a892fdcdf405bd17f6052c23d",
+        "native": "4d50754f5bed731cb4342599008eb1d9d41b8d26d19af6ea1a89f03d9dc00cbc",
+        "raw": "6134b1a2d2bf0b4e3b751109d416842cb7554098d5bef8eac1190152d8af1eb4",
+        "terminal": "013c720e0b1462f518fbd526139c3d6d8a06b6db131d52fdb29c96d14dab7a63"
+      },
+      "actual_subgroup_sizes": [
+        32,
+        32
+      ],
+      "device_vendor": 32902,
+      "device_id": 22176,
+      "device_uuid": "8680a056080000000300000000000000",
+      "driver_uuid": "542135820eef585924bda292588520e1",
+      "queue_family": 0,
+      "timestamp_valid_bits": 36,
+      "timestamp_period_ns": 52.08333206176758,
+      "timestamp_wrap_horizon_ns": 3579139325952.0,
+      "native_dispatches": 20,
+      "full_complete_buffer_comparisons": 20,
+      "native_trials": [
+        {
+          "index": 0,
+          "module": 0,
+          "timed": false,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 0,
+          "timestamp_end": 0,
+          "ticks": 0,
+          "nanoseconds": 0
+        },
+        {
+          "index": 1,
+          "module": 0,
+          "timed": false,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 0,
+          "timestamp_end": 0,
+          "ticks": 0,
+          "nanoseconds": 0
+        },
+        {
+          "index": 2,
+          "module": 1,
+          "timed": false,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 0,
+          "timestamp_end": 0,
+          "ticks": 0,
+          "nanoseconds": 0
+        },
+        {
+          "index": 3,
+          "module": 1,
+          "timed": false,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 0,
+          "timestamp_end": 0,
+          "ticks": 0,
+          "nanoseconds": 0
+        },
+        {
+          "index": 4,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49691059218,
+          "timestamp_end": 49691133776,
+          "ticks": 74558,
+          "nanoseconds": 3883229.071861267
+        },
+        {
+          "index": 5,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49692784912,
+          "timestamp_end": 49692840458,
+          "ticks": 55546,
+          "nanoseconds": 2893020.762702942
+        },
+        {
+          "index": 6,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49694500704,
+          "timestamp_end": 49694556157,
+          "ticks": 55453,
+          "nanoseconds": 2888177.0128211975
+        },
+        {
+          "index": 7,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49696219547,
+          "timestamp_end": 49696294008,
+          "ticks": 74461,
+          "nanoseconds": 3878176.9886512756
+        },
+        {
+          "index": 8,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49698009282,
+          "timestamp_end": 49698083979,
+          "ticks": 74697,
+          "nanoseconds": 3890468.655017853
+        },
+        {
+          "index": 9,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49699761260,
+          "timestamp_end": 49699817335,
+          "ticks": 56075,
+          "nanoseconds": 2920572.845363617
+        },
+        {
+          "index": 10,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49701588575,
+          "timestamp_end": 49701644139,
+          "ticks": 55564,
+          "nanoseconds": 2893958.2626800537
+        },
+        {
+          "index": 11,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49704020586,
+          "timestamp_end": 49704095713,
+          "ticks": 75127,
+          "nanoseconds": 3912864.487804413
+        },
+        {
+          "index": 12,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49705986174,
+          "timestamp_end": 49706061332,
+          "ticks": 75158,
+          "nanoseconds": 3914479.0710983276
+        },
+        {
+          "index": 13,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49707794910,
+          "timestamp_end": 49707841866,
+          "ticks": 46956,
+          "nanoseconds": 2445624.9402923584
+        },
+        {
+          "index": 14,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49709599878,
+          "timestamp_end": 49709646163,
+          "ticks": 46285,
+          "nanoseconds": 2410677.0244789124
+        },
+        {
+          "index": 15,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49711414557,
+          "timestamp_end": 49711489267,
+          "ticks": 74710,
+          "nanoseconds": 3891145.7383346558
+        },
+        {
+          "index": 16,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49713296473,
+          "timestamp_end": 49713380383,
+          "ticks": 83910,
+          "nanoseconds": 4370312.3933029175
+        },
+        {
+          "index": 17,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49715133577,
+          "timestamp_end": 49715189136,
+          "ticks": 55559,
+          "nanoseconds": 2893697.846019745
+        },
+        {
+          "index": 18,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49716972322,
+          "timestamp_end": 49717018498,
+          "ticks": 46176,
+          "nanoseconds": 2404999.9412841797
+        },
+        {
+          "index": 19,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 49718790012,
+          "timestamp_end": 49718864468,
+          "ticks": 74456,
+          "nanoseconds": 3877916.571990967
+        }
+      ],
+      "descriptive_statistics": {
+        "original": {
+          "timed_samples": 8,
+          "median_ms": 3.8908071966762545,
+          "minimum_ms": 3.877916571990967,
+          "maximum_ms": 4.3703123933029175,
+          "timed_samples_filtered": 0
+        },
+        "candidate": {
+          "timed_samples": 8,
+          "median_ms": 2.89059888776207,
+          "minimum_ms": 2.4049999412841796,
+          "maximum_ms": 2.920572845363617,
+          "timed_samples_filtered": 0
+        }
+      },
+      "final_complete_outputs": [
+        {
+          "index": 0,
+          "bytes": 4194304,
+          "sha256": "7ac84a212629a1f919996531acfa5ead0d9986b79e14d7760db1d79355e14c99",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 1,
+          "bytes": 4194304,
+          "sha256": "c8c124e5499428d93be234a8caebd3075f2fcf4cfe30d5b456953b173afbbec4",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 2,
+          "bytes": 20971520,
+          "sha256": "7a7868ef096fc2a7c59de40a25a85129fcc7f4e2430127435cc4c4a8b8b83291",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 3,
+          "bytes": 4194304,
+          "sha256": "b9835c045ab988688e4dfe9ed81920b4f04f1b0aa8314a213f7e2c0f1ed80891",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 4,
+          "bytes": 20971520,
+          "sha256": "353b062903195217d7b826913a46b8d0c75af1aabde23b06b8f79cfb30c4d107",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 5,
+          "bytes": 54525952,
+          "sha256": "b5a3a42b6310e216a9b88caff19531e1c0b6ab0691c9547a20a0d084f6703017",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 6,
+          "bytes": 4194304,
+          "sha256": "810da6c191facaa000710c11507dddcdb4e6cdffdb17204c6a5c76a261376054",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 7,
+          "bytes": 4194304,
+          "sha256": "323334824a3f64ff80ba0cb8f8602c8f6dd7be3384a32353bbd8e1eb0628c7c2",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 8,
+          "bytes": 8388608,
+          "sha256": "8ca83ce8663d0aa715aa5e777be0691ef85a2edaf99b37ed22b12cacff516d8b",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 9,
+          "bytes": 4194304,
+          "sha256": "27db8c89cae1f6d265974bdf1b64c8ba3331d8011a4782684c43ed4f709370f6",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 10,
+          "bytes": 8388608,
+          "sha256": "1e41d254f20e95c274079bfbf3ec7853daeee10b2a76a926d17f1863b41e26e1",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 11,
+          "bytes": 4194304,
+          "sha256": "ff977b45c39ac8b23638bae4bf87ee86d8052112f66a01cba8593b455916b2e5",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 12,
+          "bytes": 4194304,
+          "sha256": "858387bcb85c8799d19253808bb927a8bf643320c716857df7e2cc034ff3c36f",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 13,
+          "bytes": 4194304,
+          "sha256": "136b41f4e8eadb6284289ac7edb9f9c127a7eeb3c3bb513de01d4e664b2afb4b",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 14,
+          "bytes": 4194304,
+          "sha256": "321f4418e4c0346cb0c49a1cd701fb4625477d41f7e4bbf92cbc7244ce11e9f8",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 15,
+          "bytes": 16777216,
+          "sha256": "70aaafb2ecd09212934c780bfef176ef08bf9fab00d78f4f1c89b7b8d67d042e",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 16,
+          "bytes": 25165824,
+          "sha256": "aa63f8ccf72935dfcbb53cc82e38f8f8dde3632064395c12cbd8a0b7344653de",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 17,
+          "bytes": 4194304,
+          "sha256": "46d762b8e28e0c98c5190db97da0435f69798b0e8fc76df41bbbb04b0ada49e5",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 18,
+          "bytes": 4194304,
+          "sha256": "0565acac068cffa0fcebc9b5c3f9e6e93c55b43a095bceb6e7ba80d77628a3c9",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 19,
+          "bytes": 4194304,
+          "sha256": "6bfcf7c316905bb8bec153b471bbefe50773b6cfb9581832468a816c61d8864b",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 20,
+          "bytes": 8388608,
+          "sha256": "5f7082756f67b350856d4f4b672c460943ff7bef7c2d3b11d6e4785c312cb843",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 21,
+          "bytes": 4194304,
+          "sha256": "79d440d227908b909a4270a83db0631cf017e602dae9554a1552d6158830a056",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 22,
+          "bytes": 71303168,
+          "sha256": "ce53a57a6ffff87f16aff7e76269c2d284d39ac0ab0fa3657e0d787f022fa921",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 23,
+          "bytes": 12582912,
+          "sha256": "22a4fbf47411c46078654e2600885a33a3e62a08724a7529a608e2515b598309",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 24,
+          "bytes": 8388608,
+          "sha256": "18b3cf6ace9974b67487b9118ec104ae9998afa61df62db3c9495285dc4262c3",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 25,
+          "bytes": 167772160,
+          "sha256": "a55259a63244f2a37ba5848d600dad4ea9d7de7c7e833a88ddc7b460bcf04c4a",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 26,
+          "bytes": 25165824,
+          "sha256": "51667b8107a6f9371fd5e0ad0f5cdf6b85f4390a6c5cc19bb7f3978110e0d324",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 27,
+          "bytes": 8388608,
+          "sha256": "a826f9067d450324ce44a4c681679cc351532ed7cce8d7f3b1b1d150a7a447ad",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 28,
+          "bytes": 25165824,
+          "sha256": "8962812da5bcc885fc5f09e8cb90a53ce105d9fa8a60ee8c08ef588730289fa3",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 29,
+          "bytes": 100663296,
+          "sha256": "d18f10d867a100ada0270b1eb7cef23178846aa3b4a208b0b2f0ed416cbb425b",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 30,
+          "bytes": 37748736,
+          "sha256": "8ea55a535bafe699d5c207660b67ea1516d7324838f347d962e3745be11b8e0f",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 31,
+          "bytes": 4194304,
+          "sha256": "8f3fd31ef19b52b95e215fb8667d725cdca3fa424f21f9e79dd5eeabec840900",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 32,
+          "bytes": 8388608,
+          "sha256": "64d6f99223c1a764218a7a178a472ec5c2126dd01982c17a184cfc6d5acf2dfd",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 33,
+          "bytes": 8388608,
+          "sha256": "7ac11e357c483678465d17fdb1ac5a3c16bc166ac88b13fbe436e88dcf80d3a6",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 34,
+          "bytes": 138412032,
+          "sha256": "b1440dc6d6d4d394659ffe90d9486887e35f2571ab274954f9c99c229558781e",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 35,
+          "bytes": 4194304,
+          "sha256": "26a0fbc32aa56b86fa46cd2a4095813b5b758015f99746eff891fb314dc3b9d1",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 36,
+          "bytes": 8388608,
+          "sha256": "e2f3fe84fb758a81fb7b5646a5fb2a49ac0cc0de1f914a7d21dddcacae52f8e8",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 37,
+          "bytes": 29360128,
+          "sha256": "9520362c2131cad3ca25cb4137b260e0818db8221b1b30c516b21fd5b522da22",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 38,
+          "bytes": 33554432,
+          "sha256": "f9c0b81dc68297e9606d6339bceccc89283d9601ff6169f2e5e9ba0da94cbf7d",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 39,
+          "bytes": 4194304,
+          "sha256": "beba5eb4782ad0344518d756747d14bf6845799ee7b17366beedd8cedfbb5983",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 40,
+          "bytes": 4194304,
+          "sha256": "efc28c9191780c31891b9d76105051469a6c6d2ddf50c75e0d28ae3a2b7cec36",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 41,
+          "bytes": 4194304,
+          "sha256": "7506dcffabafc85e1a0f21088f3f1f7aaca240488c51148fab8fe71a3ae4e121",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 42,
+          "bytes": 8388608,
+          "sha256": "b5877246f07261c93485bfa06bb4b032fea0d9bd09fb0a29d69499c5e8198d59",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 43,
+          "bytes": 4194304,
+          "sha256": "b1877b471cb8cd2f435955e5b5fe7b8c1ff1a190adefd8a003fed0f72d869725",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 44,
+          "bytes": 4194304,
+          "sha256": "cfbc7559aa7296b2255426b4b6b66df369479fb3b2178912037c2e71a2cd166e",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 45,
+          "bytes": 20971520,
+          "sha256": "9534f6f3345ddfdc08d8317c0822e8356069394d3bd8412fdb19aa5f9d0e3833",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 46,
+          "bytes": 12582912,
+          "sha256": "af058e9480179f65ff407146b3309fdbd665480d37101b668e90237e18778c09",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 47,
+          "bytes": 25165824,
+          "sha256": "8e72cd9c6703326dc329f2f5d7c30f582e5b5e34a8c1db2299de0f888ae4390d",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 48,
+          "bytes": 8388608,
+          "sha256": "26b64a0b2f03cb937f1b8bdb34a2a5ffd2cc6bb57730019f25c0037e7d3ea375",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 49,
+          "bytes": 12582912,
+          "sha256": "0a16d8ef5b515ed72785e7c04990a9b176c20477d78c4a596994d3ddcf3fe9f5",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 50,
+          "bytes": 50331648,
+          "sha256": "9c45a48da708255d0ee95d1a5221c7fcb32c1dadbe30f761371e6f5a34910fb6",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 51,
+          "bytes": 16777216,
+          "sha256": "1447531c5f4147900e57062bded68b068555ec866c62029962ffd39c0d1cd7a5",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 52,
+          "bytes": 8388608,
+          "sha256": "ef815aff3b3286c4dd147afa37dcdda501ede1ae6bf48514a3117b8824b2da1f",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 53,
+          "bytes": 25165824,
+          "sha256": "77fb9fc101650c4544cc580acde14467ea9150fe7d696dc98ae98fa55fb94332",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 54,
+          "bytes": 4194304,
+          "sha256": "949195ae32f66911d77aabe284b843788d1ac7cbfa334c82e175cc016d6599a5",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 55,
+          "bytes": 4194304,
+          "sha256": "2833daaca69ec3d63b251ff7e2160ef83e682bc078c2dcf001b92cd457aff45c",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 56,
+          "bytes": 4194304,
+          "sha256": "46d950d28b8c5205ad446a173e27dcab66aa7a1e24f993393a321d7d2b7a653b",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 57,
+          "bytes": 25165824,
+          "sha256": "cfaf6a1eeb908dc4b60431f6d3f2922825d08e2a822ca2710624028468ebad5c",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 58,
+          "bytes": 2097152,
+          "sha256": "2985c50269f36396f2b6c0112f79c6c15c4bbf43520383eb61a99bdb082e5150",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 59,
+          "bytes": 8784,
+          "sha256": "0ae9e410ac93d40b4ec73073a303fdcb5fa0921dbc01c81ff1e38a349f82c393",
+          "matches_pinned_02_complete_oracle": true
+        }
+      ],
+      "final_all_60_outputs_independently_rehashed": true,
+      "source_input_and_driver_postchecks_passed": true,
+      "frozen_file_post_hashes": {
+        "tools/compute_interval_timing.py": "af3e1c99124250318eb899024406117b0dff5d02f837349bf2b1ea9c30ef612c",
+        "tests/test_compute_interval_timing.py": "0c63989b7332f457bd7dcd28f6c2add5fab3a12f6b93b8adf0527e89bd90c3f6",
+        "docs/compute-interval-timing.md": "c4c6a539ee854d824f3645519ed6e57eb0394607c21deb4e3de6d932e5e8d797",
+        "research/compute-interval-timing-preparation.json": "6cd6042729e2cb2ab4592b9620c00f265265faae23210eda7391f5fe6dd6dcd2",
+        "research/compute-interval-replay-observation.json": "f974c3fb71bc0c235194657f4386658c14b777844ec743a050ba67b9da768ee6",
+        "docs/compute-interval-replay.md": "0a9e3db3c20e323627ba6c3fd07799c79473dddbdec36946c841c123e0aab8e0",
+        "local/compute-interval-timing-owned-01/profile.json": "067ec44d3efd4ce0367904c1ff44d096c159a3f767cd3210721d0e346323f50d",
+        "local/compute-interval-timing-owned-01/paired.bin": "f4ae54d1882d06e8236c7324d0667feb3907a8ddc49374816ebe59a3276d4dc4",
+        "local/compute-interval-timing-owned-01/native": "c8a17b55e415a7d108a0420b0a6b7f6acbb87e87c063d9cf968cd98621bfb0a3",
+        "local/compute-interval-timing-owned-01/vulkan_compute_interval_timing.c": "854a2b7e76caf6b68b34df412eff95e317cc0510ee6a87b1900c07989d344d3f",
+        "local/compute-interval-timing-owned-01/native.diff": "139dc28328650ee724035a1cb82f5d6719217b734d8455d8dbcc06002b29282a",
+        "local/compute-interval-timing-owned-01/handoff.json": "4b231c9b986f67dba4c20d558241e3ccc1894fc5a1caa76b65af01772a5c7689",
+        "local/compute-interval-timing-owned-01/expected-writable.bin": "323334824a3f64ff80ba0cb8f8602c8f6dd7be3384a32353bbd8e1eb0628c7c2",
+        "local/compute-interval-timing-owned-01/cpu-validation/receipt.json": "b77a0cc674577690ff729a31307f6b9abe6f008fd62844189bcaef1ef8316e4f",
+        "local/compute-interval-timing-owned-01/full-suite.log": "58608d74ecb0bfefb1ef467cca9b9439d6425f5fc33f340f5dbe81a0310635c7"
+      },
+      "base02_file_post_hashes": {
+        "tools/compute_interval_replay.py": "9a5e3835c251047f51ba23e9042ac9b821c9e6543adc9f979186d10afcdecb85",
+        "local/compute-interval-replay-owned-02/vulkan_compute_interval_replay.c": "9b67fbdec5487cd5138395455b58c7148114ee902f7bfa643bebc30cb741e55f",
+        "local/compute-interval-replay-owned-02/native": "6bbf44eeb4f1521bc052d3a6473d5b2ba0656f986d091c9a19f97d39fb0c87dd",
+        "local/compute-interval-replay-owned-02/profile.json": "384a4064fc0aa593e4f9984122fe3f93dfaf089dfed608ee8fb0bacbace658e7",
+        "local/compute-interval-replay-owned-02/baseline32.bin": "bc1e6c3a2788190bd16d922c6e5a33b038d6774af02df3325408c0c9d43c26a4",
+        "local/compute-interval-replay-owned-02/candidate32.bin": "2f29fb6fc6104eccbd52137591119d2ecdbd6856ab3b4a4cd8d7732118e139c9"
+      },
+      "query_availability_and_interval_gates_passed": true,
+      "gpu_lease_released": true,
+      "pipeline_executable_statistics": [
+        {
+          "executable_statistics": [
+            {
+              "name": "Instructions",
+              "description": "Number of GEN instructions in the final generated shader executable.",
+              "format": 2,
+              "value": 144485
+            },
+            {
+              "name": "Code size",
+              "description": "Code size in bytes",
+              "format": 2,
+              "value": 2889872
+            },
+            {
+              "name": "SENDs",
+              "description": "Number of instructions in the final generated shader executable which access external units such as the constant cache or the sampler.",
+              "format": 2,
+              "value": 1559
+            },
+            {
+              "name": "Loops",
+              "description": "Number of loops (not unrolled) in the final generated shader executable.",
+              "format": 2,
+              "value": 72
+            },
+            {
+              "name": "Cycles",
+              "description": "Estimate of the number of EU cycles required to execute the final generated executable. This is an estimate only and may vary greatly from actual run-time performance.",
+              "format": 2,
+              "value": 3821821
+            },
+            {
+              "name": "Spills",
+              "description": "Number of scratch spill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+              "format": 2,
+              "value": 6690
+            },
+            {
+              "name": "Fills",
+              "description": "Number of scratch fill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+              "format": 2,
+              "value": 14943
+            },
+            {
+              "name": "Scratch Memory Size",
+              "description": "Number of bytes of scratch memory required by the generated shader executable. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+              "format": 2,
+              "value": 32768
+            },
+            {
+              "name": "GRF registers",
+              "description": "Number of GRF registers required by the shader.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Push constant ranges",
+              "description": "Number of push constants ranges provided to the shader.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Push constant registers",
+              "description": "Number of GRF registers in the payload registers dedicated to constants.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Max dispatch width",
+              "description": "Largest SIMD dispatch width.",
+              "format": 2,
+              "value": 32
+            },
+            {
+              "name": "Max live registers",
+              "description": "Maximum number of registers used across the entire shader.",
+              "format": 2,
+              "value": 560
+            },
+            {
+              "name": "Workgroup Memory Size",
+              "description": "Number of bytes of workgroup shared memory used by this shader including any padding.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Non SSA regs after NIR",
+              "description": "Non SSA regs after NIR translation to BRW.",
+              "format": 2,
+              "value": 1372
+            },
+            {
+              "name": "Source hash",
+              "description": "Hash generated from shader source or vkd3d-proton provided.",
+              "format": 2,
+              "value": 14125175244154702039
+            }
+          ]
+        },
+        {
+          "executable_statistics": [
+            {
+              "name": "Instructions",
+              "description": "Number of GEN instructions in the final generated shader executable.",
+              "format": 2,
+              "value": 128800
+            },
+            {
+              "name": "Code size",
+              "description": "Code size in bytes",
+              "format": 2,
+              "value": 2557616
+            },
+            {
+              "name": "SENDs",
+              "description": "Number of instructions in the final generated shader executable which access external units such as the constant cache or the sampler.",
+              "format": 2,
+              "value": 1981
+            },
+            {
+              "name": "Loops",
+              "description": "Number of loops (not unrolled) in the final generated shader executable.",
+              "format": 2,
+              "value": 72
+            },
+            {
+              "name": "Cycles",
+              "description": "Estimate of the number of EU cycles required to execute the final generated executable. This is an estimate only and may vary greatly from actual run-time performance.",
+              "format": 2,
+              "value": 2900285
+            },
+            {
+              "name": "Spills",
+              "description": "Number of scratch spill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+              "format": 2,
+              "value": 9257
+            },
+            {
+              "name": "Fills",
+              "description": "Number of scratch fill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+              "format": 2,
+              "value": 10178
+            },
+            {
+              "name": "Scratch Memory Size",
+              "description": "Number of bytes of scratch memory required by the generated shader executable. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+              "format": 2,
+              "value": 32768
+            },
+            {
+              "name": "GRF registers",
+              "description": "Number of GRF registers required by the shader.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Push constant ranges",
+              "description": "Number of push constants ranges provided to the shader.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Push constant registers",
+              "description": "Number of GRF registers in the payload registers dedicated to constants.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Max dispatch width",
+              "description": "Largest SIMD dispatch width.",
+              "format": 2,
+              "value": 32
+            },
+            {
+              "name": "Max live registers",
+              "description": "Maximum number of registers used across the entire shader.",
+              "format": 2,
+              "value": 557
+            },
+            {
+              "name": "Workgroup Memory Size",
+              "description": "Number of bytes of workgroup shared memory used by this shader including any padding.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Non SSA regs after NIR",
+              "description": "Non SSA regs after NIR translation to BRW.",
+              "format": 2,
+              "value": 1168
+            },
+            {
+              "name": "Source hash",
+              "description": "Hash generated from shader source or vkd3d-proton provided.",
+              "format": 2,
+              "value": 1873164481611099883
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "batch": 2,
+      "process_terminal": "exit0",
+      "evidence_sha256": {
+        "result": "243c6f95b6c96d7b8dd0fa5affe1498fe02231eda81b7ca99b1f453cf38868d4",
+        "native": "1d19531cabab3a1e65b07efa4ef3dabed9624334142ed70cfaf37b2de28cc2b3",
+        "raw": "a0a90fd3df9e2374dd245c5d37328356edb1d4943c1ed8e4a2b18923ba7013d9",
+        "terminal": "cf19576aa7bab8a1466fa21a8dd730c114cf52128821b2b61482714be65928b6"
+      },
+      "actual_subgroup_sizes": [
+        32,
+        32
+      ],
+      "device_vendor": 32902,
+      "device_id": 22176,
+      "device_uuid": "8680a056080000000300000000000000",
+      "driver_uuid": "542135820eef585924bda292588520e1",
+      "queue_family": 0,
+      "timestamp_valid_bits": 36,
+      "timestamp_period_ns": 52.08333206176758,
+      "timestamp_wrap_horizon_ns": 3579139325952.0,
+      "native_dispatches": 20,
+      "full_complete_buffer_comparisons": 20,
+      "native_trials": [
+        {
+          "index": 0,
+          "module": 0,
+          "timed": false,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 0,
+          "timestamp_end": 0,
+          "ticks": 0,
+          "nanoseconds": 0
+        },
+        {
+          "index": 1,
+          "module": 0,
+          "timed": false,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 0,
+          "timestamp_end": 0,
+          "ticks": 0,
+          "nanoseconds": 0
+        },
+        {
+          "index": 2,
+          "module": 1,
+          "timed": false,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 0,
+          "timestamp_end": 0,
+          "ticks": 0,
+          "nanoseconds": 0
+        },
+        {
+          "index": 3,
+          "module": 1,
+          "timed": false,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 0,
+          "timestamp_end": 0,
+          "ticks": 0,
+          "nanoseconds": 0
+        },
+        {
+          "index": 4,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52616648337,
+          "timestamp_end": 52616722825,
+          "ticks": 74488,
+          "nanoseconds": 3879583.2386169434
+        },
+        {
+          "index": 5,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52618258255,
+          "timestamp_end": 52618313858,
+          "ticks": 55603,
+          "nanoseconds": 2895989.5126304626
+        },
+        {
+          "index": 6,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52619861122,
+          "timestamp_end": 52619917186,
+          "ticks": 56064,
+          "nanoseconds": 2919999.9287109375
+        },
+        {
+          "index": 7,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52621448343,
+          "timestamp_end": 52621532728,
+          "ticks": 84385,
+          "nanoseconds": 4395051.976032257
+        },
+        {
+          "index": 8,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52623075415,
+          "timestamp_end": 52623149889,
+          "ticks": 74474,
+          "nanoseconds": 3878854.0719680786
+        },
+        {
+          "index": 9,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52624685078,
+          "timestamp_end": 52624740997,
+          "ticks": 55919,
+          "nanoseconds": 2912447.845561981
+        },
+        {
+          "index": 10,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52626269144,
+          "timestamp_end": 52626324672,
+          "ticks": 55528,
+          "nanoseconds": 2892083.26272583
+        },
+        {
+          "index": 11,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52627879118,
+          "timestamp_end": 52627953628,
+          "ticks": 74510,
+          "nanoseconds": 3880729.0719223022
+        },
+        {
+          "index": 12,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52629499912,
+          "timestamp_end": 52629574404,
+          "ticks": 74492,
+          "nanoseconds": 3879791.5719451904
+        },
+        {
+          "index": 13,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52631125056,
+          "timestamp_end": 52631180530,
+          "ticks": 55474,
+          "nanoseconds": 2889270.7627944946
+        },
+        {
+          "index": 14,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52632763505,
+          "timestamp_end": 52632828118,
+          "ticks": 64613,
+          "nanoseconds": 3365260.3345069885
+        },
+        {
+          "index": 15,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52634412520,
+          "timestamp_end": 52634487084,
+          "ticks": 74564,
+          "nanoseconds": 3883541.5718536377
+        },
+        {
+          "index": 16,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52636017632,
+          "timestamp_end": 52636092109,
+          "ticks": 74477,
+          "nanoseconds": 3879010.321964264
+        },
+        {
+          "index": 17,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52637638094,
+          "timestamp_end": 52637693662,
+          "ticks": 55568,
+          "nanoseconds": 2894166.596008301
+        },
+        {
+          "index": 18,
+          "module": 1,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52639236802,
+          "timestamp_end": 52639292247,
+          "ticks": 55445,
+          "nanoseconds": 2887760.3461647034
+        },
+        {
+          "index": 19,
+          "module": 0,
+          "timed": true,
+          "all_60_complete_buffers_match": true,
+          "timestamp_start": 52640836225,
+          "timestamp_end": 52640910757,
+          "ticks": 74532,
+          "nanoseconds": 3881874.905227661
+        }
+      ],
+      "descriptive_statistics": {
+        "original": {
+          "timed_samples": 8,
+          "median_ms": 3.880260321933746,
+          "minimum_ms": 3.8788540719680786,
+          "maximum_ms": 4.395051976032257,
+          "timed_samples_filtered": 0
+        },
+        "candidate": {
+          "timed_samples": 8,
+          "median_ms": 2.8950780543193817,
+          "minimum_ms": 2.8877603461647032,
+          "maximum_ms": 3.3652603345069885,
+          "timed_samples_filtered": 0
+        }
+      },
+      "final_complete_outputs": [
+        {
+          "index": 0,
+          "bytes": 4194304,
+          "sha256": "7ac84a212629a1f919996531acfa5ead0d9986b79e14d7760db1d79355e14c99",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 1,
+          "bytes": 4194304,
+          "sha256": "c8c124e5499428d93be234a8caebd3075f2fcf4cfe30d5b456953b173afbbec4",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 2,
+          "bytes": 20971520,
+          "sha256": "7a7868ef096fc2a7c59de40a25a85129fcc7f4e2430127435cc4c4a8b8b83291",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 3,
+          "bytes": 4194304,
+          "sha256": "b9835c045ab988688e4dfe9ed81920b4f04f1b0aa8314a213f7e2c0f1ed80891",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 4,
+          "bytes": 20971520,
+          "sha256": "353b062903195217d7b826913a46b8d0c75af1aabde23b06b8f79cfb30c4d107",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 5,
+          "bytes": 54525952,
+          "sha256": "b5a3a42b6310e216a9b88caff19531e1c0b6ab0691c9547a20a0d084f6703017",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 6,
+          "bytes": 4194304,
+          "sha256": "810da6c191facaa000710c11507dddcdb4e6cdffdb17204c6a5c76a261376054",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 7,
+          "bytes": 4194304,
+          "sha256": "323334824a3f64ff80ba0cb8f8602c8f6dd7be3384a32353bbd8e1eb0628c7c2",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 8,
+          "bytes": 8388608,
+          "sha256": "8ca83ce8663d0aa715aa5e777be0691ef85a2edaf99b37ed22b12cacff516d8b",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 9,
+          "bytes": 4194304,
+          "sha256": "27db8c89cae1f6d265974bdf1b64c8ba3331d8011a4782684c43ed4f709370f6",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 10,
+          "bytes": 8388608,
+          "sha256": "1e41d254f20e95c274079bfbf3ec7853daeee10b2a76a926d17f1863b41e26e1",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 11,
+          "bytes": 4194304,
+          "sha256": "ff977b45c39ac8b23638bae4bf87ee86d8052112f66a01cba8593b455916b2e5",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 12,
+          "bytes": 4194304,
+          "sha256": "858387bcb85c8799d19253808bb927a8bf643320c716857df7e2cc034ff3c36f",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 13,
+          "bytes": 4194304,
+          "sha256": "136b41f4e8eadb6284289ac7edb9f9c127a7eeb3c3bb513de01d4e664b2afb4b",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 14,
+          "bytes": 4194304,
+          "sha256": "321f4418e4c0346cb0c49a1cd701fb4625477d41f7e4bbf92cbc7244ce11e9f8",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 15,
+          "bytes": 16777216,
+          "sha256": "70aaafb2ecd09212934c780bfef176ef08bf9fab00d78f4f1c89b7b8d67d042e",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 16,
+          "bytes": 25165824,
+          "sha256": "aa63f8ccf72935dfcbb53cc82e38f8f8dde3632064395c12cbd8a0b7344653de",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 17,
+          "bytes": 4194304,
+          "sha256": "46d762b8e28e0c98c5190db97da0435f69798b0e8fc76df41bbbb04b0ada49e5",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 18,
+          "bytes": 4194304,
+          "sha256": "0565acac068cffa0fcebc9b5c3f9e6e93c55b43a095bceb6e7ba80d77628a3c9",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 19,
+          "bytes": 4194304,
+          "sha256": "6bfcf7c316905bb8bec153b471bbefe50773b6cfb9581832468a816c61d8864b",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 20,
+          "bytes": 8388608,
+          "sha256": "5f7082756f67b350856d4f4b672c460943ff7bef7c2d3b11d6e4785c312cb843",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 21,
+          "bytes": 4194304,
+          "sha256": "79d440d227908b909a4270a83db0631cf017e602dae9554a1552d6158830a056",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 22,
+          "bytes": 71303168,
+          "sha256": "ce53a57a6ffff87f16aff7e76269c2d284d39ac0ab0fa3657e0d787f022fa921",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 23,
+          "bytes": 12582912,
+          "sha256": "22a4fbf47411c46078654e2600885a33a3e62a08724a7529a608e2515b598309",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 24,
+          "bytes": 8388608,
+          "sha256": "18b3cf6ace9974b67487b9118ec104ae9998afa61df62db3c9495285dc4262c3",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 25,
+          "bytes": 167772160,
+          "sha256": "a55259a63244f2a37ba5848d600dad4ea9d7de7c7e833a88ddc7b460bcf04c4a",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 26,
+          "bytes": 25165824,
+          "sha256": "51667b8107a6f9371fd5e0ad0f5cdf6b85f4390a6c5cc19bb7f3978110e0d324",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 27,
+          "bytes": 8388608,
+          "sha256": "a826f9067d450324ce44a4c681679cc351532ed7cce8d7f3b1b1d150a7a447ad",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 28,
+          "bytes": 25165824,
+          "sha256": "8962812da5bcc885fc5f09e8cb90a53ce105d9fa8a60ee8c08ef588730289fa3",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 29,
+          "bytes": 100663296,
+          "sha256": "d18f10d867a100ada0270b1eb7cef23178846aa3b4a208b0b2f0ed416cbb425b",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 30,
+          "bytes": 37748736,
+          "sha256": "8ea55a535bafe699d5c207660b67ea1516d7324838f347d962e3745be11b8e0f",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 31,
+          "bytes": 4194304,
+          "sha256": "8f3fd31ef19b52b95e215fb8667d725cdca3fa424f21f9e79dd5eeabec840900",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 32,
+          "bytes": 8388608,
+          "sha256": "64d6f99223c1a764218a7a178a472ec5c2126dd01982c17a184cfc6d5acf2dfd",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 33,
+          "bytes": 8388608,
+          "sha256": "7ac11e357c483678465d17fdb1ac5a3c16bc166ac88b13fbe436e88dcf80d3a6",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 34,
+          "bytes": 138412032,
+          "sha256": "b1440dc6d6d4d394659ffe90d9486887e35f2571ab274954f9c99c229558781e",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 35,
+          "bytes": 4194304,
+          "sha256": "26a0fbc32aa56b86fa46cd2a4095813b5b758015f99746eff891fb314dc3b9d1",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 36,
+          "bytes": 8388608,
+          "sha256": "e2f3fe84fb758a81fb7b5646a5fb2a49ac0cc0de1f914a7d21dddcacae52f8e8",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 37,
+          "bytes": 29360128,
+          "sha256": "9520362c2131cad3ca25cb4137b260e0818db8221b1b30c516b21fd5b522da22",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 38,
+          "bytes": 33554432,
+          "sha256": "f9c0b81dc68297e9606d6339bceccc89283d9601ff6169f2e5e9ba0da94cbf7d",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 39,
+          "bytes": 4194304,
+          "sha256": "beba5eb4782ad0344518d756747d14bf6845799ee7b17366beedd8cedfbb5983",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 40,
+          "bytes": 4194304,
+          "sha256": "efc28c9191780c31891b9d76105051469a6c6d2ddf50c75e0d28ae3a2b7cec36",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 41,
+          "bytes": 4194304,
+          "sha256": "7506dcffabafc85e1a0f21088f3f1f7aaca240488c51148fab8fe71a3ae4e121",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 42,
+          "bytes": 8388608,
+          "sha256": "b5877246f07261c93485bfa06bb4b032fea0d9bd09fb0a29d69499c5e8198d59",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 43,
+          "bytes": 4194304,
+          "sha256": "b1877b471cb8cd2f435955e5b5fe7b8c1ff1a190adefd8a003fed0f72d869725",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 44,
+          "bytes": 4194304,
+          "sha256": "cfbc7559aa7296b2255426b4b6b66df369479fb3b2178912037c2e71a2cd166e",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 45,
+          "bytes": 20971520,
+          "sha256": "9534f6f3345ddfdc08d8317c0822e8356069394d3bd8412fdb19aa5f9d0e3833",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 46,
+          "bytes": 12582912,
+          "sha256": "af058e9480179f65ff407146b3309fdbd665480d37101b668e90237e18778c09",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 47,
+          "bytes": 25165824,
+          "sha256": "8e72cd9c6703326dc329f2f5d7c30f582e5b5e34a8c1db2299de0f888ae4390d",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 48,
+          "bytes": 8388608,
+          "sha256": "26b64a0b2f03cb937f1b8bdb34a2a5ffd2cc6bb57730019f25c0037e7d3ea375",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 49,
+          "bytes": 12582912,
+          "sha256": "0a16d8ef5b515ed72785e7c04990a9b176c20477d78c4a596994d3ddcf3fe9f5",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 50,
+          "bytes": 50331648,
+          "sha256": "9c45a48da708255d0ee95d1a5221c7fcb32c1dadbe30f761371e6f5a34910fb6",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 51,
+          "bytes": 16777216,
+          "sha256": "1447531c5f4147900e57062bded68b068555ec866c62029962ffd39c0d1cd7a5",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 52,
+          "bytes": 8388608,
+          "sha256": "ef815aff3b3286c4dd147afa37dcdda501ede1ae6bf48514a3117b8824b2da1f",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 53,
+          "bytes": 25165824,
+          "sha256": "77fb9fc101650c4544cc580acde14467ea9150fe7d696dc98ae98fa55fb94332",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 54,
+          "bytes": 4194304,
+          "sha256": "949195ae32f66911d77aabe284b843788d1ac7cbfa334c82e175cc016d6599a5",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 55,
+          "bytes": 4194304,
+          "sha256": "2833daaca69ec3d63b251ff7e2160ef83e682bc078c2dcf001b92cd457aff45c",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 56,
+          "bytes": 4194304,
+          "sha256": "46d950d28b8c5205ad446a173e27dcab66aa7a1e24f993393a321d7d2b7a653b",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 57,
+          "bytes": 25165824,
+          "sha256": "cfaf6a1eeb908dc4b60431f6d3f2922825d08e2a822ca2710624028468ebad5c",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 58,
+          "bytes": 2097152,
+          "sha256": "2985c50269f36396f2b6c0112f79c6c15c4bbf43520383eb61a99bdb082e5150",
+          "matches_pinned_02_complete_oracle": true
+        },
+        {
+          "index": 59,
+          "bytes": 8784,
+          "sha256": "0ae9e410ac93d40b4ec73073a303fdcb5fa0921dbc01c81ff1e38a349f82c393",
+          "matches_pinned_02_complete_oracle": true
+        }
+      ],
+      "final_all_60_outputs_independently_rehashed": true,
+      "source_input_and_driver_postchecks_passed": true,
+      "frozen_file_post_hashes": {
+        "tools/compute_interval_timing.py": "af3e1c99124250318eb899024406117b0dff5d02f837349bf2b1ea9c30ef612c",
+        "tests/test_compute_interval_timing.py": "0c63989b7332f457bd7dcd28f6c2add5fab3a12f6b93b8adf0527e89bd90c3f6",
+        "docs/compute-interval-timing.md": "c4c6a539ee854d824f3645519ed6e57eb0394607c21deb4e3de6d932e5e8d797",
+        "research/compute-interval-timing-preparation.json": "6cd6042729e2cb2ab4592b9620c00f265265faae23210eda7391f5fe6dd6dcd2",
+        "research/compute-interval-replay-observation.json": "f974c3fb71bc0c235194657f4386658c14b777844ec743a050ba67b9da768ee6",
+        "docs/compute-interval-replay.md": "0a9e3db3c20e323627ba6c3fd07799c79473dddbdec36946c841c123e0aab8e0",
+        "local/compute-interval-timing-owned-01/profile.json": "067ec44d3efd4ce0367904c1ff44d096c159a3f767cd3210721d0e346323f50d",
+        "local/compute-interval-timing-owned-01/paired.bin": "f4ae54d1882d06e8236c7324d0667feb3907a8ddc49374816ebe59a3276d4dc4",
+        "local/compute-interval-timing-owned-01/native": "c8a17b55e415a7d108a0420b0a6b7f6acbb87e87c063d9cf968cd98621bfb0a3",
+        "local/compute-interval-timing-owned-01/vulkan_compute_interval_timing.c": "854a2b7e76caf6b68b34df412eff95e317cc0510ee6a87b1900c07989d344d3f",
+        "local/compute-interval-timing-owned-01/native.diff": "139dc28328650ee724035a1cb82f5d6719217b734d8455d8dbcc06002b29282a",
+        "local/compute-interval-timing-owned-01/handoff.json": "4b231c9b986f67dba4c20d558241e3ccc1894fc5a1caa76b65af01772a5c7689",
+        "local/compute-interval-timing-owned-01/expected-writable.bin": "323334824a3f64ff80ba0cb8f8602c8f6dd7be3384a32353bbd8e1eb0628c7c2",
+        "local/compute-interval-timing-owned-01/cpu-validation/receipt.json": "b77a0cc674577690ff729a31307f6b9abe6f008fd62844189bcaef1ef8316e4f",
+        "local/compute-interval-timing-owned-01/full-suite.log": "58608d74ecb0bfefb1ef467cca9b9439d6425f5fc33f340f5dbe81a0310635c7"
+      },
+      "base02_file_post_hashes": {
+        "tools/compute_interval_replay.py": "9a5e3835c251047f51ba23e9042ac9b821c9e6543adc9f979186d10afcdecb85",
+        "local/compute-interval-replay-owned-02/vulkan_compute_interval_replay.c": "9b67fbdec5487cd5138395455b58c7148114ee902f7bfa643bebc30cb741e55f",
+        "local/compute-interval-replay-owned-02/native": "6bbf44eeb4f1521bc052d3a6473d5b2ba0656f986d091c9a19f97d39fb0c87dd",
+        "local/compute-interval-replay-owned-02/profile.json": "384a4064fc0aa593e4f9984122fe3f93dfaf089dfed608ee8fb0bacbace658e7",
+        "local/compute-interval-replay-owned-02/baseline32.bin": "bc1e6c3a2788190bd16d922c6e5a33b038d6774af02df3325408c0c9d43c26a4",
+        "local/compute-interval-replay-owned-02/candidate32.bin": "2f29fb6fc6104eccbd52137591119d2ecdbd6856ab3b4a4cd8d7732118e139c9"
+      },
+      "query_availability_and_interval_gates_passed": true,
+      "gpu_lease_released": true,
+      "pipeline_executable_statistics": [
+        {
+          "executable_statistics": [
+            {
+              "name": "Instructions",
+              "description": "Number of GEN instructions in the final generated shader executable.",
+              "format": 2,
+              "value": 144485
+            },
+            {
+              "name": "Code size",
+              "description": "Code size in bytes",
+              "format": 2,
+              "value": 2889872
+            },
+            {
+              "name": "SENDs",
+              "description": "Number of instructions in the final generated shader executable which access external units such as the constant cache or the sampler.",
+              "format": 2,
+              "value": 1559
+            },
+            {
+              "name": "Loops",
+              "description": "Number of loops (not unrolled) in the final generated shader executable.",
+              "format": 2,
+              "value": 72
+            },
+            {
+              "name": "Cycles",
+              "description": "Estimate of the number of EU cycles required to execute the final generated executable. This is an estimate only and may vary greatly from actual run-time performance.",
+              "format": 2,
+              "value": 3821821
+            },
+            {
+              "name": "Spills",
+              "description": "Number of scratch spill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+              "format": 2,
+              "value": 6690
+            },
+            {
+              "name": "Fills",
+              "description": "Number of scratch fill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+              "format": 2,
+              "value": 14943
+            },
+            {
+              "name": "Scratch Memory Size",
+              "description": "Number of bytes of scratch memory required by the generated shader executable. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+              "format": 2,
+              "value": 32768
+            },
+            {
+              "name": "GRF registers",
+              "description": "Number of GRF registers required by the shader.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Push constant ranges",
+              "description": "Number of push constants ranges provided to the shader.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Push constant registers",
+              "description": "Number of GRF registers in the payload registers dedicated to constants.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Max dispatch width",
+              "description": "Largest SIMD dispatch width.",
+              "format": 2,
+              "value": 32
+            },
+            {
+              "name": "Max live registers",
+              "description": "Maximum number of registers used across the entire shader.",
+              "format": 2,
+              "value": 560
+            },
+            {
+              "name": "Workgroup Memory Size",
+              "description": "Number of bytes of workgroup shared memory used by this shader including any padding.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Non SSA regs after NIR",
+              "description": "Non SSA regs after NIR translation to BRW.",
+              "format": 2,
+              "value": 1372
+            },
+            {
+              "name": "Source hash",
+              "description": "Hash generated from shader source or vkd3d-proton provided.",
+              "format": 2,
+              "value": 14125175244154702039
+            }
+          ]
+        },
+        {
+          "executable_statistics": [
+            {
+              "name": "Instructions",
+              "description": "Number of GEN instructions in the final generated shader executable.",
+              "format": 2,
+              "value": 128800
+            },
+            {
+              "name": "Code size",
+              "description": "Code size in bytes",
+              "format": 2,
+              "value": 2557616
+            },
+            {
+              "name": "SENDs",
+              "description": "Number of instructions in the final generated shader executable which access external units such as the constant cache or the sampler.",
+              "format": 2,
+              "value": 1981
+            },
+            {
+              "name": "Loops",
+              "description": "Number of loops (not unrolled) in the final generated shader executable.",
+              "format": 2,
+              "value": 72
+            },
+            {
+              "name": "Cycles",
+              "description": "Estimate of the number of EU cycles required to execute the final generated executable. This is an estimate only and may vary greatly from actual run-time performance.",
+              "format": 2,
+              "value": 2900285
+            },
+            {
+              "name": "Spills",
+              "description": "Number of scratch spill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+              "format": 2,
+              "value": 9257
+            },
+            {
+              "name": "Fills",
+              "description": "Number of scratch fill operations. This gives a rough estimate of the cost incurred due to spilling temporary values to memory. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+              "format": 2,
+              "value": 10178
+            },
+            {
+              "name": "Scratch Memory Size",
+              "description": "Number of bytes of scratch memory required by the generated shader executable. If this is non-zero, you may want to adjust your shader to reduce register pressure.",
+              "format": 2,
+              "value": 32768
+            },
+            {
+              "name": "GRF registers",
+              "description": "Number of GRF registers required by the shader.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Push constant ranges",
+              "description": "Number of push constants ranges provided to the shader.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Push constant registers",
+              "description": "Number of GRF registers in the payload registers dedicated to constants.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Max dispatch width",
+              "description": "Largest SIMD dispatch width.",
+              "format": 2,
+              "value": 32
+            },
+            {
+              "name": "Max live registers",
+              "description": "Maximum number of registers used across the entire shader.",
+              "format": 2,
+              "value": 557
+            },
+            {
+              "name": "Workgroup Memory Size",
+              "description": "Number of bytes of workgroup shared memory used by this shader including any padding.",
+              "format": 2,
+              "value": 0
+            },
+            {
+              "name": "Non SSA regs after NIR",
+              "description": "Non SSA regs after NIR translation to BRW.",
+              "format": 2,
+              "value": 1168
+            },
+            {
+              "name": "Source hash",
+              "description": "Hash generated from shader source or vkd3d-proton provided.",
+              "format": 2,
+              "value": 1873164481611099883
+            }
+          ]
+        }
+      ],
+      "first_batch_artifacts_preserved": {
+        "all_60_complete_output_bytes_match": true,
+        "first_evidence_post_hashes": {
+          "terminal-receipt.json": "013c720e0b1462f518fbd526139c3d6d8a06b6db131d52fdb29c96d14dab7a63",
+          "result.json": "db488cb10f2969c21b954baa1ab9aca3b241f13a892fdcdf405bd17f6052c23d",
+          "native.json": "4d50754f5bed731cb4342599008eb1d9d41b8d26d19af6ea1a89f03d9dc00cbc",
+          "raw-samples.json": "6134b1a2d2bf0b4e3b751109d416842cb7554098d5bef8eac1190152d8af1eb4"
+        }
+      }
+    }
+  ],
+  "background_activity": {
+    "known_process_scan": "No matching known game/helper executable was observed before either batch.",
+    "exclusive_lease_coordination": "Parent granted each bounded batch separately; both leases released after terminal completion.",
+    "all_background_GPU_activity_excluded": "unknown",
+    "limitation": "The known-process scan is not proof that all GPU background activity was excluded."
+  },
+  "limitations": [
+    "Measurements surround a dispatch, not shader arithmetic alone: pipeline/driver state emitted for the dispatch may fall inside the GPU bracket.",
+    "Compilation, shader-cache setup, CPU resets, complete CPU oracle checks and final file hashes are outside measured intervals.",
+    "CPU full-oracle/reset gaps can affect subsequent GPU clock/cache state; no locked-clock or equivalent device-state claim is made.",
+    "All samples and outliers are retained. The candidate has a lower latency cluster in batch 1 and a higher outlier in batch 2; these are observations, not assigned causes.",
+    "Both complete byte checks and two unfiltered batches support this fixed owned-graph observation only; general equivalence, live renderer integration, visual/native quality and accepted gameplay optimization remain unproved.",
+    "Historical live CPU atomicity and original complete device/float-state equivalence remain separate.",
+    "No normal-frame FPS or whole-game speedup was measured."
+  ],
+  "frozen_artifact_policy": "Profile 02, original timing CPU freeze, source, helper, plans, preparation metadata/docs and both runtime batches are preserved unchanged.",
+  "pipeline_executable_statistics_scope": "Driver compiler metadata retained separately from timestamp durations. Cycles is an estimate; zero reported GRF registers does not establish zero physical register usage."
+}

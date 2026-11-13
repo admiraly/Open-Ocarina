@@ -9,6 +9,15 @@ across stage keys, pipeline caches and disk caches. The isolated driver reproduc
 all 59 complete compute allocations at widths 32, 32 repeated, 16 and 8 on one
 frozen input graph. This verifies those outputs, without establishing a speedup.
 
+The separate [interval-lookup timing observation](compute-interval-timing-observation.md)
+records two completed batches on that owned compute graph. The original and
+candidate both passed all 60 complete buffer/record checks after each of 40
+dispatches. All 32 timed samples are retained, and the candidate's measured
+isolated-dispatch median was lower in both batches. CPU reset/oracle gaps can
+affect clock/cache state, and all background GPU activity was not excluded.
+This is an isolated observation, not a normal-frame FPS result, live renderer
+integration, native-quality acceptance or an accepted gameplay optimization.
+
 [Native mesh lowering revision 2](native-mesh-warp32-integration.md) requires the
 MAX-absent compiler policy; earlier integrated pilots remain explicitly revision 1.
 New [V2/E5 identity pilots](../research/native-renderer-v2-e5-pilot.json) reached

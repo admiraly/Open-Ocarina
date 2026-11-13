@@ -6,7 +6,7 @@ The first performance target is correct rendering at a sustained, real **60 FPS 
 
 [The active goal](docs/goal.md) requires native features and visual quality, stable gameplay, and explicit hair/foliage aliasing investigation. Turning off rendering work is not an accepted performance improvement.
 
-**Current state:** working reconstruction tools, bounded Ghidra and matching probes, exact live GPU identities, resource captures and optimized compiler experiments. There is no complete reconstructed game or validated performance gain yet. [Status](docs/status.md) records the evidence and limitations; [the roadmap](docs/roadmap.md) defines the next exit tests.
+**Current state:** working reconstruction tools, bounded Ghidra and matching probes, exact live GPU identities, resource captures and optimized compiler experiments. A compute candidate now passes complete owned-buffer checks and has lower isolated-dispatch medians in two batches. There is no complete reconstructed game or accepted gameplay performance gain yet. [Status](docs/status.md) records the evidence and limitations; [the roadmap](docs/roadmap.md) defines the next exit tests.
 
 **Development strategy:** [Arc-first targeted reconstruction](docs/strategy.md). Full CPU matching is a supporting long-term track, not a prerequisite for fixing the existing open renderer and shader translator.
 

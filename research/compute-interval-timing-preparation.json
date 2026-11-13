@@ -1,0 +1,123 @@
+{
+  "schema": "open-ocarina.compute-interval-timing-preparation/v1",
+  "state": "CPU-prepared only; no Vulkan instance/device/pipeline/query/dispatch in this new profile",
+  "identity": {
+    "adapter_sha256": "af3e1c99124250318eb899024406117b0dff5d02f837349bf2b1ea9c30ef612c",
+    "tests_sha256": "0c63989b7332f457bd7dcd28f6c2add5fab3a12f6b93b8adf0527e89bd90c3f6",
+    "doc_sha256": "c4c6a539ee854d824f3645519ed6e57eb0394607c21deb4e3de6d932e5e8d797",
+    "native_source_sha256": "854a2b7e76caf6b68b34df412eff95e317cc0510ee6a87b1900c07989d344d3f",
+    "native_binary_sha256": "c8a17b55e415a7d108a0420b0a6b7f6acbb87e87c063d9cf968cd98621bfb0a3",
+    "native_diff_sha256": "139dc28328650ee724035a1cb82f5d6719217b734d8455d8dbcc06002b29282a",
+    "profile_sha256": "067ec44d3efd4ce0367904c1ff44d096c159a3f767cd3210721d0e346323f50d",
+    "plan_sha256": "f4ae54d1882d06e8236c7324d0667feb3907a8ddc49374816ebe59a3276d4dc4",
+    "handoff_sha256": "4b231c9b986f67dba4c20d558241e3ccc1894fc5a1caa76b65af01772a5c7689",
+    "original_module_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+    "candidate_module_sha256": "d5148342b4517882b25a48e63700cbfb8695454cc05d131da718509ac2563dc0",
+    "record_payload_sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+    "guarded_record_sha256": "0ae9e410ac93d40b4ec73073a303fdcb5fa0921dbc01c81ff1e38a349f82c393",
+    "driver": {
+      "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+      "library_name": "libvulkan_intel.so",
+      "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+    },
+    "baseline02_reference_result_sha256": "077895e5db733accf85bb5b97ff7996bdc2a15a112478696a82f94a53451aa47"
+  },
+  "base02_preserved": {
+    "tools/compute_interval_replay.py": "9a5e3835c251047f51ba23e9042ac9b821c9e6543adc9f979186d10afcdecb85",
+    "local/compute-interval-replay-owned-02/vulkan_compute_interval_replay.c": "9b67fbdec5487cd5138395455b58c7148114ee902f7bfa643bebc30cb741e55f",
+    "local/compute-interval-replay-owned-02/native": "6bbf44eeb4f1521bc052d3a6473d5b2ba0656f986d091c9a19f97d39fb0c87dd",
+    "local/compute-interval-replay-owned-02/profile.json": "384a4064fc0aa593e4f9984122fe3f93dfaf089dfed608ee8fb0bacbace658e7",
+    "local/compute-interval-replay-owned-02/baseline32.bin": "bc1e6c3a2788190bd16d922c6e5a33b038d6774af02df3325408c0c9d43c26a4",
+    "local/compute-interval-replay-owned-02/candidate32.bin": "2f29fb6fc6104eccbd52137591119d2ecdbd6856ab3b4a4cd8d7732118e139c9"
+  },
+  "cpu_checks": {
+    "real_control_native_check_only_passed": true,
+    "real_control_vulkan_entry_linker_trap_passed": true,
+    "real_control_trap_receipt_sha256": "b77a0cc674577690ff729a31307f6b9abe6f008fd62844189bcaef1ef8316e4f",
+    "game_free_timing_tests": 14,
+    "full_suite_tests": 810,
+    "full_suite_optional_skips": 5,
+    "full_suite_passed": true,
+    "public_tree_index_check_passed": true,
+    "public_tree_index_scope": "Tracked/staged content only; new files separately reviewed before parent publication.",
+    "write_proofs": [
+      {
+        "label": "baseline32",
+        "module_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+        "write_proof": {
+          "reachable_functions": 3,
+          "storage_write_binding": 6,
+          "storage_store_sites": 16,
+          "local_store_sites": 4,
+          "physical_stores": 0,
+          "image_writes": 0,
+          "unresolved_write_origins": 0
+        }
+      },
+      {
+        "label": "candidate32",
+        "module_sha256": "d5148342b4517882b25a48e63700cbfb8695454cc05d131da718509ac2563dc0",
+        "write_proof": {
+          "reachable_functions": 3,
+          "storage_write_binding": 6,
+          "storage_store_sites": 16,
+          "local_store_sites": 12,
+          "physical_stores": 0,
+          "image_writes": 0,
+          "unresolved_write_origins": 0
+        }
+      }
+    ],
+    "all_other_58_original_buffers_equal_initial": true,
+    "guarded_record_equals_initial": true,
+    "source_reuses_hash_pinned_02_full_graph_admission": true
+  },
+  "protocol": {
+    "required_actual_widths": [
+      32,
+      32
+    ],
+    "same_process_and_resource_owners": true,
+    "warmups_per_module": 2,
+    "timed_order": "ABBA repeated four times",
+    "timed_samples_per_module": 8,
+    "target_dispatches_max": 20,
+    "initial_image_upload_separately_fenced": true,
+    "full_writable_owner_reset_before_every_dispatch": {
+      "index": 7,
+      "bytes": 4194304
+    },
+    "full_oracle_after_every_dispatch": {
+      "owners": 60,
+      "original_bytes": 1163919360,
+      "record_and_guard_bytes": 8784
+    },
+    "start_stage": "TOP_OF_PIPE",
+    "end_stage": "BOTTOM_OF_PIPE",
+    "only_dispatch_inside_bracket": true,
+    "prior_host_barrier_destination": "ALL_COMMANDS",
+    "query_reset_before_bracket": true,
+    "query_availability_after_fence_required": true,
+    "query_read_wait_flag": false,
+    "fence_ns": 2000000000,
+    "whole_process_seconds": 120,
+    "wrap_horizon_required_greater_than_ns": 120000000000,
+    "runtime_timestamp_capabilities_queried": false,
+    "runtime_timestamp_capability_validation_pending": true,
+    "policy": {
+      "HS_SPILL_BATCH": "1",
+      "shader_spilling_rate": "1",
+      "HS_PUSH_SHADOW": null,
+      "HS_CS32_MAX_INSTS": null,
+      "other_HS_VK_MESA_INTEL_overrides": "cleared"
+    },
+    "pipeline_optimization_disabled": false
+  },
+  "limitations": [
+    "No paired timing run or timestamp/device capability query has occurred.",
+    "Future results are isolated frozen dispatch durations, never normal-frame FPS or live-renderer speed.",
+    "Full per-trial comparisons cover buffers and record guards; sampled-image inputs are preserved but there is no rendered-image comparison.",
+    "Original historical CPU atomicity, live selector integration, general equivalence and whole-game correctness remain separate.",
+    "A separate exclusive GPU grant and review of these exact hashes is required before execution."
+  ]
+}
