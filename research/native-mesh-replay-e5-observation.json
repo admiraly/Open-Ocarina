@@ -1,0 +1,5489 @@
+{
+  "schema": "open-ocarina.native-mesh-replay-e5-observation/v2",
+  "observed_date": "2026-11-13",
+  "scope": "Historical D8 PASS, spent6864 timeout and separate compile-only run; fresh-budget authored fixtures; finite full67group chosen-readonly6864 comparison across3windows/12realcases. No universal shader/rendering claim.",
+  "gpu_device_lease_released": true,
+  "d8_chosen_readonly": {
+    "schema": "open-ocarina.mesh-replay-e5-d8-readonly-observation/v1",
+    "reviewed_plan_sha256": "fdc2d750d992a268d6bb7bed377433e70db26c5c1494018c52e6e2d32b818585",
+    "execution_report_sha256": "a6f519db652720049c498d50db00b28d7555d0bd820aba0afa91e6432605279d",
+    "gpu_lease_released": true,
+    "output_profile": "d8-position9-128/v1",
+    "mode": "frozen-logical-readonly",
+    "origin": [
+      128,
+      0,
+      0
+    ],
+    "groups": [
+      2,
+      1,
+      1
+    ],
+    "native_grid": [
+      705,
+      1,
+      1
+    ],
+    "full_output_bytes": 89984,
+    "full_output_sha256": "e0a4f3356246714cd1a4bad3a0f4a5ecdc005dc6ea4e2f9f020ab1acb71b5bbf",
+    "counts": [
+      {
+        "vertices": 128,
+        "primitives": 32
+      },
+      {
+        "vertices": 128,
+        "primitives": 32
+      }
+    ],
+    "all_guards_writtenness_counts_padding_valid": true,
+    "all_full_buffers_identical": true,
+    "baseline_repeat_identical": true,
+    "legacy_same_owned_input_graph_full_output_equal": true,
+    "legacy_plan_sha256": "4d59d9be8b59316a58eb57335f6b984f8f7257b43682413730e42318fadfd02a",
+    "legacy_full_output_sha256": "e0a4f3356246714cd1a4bad3a0f4a5ecdc005dc6ea4e2f9f020ab1acb71b5bbf",
+    "driver": {
+      "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+      "library_name": "libvulkan_intel.so",
+      "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+    },
+    "driver_profile": {
+      "name": "cache-safe-e5",
+      "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+      "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+      "policy": "native-safe"
+    },
+    "driver_policy": {
+      "name": "native-safe",
+      "controlled_options": {
+        "HS_CS32_MAX_INSTS": null,
+        "HS_SPILL_BATCH": "1",
+        "HS_PUSH_SHADOW": "1",
+        "shader_spilling_rate": "1",
+        "INTEL_DEBUG": null,
+        "HS_SPILL_PCT": null,
+        "HS_RA_DEBUG": null,
+        "HS_FORCE_SIMD8": null,
+        "HS_LARGE_GRF": null,
+        "HS_SUBGROUP8": null,
+        "HS_LARGE_GRF_BIT": null,
+        "RX_VK_WARP64": null,
+        "RX_VK_NOOPT": null
+      },
+      "full_environment_snapshot": false,
+      "profile_scope": "MAX absent; no global compute fallback opt-in"
+    },
+    "helper_sha256": "b379519f9e24eed0d271f438848ecff560ec82b891b7c97f7f805bfaa938a398",
+    "sources": {
+      "tools/mesh_replay.py": "e91bba8b8972a42a9456422fcffacb8fe07803dfa0d47077f448c55113edb222",
+      "tools/vulkan_mesh_replay.c": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+      "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+      "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+      "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+      "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c",
+      "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+      "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+      "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+    },
+    "cases": [
+      {
+        "name": "original32-a",
+        "requested_width": 32,
+        "actual_width": 32,
+        "full_output_sha256": "e0a4f3356246714cd1a4bad3a0f4a5ecdc005dc6ea4e2f9f020ab1acb71b5bbf",
+        "counts": [
+          {
+            "vertices": 128,
+            "primitives": 32
+          },
+          {
+            "vertices": 128,
+            "primitives": 32
+          }
+        ],
+        "inputs_unchanged": true,
+        "control_unchanged": true
+      },
+      {
+        "name": "original32-b",
+        "requested_width": 32,
+        "actual_width": 32,
+        "full_output_sha256": "e0a4f3356246714cd1a4bad3a0f4a5ecdc005dc6ea4e2f9f020ab1acb71b5bbf",
+        "counts": [
+          {
+            "vertices": 128,
+            "primitives": 32
+          },
+          {
+            "vertices": 128,
+            "primitives": 32
+          }
+        ],
+        "inputs_unchanged": true,
+        "control_unchanged": true
+      },
+      {
+        "name": "conditional8",
+        "requested_width": 8,
+        "actual_width": 8,
+        "full_output_sha256": "e0a4f3356246714cd1a4bad3a0f4a5ecdc005dc6ea4e2f9f020ab1acb71b5bbf",
+        "counts": [
+          {
+            "vertices": 128,
+            "primitives": 32
+          },
+          {
+            "vertices": 128,
+            "primitives": 32
+          }
+        ],
+        "inputs_unchanged": true,
+        "control_unchanged": true
+      },
+      {
+        "name": "conditional16",
+        "requested_width": 16,
+        "actual_width": 16,
+        "full_output_sha256": "e0a4f3356246714cd1a4bad3a0f4a5ecdc005dc6ea4e2f9f020ab1acb71b5bbf",
+        "counts": [
+          {
+            "vertices": 128,
+            "primitives": 32
+          },
+          {
+            "vertices": 128,
+            "primitives": 32
+          }
+        ],
+        "inputs_unchanged": true,
+        "control_unchanged": true
+      }
+    ],
+    "historical_draw_reproduced": false,
+    "real_game_rendering_equivalence": false,
+    "conditional_transform_equivalence_proven": false,
+    "fps_gain": false,
+    "scope": "Finite chosen immutable readonly descriptor graph only; E5 2WG comparison, not historical capture reproduction or final rendering."
+  },
+  "6864_spent_replay": {
+    "status": "first-baseline-process-deadline-exceeded",
+    "reviewed_plan_sha256": "d29d7460ce47418304674ac68318aa275d5455ade3e256b2ec4ff2c8b4f5f137",
+    "source_module_sha256": "999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93",
+    "instrumented_module_sha256": "2d0bd1c6dfb72398a30c6ad4539be01dae27fbc1c92e963de2b2e3db9c381682",
+    "helper_sha256": "b379519f9e24eed0d271f438848ecff560ec82b891b7c97f7f805bfaa938a398",
+    "sources": {
+      "tools/mesh_replay.py": "e91bba8b8972a42a9456422fcffacb8fe07803dfa0d47077f448c55113edb222",
+      "tools/vulkan_mesh_replay.c": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+      "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+      "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+      "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+      "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c",
+      "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+      "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+      "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+    },
+    "driver_profile": {
+      "name": "cache-safe-e5",
+      "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+      "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+      "policy": "native-safe"
+    },
+    "driver_policy": {
+      "name": "native-safe",
+      "controlled_options": {
+        "HS_CS32_MAX_INSTS": null,
+        "HS_SPILL_BATCH": "1",
+        "HS_PUSH_SHADOW": "1",
+        "shader_spilling_rate": "1",
+        "INTEL_DEBUG": null,
+        "HS_SPILL_PCT": null,
+        "HS_RA_DEBUG": null,
+        "HS_FORCE_SIMD8": null,
+        "HS_LARGE_GRF": null,
+        "HS_SUBGROUP8": null,
+        "HS_LARGE_GRF_BIT": null,
+        "RX_VK_WARP64": null,
+        "RX_VK_NOOPT": null
+      },
+      "full_environment_snapshot": false,
+      "profile_scope": "MAX absent; no global compute fallback opt-in"
+    },
+    "origin": [
+      0,
+      0,
+      0
+    ],
+    "groups": [
+      32,
+      1,
+      1
+    ],
+    "native_grid": [
+      67,
+      1,
+      1
+    ],
+    "full_initialized_capture_bytes": 1179776,
+    "input_bundle_sha256": "6f250c97c3ae3b6242be1eb2a30280da8076349b5b3c76f8b8a81e97bf19287a",
+    "source_manifest_sha256": "274a511b8453ea8a0e8022ff0516c03afcc14e9091bf36420f24bb0261553708",
+    "requested_width": 32,
+    "actual_width": null,
+    "process_timeout_seconds": 30,
+    "native_fence_timeout_seconds": 2,
+    "baseline_output_written": false,
+    "complete_output_comparison_available": false,
+    "repeat_or_alternatives_executed": false,
+    "failure_phase_established": false,
+    "live_owned_helper_after_terminal": false,
+    "terminal_log_hashes": [
+      {
+        "name": "execution-started.json",
+        "bytes": 345,
+        "sha256": "b904ff8f0a4f27f5af4387bdb906cbc05aae6fe197f8573207c9b9e2fa6b6b90"
+      },
+      {
+        "name": "original32-a.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "name": "original32-a.stderr",
+        "bytes": 83,
+        "sha256": "e16f2dd90c394840f8a1afc5d7ca2770c09ca90780a94c55359a14604c15b489"
+      }
+    ],
+    "limitation": "No phase milestones in this original helper; no terminal native metadata or output. Compilation versus dispatch phase of this attempt remains unknown."
+  },
+  "6864_separate_compile_only": {
+    "status": "completed-no-shader-work-submitted",
+    "reviewed_plan_sha256": "a94b12ba3e306cbd5453c91a0a538eaa02430849012a83b394cf1f0d4fe54253",
+    "derivative_C_sha256": "f980dfe8bea7e37f9d3b09132137622159265ca46881dda8c2763cd43134bfe1",
+    "helper_sha256": "54f32280e61f47a76b5b7125e1a8da61e31553b0520ac88b95821f83f21ad2a4",
+    "exact_source_diff_sha256": "c992ab7ac6ceacb20e3d68ebe6fc132b16c61e030cf7e53edf7604f38b7d6aea",
+    "source_parent_C_sha256": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+    "module_sha256": "2d0bd1c6dfb72398a30c6ad4539be01dae27fbc1c92e963de2b2e3db9c381682",
+    "input_bundle_sha256": "6f250c97c3ae3b6242be1eb2a30280da8076349b5b3c76f8b8a81e97bf19287a",
+    "result_sha256": "51d834382ec44fb838b8dfe110ce10fe051f63964c542e3b464f2845db321381",
+    "stdout_sha256": "06132d2dee88c271c573a83f4e1311d4fddb285e82e03d72070068d249b34242",
+    "stderr_sha256": "9c43e98518cc0012c00e092879fb5d967907d1b20e8700a953117efb7d2705e6",
+    "sources": {
+      "tools/mesh_replay.py": "e91bba8b8972a42a9456422fcffacb8fe07803dfa0d47077f448c55113edb222",
+      "tools/vulkan_mesh_replay.c": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+      "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+      "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+      "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+      "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c",
+      "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+      "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+      "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+    },
+    "driver": {
+      "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+      "library_name": "libvulkan_intel.so",
+      "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+    },
+    "driver_policy": {
+      "name": "native-safe",
+      "controlled_options": {
+        "HS_CS32_MAX_INSTS": null,
+        "HS_SPILL_BATCH": "1",
+        "HS_PUSH_SHADOW": "1",
+        "shader_spilling_rate": "1",
+        "INTEL_DEBUG": null,
+        "HS_SPILL_PCT": null,
+        "HS_RA_DEBUG": null,
+        "HS_FORCE_SIMD8": null,
+        "HS_LARGE_GRF": null,
+        "HS_SUBGROUP8": null,
+        "HS_LARGE_GRF_BIT": null,
+        "RX_VK_WARP64": null,
+        "RX_VK_NOOPT": null
+      },
+      "full_environment_snapshot": false,
+      "profile_scope": "MAX absent; no global compute fallback opt-in"
+    },
+    "pipeline_flags": 0,
+    "statistics_capture_requested": false,
+    "pipeline_optimization_disabled": false,
+    "requested_width": 32,
+    "actual_width": 32,
+    "stage": 128,
+    "process_bound_seconds": 120,
+    "process_seconds": 40.22607636998873,
+    "graphics_pipeline_call_seconds": 40.08769631385803,
+    "flushed_phases": [
+      {
+        "phase": "before_instance",
+        "utc_seconds": 1794535474,
+        "nanoseconds": 748042366
+      },
+      {
+        "phase": "after_instance",
+        "utc_seconds": 1794535474,
+        "nanoseconds": 749954891
+      },
+      {
+        "phase": "before_device",
+        "utc_seconds": 1794535474,
+        "nanoseconds": 767171324
+      },
+      {
+        "phase": "after_device",
+        "utc_seconds": 1794535474,
+        "nanoseconds": 768098557
+      },
+      {
+        "phase": "before_module",
+        "utc_seconds": 1794535474,
+        "nanoseconds": 809398953
+      },
+      {
+        "phase": "after_module",
+        "utc_seconds": 1794535474,
+        "nanoseconds": 809551218
+      },
+      {
+        "phase": "before_graphics_pipeline",
+        "utc_seconds": 1794535474,
+        "nanoseconds": 809551961
+      },
+      {
+        "phase": "after_graphics_pipeline",
+        "utc_seconds": 1794535514,
+        "nanoseconds": 897248215
+      }
+    ],
+    "command_buffers": 0,
+    "submissions": 0,
+    "draws": 0,
+    "dispatches": 0,
+    "fences": 0,
+    "comparison_output_available": false,
+    "prior_replay_failure_phase_established": false,
+    "limitation": "This independently instrumented compile-only pipeline call exceeded30seconds. It does not retroactively prove the phase of the earlier replay timeout or execute the shader."
+  },
+  "limitations": [
+    "D8 tests only two workgroups of one explicitly chosen frozen readonly descriptor graph.",
+    "The6864comparison now covers all67workgroups of exactly one chosen immutable67x1x1 input graph, across3separately authorized windows; the earlier first32checkpoint remains preserved.",
+    "Within each window complete repeated-original32 and conditional8/16 output buffers match, including all defined components, markers, count rows, padding, unwritten storage and guards. This is differential evidence without an independent CPU algorithm oracle.",
+    "Historical CPU atomicity and backing/alias provenance remain unknown; no historical draw reproduction claim.",
+    "6864shared initialization includes overlapping same-value writes; no general race-freedom or universal transformation-equivalence proof is claimed.",
+    "This replay tests the exact Python-transformed module digest a41c; it makes no runtime claim for a separate native C++ lowering implementation.",
+    "The separate40second compile-only call does not establish the phase of the earlier uninstrumented timeout.",
+    "No final rendering quality or performance/FPS conclusion."
+  ],
+  "claims": {
+    "historical_draw_reproduced": false,
+    "general_race_freedom_proven": false,
+    "conditional_transform_equivalence_proven": false,
+    "real_game_rendering_equivalence": false,
+    "fps_gain": false
+  },
+  "initial_budget_update_cpu_handoff": {
+    "wrapper_sha256": "f75a509df716ffdb89c999c6967003e846622336b6be7afa791669fdd62518a6",
+    "D8_process_seconds": 30,
+    "profile96_process_seconds": 120,
+    "native_fence_seconds": 2,
+    "fresh_fixture_and_real_plans_CPU_only": true,
+    "old_plans_relabelled": false
+  },
+  "fresh_budget_authored_fixtures": {
+    "status": "eight-cases-complete-CPU-golden-pass",
+    "handoff_sha256": "775f58cde63c0ecfff8febcb5789574bf1af2529d231ead3a63ecc3a17c4b49b",
+    "profiles": [
+      {
+        "profile": "d8-position9-128/v1",
+        "plan_sha256": "da4d42bf2c47d1d4a7fdbabf8008b15d246424f55dff68b50c1d851121091916",
+        "execution_report_sha256": "d134555499eb2b52c2177091439469aecd8fee163e876193ab5445e1e94366e8",
+        "helper_sha256": "b379519f9e24eed0d271f438848ecff560ec82b891b7c97f7f805bfaa938a398",
+        "sources": {
+          "tools/mesh_replay.py": "f75a509df716ffdb89c999c6967003e846622336b6be7afa791669fdd62518a6",
+          "tools/vulkan_mesh_replay.c": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+          "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+          "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+          "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+          "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c",
+          "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+          "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+          "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+        },
+        "driver_profile": {
+          "name": "cache-safe-e5",
+          "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+          "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+          "policy": "native-safe"
+        },
+        "driver": {
+          "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+          "library_name": "libvulkan_intel.so",
+          "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+        },
+        "driver_policy": {
+          "name": "native-safe",
+          "controlled_options": {
+            "HS_CS32_MAX_INSTS": null,
+            "HS_SPILL_BATCH": "1",
+            "HS_PUSH_SHADOW": "1",
+            "shader_spilling_rate": "1",
+            "INTEL_DEBUG": null,
+            "HS_SPILL_PCT": null,
+            "HS_RA_DEBUG": null,
+            "HS_FORCE_SIMD8": null,
+            "HS_LARGE_GRF": null,
+            "HS_SUBGROUP8": null,
+            "HS_LARGE_GRF_BIT": null,
+            "RX_VK_WARP64": null,
+            "RX_VK_NOOPT": null
+          },
+          "full_environment_snapshot": false,
+          "profile_scope": "MAX absent; no global compute fallback opt-in"
+        },
+        "limits": {
+          "groups_per_draw": 32,
+          "draws_per_helper": 1,
+          "fence_seconds": 2,
+          "process_seconds": 30,
+          "max_total_input_bytes": 1073741824
+        },
+        "full_output_bytes": 89984,
+        "full_output_sha256": "468f2a6104f33a8adf303f928857d8609753fd73f8033236b61eb6d58d84d7d1",
+        "actual_widths": [
+          32,
+          32,
+          8,
+          16
+        ],
+        "requested_widths": [
+          32,
+          32,
+          8,
+          16
+        ],
+        "counts": [
+          {
+            "vertices": 128,
+            "primitives": 128
+          },
+          {
+            "vertices": 128,
+            "primitives": 0
+          }
+        ],
+        "all_full_buffers_match_cpu_golden": true,
+        "guards_writtenness_padding_counts_valid": true,
+        "cases": [
+          {
+            "case": {
+              "name": "original32-a",
+              "module": "original/instrumented.spv",
+              "width": 32
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "d8-position9-128/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 32,
+              "actual_width": 32,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                2,
+                1,
+                1
+              ],
+              "origin": [
+                128,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 89984,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "468f2a6104f33a8adf303f928857d8609753fd73f8033236b61eb6d58d84d7d1",
+              "counts": [
+                {
+                  "vertices": 128,
+                  "primitives": 128
+                },
+                {
+                  "vertices": 128,
+                  "primitives": 0
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "original32-b",
+              "module": "original/instrumented.spv",
+              "width": 32
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "d8-position9-128/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 32,
+              "actual_width": 32,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                2,
+                1,
+                1
+              ],
+              "origin": [
+                128,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 89984,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "468f2a6104f33a8adf303f928857d8609753fd73f8033236b61eb6d58d84d7d1",
+              "counts": [
+                {
+                  "vertices": 128,
+                  "primitives": 128
+                },
+                {
+                  "vertices": 128,
+                  "primitives": 0
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "conditional8",
+              "module": "original/instrumented.spv",
+              "width": 8
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "d8-position9-128/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 8,
+              "actual_width": 8,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                2,
+                1,
+                1
+              ],
+              "origin": [
+                128,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 89984,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "468f2a6104f33a8adf303f928857d8609753fd73f8033236b61eb6d58d84d7d1",
+              "counts": [
+                {
+                  "vertices": 128,
+                  "primitives": 128
+                },
+                {
+                  "vertices": 128,
+                  "primitives": 0
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "conditional16",
+              "module": "original/instrumented.spv",
+              "width": 16
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "d8-position9-128/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 16,
+              "actual_width": 16,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                2,
+                1,
+                1
+              ],
+              "origin": [
+                128,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 89984,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "468f2a6104f33a8adf303f928857d8609753fd73f8033236b61eb6d58d84d7d1",
+              "counts": [
+                {
+                  "vertices": 128,
+                  "primitives": 128
+                },
+                {
+                  "vertices": 128,
+                  "primitives": 0
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          }
+        ],
+        "kind": "synthetic-fixture",
+        "only_independently_authored_module": true,
+        "no_subgroup_operations": true,
+        "no_input_descriptor_reads": true,
+        "evidence_scope": "Complete initialized output compared with independent CPU golden at four widths; validates bounded executor, not transformation or null reads"
+      },
+      {
+        "profile": "6864-position10-96/v1",
+        "plan_sha256": "bc235dd9898d0873342213196d675c432cf85d3fb71e10d95dc99452cee0c694",
+        "execution_report_sha256": "bd24292cbff8a692a8d5cb7efb3dd1035c1e5d42e5e8d3d01832387b07db7399",
+        "helper_sha256": "b379519f9e24eed0d271f438848ecff560ec82b891b7c97f7f805bfaa938a398",
+        "sources": {
+          "tools/mesh_replay.py": "f75a509df716ffdb89c999c6967003e846622336b6be7afa791669fdd62518a6",
+          "tools/vulkan_mesh_replay.c": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+          "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+          "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+          "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+          "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c",
+          "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+          "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+          "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+        },
+        "driver_profile": {
+          "name": "cache-safe-e5",
+          "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+          "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+          "policy": "native-safe"
+        },
+        "driver": {
+          "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+          "library_name": "libvulkan_intel.so",
+          "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+        },
+        "driver_policy": {
+          "name": "native-safe",
+          "controlled_options": {
+            "HS_CS32_MAX_INSTS": null,
+            "HS_SPILL_BATCH": "1",
+            "HS_PUSH_SHADOW": "1",
+            "shader_spilling_rate": "1",
+            "INTEL_DEBUG": null,
+            "HS_SPILL_PCT": null,
+            "HS_RA_DEBUG": null,
+            "HS_FORCE_SIMD8": null,
+            "HS_LARGE_GRF": null,
+            "HS_SUBGROUP8": null,
+            "HS_LARGE_GRF_BIT": null,
+            "RX_VK_WARP64": null,
+            "RX_VK_NOOPT": null
+          },
+          "full_environment_snapshot": false,
+          "profile_scope": "MAX absent; no global compute fallback opt-in"
+        },
+        "limits": {
+          "groups_per_draw": 32,
+          "draws_per_helper": 1,
+          "fence_seconds": 2,
+          "process_seconds": 120,
+          "max_total_input_bytes": 1073741824
+        },
+        "full_output_bytes": 73856,
+        "full_output_sha256": "f986d679c1b1725a4a9d25ab7661c25ef295044873d0fc0d54644397721e658c",
+        "actual_widths": [
+          32,
+          32,
+          8,
+          16
+        ],
+        "requested_widths": [
+          32,
+          32,
+          8,
+          16
+        ],
+        "counts": [
+          {
+            "vertices": 96,
+            "primitives": 96
+          },
+          {
+            "vertices": 96,
+            "primitives": 0
+          }
+        ],
+        "all_full_buffers_match_cpu_golden": true,
+        "guards_writtenness_padding_counts_valid": true,
+        "cases": [
+          {
+            "case": {
+              "name": "original32-a",
+              "module": "original/instrumented.spv",
+              "width": 32
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 32,
+              "actual_width": 32,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                2,
+                1,
+                1
+              ],
+              "origin": [
+                96,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 73856,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "f986d679c1b1725a4a9d25ab7661c25ef295044873d0fc0d54644397721e658c",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 96
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 0
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "original32-b",
+              "module": "original/instrumented.spv",
+              "width": 32
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 32,
+              "actual_width": 32,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                2,
+                1,
+                1
+              ],
+              "origin": [
+                96,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 73856,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "f986d679c1b1725a4a9d25ab7661c25ef295044873d0fc0d54644397721e658c",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 96
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 0
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "conditional8",
+              "module": "original/instrumented.spv",
+              "width": 8
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 8,
+              "actual_width": 8,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                2,
+                1,
+                1
+              ],
+              "origin": [
+                96,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 73856,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "f986d679c1b1725a4a9d25ab7661c25ef295044873d0fc0d54644397721e658c",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 96
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 0
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "conditional16",
+              "module": "original/instrumented.spv",
+              "width": 16
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 16,
+              "actual_width": 16,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                2,
+                1,
+                1
+              ],
+              "origin": [
+                96,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 73856,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "f986d679c1b1725a4a9d25ab7661c25ef295044873d0fc0d54644397721e658c",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 96
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 0
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          }
+        ],
+        "kind": "synthetic-fixture",
+        "only_independently_authored_module": true,
+        "no_subgroup_operations": true,
+        "no_input_descriptor_reads": true,
+        "evidence_scope": "Complete initialized output compared with independent CPU golden at four widths; validates bounded executor, not transformation or null reads"
+      }
+    ],
+    "no_game_modules_executed_in_these_fixture_cases": true,
+    "gpu_lease_released_after_terminal": true
+  },
+  "fresh_budget_6864_first32groups": {
+    "schema": "open-ocarina.mesh-replay-profile96-readonly-observation/v1",
+    "reviewed_plan_sha256": "cddd6349dddfd2dfc8b1b18ea9e4fcca03dee40f133da18946c8da06832ed8e5",
+    "execution_report_sha256": "fa3f047484f3ff9cbe4bf4b9c9cd48768487396c0bf271c496d65ff36c5bc1ef",
+    "full_output_sha256": "06cc1d2e1aafa042f6d31282587a98f726d7ffd5bcf87698df928ee4091ed694",
+    "full_output_bytes": 1179776,
+    "driver": {
+      "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+      "library_name": "libvulkan_intel.so",
+      "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+    },
+    "driver_profile": {
+      "name": "cache-safe-e5",
+      "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+      "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+      "policy": "native-safe"
+    },
+    "driver_policy": {
+      "name": "native-safe",
+      "controlled_options": {
+        "HS_CS32_MAX_INSTS": null,
+        "HS_SPILL_BATCH": "1",
+        "HS_PUSH_SHADOW": "1",
+        "shader_spilling_rate": "1",
+        "INTEL_DEBUG": null,
+        "HS_SPILL_PCT": null,
+        "HS_RA_DEBUG": null,
+        "HS_FORCE_SIMD8": null,
+        "HS_LARGE_GRF": null,
+        "HS_SUBGROUP8": null,
+        "HS_LARGE_GRF_BIT": null,
+        "RX_VK_WARP64": null,
+        "RX_VK_NOOPT": null
+      },
+      "full_environment_snapshot": false,
+      "profile_scope": "MAX absent; no global compute fallback opt-in"
+    },
+    "sources": {
+      "tools/mesh_replay.py": "f75a509df716ffdb89c999c6967003e846622336b6be7afa791669fdd62518a6",
+      "tools/vulkan_mesh_replay.c": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+      "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+      "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+      "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+      "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c",
+      "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+      "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+      "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+    },
+    "helper_sha256": "b379519f9e24eed0d271f438848ecff560ec82b891b7c97f7f805bfaa938a398",
+    "origin": [
+      0,
+      0,
+      0
+    ],
+    "groups": [
+      32,
+      1,
+      1
+    ],
+    "native_grid": [
+      67,
+      1,
+      1
+    ],
+    "source_manifest_sha256": "274a511b8453ea8a0e8022ff0516c03afcc14e9091bf36420f24bb0261553708",
+    "input_bundle_sha256": "6f250c97c3ae3b6242be1eb2a30280da8076349b5b3c76f8b8a81e97bf19287a",
+    "limits": {
+      "groups_per_draw": 32,
+      "draws_per_helper": 1,
+      "fence_seconds": 2,
+      "process_seconds": 120,
+      "max_total_input_bytes": 1073741824
+    },
+    "all_full_buffers_identical": true,
+    "baseline_repeat_identical": true,
+    "actual_widths": [
+      32,
+      32,
+      8,
+      16
+    ],
+    "requested_widths": [
+      32,
+      32,
+      8,
+      16
+    ],
+    "cases": [
+      {
+        "case": {
+          "name": "original32-a",
+          "module": "original/instrumented.spv",
+          "width": 32
+        },
+        "metadata": {
+          "schema": 2,
+          "output_profile": "6864-position10-96/v1",
+          "gpu_executed": true,
+          "mesh_draw_calls": 1,
+          "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "driver": "Intel open-source Mesa driver",
+          "driver_info": "Mesa 26.2.4",
+          "vendor_id": 32902,
+          "device_id": 22176,
+          "requested_width": 32,
+          "actual_width": 32,
+          "width_source": "pipeline_executable_properties",
+          "executable_stage": 128,
+          "workgroup": [
+            32,
+            1,
+            1
+          ],
+          "draw_mesh_tasks": [
+            32,
+            1,
+            1
+          ],
+          "origin": [
+            0,
+            0,
+            0
+          ],
+          "fence_timeout_ns": 2000000000,
+          "input_bytes_unchanged": true,
+          "control_bytes_unchanged": true,
+          "robustBufferAccess2": true,
+          "nullDescriptor": true,
+          "capture_bytes": 1179776,
+          "rasterizer_discard": true,
+          "attachments": 0,
+          "pipeline_optimization_disabled": false
+        },
+        "capture": {
+          "sha256": "06cc1d2e1aafa042f6d31282587a98f726d7ffd5bcf87698df928ee4091ed694",
+          "counts": [
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            }
+          ],
+          "all_guards_and_writtenness_valid": true
+        }
+      },
+      {
+        "case": {
+          "name": "original32-b",
+          "module": "original/instrumented.spv",
+          "width": 32
+        },
+        "metadata": {
+          "schema": 2,
+          "output_profile": "6864-position10-96/v1",
+          "gpu_executed": true,
+          "mesh_draw_calls": 1,
+          "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "driver": "Intel open-source Mesa driver",
+          "driver_info": "Mesa 26.2.4",
+          "vendor_id": 32902,
+          "device_id": 22176,
+          "requested_width": 32,
+          "actual_width": 32,
+          "width_source": "pipeline_executable_properties",
+          "executable_stage": 128,
+          "workgroup": [
+            32,
+            1,
+            1
+          ],
+          "draw_mesh_tasks": [
+            32,
+            1,
+            1
+          ],
+          "origin": [
+            0,
+            0,
+            0
+          ],
+          "fence_timeout_ns": 2000000000,
+          "input_bytes_unchanged": true,
+          "control_bytes_unchanged": true,
+          "robustBufferAccess2": true,
+          "nullDescriptor": true,
+          "capture_bytes": 1179776,
+          "rasterizer_discard": true,
+          "attachments": 0,
+          "pipeline_optimization_disabled": false
+        },
+        "capture": {
+          "sha256": "06cc1d2e1aafa042f6d31282587a98f726d7ffd5bcf87698df928ee4091ed694",
+          "counts": [
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            }
+          ],
+          "all_guards_and_writtenness_valid": true
+        }
+      },
+      {
+        "case": {
+          "name": "conditional8",
+          "module": "conditional/instrumented.spv",
+          "width": 8
+        },
+        "metadata": {
+          "schema": 2,
+          "output_profile": "6864-position10-96/v1",
+          "gpu_executed": true,
+          "mesh_draw_calls": 1,
+          "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "driver": "Intel open-source Mesa driver",
+          "driver_info": "Mesa 26.2.4",
+          "vendor_id": 32902,
+          "device_id": 22176,
+          "requested_width": 8,
+          "actual_width": 8,
+          "width_source": "pipeline_executable_properties",
+          "executable_stage": 128,
+          "workgroup": [
+            32,
+            1,
+            1
+          ],
+          "draw_mesh_tasks": [
+            32,
+            1,
+            1
+          ],
+          "origin": [
+            0,
+            0,
+            0
+          ],
+          "fence_timeout_ns": 2000000000,
+          "input_bytes_unchanged": true,
+          "control_bytes_unchanged": true,
+          "robustBufferAccess2": true,
+          "nullDescriptor": true,
+          "capture_bytes": 1179776,
+          "rasterizer_discard": true,
+          "attachments": 0,
+          "pipeline_optimization_disabled": false
+        },
+        "capture": {
+          "sha256": "06cc1d2e1aafa042f6d31282587a98f726d7ffd5bcf87698df928ee4091ed694",
+          "counts": [
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            }
+          ],
+          "all_guards_and_writtenness_valid": true
+        }
+      },
+      {
+        "case": {
+          "name": "conditional16",
+          "module": "conditional/instrumented.spv",
+          "width": 16
+        },
+        "metadata": {
+          "schema": 2,
+          "output_profile": "6864-position10-96/v1",
+          "gpu_executed": true,
+          "mesh_draw_calls": 1,
+          "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+          "driver": "Intel open-source Mesa driver",
+          "driver_info": "Mesa 26.2.4",
+          "vendor_id": 32902,
+          "device_id": 22176,
+          "requested_width": 16,
+          "actual_width": 16,
+          "width_source": "pipeline_executable_properties",
+          "executable_stage": 128,
+          "workgroup": [
+            32,
+            1,
+            1
+          ],
+          "draw_mesh_tasks": [
+            32,
+            1,
+            1
+          ],
+          "origin": [
+            0,
+            0,
+            0
+          ],
+          "fence_timeout_ns": 2000000000,
+          "input_bytes_unchanged": true,
+          "control_bytes_unchanged": true,
+          "robustBufferAccess2": true,
+          "nullDescriptor": true,
+          "capture_bytes": 1179776,
+          "rasterizer_discard": true,
+          "attachments": 0,
+          "pipeline_optimization_disabled": false
+        },
+        "capture": {
+          "sha256": "06cc1d2e1aafa042f6d31282587a98f726d7ffd5bcf87698df928ee4091ed694",
+          "counts": [
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            },
+            {
+              "vertices": 96,
+              "primitives": 64
+            }
+          ],
+          "all_guards_and_writtenness_valid": true
+        }
+      }
+    ],
+    "primitive_count_histogram": {
+      "64": 32
+    },
+    "coverage_totals": {
+      "vertices": 3072,
+      "primitives": 2048,
+      "unique_referenced_vertices_sum": 3072,
+      "nonzero_vertex_bit_words": 110592,
+      "referenced_position_nonfinite_components": 0,
+      "referenced_position_zero_w": 0
+    },
+    "gpu_lease_released": true,
+    "historical_draw_reproduced": false,
+    "general_race_freedom_proven": false,
+    "conditional_transform_equivalence_proven": false,
+    "full_rendering_equivalence": false,
+    "fps_gain": false,
+    "scope": "Finite first32workgroups of explicitly chosen frozen readonly graph; repeated original32 and conditional8/16 full-byte differential, no CPU algorithm oracle.",
+    "status": "first32groups-four-cases-complete-full-buffer-match",
+    "kind": "game-derived-instrumented-mesh",
+    "mode": "frozen-logical-readonly",
+    "source_module_sha256": "999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93",
+    "conditional_module_sha256": "a41c6df753f30f8c0646ffa45227304e994b3fbaccdcad64927cd57f5e2327e7",
+    "original_instrumented_sha256": "2d0bd1c6dfb72398a30c6ad4539be01dae27fbc1c92e963de2b2e3db9c381682",
+    "conditional_instrumented_sha256": "8e10dad18d4b674df682ee03c00b507457de8c691d4e72f85919ce056128e573",
+    "output_profile": "6864-position10-96/v1",
+    "all_guards_writtenness_padding_counts_valid": true,
+    "all32groups_nonempty": true,
+    "cpu_algorithm_oracle_available": false,
+    "root_independent_saved_full_buffer_review_passed": true,
+    "root_independent_review_sha256": "90652e1d2cbac93781312b02e1c7555cb8f6fb36f6c61d43e2412fd8b1fe5e95",
+    "counts_all_groups": [
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      },
+      {
+        "vertices": 96,
+        "primitives": 64
+      }
+    ]
+  },
+  "current_budget_status": {
+    "wrapper_sha256": "f75a509df716ffdb89c999c6967003e846622336b6be7afa791669fdd62518a6",
+    "native_C_sha256": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+    "helper_sha256": "b379519f9e24eed0d271f438848ecff560ec82b891b7c97f7f805bfaa938a398",
+    "D8_process_seconds": 30,
+    "profile96_process_seconds": 120,
+    "native_fence_seconds": 2,
+    "fresh_fixture_cases_passed": 8,
+    "fresh_real_6864_cases_passed": 12,
+    "remaining_windows_executed": true,
+    "old_plans_relabelled": false,
+    "complete_chosen_grid_unique_workgroups": 67
+  },
+  "revision": {
+    "number": 2,
+    "previous_schema": "open-ocarina.native-mesh-replay-e5-observation/v1",
+    "previous_metadata_sha256": "b0efe3b6721e2e490ef03a401143a21ab2fffdff67a1c26e73529a4c85d5fca7",
+    "change": "Append remaining two authorized windows and complete67group coverage; preserve first32 checkpoint and all historical entries."
+  },
+  "remaining_windows_CPU_handoff_checkpoint": {
+    "status": "prepared-not-executed",
+    "gpu_execution_authorized_by_this_document": false,
+    "plans": [
+      {
+        "plan_sha256": "3d88c844ee56bb9b72d8c30620ba34cd5d7f23fc6d1caf4a741f4ac8bd7af5b1",
+        "helper_sha256": "b379519f9e24eed0d271f438848ecff560ec82b891b7c97f7f805bfaa938a398",
+        "sources": {
+          "tools/mesh_replay.py": "f75a509df716ffdb89c999c6967003e846622336b6be7afa791669fdd62518a6",
+          "tools/vulkan_mesh_replay.c": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+          "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+          "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+          "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+          "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c",
+          "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+          "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+          "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+        },
+        "origin": [
+          32,
+          0,
+          0
+        ],
+        "groups": [
+          32,
+          1,
+          1
+        ],
+        "native_grid": [
+          67,
+          1,
+          1
+        ],
+        "capture_bytes": 1179776,
+        "input_bundle_sha256": "b166160ee106b27e76c63462ad2c2bb0119d6e2becbe42edabaa94676bb10593",
+        "limits": {
+          "groups_per_draw": 32,
+          "draws_per_helper": 1,
+          "fence_seconds": 2,
+          "process_seconds": 120,
+          "max_total_input_bytes": 1073741824
+        },
+        "driver_profile": {
+          "name": "cache-safe-e5",
+          "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+          "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+          "policy": "native-safe"
+        },
+        "driver_policy": {
+          "name": "native-safe",
+          "controlled_options": {
+            "HS_CS32_MAX_INSTS": null,
+            "HS_SPILL_BATCH": "1",
+            "HS_PUSH_SHADOW": "1",
+            "shader_spilling_rate": "1",
+            "INTEL_DEBUG": null,
+            "HS_SPILL_PCT": null,
+            "HS_RA_DEBUG": null,
+            "HS_FORCE_SIMD8": null,
+            "HS_LARGE_GRF": null,
+            "HS_SUBGROUP8": null,
+            "HS_LARGE_GRF_BIT": null,
+            "RX_VK_WARP64": null,
+            "RX_VK_NOOPT": null
+          },
+          "full_environment_snapshot": false,
+          "profile_scope": "MAX absent; no global compute fallback opt-in"
+        },
+        "gpu_executed": false
+      },
+      {
+        "plan_sha256": "5ffc39edb93b561fea63e7480440cb4456f84d3d45078a8d80e51a212a5bc6a0",
+        "helper_sha256": "b379519f9e24eed0d271f438848ecff560ec82b891b7c97f7f805bfaa938a398",
+        "sources": {
+          "tools/mesh_replay.py": "f75a509df716ffdb89c999c6967003e846622336b6be7afa791669fdd62518a6",
+          "tools/vulkan_mesh_replay.c": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+          "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+          "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+          "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+          "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c",
+          "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+          "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+          "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+        },
+        "origin": [
+          64,
+          0,
+          0
+        ],
+        "groups": [
+          3,
+          1,
+          1
+        ],
+        "native_grid": [
+          67,
+          1,
+          1
+        ],
+        "capture_bytes": 110720,
+        "input_bundle_sha256": "84d40ef0b949accd8900d1331952c5bffa694513f87fdfa1ed2140c9d9047caa",
+        "limits": {
+          "groups_per_draw": 32,
+          "draws_per_helper": 1,
+          "fence_seconds": 2,
+          "process_seconds": 120,
+          "max_total_input_bytes": 1073741824
+        },
+        "driver_profile": {
+          "name": "cache-safe-e5",
+          "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+          "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+          "policy": "native-safe"
+        },
+        "driver_policy": {
+          "name": "native-safe",
+          "controlled_options": {
+            "HS_CS32_MAX_INSTS": null,
+            "HS_SPILL_BATCH": "1",
+            "HS_PUSH_SHADOW": "1",
+            "shader_spilling_rate": "1",
+            "INTEL_DEBUG": null,
+            "HS_SPILL_PCT": null,
+            "HS_RA_DEBUG": null,
+            "HS_FORCE_SIMD8": null,
+            "HS_LARGE_GRF": null,
+            "HS_SUBGROUP8": null,
+            "HS_LARGE_GRF_BIT": null,
+            "RX_VK_WARP64": null,
+            "RX_VK_NOOPT": null
+          },
+          "full_environment_snapshot": false,
+          "profile_scope": "MAX absent; no global compute fallback opt-in"
+        },
+        "gpu_executed": false
+      }
+    ]
+  },
+  "complete_6864_chosen_grid": {
+    "schema": "open-ocarina.mesh-replay-profile96-complete-chosen-grid/v1",
+    "windows": [
+      {
+        "origin": [
+          0,
+          0,
+          0
+        ],
+        "groups": [
+          32,
+          1,
+          1
+        ],
+        "native_grid": [
+          67,
+          1,
+          1
+        ],
+        "plan_sha256": "cddd6349dddfd2dfc8b1b18ea9e4fcca03dee40f133da18946c8da06832ed8e5",
+        "execution_report_sha256": "fa3f047484f3ff9cbe4bf4b9c9cd48768487396c0bf271c496d65ff36c5bc1ef",
+        "full_output_bytes": 1179776,
+        "full_output_sha256": "06cc1d2e1aafa042f6d31282587a98f726d7ffd5bcf87698df928ee4091ed694",
+        "requested_widths": [
+          32,
+          32,
+          8,
+          16
+        ],
+        "actual_widths": [
+          32,
+          32,
+          8,
+          16
+        ],
+        "cases": [
+          {
+            "case": {
+              "name": "original32-a",
+              "module": "original/instrumented.spv",
+              "width": 32
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 32,
+              "actual_width": 32,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                32,
+                1,
+                1
+              ],
+              "origin": [
+                0,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 1179776,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "06cc1d2e1aafa042f6d31282587a98f726d7ffd5bcf87698df928ee4091ed694",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "original32-b",
+              "module": "original/instrumented.spv",
+              "width": 32
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 32,
+              "actual_width": 32,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                32,
+                1,
+                1
+              ],
+              "origin": [
+                0,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 1179776,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "06cc1d2e1aafa042f6d31282587a98f726d7ffd5bcf87698df928ee4091ed694",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "conditional8",
+              "module": "conditional/instrumented.spv",
+              "width": 8
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 8,
+              "actual_width": 8,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                32,
+                1,
+                1
+              ],
+              "origin": [
+                0,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 1179776,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "06cc1d2e1aafa042f6d31282587a98f726d7ffd5bcf87698df928ee4091ed694",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "conditional16",
+              "module": "conditional/instrumented.spv",
+              "width": 16
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 16,
+              "actual_width": 16,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                32,
+                1,
+                1
+              ],
+              "origin": [
+                0,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 1179776,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "06cc1d2e1aafa042f6d31282587a98f726d7ffd5bcf87698df928ee4091ed694",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          }
+        ],
+        "limits": {
+          "groups_per_draw": 32,
+          "draws_per_helper": 1,
+          "fence_seconds": 2,
+          "process_seconds": 120,
+          "max_total_input_bytes": 1073741824
+        },
+        "sources": {
+          "tools/mesh_replay.py": "f75a509df716ffdb89c999c6967003e846622336b6be7afa791669fdd62518a6",
+          "tools/vulkan_mesh_replay.c": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+          "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+          "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+          "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+          "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c",
+          "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+          "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+          "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+        },
+        "helper_sha256": "b379519f9e24eed0d271f438848ecff560ec82b891b7c97f7f805bfaa938a398",
+        "source_manifest_sha256": "274a511b8453ea8a0e8022ff0516c03afcc14e9091bf36420f24bb0261553708",
+        "input_bundle_sha256": "6f250c97c3ae3b6242be1eb2a30280da8076349b5b3c76f8b8a81e97bf19287a",
+        "driver": {
+          "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+          "library_name": "libvulkan_intel.so",
+          "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+        },
+        "driver_profile": {
+          "name": "cache-safe-e5",
+          "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+          "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+          "policy": "native-safe"
+        },
+        "driver_policy": {
+          "name": "native-safe",
+          "controlled_options": {
+            "HS_CS32_MAX_INSTS": null,
+            "HS_SPILL_BATCH": "1",
+            "HS_PUSH_SHADOW": "1",
+            "shader_spilling_rate": "1",
+            "INTEL_DEBUG": null,
+            "HS_SPILL_PCT": null,
+            "HS_RA_DEBUG": null,
+            "HS_FORCE_SIMD8": null,
+            "HS_LARGE_GRF": null,
+            "HS_SUBGROUP8": null,
+            "HS_LARGE_GRF_BIT": null,
+            "RX_VK_WARP64": null,
+            "RX_VK_NOOPT": null
+          },
+          "full_environment_snapshot": false,
+          "profile_scope": "MAX absent; no global compute fallback opt-in"
+        },
+        "baseline_repeat_identical": true,
+        "all_full_buffers_identical": true,
+        "all_guards_writtenness_padding_counts_valid": true,
+        "all_groups_nonempty": true,
+        "coverage_totals": {
+          "vertices": 3072,
+          "primitives": 2048,
+          "unique_referenced_vertices_sum": 3072,
+          "nonzero_vertex_attribute_bit_words": 110592,
+          "referenced_position_nonfinite_components": 0,
+          "referenced_position_zero_w": 0
+        },
+        "per_field_nonzero_bit_words": {
+          "Position": 12288,
+          "Location0": 6144,
+          "Location1": 6144,
+          "Location2": 6144,
+          "Location4": 12288,
+          "Location5": 12288,
+          "Location6": 6144,
+          "Location7": 12288,
+          "Location8": 12288,
+          "Location11": 12288,
+          "Location12": 12288
+        },
+        "per_group_coverage": [
+          {
+            "workgroup_x": 0,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 1,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 2,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 3,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 4,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 5,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 6,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 7,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 8,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 9,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 10,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 11,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 12,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 13,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 14,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 15,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 16,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 17,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 18,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 19,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 20,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 21,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 22,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 23,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 24,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 25,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 26,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 27,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 28,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 29,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 30,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 31,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          }
+        ]
+      },
+      {
+        "origin": [
+          32,
+          0,
+          0
+        ],
+        "groups": [
+          32,
+          1,
+          1
+        ],
+        "native_grid": [
+          67,
+          1,
+          1
+        ],
+        "plan_sha256": "3d88c844ee56bb9b72d8c30620ba34cd5d7f23fc6d1caf4a741f4ac8bd7af5b1",
+        "execution_report_sha256": "f60676b9b7775fd21a819e30f4d6237c5198076155902f3e8b7aef9f6b0ec78f",
+        "full_output_bytes": 1179776,
+        "full_output_sha256": "e86912b7906053cfb7d25cacc2fac481e4f7360fcfbe3c970632424967e327d6",
+        "requested_widths": [
+          32,
+          32,
+          8,
+          16
+        ],
+        "actual_widths": [
+          32,
+          32,
+          8,
+          16
+        ],
+        "cases": [
+          {
+            "case": {
+              "name": "original32-a",
+              "module": "original/instrumented.spv",
+              "width": 32
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 32,
+              "actual_width": 32,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                32,
+                1,
+                1
+              ],
+              "origin": [
+                32,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 1179776,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "e86912b7906053cfb7d25cacc2fac481e4f7360fcfbe3c970632424967e327d6",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "original32-b",
+              "module": "original/instrumented.spv",
+              "width": 32
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 32,
+              "actual_width": 32,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                32,
+                1,
+                1
+              ],
+              "origin": [
+                32,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 1179776,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "e86912b7906053cfb7d25cacc2fac481e4f7360fcfbe3c970632424967e327d6",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "conditional8",
+              "module": "conditional/instrumented.spv",
+              "width": 8
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 8,
+              "actual_width": 8,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                32,
+                1,
+                1
+              ],
+              "origin": [
+                32,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 1179776,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "e86912b7906053cfb7d25cacc2fac481e4f7360fcfbe3c970632424967e327d6",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "conditional16",
+              "module": "conditional/instrumented.spv",
+              "width": 16
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 16,
+              "actual_width": 16,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                32,
+                1,
+                1
+              ],
+              "origin": [
+                32,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 1179776,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "e86912b7906053cfb7d25cacc2fac481e4f7360fcfbe3c970632424967e327d6",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          }
+        ],
+        "limits": {
+          "groups_per_draw": 32,
+          "draws_per_helper": 1,
+          "fence_seconds": 2,
+          "process_seconds": 120,
+          "max_total_input_bytes": 1073741824
+        },
+        "sources": {
+          "tools/mesh_replay.py": "f75a509df716ffdb89c999c6967003e846622336b6be7afa791669fdd62518a6",
+          "tools/vulkan_mesh_replay.c": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+          "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+          "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+          "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+          "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c",
+          "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+          "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+          "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+        },
+        "helper_sha256": "b379519f9e24eed0d271f438848ecff560ec82b891b7c97f7f805bfaa938a398",
+        "source_manifest_sha256": "274a511b8453ea8a0e8022ff0516c03afcc14e9091bf36420f24bb0261553708",
+        "input_bundle_sha256": "b166160ee106b27e76c63462ad2c2bb0119d6e2becbe42edabaa94676bb10593",
+        "driver": {
+          "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+          "library_name": "libvulkan_intel.so",
+          "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+        },
+        "driver_profile": {
+          "name": "cache-safe-e5",
+          "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+          "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+          "policy": "native-safe"
+        },
+        "driver_policy": {
+          "name": "native-safe",
+          "controlled_options": {
+            "HS_CS32_MAX_INSTS": null,
+            "HS_SPILL_BATCH": "1",
+            "HS_PUSH_SHADOW": "1",
+            "shader_spilling_rate": "1",
+            "INTEL_DEBUG": null,
+            "HS_SPILL_PCT": null,
+            "HS_RA_DEBUG": null,
+            "HS_FORCE_SIMD8": null,
+            "HS_LARGE_GRF": null,
+            "HS_SUBGROUP8": null,
+            "HS_LARGE_GRF_BIT": null,
+            "RX_VK_WARP64": null,
+            "RX_VK_NOOPT": null
+          },
+          "full_environment_snapshot": false,
+          "profile_scope": "MAX absent; no global compute fallback opt-in"
+        },
+        "baseline_repeat_identical": true,
+        "all_full_buffers_identical": true,
+        "all_guards_writtenness_padding_counts_valid": true,
+        "all_groups_nonempty": true,
+        "coverage_totals": {
+          "vertices": 3072,
+          "primitives": 2048,
+          "unique_referenced_vertices_sum": 3072,
+          "nonzero_vertex_attribute_bit_words": 110592,
+          "referenced_position_nonfinite_components": 0,
+          "referenced_position_zero_w": 0
+        },
+        "per_field_nonzero_bit_words": {
+          "Position": 12288,
+          "Location0": 6144,
+          "Location1": 6144,
+          "Location2": 6144,
+          "Location4": 12288,
+          "Location5": 12288,
+          "Location6": 6144,
+          "Location7": 12288,
+          "Location8": 12288,
+          "Location11": 12288,
+          "Location12": 12288
+        },
+        "per_group_coverage": [
+          {
+            "workgroup_x": 32,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 33,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 34,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 35,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 36,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 37,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 38,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 39,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 40,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 41,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 42,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 43,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 44,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 45,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 46,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 47,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 48,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 49,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 50,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 51,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 52,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 53,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 54,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 55,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 56,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 57,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 58,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 59,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 60,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 61,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 62,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 63,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          }
+        ]
+      },
+      {
+        "origin": [
+          64,
+          0,
+          0
+        ],
+        "groups": [
+          3,
+          1,
+          1
+        ],
+        "native_grid": [
+          67,
+          1,
+          1
+        ],
+        "plan_sha256": "5ffc39edb93b561fea63e7480440cb4456f84d3d45078a8d80e51a212a5bc6a0",
+        "execution_report_sha256": "75ed3d29c27fa8a2a555d329afb01aec508098cea3e0a40f40db99c43551983c",
+        "full_output_bytes": 110720,
+        "full_output_sha256": "7d8b5004d380810c9f9995ee63cda001cebb48be82a6a65786d6be31f2953e0b",
+        "requested_widths": [
+          32,
+          32,
+          8,
+          16
+        ],
+        "actual_widths": [
+          32,
+          32,
+          8,
+          16
+        ],
+        "cases": [
+          {
+            "case": {
+              "name": "original32-a",
+              "module": "original/instrumented.spv",
+              "width": 32
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 32,
+              "actual_width": 32,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                3,
+                1,
+                1
+              ],
+              "origin": [
+                64,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 110720,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "7d8b5004d380810c9f9995ee63cda001cebb48be82a6a65786d6be31f2953e0b",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 12
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "original32-b",
+              "module": "original/instrumented.spv",
+              "width": 32
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 32,
+              "actual_width": 32,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                3,
+                1,
+                1
+              ],
+              "origin": [
+                64,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 110720,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "7d8b5004d380810c9f9995ee63cda001cebb48be82a6a65786d6be31f2953e0b",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 12
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "conditional8",
+              "module": "conditional/instrumented.spv",
+              "width": 8
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 8,
+              "actual_width": 8,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                3,
+                1,
+                1
+              ],
+              "origin": [
+                64,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 110720,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "7d8b5004d380810c9f9995ee63cda001cebb48be82a6a65786d6be31f2953e0b",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 12
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          },
+          {
+            "case": {
+              "name": "conditional16",
+              "module": "conditional/instrumented.spv",
+              "width": 16
+            },
+            "metadata": {
+              "schema": 2,
+              "output_profile": "6864-position10-96/v1",
+              "gpu_executed": true,
+              "mesh_draw_calls": 1,
+              "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+              "driver": "Intel open-source Mesa driver",
+              "driver_info": "Mesa 26.2.4",
+              "vendor_id": 32902,
+              "device_id": 22176,
+              "requested_width": 16,
+              "actual_width": 16,
+              "width_source": "pipeline_executable_properties",
+              "executable_stage": 128,
+              "workgroup": [
+                32,
+                1,
+                1
+              ],
+              "draw_mesh_tasks": [
+                3,
+                1,
+                1
+              ],
+              "origin": [
+                64,
+                0,
+                0
+              ],
+              "fence_timeout_ns": 2000000000,
+              "input_bytes_unchanged": true,
+              "control_bytes_unchanged": true,
+              "robustBufferAccess2": true,
+              "nullDescriptor": true,
+              "capture_bytes": 110720,
+              "rasterizer_discard": true,
+              "attachments": 0,
+              "pipeline_optimization_disabled": false
+            },
+            "capture": {
+              "sha256": "7d8b5004d380810c9f9995ee63cda001cebb48be82a6a65786d6be31f2953e0b",
+              "counts": [
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 64
+                },
+                {
+                  "vertices": 96,
+                  "primitives": 12
+                }
+              ],
+              "all_guards_and_writtenness_valid": true
+            }
+          }
+        ],
+        "limits": {
+          "groups_per_draw": 32,
+          "draws_per_helper": 1,
+          "fence_seconds": 2,
+          "process_seconds": 120,
+          "max_total_input_bytes": 1073741824
+        },
+        "sources": {
+          "tools/mesh_replay.py": "f75a509df716ffdb89c999c6967003e846622336b6be7afa791669fdd62518a6",
+          "tools/vulkan_mesh_replay.c": "f26d99e14ee41659015b39bd83f374e6b35641bf945deb48439bd66aed6d5038",
+          "tools/mesh_output_instrument.py": "69e97d192ca4607a2c7f50c4d92460c0467b5f0f076b9e3775dd04ac4fe960e7",
+          "tools/mesh_output_profile96.py": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+          "tools/graphics_compile_probe.py": "ec4cbaf812276fda0c266bd4f6c43729aedfac6cdc8b78a59b1eb47b0ef09f37",
+          "tools/mesh_mapping_probe.py": "70c23f954defe88101fe9001377fe391bdbf4885073b1f4c043875985d29127c",
+          "tools/compile_probe.py": "3f545e63c23ff2f3e8b24c77941fb6e2519a2371e913be3df76b87f1667d72af",
+          "tools/replay_contract.py": "9c4c4eec3fb027daa311a0017741b2a8d683b7a1941706f1b03a5ca23acd6c3d",
+          "tools/spirv_contract.py": "91bb902ee11d37ed24cda2c74a086e6c53fb15405311adc1fdd6a38f905048f7"
+        },
+        "helper_sha256": "b379519f9e24eed0d271f438848ecff560ec82b891b7c97f7f805bfaa938a398",
+        "source_manifest_sha256": "274a511b8453ea8a0e8022ff0516c03afcc14e9091bf36420f24bb0261553708",
+        "input_bundle_sha256": "84d40ef0b949accd8900d1331952c5bffa694513f87fdfa1ed2140c9d9047caa",
+        "driver": {
+          "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+          "library_name": "libvulkan_intel.so",
+          "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f"
+        },
+        "driver_profile": {
+          "name": "cache-safe-e5",
+          "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+          "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+          "policy": "native-safe"
+        },
+        "driver_policy": {
+          "name": "native-safe",
+          "controlled_options": {
+            "HS_CS32_MAX_INSTS": null,
+            "HS_SPILL_BATCH": "1",
+            "HS_PUSH_SHADOW": "1",
+            "shader_spilling_rate": "1",
+            "INTEL_DEBUG": null,
+            "HS_SPILL_PCT": null,
+            "HS_RA_DEBUG": null,
+            "HS_FORCE_SIMD8": null,
+            "HS_LARGE_GRF": null,
+            "HS_SUBGROUP8": null,
+            "HS_LARGE_GRF_BIT": null,
+            "RX_VK_WARP64": null,
+            "RX_VK_NOOPT": null
+          },
+          "full_environment_snapshot": false,
+          "profile_scope": "MAX absent; no global compute fallback opt-in"
+        },
+        "baseline_repeat_identical": true,
+        "all_full_buffers_identical": true,
+        "all_guards_writtenness_padding_counts_valid": true,
+        "all_groups_nonempty": true,
+        "coverage_totals": {
+          "vertices": 288,
+          "primitives": 140,
+          "unique_referenced_vertices_sum": 210,
+          "nonzero_vertex_attribute_bit_words": 8340,
+          "referenced_position_nonfinite_components": 0,
+          "referenced_position_zero_w": 0
+        },
+        "per_field_nonzero_bit_words": {
+          "Position": 840,
+          "Location0": 498,
+          "Location1": 498,
+          "Location2": 498,
+          "Location4": 918,
+          "Location5": 918,
+          "Location6": 498,
+          "Location7": 918,
+          "Location8": 918,
+          "Location11": 918,
+          "Location12": 918
+        },
+        "per_group_coverage": [
+          {
+            "workgroup_x": 64,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 65,
+            "vertices": 96,
+            "primitives": 64,
+            "unique_referenced_vertices": 96,
+            "nonzero_vertex_attribute_bit_words": 3456,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          },
+          {
+            "workgroup_x": 66,
+            "vertices": 96,
+            "primitives": 12,
+            "unique_referenced_vertices": 18,
+            "nonzero_vertex_attribute_bit_words": 1428,
+            "referenced_position_nonfinite_components": 0,
+            "referenced_position_zero_w": 0
+          }
+        ]
+      }
+    ],
+    "unique_workgroups": 67,
+    "real_cases": 12,
+    "all67groups_nonempty": true,
+    "all_full_buffers_identical_within_each_window": true,
+    "all_actual_widths_verified": true,
+    "primitive_count_histogram": {
+      "12": 1,
+      "64": 66
+    },
+    "coverage_totals": {
+      "vertices": 6432,
+      "primitives": 4236,
+      "unique_referenced_vertices_sum": 6354,
+      "nonzero_vertex_attribute_bit_words": 229524,
+      "referenced_position_nonfinite_components": 0,
+      "referenced_position_zero_w": 0
+    },
+    "per_field_nonzero_bit_words": {
+      "Position": 25416,
+      "Location0": 12786,
+      "Location1": 12786,
+      "Location2": 12786,
+      "Location4": 25494,
+      "Location5": 25494,
+      "Location6": 12786,
+      "Location7": 25494,
+      "Location8": 25494,
+      "Location11": 25494,
+      "Location12": 25494
+    },
+    "all_counts": [
+      {
+        "workgroup_x": 0,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 1,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 2,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 3,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 4,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 5,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 6,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 7,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 8,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 9,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 10,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 11,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 12,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 13,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 14,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 15,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 16,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 17,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 18,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 19,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 20,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 21,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 22,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 23,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 24,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 25,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 26,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 27,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 28,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 29,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 30,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 31,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 32,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 33,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 34,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 35,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 36,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 37,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 38,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 39,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 40,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 41,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 42,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 43,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 44,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 45,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 46,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 47,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 48,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 49,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 50,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 51,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 52,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 53,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 54,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 55,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 56,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 57,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 58,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 59,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 60,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 61,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 62,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 63,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 64,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 65,
+        "vertices": 96,
+        "primitives": 64,
+        "unique_referenced_vertices": 96,
+        "nonzero_vertex_attribute_bit_words": 3456,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      },
+      {
+        "workgroup_x": 66,
+        "vertices": 96,
+        "primitives": 12,
+        "unique_referenced_vertices": 18,
+        "nonzero_vertex_attribute_bit_words": 1428,
+        "referenced_position_nonfinite_components": 0,
+        "referenced_position_zero_w": 0
+      }
+    ],
+    "canonical_record_bodies_in_workgroup_order": {
+      "bytes": 2469888,
+      "sha256": "04af610e9f5cef3fb294c2740b3a9bc6f9a40037c573b19e74f638148405a178",
+      "definition": "Each baseline32 capture body excluding its outer64-byte guards, concatenated in window0,32,64 order; per-record inner guards retained"
+    },
+    "all_defined_vertex_attribute_words_in_workgroup_order": {
+      "bytes": 1132032,
+      "sha256": "5e90efb67ef0791976fc0e585a1cc574b43d63eb3924fa3b1bc60b638c2fe58a",
+      "definition": "Position then10generic vec4 arrays,96vertices each, per group0..66; no guard/count/triangle/marker bytes"
+    },
+    "all_emitted_triangle_components_in_workgroup_order": {
+      "bytes": 50832,
+      "sha256": "4807eedf0c8d37af760a9fd421bbe38ffbc7d153eee3105d6951a157066f1c83",
+      "definition": "uvec3 emitted primitive indices, no padding, in group/primitive order"
+    },
+    "gpu_lease_released": true,
+    "historical_draw_reproduced": false,
+    "general_race_freedom_proven": false,
+    "universal_transform_equivalence_proven": false,
+    "full_rendering_equivalence": false,
+    "fps_gain": false,
+    "handoff_sha256": "3f20c29d5472e0ea4da6b199e1da008f04a831449028b0ec7ce66056c9e19aaa",
+    "source_module_sha256": "999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93",
+    "conditional_module_sha256": "a41c6df753f30f8c0646ffa45227304e994b3fbaccdcad64927cd57f5e2327e7",
+    "conditional_source_kind": "Exact independently authored Python ballot transform derivative; no C++ native lowering tested in this replay"
+  }
+}

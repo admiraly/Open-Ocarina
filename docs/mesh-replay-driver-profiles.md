@@ -1,8 +1,10 @@
 # Explicit driver and mesh replay profiles
 
-Both independently authored output fixtures passed their four authorized GPU cases on the pinned E5 driver: actual widths 32,32,8,16 matched their complete CPU golden buffers. [Sanitized evidence](../research/mesh-replay-e5-fixture-observation.json) records all eight cases and exact artifacts. No game shader ran in this checkpoint. The [previous D8 observations](native-mesh-replay.md) retain their original source, helper, driver and plan hashes.
+The 6864 mesh now matches repeated original32 at actual widths 8 and 16 over all 67 workgroups of one chosen frozen readonly graph on the pinned E5 driver. All twelve cases across three windows pass complete byte comparisons, including count rows, writtenness, padding and guards. The two authored fixtures also passed eight fresh-budget cases against their complete CPU golden buffers. [Combined sanitized evidence, revision 2](../research/native-mesh-replay-e5-observation.json) preserves the earlier 32-group checkpoint separately from completion, the historical timeout and the compile-only diagnostic; none establishes final rendering or FPS.
 
-The current replay wrapper requires an explicit driver profile and compiler policy during CPU preparation. It supports two separately identified mesh output contracts. Fresh real-module plans still need separate review and an exclusive GPU lease before execution.
+The [earlier fixture-only checkpoint](../research/mesh-replay-e5-fixture-observation.json) and [previous D8 observations](native-mesh-replay.md) retain their original source, helper, driver and plan hashes. No game shader ran in that earlier fixture checkpoint.
+
+The current replay wrapper requires an explicit driver profile and compiler policy during CPU preparation. It supports two separately identified mesh output contracts. Each preparation requires separate review and an exclusive GPU grant before execution; the two remaining windows received those grants before the completion recorded below.
 
 ## Driver admission
 
@@ -56,7 +58,7 @@ python3 tools/mesh_replay.py fixture \
 
 These commands assemble/validate independently authored fixtures, build the optimized native helper and invoke its CPU-only `--validate` path. That path returns before `vkCreateInstance`. Each fixture produces one full-primitive and one empty-primitive record with nonzero origin. Four planned cases use the same independent fixture at actual widths 32,32,8,16; they test the executor and capture machinery, not transformation equivalence or shader-side null reads.
 
-The native execution boundary remains exactly one draw over at most 32 workgroups, a two-second fence, a thirty-second process timeout, competing-game refusal, no GPU polling loop and no idle wait after timeout. Each plan is single use. Both driver identity and the explicitly reviewed plan hash must match before execution. Preparation never schedules execution automatically.
+The native execution boundary remains exactly one draw over at most 32 workgroups, a two-second fence, competing-game refusal, no GPU polling loop and no idle wait after timeout. The fixed process budget covers pipeline compilation plus the bounded run: D8 uses 30 seconds and the 6864 profile uses 120 seconds. There is no generic timeout override. Each plan is single use. Both driver identity and the explicitly reviewed plan hash must match before execution. Preparation never schedules execution automatically.
 
 ## CPU review handoff
 
@@ -83,3 +85,62 @@ On 2026-11-13, both exact plans and the helper above executed after source revie
 Both original32 fixture cases passed the complete CPU oracle, count/writtenness/padding and guard checks before the width8 and width16 cases ran. Input and origin-control bytes stayed unchanged. The root independently read all eight saved outputs, checked their records and compared them with the frozen expected files. Execution report hashes are `19ec4b4f421316f1b65343f27cec59802ed80937ee0d995ca5cf5b34ca3d9d0b` for D8 and `4008a08bc5a69aa831a49d2cfc8cf1b5f118042b69c3b43f04328592896a3fea` for 6864. The GPU lease was released immediately after terminal completion.
 
 All cases used independently authored fixtures without subgroup operations or input reads. This establishes bounded executor/profile/capture behavior on the pinned configuration; it does not establish transformation equivalence, shader-side null reads, historical reproduction, rendering quality or speed. No original or transformed game module was executed as part of this fixture checkpoint.
+
+## Per-profile process budget update
+
+The separate [E5 real-module and compile-only evidence](../research/native-mesh-replay-e5-observation.json) records three distinct outcomes. The two-group D8 chosen-readonly comparison passed all four requested/actual widths 32,32,8,16, with complete 89,984-byte output equality and 128 vertices/32 primitives per group. Its output also matches the earlier pinned legacy-driver result for the same owned input graph. This is finite shader-output evidence, not historical draw reproduction or full rendering equivalence.
+
+The first 6864 baseline reached the original 30-second process deadline without terminal native metadata or output. Its repeat and alternative widths did not run. The wrapper stopped only its own process group, and the spent plan remains preserved. The failed attempt's phase is unknown.
+
+A separately reviewed private compile-only derivative then retained the exact graphics pipeline flags zero, required width32, profile/device/features/layout and optimized raster-discard state. It removed all command recording, submission, draw and fence code, and flushed milestones before/after instance, device, module and graphics pipeline creation. The one authorized invocation completed with actual mesh width32: its graphics pipeline call took 40.087696 seconds and its complete process took 40.226076 seconds. These are diagnostic host-call observations, not FPS measurements. The new observation does not retroactively identify the earlier replay's phase. Compiler statistics were omitted to preserve the original pipeline flags.
+
+That compile duration justifies a fixed 120-second process budget for the explicit 6864 profile. D8 stays at 30 seconds. The native C source and helper remain unchanged, including the two-second GPU fence, one draw, all guards and complete byte comparisons. `checked_prepared` requires the exact complete limits dictionary for its profile, with integer values: missing, extra, tampered or incompatible process/fence/draw/input limits fail closed. Execution selects the immutable profile budget rather than an arbitrary manifest timeout.
+
+The updated wrapper SHA-256 is `f75a509df716ffdb89c999c6967003e846622336b6be7afa791669fdd62518a6`. It invalidates every earlier plan through the source graph, including D8 and fixture plans. The prior `e91bba8b…` wrapper was archived before edits; all earlier plans, outputs and reports retain their historical identities. The fixture observation above used that earlier wrapper, not the budget update.
+
+The budget update's initial CPU-only preparations used the unchanged helper `b379519f…`:
+
+| Preparation | Prepared-plan SHA-256 | Process / fence budget |
+|---|---|---|
+| D8 authored fixture | `da4d42bf2c47d1d4a7fdbabf8008b15d246424f55dff68b50c1d851121091916` | 30 / 2 seconds |
+| 6864 authored fixture | `bc235dd9898d0873342213196d675c432cf85d3fb71e10d95dc99452cee0c694` | 120 / 2 seconds |
+| 6864 chosen readonly graph, origin0 + 32 groups of grid67 | `cddd6349dddfd2dfc8b1b18ea9e4fcca03dee40f133da18946c8da06832ed8e5` | 120 / 2 seconds |
+
+Their private directories are `local/native-mesh-replay/budget-d8-fixture-review-01`, `budget-6864-fixture-review-01` and `budget-6864-frozen-origin0-review-01`, respectively. At that initial CPU handoff none had executed. Both new fixtures subsequently received separate review and grants, passed all eight cases, and released their lease before the real 6864 plan received its own review and grant. Eighteen dedicated tests and the full 589-test CPU suite passed for the frozen implementation. Historical atomicity, general race freedom of same-value shared writes, universal transformation equivalence, full rendering and FPS remain unproven.
+
+## Authorized fresh-budget observations
+
+The freshly reviewed D8 and 6864 authored fixtures each passed actual/requested widths 32,32,8,16 against their independently computed full expected outputs. D8 compared 89,984 bytes with primitive counts 128 and 0, under the unchanged 30-second process budget. The 6864 fixture compared 73,856 bytes with primitive counts 96 and 0, under its explicit 120-second budget. Both retained the two-second native fence. Their execution report hashes are `d134555499eb2b52c2177091439469aecd8fee163e876193ab5445e1e94366e8` and `bd24292cbff8a692a8d5cb7efb3dd1035c1e5d42e5e8d3d01832387b07db7399`, respectively. These independently authored fixtures contain no subgroup operations or input reads and establish executor/capture behavior only.
+
+The separately authorized real plan `cddd6349…` then compared the first 32 workgroups of the chosen 67×1×1 readonly input graph. Original32, its repeat, conditional8 and conditional16 all produced the same complete 1,179,776-byte capture, SHA-256 `06cc1d2e1aafa042f6d31282587a98f726d7ffd5bcf87698df928ee4091ed694`. Pipeline executable properties verified actual widths 32,32,8,16. Execution report SHA-256 is `fa3f047484f3ff9cbe4bf4b9c9cd48768487396c0bf271c496d65ff36c5bc1ef`.
+
+Every group emitted 96 vertices and 64 primitives: 3,072 vertices and 2,048 primitives in total. All 96 vertices per group were referenced, with 110,592 nonzero vertex-attribute bit words overall. Referenced positions had no nonfinite components or zero W. All lane counts, component markers, padding, unwritten storage, inner/outer guards and full output bytes passed. Input and control bytes stayed unchanged. The root independently read all four saved captures, rechecked the records and compared the complete files. The GPU lease was released after terminal completion.
+
+This real-module comparison uses repeated original32 as its differential reference; it has no independent CPU algorithm oracle. It covers one finite chosen immutable graph and workgroups 0–31 only. Historical CPU atomicity and backing provenance remain unknown. The exact shader contains overlapping same-value shared initializer writes, so this observation does not prove general race freedom or universal transformation equivalence. It does not establish historical draw reproduction, final rendering or FPS. The old 30-second timeout and separate 40-second compile-only result remain distinct historical entries, with the old attempt's phase still unknown.
+
+At the first 32-group checkpoint, the remaining windows had been prepared but not executed:
+
+| Window | Prepared-plan SHA-256 | Full initialized capture |
+|---|---|---|
+| Origin32 + 32 groups | `3d88c844ee56bb9b72d8c30620ba34cd5d7f23fc6d1caf4a741f4ac8bd7af5b1` | 1,179,776 bytes |
+| Origin64 + 3 groups | `5ffc39edb93b561fea63e7480440cb4456f84d3d45078a8d80e51a212a5bc6a0` | 110,720 bytes |
+
+They retained the same source/module/helper/driver pins, readonly graph, 120-second process budget and two-second fence. Preparation supplied no permission to execute them; separate grants later authorized exactly their four-case matrices.
+
+## Complete 67-group chosen graph
+
+The two remaining windows subsequently passed all four actual/requested widths 32,32,8,16. Each original32 baseline and repeat passed all full-record checks before width8 and width16 ran; any difference would have stopped the matrix. All eight newly authorized processes terminated successfully, and their GPU lease was released immediately afterward. No extra window or shader ran under those grants.
+
+| Workgroups | Cases | Complete capture per case | Full capture SHA-256 | Geometry |
+|---|---|---|---|---|
+| 0–31, previous checkpoint | 4 | 1,179,776 bytes | `06cc1d2e1aafa042f6d31282587a98f726d7ffd5bcf87698df928ee4091ed694` | 32 × 96 vertices / 64 primitives |
+| 32–63 | 4 | 1,179,776 bytes | `e86912b7906053cfb7d25cacc2fac481e4f7360fcfbe3c970632424967e327d6` | 32 × 96 vertices / 64 primitives |
+| 64–66 | 4 | 110,720 bytes | `7d8b5004d380810c9f9995ee63cda001cebb48be82a6a65786d6be31f2953e0b` | 96 vertices each; 64,64,12 primitives |
+
+All 67 groups are nonempty. Together they contain 6,432 vertices and 4,236 primitives, with 6,354 referenced vertices summed across workgroups and 229,524 nonzero vertex-attribute bit words. Referenced positions contain no nonfinite components or zero W. Every full initialized output, lane-count row, component marker, padding word, unwritten tail and inner/outer guard passed. Input/control buffers remained unchanged. This includes the shorter final group, rather than extrapolating from full groups.
+
+Concatenating the 67 baseline record bodies in workgroup order, excluding each window's outer guards but retaining per-record inner guards, yields 2,469,888 bytes with SHA-256 `04af610e9f5cef3fb294c2740b3a9bc6f9a40037c573b19e74f638148405a178`. The defined Position and ten generic vertex arrays alone total 1,132,032 bytes, SHA-256 `5e90efb67ef0791976fc0e585a1cc574b43d63eb3924fa3b1bc60b638c2fe58a`. These hashes identify saved output data; no shader or output bytes are published.
+
+Execution report hashes for windows32 and64 are respectively `f60676b9b7775fd21a819e30f4d6237c5198076155902f3e8b7aef9f6b0ec78f` and `75ed3d29c27fa8a2a555d329afb01aec508098cea3e0a40f40db99c43551983c`. Revision 2 of the sanitized observation retains its predecessor metadata SHA-256 `b0efe3b6721e2e490ef03a401143a21ab2fffdff67a1c26e73529a4c85d5fca7` and the exact earlier first32 scope and source identities.
+
+This covers the complete launch grid of one explicitly chosen immutable input graph. It tests original source `999c8511…` and the exact Python-transformed conditional source `a41c6df7…`; a separate native C++ lowering implementation was not part of these replay grants. No general race-freedom, universal transformation-equivalence, historical live-draw reproduction, final rendering or FPS claim follows. Frozen replay sources, native helper, optimization flags and two-second fence were unchanged throughout.

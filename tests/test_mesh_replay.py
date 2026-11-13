@@ -256,6 +256,13 @@ class MeshReplayTests(unittest.TestCase):
                     manifest.write_text(json.dumps(broken))
                     with self.assertRaises(ValueError):
                         replay.checked_prepared(output, replay.digest(manifest))
+                for field, value in (("process_seconds", 120), ("process_seconds", 31), ("fence_seconds", 120),
+                                     ("draws_per_helper", 2), ("groups_per_draw", 64), ("max_total_input_bytes", 1)):
+                    broken = copy.deepcopy(plan)
+                    broken["limits"][field] = value
+                    manifest.write_text(json.dumps(broken))
+                    with self.subTest(limit=field, value=value), self.assertRaisesRegex(ValueError, "exact mesh profile budget"):
+                        replay.checked_prepared(output, replay.digest(manifest))
                 manifest.write_text(json.dumps(plan, indent=2) + "\n")
                 manifest.chmod(0o444)
                 self.assertEqual(replay.digest(manifest), reviewed)
@@ -369,6 +376,33 @@ class MeshReplayTests(unittest.TestCase):
                                                                "prepare_only": True, "gpu_executed": False}))
             with self.assertRaises(ValueError):
                 replay.checked_prepared(root, replay.digest(root / "prepared-plan.json"))
+
+    def test_exact_profile_process_budgets_preserve_native_bounds(self):
+        for profile, seconds in ((replay.D8_PROFILE, 30), (replay.PROFILE96, 120)):
+            limits = replay.execution_limits(profile)
+            self.assertEqual(limits, {"groups_per_draw": 32, "draws_per_helper": 1, "fence_seconds": 2,
+                                      "process_seconds": seconds, "max_total_input_bytes": 1024**3})
+            self.assertEqual(replay.output_profile(profile)["process_seconds"], seconds)
+        with self.assertRaises(ValueError):
+            replay.execution_limits("arbitrary")
+
+    def test_tampered_profile_budgets_rejected_before_artifact_or_device_checks(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = root / "prepared-plan.json"
+            for profile, wrong_process in ((replay.D8_PROFILE, 120), (replay.PROFILE96, 30)):
+                approved = replay.execution_limits(profile)
+                for limits in (None, {}, approved | {"process_seconds": wrong_process},
+                               approved | {"process_seconds": float(approved["process_seconds"])},
+                               approved | {"fence_seconds": 120}, approved | {"draws_per_helper": True},
+                               approved | {"arbitrary_override": 120}):
+                    plan = {"schema": replay.output_profile(profile)["schema"], "output_profile": profile,
+                            "prepare_only": True, "gpu_executed": False, "limits": limits}
+                    manifest.write_text(json.dumps(plan))
+                    with self.subTest(profile=profile, limits=limits), patch.object(replay, "driver_identity") as device:
+                        with self.assertRaisesRegex(ValueError, "exact mesh profile budget"):
+                            replay.checked_prepared(root, replay.digest(manifest))
+                        device.assert_not_called()
 
 
 if __name__ == "__main__":

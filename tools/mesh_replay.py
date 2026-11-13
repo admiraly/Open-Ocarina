@@ -74,7 +74,7 @@ def output_profile(name):
                 "program": "d8e59341cf4f629c", "variant": "0c8f08626a9d98a4", "layout": LAYOUT,
                 "magic": MAGIC, "engine": instrumenter, "engine_sha256": INSTRUMENTER,
                 "report_schema": "open-ocarina.mesh-output-instrument/v1", "modules": APPROVED_MODULES,
-                "bindings": EXPECTED_BINDINGS, "ubo_count": 5, "kind": "captured-d8"}
+                "bindings": EXPECTED_BINDINGS, "ubo_count": 5, "kind": "captured-d8", "process_seconds": 30}
     if name == PROFILE96:
         return {"id": name, "schema": "open-ocarina.prepared-native-mesh-replay96/v1",
                 "result_schema": "open-ocarina.native-mesh-replay96-result/v1",
@@ -93,8 +93,13 @@ def output_profile(name):
                                           "9453c1a003e070a69e2dd7462aa6ef0de5c433a91e0976fffa45da9bb70cf3a7")},
                 "bindings": [(0, binding, element, 6 if binding < 4 else 7)
                              for binding in range(9) for element in range(3 if binding == 8 else 1)],
-                "ubo_count": 4, "kind": "captured-6864"}
+                "ubo_count": 4, "kind": "captured-6864", "process_seconds": 120}
     raise ValueError("Unknown explicit mesh output profile")
+
+
+def execution_limits(profile_id):
+    return {"groups_per_draw": 32, "draws_per_helper": 1, "fence_seconds": 2,
+            "process_seconds": output_profile(profile_id)["process_seconds"], "max_total_input_bytes": MAX_BYTES}
 
 
 def validate_driver_profile(name, policy):
@@ -542,8 +547,7 @@ def prepare(output_path, *, capture=None, original=None, conditional=None, origi
                 "uniformBufferStandardLayout": True, "shaderFloat16": True, "shaderInt8": True,
                 "nullDescriptor_required": input_info["null_descriptor_elements"] > 0,
                 "signed_zero_inf_nan_preserve_float32_required": True},
-            "limits": {"groups_per_draw": 32, "draws_per_helper": 1, "fence_seconds": 2, "process_seconds": 30,
-                       "max_total_input_bytes": MAX_BYTES},
+            "limits": execution_limits(profile_id),
             "claims": {"real_game_rendering_equivalence": False, "fps_gain": False,
                        "historical_draw_reproduced": False, "conditional_transform_equivalence_proven": False}}
     if not fixture and digest(capture) != state["source_manifest_sha256"]:
@@ -567,6 +571,9 @@ def checked_prepared(path, expected_sha256):
     profile = output_profile(plan.get("output_profile"))
     if plan.get("schema") != profile["schema"] or plan.get("prepare_only") is not True or plan.get("gpu_executed") is not False:
         raise ValueError("Unexpected prepared native-mesh replay plan")
+    limits = plan.get("limits")
+    if not isinstance(limits, dict) or any(type(value) is not int for value in limits.values()) or limits != execution_limits(profile["id"]):
+        raise ValueError("Prepared execution limits differ from the exact mesh profile budget")
     selected_driver = validate_driver_profile(plan.get("driver_profile", {}).get("name"), plan.get("driver_policy", {}).get("name"))
     if plan.get("driver_profile") != selected_driver or plan.get("expected_driver_library_sha256") != selected_driver["library_sha256"]:
         raise ValueError("Prepared driver profile/hash/policy identity differs")
@@ -633,7 +640,7 @@ def execute(path, expected_sha256, driver):
         result_path = output / f"{case['name']}.bin"
         metadata = json.loads(run_process([str(output / "mesh-replay-helper"), str(output / case["module"]),
                                           str(output / "inputs.bin"), str(result_path), str(case["width"]),
-                                          str(plan["device_index"])], env, output, case["name"], 30))
+                                          str(plan["device_index"])], env, output, case["name"], profile["process_seconds"]))
         if metadata.get("output_profile") != profile["id"] or metadata.get("gpu_executed") is not True or metadata.get("actual_width") != case["width"] or \
                 metadata.get("requested_width") != case["width"] or metadata.get("executable_stage") != 128 or \
                 metadata.get("width_source") != "pipeline_executable_properties" or metadata.get("mesh_draw_calls") != 1 or \
