@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""CPU model of Hookshot global-address lowering.
+"""Abstract byte-view model and separate typed Hookshot addressing checks.
 
 Compares the unrolled first-match storage-buffer walk plus page-table fallback
 with a page-table-only helper. Finite boundary-grid sampling finds counterexamples;
 an empty objection list is not a proof or permission to change a runtime pipeline.
 Synthetic ranges only: no guest addresses from a capture, no device execution.
+The original byte-view model does not reproduce typed element flooring or all
+descriptor-class length rules. See hookshot_typed_hit for the narrower source
+arithmetic checks; neither model is a native admission certificate.
 """
 
 from __future__ import annotations
@@ -160,6 +163,62 @@ def binding_load(image, binding, relative, size, robust_mode="whole", alignment=
         result.extend(read_dev(image, binding.device + position, chunk)
                       if 0 <= position and position + chunk <= limit else bytes(chunk))
     return bytes(result)
+
+
+def hookshot_typed_hit(bindings, addr, size):
+    """Model the inspected U32/U32x2/U32x4 descriptor search after classification.
+
+    The caller supplies actual declared ranges and the already-classified
+    candidate/single/table order. OpArrayLength yields whole typed elements;
+    its byte-count shift and the address-to-index conversion are 32-bit.
+    Classification, descriptor creation, device robustness and validity of the
+    original memory accesses are outside this helper.
+    """
+    if size not in SIZES or not 0 <= addr < 1 << 64:
+        raise ValueError("Expected a 4/8/16-byte typed view and a uint64 address")
+    mask64, mask32 = (1 << 64) - 1, (1 << 32) - 1
+
+    def interval(binding):
+        if binding.kind not in ("candidate", "single", "table"):
+            raise ValueError("Unknown source descriptor class")
+        if not 0 <= binding.guest <= mask64 or binding.bound_len < 0:
+            raise ValueError("Invalid descriptor extent")
+        base = binding.aligned()
+        elements = (binding.bound_len // size) & mask32
+        bound_end = (base + ((elements * size) & mask32)) & mask64
+        size_word = binding.size_word & mask32
+        if binding.kind == "candidate" or (binding.kind == "table" and size_word == 0):
+            end = bound_end
+        else:
+            end = min((binding.guest + size_word) & mask64, bound_end)
+        return base, end
+
+    best, best_distance = None, None
+    for binding in bindings:
+        base, end = interval(binding)
+        if binding.kind == "candidate" and base <= addr < end:
+            distance = addr - base
+            if best_distance is None or distance < best_distance:
+                best, best_distance = binding, distance
+    if best is None:
+        for binding in bindings:
+            base, end = interval(binding)
+            if binding.kind != "candidate" and base <= addr < end:
+                best = binding
+                break
+    if best is None:
+        return None
+    # OpUConvert to U32 precedes the element-index shift.
+    relative = ((addr - best.aligned()) & mask32) & ~(size - 1)
+    return best, relative
+
+
+def hookshot_typed_load(image, bindings, addr, size):
+    hit = hookshot_typed_hit(bindings, addr, size)
+    if hit is not None:
+        binding, relative = hit
+        return binding_load(image, binding, relative, size)
+    return pt_only_load(image, addr, size)
 
 
 def legacy_load(image, bindings, addr, size, table="gpu", robust_mode="whole", alignment=1):
@@ -327,6 +386,67 @@ def paint(image, binding):
         if window_index(page) is not None:
             image.map_page(window_index(page), binding.device + (page - base))
         page += PAGE
+
+
+class TypedSourceAddressingTests(unittest.TestCase):
+    def test_unaligned_vector_hit_floors_to_its_element(self):
+        image = Image()
+        binding = Binding(W0, 16, 16, 0x800000, bytes(range(32)))
+        paint(image, binding)
+        self.assertEqual(hookshot_typed_hit([binding], W0 + 12, 16), (binding, 0))
+        self.assertEqual(hookshot_typed_load(image, [binding], W0 + 12, 16), bytes(range(16)))
+        self.assertEqual(legacy_load(image, [binding], W0 + 12, 16), bytes(16))
+        self.assertNotEqual(hookshot_typed_load(image, [binding], W0 + 12, 16),
+                            pt_only_load(image, W0 + 12, 16))
+
+    def test_array_length_changes_claims_for_each_typed_view(self):
+        binding = Binding(W0, 10, 10, 0x800000, bytes(range(16)))
+        self.assertEqual(hookshot_typed_hit([binding], W0 + 4, 4), (binding, 4))
+        self.assertEqual(hookshot_typed_hit([binding], W0 + 4, 8), (binding, 0))
+        for size in SIZES:
+            self.assertIsNone(hookshot_typed_hit([binding], W0 + 8, size))
+        self.assertIsNone(hookshot_typed_hit([binding], W0, 16))
+
+    def test_nearest_candidate_uses_bound_without_size_word_cap(self):
+        binding = Binding(W0, 4, 64, 0x800000, bytes(64), kind="candidate")
+        self.assertEqual(hookshot_typed_hit([binding], W0 + 48, 16), (binding, 48))
+        self.assertIsNone(ssbo_hit([binding], W0 + 48))  # Abstract model differs.
+
+    def test_zero_size_table_differs_from_ordinary_single(self):
+        ordinary = Binding(W0, 0, 64, 0x800000, bytes(64))
+        table = Binding(W0, 0, 64, 0x900000, bytes(64), kind="table")
+        self.assertIsNone(hookshot_typed_hit([ordinary], W0 + 16, 16))
+        self.assertEqual(hookshot_typed_hit([table], W0 + 16, 16), (table, 16))
+
+    def test_zero_guest_word_alone_does_not_prove_no_claim(self):
+        binding = Binding(0, 64, 64, 0x800000, bytes(64))
+        self.assertEqual(hookshot_typed_hit([binding], 16, 4), (binding, 16))
+
+    def test_zero_size_single_can_still_claim_alignment_prefix(self):
+        binding = Binding(W0 + 3, 0, 16, 0x800000, bytes(16))
+        self.assertEqual(hookshot_typed_hit([binding], W0 + 2, 4), (binding, 0))
+        self.assertIsNone(hookshot_typed_hit([binding], W0 + 3, 4))
+
+    def test_guest_page_straddle_operand_is_floored_on_storage_hit(self):
+        image = Image()
+        binding = Binding(W0, 8192, 8192, 0x800000, bytes([0x5A]) * 8192)
+        paint(image, binding)
+        address = W0 + PAGE - 8
+        self.assertEqual(hookshot_typed_hit([binding], address, 16), (binding, PAGE - 16))
+        self.assertEqual(hookshot_typed_load(image, [binding], address, 16), bytes([0x5A]) * 16)
+        self.assertEqual(pt_only_load(image, address, 16), bytes(16))
+
+    def test_short_first_typed_view_yields_to_later_claim(self):
+        first = Binding(W0, 10, 10, 0x800000, bytes(10))
+        later = Binding(W0, 32, 32, 0x900000, bytes(32))
+        self.assertEqual(hookshot_typed_hit([first, later], W0 + 8, 4), (later, 8))
+        self.assertIs(ssbo_hit([first, later], W0 + 8), first)
+
+    def test_bound_byte_shift_is_uint32_arithmetic(self):
+        # Arithmetic fixture only; this does not assert a supported Vulkan range.
+        binding = Binding(W0, 0, (1 << 32) + 16, 0x800000, b"", kind="table")
+        self.assertEqual(hookshot_typed_hit([binding], W0 + 12, 4), (binding, 12))
+        self.assertIsNone(hookshot_typed_hit([binding], W0 + 16, 4))
 
 
 class CertificateTests(unittest.TestCase):
