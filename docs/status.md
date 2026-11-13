@@ -86,6 +86,14 @@ counts and generation-wrap behavior. Source-backed tests and a separate
 page-walk oracle pass. Neither candidate has been enabled in a game run,
 so no rendering or gameplay performance gain is accepted.
 
+The [actual D8 interval candidate](../research/grok-d8-interval.md) now has a
+[paired A770 compile observation](grok-d8-interval-compile-observation.md). Both
+pipelines used one common ordinary descriptor-set layout: adding the record
+exceeds the prior push-descriptor element limit. Compiler code/spill results
+are mixed, with unchanged scratch allocation and increased SENDs. No draw,
+output equivalence or execution-time measurement occurred. Owned replay and
+a live descriptor ABI remain integration work.
+
 ## Implemented starting point
 
 - Module inventory reads NSO header metadata and computes SHA-256 hashes without exporting executable bytes.
