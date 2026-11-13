@@ -1,0 +1,149 @@
+{
+  "schema": "open-ocarina.ndve-software-compile-observation/v1",
+  "date": "2026-11-13",
+  "program": "e409733c45530d75",
+  "module_sha256": "169b30754016737e4b49bb633dc2e2656b62e6f40fbdccbd907a538393f28338",
+  "helper_source_sha256": "7e94849a8baff6d0867262b60773d56ad114cf8c166d5b323e26a1d1290a6339",
+  "helper_binary_sha256": "221cc18a911ccc67f3ef01a218de35c109d48bf3897d016a52029305d4806edd",
+  "plan_sha256": "fc4711881784ae2395587af3a6230693f754da9753fff224bef628216bb102e3",
+  "freeze_sha256": "a6e5df88de1b2edc1e4f4161d958564dc0dea3a467c4ccaa7e54ff00a34da65c",
+  "result_sha256": "d568e8318d997d4242cebbd7a0391d05bb228e356c40aeebdd5536589541aea4",
+  "driver_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+  "policy": {
+    "subgroup": "required32 with full subgroups",
+    "spill_batch": 1,
+    "push_shadow": 1,
+    "shader_spilling_rate": 1,
+    "HS_CS32_MAX_INSTS": "absent",
+    "SIMD_overrides": "absent",
+    "disk_cache": "disabled"
+  },
+  "pipeline_result": {
+    "schema": 1,
+    "compile_only": true,
+    "dispatch_executed": false,
+    "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+    "driver": "Intel open-source Mesa driver",
+    "driver_info": "Mesa 26.2.4",
+    "vendor_id": 32902,
+    "device_id": 22176,
+    "api_version": 4211042,
+    "policy": "pinned32",
+    "features": {
+      "robustBufferAccess": true,
+      "robustBufferAccess2": true,
+      "uniformBufferStandardLayout": true,
+      "bufferDeviceAddress": true,
+      "shaderFloat16": true,
+      "shaderSignedZeroInfNanPreserveFloat16": true,
+      "shaderSignedZeroInfNanPreserveFloat32": true,
+      "shaderInt16": true,
+      "shaderInt64": true,
+      "shaderStorageBufferArrayDynamicIndexing": true,
+      "shaderImageGatherExtended": true,
+      "subgroupSizeControl": true,
+      "computeFullSubgroups": true
+    },
+    "pipeline_optimization_disabled": false,
+    "null_descriptor_enabled": true,
+    "descriptor_mode": "push",
+    "push_constant_range_bytes": 56,
+    "pipeline_create_seconds": 5.155295346,
+    "executables": [
+      {
+        "name": "compute",
+        "subgroup_size": 32,
+        "statistics": [
+          {
+            "name": "Instructions",
+            "value": 68551
+          },
+          {
+            "name": "Code size",
+            "value": 1300608
+          },
+          {
+            "name": "SENDs",
+            "value": 665
+          },
+          {
+            "name": "Loops",
+            "value": 73
+          },
+          {
+            "name": "Cycles",
+            "value": 25210376
+          },
+          {
+            "name": "Spills",
+            "value": 2348
+          },
+          {
+            "name": "Fills",
+            "value": 5998
+          },
+          {
+            "name": "Scratch Memory Size",
+            "value": 32768
+          },
+          {
+            "name": "GRF registers",
+            "value": 0
+          },
+          {
+            "name": "Push constant ranges",
+            "value": 0
+          },
+          {
+            "name": "Push constant registers",
+            "value": 0
+          },
+          {
+            "name": "Max dispatch width",
+            "value": 32
+          },
+          {
+            "name": "Max live registers",
+            "value": 645
+          },
+          {
+            "name": "Workgroup Memory Size",
+            "value": 3360
+          },
+          {
+            "name": "Non SSA regs after NIR",
+            "value": 702
+          },
+          {
+            "name": "Source hash",
+            "value": 243790817253303392
+          }
+        ]
+      }
+    ]
+  },
+  "process": {
+    "normal_exit": true,
+    "reaped": true,
+    "pid_absent": true,
+    "post_pins_unchanged": true,
+    "parent_time_bound_seconds": 180,
+    "parent_each_pipe_byte_cap": 8388608,
+    "child_rlimits_changed": false
+  },
+  "claims": {
+    "pipeline_compiled": true,
+    "queue_retrieved": false,
+    "shader_dispatched": false,
+    "output_validated": false,
+    "native_network_restored": false,
+    "native_quality_accepted": false,
+    "gameplay_FPS_claim": false
+  },
+  "limitations": [
+    "Sampled CPU what-if export; not an observed live emitted variant.",
+    "Compiler statistics and pipeline creation duration are not GPU execution timing.",
+    "The production network exclusion and software matrix arithmetic are unchanged.",
+    "Resources and historical input atomicity remain unproved."
+  ]
+}

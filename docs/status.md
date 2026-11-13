@@ -20,7 +20,13 @@ A bounded [original-path native-network observation](ndve-live-metadata-observat
 now records 47 real compiler queries, all 21 host-configuration fields at use,
 and a stable registered texture matching the native table. The existing
 network exclusion still occurs before SPIR-V emission. A sampled profile is
-not an actual emitter input, and the native network is not restored.
+not an actual emitter input, and the native network is not restored. A
+[sampled CPU what-if](ndve-sampled-stage-export.md) assigns the observed host
+fields and that profile; its validated module matches the existing offline
+export byte for byte and is not a new live variant.
+That sampled module now also compiles on the A770 through a feature-correct
+float16 probe at actual width 32. Substantial spills remain; no queue,
+resource binding, shader execution or network restoration was performed.
 
 The D8 graphics interval candidate now passes a separate
 [complete owned mesh-output comparison](grok-d8-interval-replay-observation.md)
