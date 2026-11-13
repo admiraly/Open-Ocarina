@@ -328,9 +328,10 @@ jobs:
           cc="$tools/llvm-mingw/bin/clang.exe"
           ff_inc=$(ls -d "$tools/cpm/ffmpeg/"*/include | head -1)
           dav_inc=$(ls -d "$tools/cpm/dav1d/"*/include | head -1)
-          "$cc" -c "$tools/host/nn_video.c" -o "$RUNNER_TEMP/nn_video.o" -O2 -Wno-everything -I"$tools/host" -I"$ff_inc" -I"$dav_inc" -DHOOKSHOT_DAV1D
+          rt64_inc="$RUNNER_TEMP/smoke-work/sa/build/rt64"
+          "$cc" -c "$tools/host/nn_video.c" -o "$RUNNER_TEMP/nn_video.o" -O2 -Wno-everything -I"$tools/host" -I"$rt64_inc" -I"$ff_inc" -I"$dav_inc" -DHOOKSHOT_DAV1D
           "$cc" -c "$tools/host/dav1d_av1.c" -o "$RUNNER_TEMP/dav1d_av1.o" -O2 -Wno-everything -I"$tools/host" -I"$dav_inc" -DHOOKSHOT_DAV1D
-          "$cc" -c "$tools/host/pad_sdl.c" -o "$RUNNER_TEMP/pad_sdl.o" -O2 -Wno-everything -I"$tools/host"
+          "$cc" -c "$tools/host/pad_sdl.c" -o "$RUNNER_TEMP/pad_sdl.o" -O2 -Wno-everything -I"$tools/host" -I"$rt64_inc"
       - name: Package Windows artifacts
         run: |
           mkdir -p dist
