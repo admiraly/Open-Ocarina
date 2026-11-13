@@ -28,7 +28,11 @@ including the partial tail. Historical snapshot atomicity and general race freed
 remain unproved. The [native C++ extension](native-mesh-profile96-lowering.md)
 is built and remains off by default. Its exact instrumented derivative matches
 the tested conditional module; paired compiler checks also match raw native/Python
-code generation. An isolated game pilot of the new build remains pending.
+code generation. The [V3/E5 identity pilot](../research/native-renderer-v3-e5-pilot.json)
+now records both target module pairs in the original and requested8/16 modes,
+with verified binaries/settings and all owned processes stopped. Differing UI/
+temporal states, unresolved dark shapes and unknown live width/indirect grid keep
+rendering, native-quality and performance acceptance open.
 
 The [native-network investigation](../research/native-network-restoration.md)
 identifies ten omitted startup programs as movie-upscale networks. Their linear

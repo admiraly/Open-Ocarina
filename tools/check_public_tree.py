@@ -19,7 +19,8 @@ def audit(name, content, symlink=False):
         errors.append("symlink")
     scoped_source = ((path.suffix == ".java" and path.parts[:2] == ("tools", "ghidra_scripts"))
                      or (path.suffix == ".c" and path.parts[:2] == ("src", "probes"))
-                     or name in {"tools/vulkan_compile_probe.c", "tools/vulkan_execution_probe.c",
+                     or name in {"src/probes/compute_interval_records.h",
+                                 "tools/vulkan_compile_probe.c", "tools/vulkan_execution_probe.c",
                                  "tools/vulkan_graphics_compile_probe.c", "tools/vulkan_mesh_execution_probe.c",
                                  "tools/vulkan_physical_replay.c", "tools/vulkan_mesh_replay.c"})
     if set(path.parts) & PRIVATE_PARTS or (path.suffix not in ALLOWED and path.name not in NAMES and not scoped_source):

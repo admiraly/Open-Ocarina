@@ -1,6 +1,6 @@
 # Optional native 6864 lowering overlay
 
-The new `patches/hookshot/mesh-warp32-profile96.patch` is an optional twelfth overlay after the frozen eleven-overlay renderer chain. It extends the existing two-ballot native writer to the exact timed `68642bb810ee3e7c` mesh family. It remains experimental and off by default. CPU/build preparation now has a separate [paired compiler observation](../research/native-mesh-profile96-codegen-observation.json); the frozen V2 patch, capture96 patch, structural writer and original replay/instrumentation tools remain unchanged.
+The new `patches/hookshot/mesh-warp32-profile96.patch` is an optional twelfth overlay after the frozen eleven-overlay renderer chain. It extends the existing two-ballot native writer to the exact timed `68642bb810ee3e7c` mesh family. It remains experimental and off by default. Separate [paired compiler evidence](../research/native-mesh-profile96-codegen-observation.json) and [bounded V3/E5 identity pilots](../research/native-renderer-v3-e5-pilot.json) now accompany the build; the frozen V2 patch, capture96 patch, structural writer and original replay/instrumentation tools remain unchanged.
 
 [Sanitized build metadata](../research/native-mesh-profile96-lowering.json) records all twelve patch hashes, reviewed source hashes, binary identity, CPU comparisons and limitations. The [family inventory](../research/mesh-family-audit.md) explains target priority and why the larger43ec family cannot use this lowering.
 
@@ -63,6 +63,23 @@ Matching compiler output neither executes raw43434 nor establishes complete
 runtime-pipeline, native-quality or performance acceptance. It remains separate
 from the original a41c replay and the instrumentation correspondence.
 
+## Integrated V3 identity pilot
+
+[Separate runtime metadata](../research/native-renderer-v3-e5-pilot.json) records
+three processes using the unchanged629add renderer, E5 driver and profile96 flag1.
+Mode0 selected both original mesh modules; modes8/16 selected native d8875… and
+6864434… with unchanged fragments and both correct revision3/shared-byte receipts.
+Each target exceeded32 matching unique records. Admission and final preserved
+counts are recorded separately; the global256-event cap was not exhausted. All
+owned processes stopped and reaped, with loaded-file identities/hashes, settings,
+script path and immutable seeds checked.
+
+Private2048×1152 control images show broad world/Link, with differing temporal/UI
+states and unresolved flat dark shapes in baseline and both candidates. The cause
+is unknown, not a proven new lowering defect. Live executable width, GPU-generated
+indirect grid, full native quality and output equivalence remain unverified; no
+benchmark result follows from these identity/image diagnostics.
+
 ## Cache and pipeline paths
 
 The new registry has revision3. Translator cache policy includes revision, width and the explicit profile flag; the build's translator stamp includes the registry source. Pipeline and GPL tags use revision3 as well. Canonical shader-cache serialization still writes the original words. Selected native identity metadata records the actual candidate digest and is not overwritten by those canonical words.
@@ -84,6 +101,6 @@ The broader vendor game-free suite reported449pass/9fail/64skip. All nine failin
 | Source manifest | `58e0a65ce8dc5b958c838a7b76cd8f83687bab32221b83efa296b3cfbc74b8ca` |
 | Private build receipt | `d51a854e6dd6243785b607dcb472d100cd56f8cded59344ab94b4f6b80f773cf` |
 
-The isolated renderer is under ignored `local/mesh-warp32-profile96-renderer-build/sa/build/hookshot_vk.so`; receipt, source manifest, comparisons and private logs are under `local/mesh-warp32-profile96-native/`. The reconstructed twelve-overlay tree is `58ca709617448e06af382c3443dd88dac3ffcb8e`. No device, pipeline, game or play test was performed for this new build. No commit or publication was made by this task.
+The isolated renderer is under ignored `local/mesh-warp32-profile96-renderer-build/sa/build/hookshot_vk.so`; receipt, source manifest, comparisons and private logs are under `local/mesh-warp32-profile96-native/`. The reconstructed twelve-overlay tree is `58ca709617448e06af382c3443dd88dac3ffcb8e`. That build task did not launch a device or game; the later bounded V3/E5 observation is separate and preserves the original receipt unchanged.
 
-The remaining integration boundary is the unmodified629add renderer's actual selected-module evidence and broader rendering/performance validation. The exact [instrumentation correspondence](native-mesh-profile96-instrumentation-correspondence.md) and paired compiler observation relate the native writer to the completed chosen67-group comparison without claiming direct raw43434 execution or adding a redundant ABI. Original shared-memory race-freedom limitations, native scene quality and matched ordinary execution measurements remain separate requirements.
+The V3 pilot adds actual selected-module evidence for the unmodified629add renderer. The exact [instrumentation correspondence](native-mesh-profile96-instrumentation-correspondence.md) and paired compiler observation relate the native writer to the completed chosen67-group comparison without promoting a recording-time identity to a captured GPU-output comparison or adding a redundant ABI. Original shared-memory race-freedom limitations, native scene quality and matched ordinary execution measurements remain separate requirements.

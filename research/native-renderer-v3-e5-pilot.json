@@ -1,0 +1,696 @@
+{
+  "schema": "open-ocarina.native-renderer-v3-e5-pilot/v1",
+  "date": "2026-11-13",
+  "scope": "Three bounded integrated dual-target V3/E5 command-recording identity and control-image diagnostics; no complete rendering or performance acceptance",
+  "integration_revision": 3,
+  "renderer_sha256": "629addc24fe06d5170ebd0d6892cd0722dc69e7171ee951abc4188f17d26405d",
+  "renderer_source_version": "4ec2a989",
+  "renderer_readonly_freeze_sha256": "19d4e8356b5c531a2bb0d6c18406a302d18e168daa37218e8a7833728acd8524",
+  "renderer_original_build_receipt_sha256": "d51a854e6dd6243785b607dcb472d100cd56f8cded59344ab94b4f6b80f773cf",
+  "renderer_source_manifest_sha256": "58e0a65ce8dc5b958c838a7b76cd8f83687bab32221b83efa296b3cfbc74b8ca",
+  "renderer_patch_chain": [
+    {
+      "patch": "compute-identity.patch",
+      "sha256": "2f14873edfdb47b1f915e75bc4bbe6683ef6632bc66fcbfa1d918aa1c176f018"
+    },
+    {
+      "patch": "page-table-snapshot.patch",
+      "sha256": "c236b96851bc95426202abec6447e672577fdda747fd8405cc435dae435834ab"
+    },
+    {
+      "patch": "allocation-capture.patch",
+      "sha256": "7d8f23d3824374002472bc4a65f3f078c3306d4c5cd395f97e2a1e083fe49aab"
+    },
+    {
+      "patch": "occurrence-capture.patch",
+      "sha256": "defdda2dced583678e39daea0dc7e671fcc8926df8374a62ad45fe675692b752"
+    },
+    {
+      "patch": "graphics-identity.patch",
+      "sha256": "d2572d167c7427c79ce5b600fdeef67a0738678e5e05cbe1ec21db89d8865e53"
+    },
+    {
+      "patch": "sampled-image-capture.patch",
+      "sha256": "45fd019c2670a0c5c4cb0bfba8decb3701531c8248ec205e2b95ba03969aa362"
+    },
+    {
+      "patch": "dispatch-parameters.patch",
+      "sha256": "ff86fe706725f2c70dc759a6e2d295ebedee12b5b93b4b6e2cf407c58a689d8e"
+    },
+    {
+      "patch": "binding-provenance.patch",
+      "sha256": "af88886fb027b91bea136db0c2bf05865cf510232c50fdcbdd9d238d930009b1"
+    },
+    {
+      "patch": "mesh-input-capture.patch",
+      "sha256": "eea7b1b3181751b6b09811a458626958799f2d9a8511a74fdb8bd49854462f5c"
+    },
+    {
+      "patch": "mesh-warp32-lowering.patch",
+      "sha256": "8d0cc053103ccf90b51e6c55c6e7ee39292636f03b85e16d74bd8d8d1221854b"
+    },
+    {
+      "patch": "mesh-input-profile96.patch",
+      "sha256": "d87391e4c8ff1130b2c918da4d6e38c45420acd0f43b12b6ea47a33a3b27f51b"
+    },
+    {
+      "patch": "mesh-warp32-profile96.patch",
+      "sha256": "e419822c42b800ea406e692a366b5891a21baa030632c8f30ec6af134dc5f116"
+    }
+  ],
+  "host_sha256": "4eb32b56a91869b5d7ac1673f0ca1e3c0841e893a8a34f728ec85344a312cb30",
+  "driver_library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+  "driver_icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+  "private_launcher_sha256": "8442ec2c79f54d7549f138e26dbfc4dcf00580272fb53daa462cea9d4c4fb4ee",
+  "private_plan_sha256": "2ade0cd1bd126eecd7ab8c93aa045131a8915914419497bf705c402dbecdb355",
+  "private_preparation_freeze_sha256": "c9cde37910c47587fd541ac4ebc9894ed08378b9dca5254fd78f96e6af0e08ae",
+  "CPU_preparation": {
+    "twelve_source_files_checked_against_build_receipt": true,
+    "synthetic_test_groups_passed": 10,
+    "saved_real_original_target_components_and_option_reply_passed": true,
+    "actual_old_revision2_log_rejected": true,
+    "per_target32_unique_rows_required": true,
+    "global_observer_limit": 256,
+    "missing_or_starved_target_admission": false,
+    "oldV2pilot03_and_all_compiler_plans_sources_and_raw_IR_preserved": true
+  },
+  "controlled_policy": {
+    "profile96_flag_constant": "1",
+    "only_experimental_mode_control": "RX_VK_OO_MESH_WARP32=0/8/16; private filesystem paths vary by case",
+    "compiler_controls": {
+      "HS_SPILL_BATCH": "1",
+      "HS_PUSH_SHADOW": "1",
+      "shader_spilling_rate": "1",
+      "HS_CS32_MAX_INSTS": null,
+      "HS_FORCE_SIMD8": null,
+      "HS_SUBGROUP8": null,
+      "HS_SPILL_PCT": null,
+      "HS_LARGE_GRF": null,
+      "HS_LARGE_GRF_BIT": null,
+      "HS_RA_DEBUG": null,
+      "INTEL_DEBUG": null,
+      "RX_VK_WARP64": null,
+      "RX_VK_NOOPT": null
+    },
+    "MAX_absent_even_empty_or_zero": true,
+    "hidden_environment_overrides_prevented_by_exact_allowlisted_HOS_ENV_FILE": true,
+    "fresh_independent_cases_from_same_immutable_common_seed": true,
+    "seed_content_manifest_sha256": {
+      "mesa-cache": "557035a1681edb9f06d44ed18812a14a70e2c5e38e4cced2a904e84b6bbcbb79",
+      "userdata": "d14225eaaa2e9d5a21b49eab6b6c433cc3b3b33fcb674527a520adcf9c0d8c96"
+    },
+    "seed_manifest_file_sha256": "d09eb40cb246f8a9a3f3f37234e65e926a086b02ef4276614c720c242aa42ddc",
+    "mutable_runtime_cache_or_used_case_as_seed": false,
+    "E5_cache_mode": "Same copied warm cache content, isolated per case and writable; not empty or disabled",
+    "legacy_Hookshot_compiled_pipeline_cache_imported": false
+  },
+  "cache_and_JIT_scope": {
+    "canonical_original_cache_words_preserved_by_audited_source": true,
+    "independent_post_run_cache_payload_decode": false,
+    "actual_selected_module_identity_observed_separately": true,
+    "canonical_cache_digest_is_not_native_candidate_identity_proof": true,
+    "complete_cache_or_JIT_runtime_validation": false
+  },
+  "actual_settings": {
+    "selected_values_equal_across_cases": true,
+    "game_speed": {
+      "value": 0,
+      "meaning": "Per frame"
+    },
+    "frame_rate_cap": {
+      "value": 0,
+      "meaning": "Console default cap"
+    },
+    "frame_generation": {
+      "value": 0,
+      "meaning": "Off"
+    },
+    "output_resolution": "2048x1152 (game's)",
+    "profile": "Docked",
+    "upscaler": "AMD FSR 3.1",
+    "render_resolution": "Auto (dynamic)",
+    "mesh_shaders": "Automatic",
+    "motion_controls": "On (no controller)",
+    "complete_option_replies_kept_privately": true
+  },
+  "script_scope": {
+    "script": "4:A,6:A,8:A,10:A,12:A,14:A,16:A",
+    "units": "Scripted seconds advanced by pinned native-present clock; not native frame indices",
+    "seven_press_parser_and_source_clock_rate_verified": true,
+    "last_hold_window_elapsed_after972_native_presents": true,
+    "at_least30_further_sampled_play_nonloading_nonstalled_native_presents_required": true,
+    "window_resets_on_missing_status_loading_menu_or_stall": true,
+    "configured_exclusive_persistent_policy": true,
+    "independent_injected_live_input_isolation": null,
+    "individual_applied_step_trace_available": false,
+    "control_status_exclusive_is_script_ownership_observation": false
+  },
+  "cases": [
+    {
+      "mode": "baseline0",
+      "integration_revision": 3,
+      "profile96_flag": "1",
+      "mesh_mode_control": "0",
+      "diagnostic_completed": true,
+      "identity_scope": "Selected modules and requested policies at CPU command recording; not executable-width/indirect-grid/output observation",
+      "identity_events_at_admission": 140,
+      "final_preserved_identity_events_validated": 146,
+      "global_identity_cap": 256,
+      "global_cap_exhausted": false,
+      "missing_target_defaults_to_incomplete": true,
+      "targets": [
+        {
+          "program": "d8e59341cf4f629c",
+          "variant": "0c8f08626a9d98a4",
+          "rows_at_admission": 70,
+          "final_preserved_rows_validated": 73,
+          "all_final_rows_unique_and_exact": true,
+          "selected_stages": [
+            {
+              "index": 0,
+              "nvn_stage": 7,
+              "vk_stage": 128,
+              "spirv": {
+                "sha256": "835aa59799c6ecb621034d946e2fa4eadb1aa2407d293321ae3e3052882bc9b3",
+                "word_count": 42939
+              },
+              "subgroup_request": {
+                "required_size": 32,
+                "require_full_subgroups": false
+              },
+              "driver_selected_simd_width": null
+            },
+            {
+              "index": 1,
+              "nvn_stage": 1,
+              "vk_stage": 16,
+              "spirv": {
+                "sha256": "569b378a012388d711a115030bd1f41af66d38aebb645118baacd1e90a8f5a3a",
+                "word_count": 29766
+              },
+              "subgroup_request": {
+                "required_size": null,
+                "require_full_subgroups": false
+              },
+              "driver_selected_simd_width": null
+            }
+          ],
+          "application_revision_receipt": null,
+          "application_profile96_receipt": null,
+          "application_shared_bytes_receipt": null,
+          "GPU_generated_indirect_grid": null,
+          "GPU_executed_draw_count": null,
+          "stage_output_contents_captured": false,
+          "observed_attachments": {
+            "width": 1536,
+            "height": 864,
+            "sample_count_flag": 1,
+            "depth_format": 126,
+            "color_formats": [
+              122
+            ]
+          }
+        },
+        {
+          "program": "68642bb810ee3e7c",
+          "variant": "3f3f5b29054673da",
+          "rows_at_admission": 70,
+          "final_preserved_rows_validated": 73,
+          "all_final_rows_unique_and_exact": true,
+          "selected_stages": [
+            {
+              "index": 0,
+              "nvn_stage": 7,
+              "vk_stage": 128,
+              "spirv": {
+                "sha256": "999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93",
+                "word_count": 62106
+              },
+              "subgroup_request": {
+                "required_size": 32,
+                "require_full_subgroups": false
+              },
+              "driver_selected_simd_width": null
+            },
+            {
+              "index": 1,
+              "nvn_stage": 1,
+              "vk_stage": 16,
+              "spirv": {
+                "sha256": "3de1d79c321db3863dbb07de0d3fa0cdb126d72c07c2f1d70f0514eda3611b10",
+                "word_count": 16083
+              },
+              "subgroup_request": {
+                "required_size": null,
+                "require_full_subgroups": false
+              },
+              "driver_selected_simd_width": null
+            }
+          ],
+          "application_revision_receipt": null,
+          "application_profile96_receipt": null,
+          "application_shared_bytes_receipt": null,
+          "GPU_generated_indirect_grid": null,
+          "GPU_executed_draw_count": null,
+          "stage_output_contents_captured": false,
+          "observed_attachments": {
+            "width": 1536,
+            "height": 864,
+            "sample_count_flag": 1,
+            "depth_format": 126,
+            "color_formats": [
+              122
+            ]
+          }
+        }
+      ],
+      "source_matched_pipeline_device_or_background_job_error_observed": false,
+      "baseline_retention_used_as_candidate_recovery": false,
+      "actual_renderer_and_ICD_path_device_inode_and_hash_attested": true,
+      "all_frozen_hash_and_identity_pins_match_before_after": true,
+      "controlled_environment_and_common_seeds_match_after": true,
+      "native_world_window": {
+        "first_native_frame": 1047,
+        "last_native_frame": 1080,
+        "native_frame_delta": 33,
+        "scope": "Sampled play/nonloading status; not a complete deterministic frame producer"
+      },
+      "control_status_native_frame": 1080,
+      "control_shot_reply_native_frame": 1082,
+      "control_shot_reply_present": 1081,
+      "observed_state": "play",
+      "observed_map": "KokiriForest_Child",
+      "observed_game": {
+        "age": "child",
+        "event": false,
+        "loading": false
+      },
+      "PNG_dimensions": [
+        2048,
+        1152
+      ],
+      "PNG_sha256": "de591bcb28de7f4c91ae5bda6d82b2a1946d664e1e6bfdbf9c423e47065cedbb",
+      "image_capture_completed": true,
+      "single_image_parent_review": {
+        "broad_world_and_Link_visible": true,
+        "HUD_and_minimap_visible": true,
+        "dark_flat_shapes_visible": true,
+        "native_quality_accepted": false,
+        "matched_temporal_UI_state": false
+      },
+      "known_startup_network_omission_count": 10,
+      "owned_process_stopped_and_reaped": true,
+      "forced_kill": false,
+      "termination_kind": "Planned termination of owned process after bounded diagnostic",
+      "private_artifact_sha256": {
+        "runtime_result": "cdce4df29ad0f271f69b34663649b4cc2a0ec6bce85d5af3fb2260a7177b76c1",
+        "terminal_receipt": "a11a8139aa0a661ef3ee109d19c69a12f3c1af34e54055ae42a7dd8a63ab00b3",
+        "all_final_identity_rows": "a54b099c75b0f8e3fbde9fb5ce1ee60a799a2159b3d770677576385f79cf44ce",
+        "actual_settings_reply": "16fd91c5ad0528171a77fb41bc84250c6ec8273e5dd301bdf032980203ec9758",
+        "initial_process_maps": "ce617bbe355f43ca0400477c8c567aa408071669e4e27eaebf338c1e2bebb501",
+        "final_process_maps": "0cd0700cae82e12e2caa263123293580a83d543935f2562a50037e2536ba846d",
+        "raw_log": "6db233778ebe6390e79c3bb00ccfff95698a8057c4cb3cda1779caa33a1dc07f"
+      }
+    },
+    {
+      "mode": "candidate8",
+      "integration_revision": 3,
+      "profile96_flag": "1",
+      "mesh_mode_control": "8",
+      "diagnostic_completed": true,
+      "identity_scope": "Selected modules and requested policies at CPU command recording; not executable-width/indirect-grid/output observation",
+      "identity_events_at_admission": 130,
+      "final_preserved_identity_events_validated": 136,
+      "global_identity_cap": 256,
+      "global_cap_exhausted": false,
+      "missing_target_defaults_to_incomplete": true,
+      "targets": [
+        {
+          "program": "d8e59341cf4f629c",
+          "variant": "0c8f08626a9d98a4",
+          "rows_at_admission": 65,
+          "final_preserved_rows_validated": 68,
+          "all_final_rows_unique_and_exact": true,
+          "selected_stages": [
+            {
+              "index": 0,
+              "nvn_stage": 7,
+              "vk_stage": 128,
+              "spirv": {
+                "sha256": "8754612a7395d1f804d4e56a7c18cb5a6f23ed2e02f01879cbc51bd108682de0",
+                "word_count": 44043
+              },
+              "subgroup_request": {
+                "required_size": 8,
+                "require_full_subgroups": false
+              },
+              "driver_selected_simd_width": null
+            },
+            {
+              "index": 1,
+              "nvn_stage": 1,
+              "vk_stage": 16,
+              "spirv": {
+                "sha256": "569b378a012388d711a115030bd1f41af66d38aebb645118baacd1e90a8f5a3a",
+                "word_count": 29766
+              },
+              "subgroup_request": {
+                "required_size": null,
+                "require_full_subgroups": false
+              },
+              "driver_selected_simd_width": null
+            }
+          ],
+          "application_revision_receipt": 3,
+          "application_profile96_receipt": 1,
+          "application_shared_bytes_receipt": 14612,
+          "GPU_generated_indirect_grid": null,
+          "GPU_executed_draw_count": null,
+          "stage_output_contents_captured": false,
+          "observed_attachments": {
+            "width": 1536,
+            "height": 864,
+            "sample_count_flag": 1,
+            "depth_format": 126,
+            "color_formats": [
+              122
+            ]
+          }
+        },
+        {
+          "program": "68642bb810ee3e7c",
+          "variant": "3f3f5b29054673da",
+          "rows_at_admission": 65,
+          "final_preserved_rows_validated": 68,
+          "all_final_rows_unique_and_exact": true,
+          "selected_stages": [
+            {
+              "index": 0,
+              "nvn_stage": 7,
+              "vk_stage": 128,
+              "spirv": {
+                "sha256": "43434b023ff17ee4b92ed8e49f19c937c86f15cf31a7034161dd11878f944099",
+                "word_count": 63210
+              },
+              "subgroup_request": {
+                "required_size": 8,
+                "require_full_subgroups": false
+              },
+              "driver_selected_simd_width": null
+            },
+            {
+              "index": 1,
+              "nvn_stage": 1,
+              "vk_stage": 16,
+              "spirv": {
+                "sha256": "3de1d79c321db3863dbb07de0d3fa0cdb126d72c07c2f1d70f0514eda3611b10",
+                "word_count": 16083
+              },
+              "subgroup_request": {
+                "required_size": null,
+                "require_full_subgroups": false
+              },
+              "driver_selected_simd_width": null
+            }
+          ],
+          "application_revision_receipt": 3,
+          "application_profile96_receipt": 1,
+          "application_shared_bytes_receipt": 11412,
+          "GPU_generated_indirect_grid": null,
+          "GPU_executed_draw_count": null,
+          "stage_output_contents_captured": false,
+          "observed_attachments": {
+            "width": 1536,
+            "height": 864,
+            "sample_count_flag": 1,
+            "depth_format": 126,
+            "color_formats": [
+              122
+            ]
+          }
+        }
+      ],
+      "source_matched_pipeline_device_or_background_job_error_observed": false,
+      "baseline_retention_used_as_candidate_recovery": false,
+      "actual_renderer_and_ICD_path_device_inode_and_hash_attested": true,
+      "all_frozen_hash_and_identity_pins_match_before_after": true,
+      "controlled_environment_and_common_seeds_match_after": true,
+      "native_world_window": {
+        "first_native_frame": 1051,
+        "last_native_frame": 1083,
+        "native_frame_delta": 32,
+        "scope": "Sampled play/nonloading status; not a complete deterministic frame producer"
+      },
+      "control_status_native_frame": 1083,
+      "control_shot_reply_native_frame": 1085,
+      "control_shot_reply_present": 1084,
+      "observed_state": "play",
+      "observed_map": "KokiriForest_Child",
+      "observed_game": {
+        "age": "child",
+        "event": false,
+        "loading": false
+      },
+      "PNG_dimensions": [
+        2048,
+        1152
+      ],
+      "PNG_sha256": "10e8eba9d1078d5f1c0cd57328cfc257faa59eda999eca904edc648706d852f3",
+      "image_capture_completed": true,
+      "single_image_parent_review": {
+        "broad_world_and_Link_visible": true,
+        "HUD_and_minimap_visible": false,
+        "dark_flat_shapes_visible": true,
+        "native_quality_accepted": false,
+        "matched_temporal_UI_state": false
+      },
+      "known_startup_network_omission_count": 10,
+      "owned_process_stopped_and_reaped": true,
+      "forced_kill": false,
+      "termination_kind": "Planned termination of owned process after bounded diagnostic",
+      "private_artifact_sha256": {
+        "runtime_result": "aadd87b304e32845d4b868cad209d96a7f089e73cbcf1731efa219746052135f",
+        "terminal_receipt": "ff2c5bc1fcfa2d284491698d94a149d6ced028fc130a44087f9bfb8778d88424",
+        "all_final_identity_rows": "c9715437bd6b334dc48d62d4268b5a9052873a16e750d363b3fd70769ee17757",
+        "actual_settings_reply": "2431fe5783139932817b81e22cf79f433f6d1880d3fd5caaa971a72de7cba5b4",
+        "initial_process_maps": "1853c4ca4c4e5e3aee3f312fd7a94b57c0e402d45dfc069269576e0c872e4bf0",
+        "final_process_maps": "fc189d1edcc2a4fb08a8b12422a2adc9864d2592c813687b63ab48b519b7f49e",
+        "raw_log": "a217cf598175f6d20f9cf34f68269f7b016289ea46e8407da0744745f1cfae2a"
+      }
+    },
+    {
+      "mode": "candidate16",
+      "integration_revision": 3,
+      "profile96_flag": "1",
+      "mesh_mode_control": "16",
+      "diagnostic_completed": true,
+      "identity_scope": "Selected modules and requested policies at CPU command recording; not executable-width/indirect-grid/output observation",
+      "identity_events_at_admission": 136,
+      "final_preserved_identity_events_validated": 142,
+      "global_identity_cap": 256,
+      "global_cap_exhausted": false,
+      "missing_target_defaults_to_incomplete": true,
+      "targets": [
+        {
+          "program": "d8e59341cf4f629c",
+          "variant": "0c8f08626a9d98a4",
+          "rows_at_admission": 68,
+          "final_preserved_rows_validated": 71,
+          "all_final_rows_unique_and_exact": true,
+          "selected_stages": [
+            {
+              "index": 0,
+              "nvn_stage": 7,
+              "vk_stage": 128,
+              "spirv": {
+                "sha256": "8754612a7395d1f804d4e56a7c18cb5a6f23ed2e02f01879cbc51bd108682de0",
+                "word_count": 44043
+              },
+              "subgroup_request": {
+                "required_size": 16,
+                "require_full_subgroups": false
+              },
+              "driver_selected_simd_width": null
+            },
+            {
+              "index": 1,
+              "nvn_stage": 1,
+              "vk_stage": 16,
+              "spirv": {
+                "sha256": "569b378a012388d711a115030bd1f41af66d38aebb645118baacd1e90a8f5a3a",
+                "word_count": 29766
+              },
+              "subgroup_request": {
+                "required_size": null,
+                "require_full_subgroups": false
+              },
+              "driver_selected_simd_width": null
+            }
+          ],
+          "application_revision_receipt": 3,
+          "application_profile96_receipt": 1,
+          "application_shared_bytes_receipt": 14612,
+          "GPU_generated_indirect_grid": null,
+          "GPU_executed_draw_count": null,
+          "stage_output_contents_captured": false,
+          "observed_attachments": {
+            "width": 1536,
+            "height": 864,
+            "sample_count_flag": 1,
+            "depth_format": 126,
+            "color_formats": [
+              122
+            ]
+          }
+        },
+        {
+          "program": "68642bb810ee3e7c",
+          "variant": "3f3f5b29054673da",
+          "rows_at_admission": 68,
+          "final_preserved_rows_validated": 71,
+          "all_final_rows_unique_and_exact": true,
+          "selected_stages": [
+            {
+              "index": 0,
+              "nvn_stage": 7,
+              "vk_stage": 128,
+              "spirv": {
+                "sha256": "43434b023ff17ee4b92ed8e49f19c937c86f15cf31a7034161dd11878f944099",
+                "word_count": 63210
+              },
+              "subgroup_request": {
+                "required_size": 16,
+                "require_full_subgroups": false
+              },
+              "driver_selected_simd_width": null
+            },
+            {
+              "index": 1,
+              "nvn_stage": 1,
+              "vk_stage": 16,
+              "spirv": {
+                "sha256": "3de1d79c321db3863dbb07de0d3fa0cdb126d72c07c2f1d70f0514eda3611b10",
+                "word_count": 16083
+              },
+              "subgroup_request": {
+                "required_size": null,
+                "require_full_subgroups": false
+              },
+              "driver_selected_simd_width": null
+            }
+          ],
+          "application_revision_receipt": 3,
+          "application_profile96_receipt": 1,
+          "application_shared_bytes_receipt": 11412,
+          "GPU_generated_indirect_grid": null,
+          "GPU_executed_draw_count": null,
+          "stage_output_contents_captured": false,
+          "observed_attachments": {
+            "width": 1536,
+            "height": 864,
+            "sample_count_flag": 1,
+            "depth_format": 126,
+            "color_formats": [
+              122
+            ]
+          }
+        }
+      ],
+      "source_matched_pipeline_device_or_background_job_error_observed": false,
+      "baseline_retention_used_as_candidate_recovery": false,
+      "actual_renderer_and_ICD_path_device_inode_and_hash_attested": true,
+      "all_frozen_hash_and_identity_pins_match_before_after": true,
+      "controlled_environment_and_common_seeds_match_after": true,
+      "native_world_window": {
+        "first_native_frame": 1018,
+        "last_native_frame": 1051,
+        "native_frame_delta": 33,
+        "scope": "Sampled play/nonloading status; not a complete deterministic frame producer"
+      },
+      "control_status_native_frame": 1051,
+      "control_shot_reply_native_frame": 1054,
+      "control_shot_reply_present": 1053,
+      "observed_state": "play",
+      "observed_map": "KokiriForest_Child",
+      "observed_game": {
+        "age": "child",
+        "event": false,
+        "loading": false
+      },
+      "PNG_dimensions": [
+        2048,
+        1152
+      ],
+      "PNG_sha256": "85897e5e6029150efc75a2a34f11b9711511bb15ee209c9389e5ab85e46c497c",
+      "image_capture_completed": true,
+      "single_image_parent_review": {
+        "broad_world_and_Link_visible": true,
+        "HUD_and_minimap_visible": true,
+        "dark_flat_shapes_visible": true,
+        "native_quality_accepted": false,
+        "matched_temporal_UI_state": false
+      },
+      "known_startup_network_omission_count": 10,
+      "owned_process_stopped_and_reaped": true,
+      "forced_kill": false,
+      "termination_kind": "Planned termination of owned process after bounded diagnostic",
+      "private_artifact_sha256": {
+        "runtime_result": "4fde27762eea02ae50179754df56dad5375652036f7101157abe44c50b9746fe",
+        "terminal_receipt": "0d700f5822a27bff1517d3e28bb7132e21d44c63ef8f4a27f8c08ede1af36f91",
+        "all_final_identity_rows": "eaabf062484764f32475346466c7bda0d0911ba8c98dc9f2972ffdc43a30756b",
+        "actual_settings_reply": "3d9e6fe1d66ae9199f6c357597b5be82181cfc94b2f4a44fc46befe170ff8399",
+        "initial_process_maps": "855ef72e2031ad290c8e0a85a68bd864df939128e53fce185932b9f3b8b5bcf1",
+        "final_process_maps": "19c47d82783ad6cf2f58f003933b61707690d5f941b83ce5f529131721e97a33",
+        "raw_log": "63d49b797343d9df1841e98613438af64d2a7613af07de0c7b7cff36118d4b13"
+      }
+    }
+  ],
+  "image_scope": {
+    "full_control_PNG": [
+      2048,
+      1152
+    ],
+    "headless_presentation": [
+      1920,
+      1080
+    ],
+    "target_attachments": [
+      1536,
+      864
+    ],
+    "PNG_dimensions_do_not_certify_native_scene_resolution": true,
+    "same_temporal_UI_camera_state_established": false,
+    "visual_question": "Flat dark shapes appear in baseline and both candidates; their cause is unknown and is not established as a new lowering defect. Broad scene/Link are visible; HUD/minimap differ between captures.",
+    "console_reference_or_pixel_equivalence_established": false
+  },
+  "native_quality_gaps": [
+    "Ten startup movie-network programs remain policy omissions.",
+    "FSR 3.1 replaces native gameplay reconstruction in these settings.",
+    "Dark-shape cause, hair/foliage coverage, materials, motion and sampling fidelity remain unisolated.",
+    "Single broad-scene images and selected module metadata do not certify all native features or temporal behavior."
+  ],
+  "acceptance": {
+    "bounded_dual_target_module_and_requested_policy_identity_diagnostics_completed": true,
+    "all_three_owned_processes_stopped_and_reaped": true,
+    "GPU_lease_released": true,
+    "actual_live_executable_SIMD_width_observed": false,
+    "GPU_generated_indirect_grid_captured": false,
+    "selected_target_GPU_outputs_compared": false,
+    "matched_deterministic_workload_established": false,
+    "all_native_features_and_quality_accepted": false,
+    "pixel_or_temporal_equivalence_accepted": false,
+    "performance_run": false,
+    "benchmark_eligible": false,
+    "performance_gain_established": false,
+    "independently_injected_live_input_isolation_established": false
+  },
+  "references": [
+    "docs/native-mesh-profile96-lowering.md",
+    "research/native-mesh-profile96-lowering.json",
+    "research/native-mesh-profile96-codegen-observation.json",
+    "research/native-mesh-profile96-instrumentation-correspondence.json",
+    "research/native-mesh-replay-e5-observation.json",
+    "research/native-renderer-v2-e5-pilot.json",
+    "research/native-network-restoration.md"
+  ]
+}

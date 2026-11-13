@@ -1,0 +1,60 @@
+{
+  "schema": "open-ocarina.compute-interval-record-core-observation/v1",
+  "status": "CPU-only owned-graph record core; live extraction unimplemented",
+  "source": {
+    "header": "src/probes/compute_interval_records.h",
+    "header_sha256": "eec1960f1c3a8df33d0c9ccbb70f8a01037713c912317bb705e87b8aae7bc88b",
+    "tests": "tests/test_compute_interval_records_cpp.py",
+    "tests_sha256": "d7e49bbb1b05aa0575f8614d715bfcd9fa45d99f17b88ed6beeb3189acdef058",
+    "language": "C++17",
+    "third_party_dependencies": []
+  },
+  "target": {
+    "program": "cc62764061c44f6a",
+    "variant": "095931037888515a",
+    "original_spirv_sha256": "b9af52c0ba07f64eb8b0ca2905c432d094999fdf669aa95182ff7754b510e97b",
+    "preserved_python_tool_sha256": "3176a7e0130b5d722a88fdb2d5ab9512fff4afecf78e10828eb6747b38ca00ca",
+    "preserved_candidate_sha256": "d5148342b4517882b25a48e63700cbfb8695454cc05d131da718509ac2563dc0",
+    "owned_manifest_sha256": "4c4b5fcaf73318b8edc08406a58e39a2702544f86183e7d894455e7d363206b9",
+    "ubo0_visible_bytes": 2224,
+    "ubo0_visible_sha256": "778a893b3523a792183d46f8d8e0e0d517e3957b808cdea2be97294b3b008bcf"
+  },
+  "record_result": {
+    "bytes": 592,
+    "sha256": "49da4bdc0c4542b4fef7b5dcbb631d41fb030d80803cde3bb37185722daf9770",
+    "matches_frozen_python_bytes": true,
+    "new_binding": 12,
+    "header_bytes": 16,
+    "row_bytes": 48,
+    "accessor_widths": [4, 16],
+    "rows_per_width": [6, 6],
+    "complete_uint64_selection_cells_per_width": [13, 13],
+    "identity_compared": ["StorageBuffer binding", "descriptor element", "aligned guest base"],
+    "nearest_phase": false
+  },
+  "cpu_validation": {
+    "new_synthetic_tests": 15,
+    "deterministic_mixed_complete_domain_cases": 160,
+    "gcc": "16.2.1",
+    "clang_ubsan": "22.1.8",
+    "sanitizer_tests": 15,
+    "sanitizer_failures": 0,
+    "gcc_test_transport_binary_sha256": "ad8b48d7325c788a794461dbc922dc901a1f03dde3553220b0217f8065684dde",
+    "clang_ubsan_test_transport_binary_sha256": "3270a535a05e8c7cfe9d35f519087f52fe817d2a2beefcd7559d2e48755c9b41",
+    "full_suite_tests": 663,
+    "full_suite_optional_skips": 5,
+    "full_suite_passed": true
+  },
+  "evidence_limits": [
+    "Owner/generation/range/lease inputs are consistency checked, not authenticated as actual live renderer facts",
+    "Frozen-graph calculation uses explicit fresh diagnostic lease positions, not original live completion or retention claims",
+    "Module digest is a required identity input; the C++ core does not independently hash or audit submitted SPIR-V bytes",
+    "Live extraction and completeness of its possible-write inventory are unimplemented",
+    "Unspecified and live modes are rejected",
+    "No shader or pipeline compilation, GPU execution, performance measurement or renderer binding mutation"
+  ],
+  "gpu_calls": false,
+  "renderer_changed": false,
+  "live_execution_admitted": false,
+  "production_feature_enabled": false
+}
