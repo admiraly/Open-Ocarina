@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Prepare bounded native-mesh logical-output replay; GPU execution is explicit.
 
-Only the two audited d8 source modules or the independent instrumenter fixture
-can enter preparation. A prepared-plan SHA-256 pins every execution artifact.
+Only exact audited source pairs for an explicit mesh profile, or independently
+authored fixtures, can enter preparation. Plan hashes pin execution artifacts.
 """
 from __future__ import annotations
 
@@ -21,13 +21,14 @@ import sys
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from tools import mesh_output_instrument as instrumenter
+from tools import mesh_output_profile96 as instrumenter96
 from tools.compile_probe import driver_identity, private_output
 from tools.graphics_compile_probe import controlled_driver_environment, reflect_stage
 from tools.mesh_mapping_probe import BUILD_FLAGS, digest, environment, ensure_no_games, run_process
 from tools.replay_contract import _identifier, _integer, _json, _object, _snapshot
 
 ROOT = Path(__file__).resolve().parents[1]
-SCHEMA = "open-ocarina.prepared-native-mesh-replay/v1"
+SCHEMA = "open-ocarina.prepared-native-mesh-replay/v2"
 CAPTURE_SCHEMA = "open-ocarina.mesh-logical-input/v1"
 COVERAGE_SCHEMA = "open-ocarina.mesh-logical-coverage/v1"
 ORIGINAL = "835aa59799c6ecb621034d946e2fa4eadb1aa2407d293321ae3e3052882bc9b3"
@@ -39,6 +40,16 @@ APPROVED_MODULES = {
     "synthetic-fixture": ("7cf8f030615526b4dc2025114a547a07be7c764f7ece3cc044aece6f9dcf13a8",
                           "e548e6d40320c28f1156e8c910fa64ee6f87b936cba15856b41648295b5828fa")}
 AUDITED_DRIVER = "5ea19ac96aa52d061ecf2b8e23df7ed3d7d3b36c7d2ae7fe62f01c5a9b610aaa"
+DRIVER_PROFILES = {
+    "legacy-5ea": {"library_sha256": AUDITED_DRIVER, "icd_sha256": None, "policies": ("diagnostic", "runtime")},
+    "cache-safe-e5": {"library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+                      "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+                      "policies": ("native-safe",)}}
+D8_PROFILE = "d8-position9-128/v1"
+PROFILE96 = "6864-position10-96/v1"
+DEPENDENCY_SOURCES = ("tools/mesh_replay.py", "tools/vulkan_mesh_replay.c", "tools/mesh_output_instrument.py",
+                      "tools/mesh_output_profile96.py", "tools/graphics_compile_probe.py", "tools/mesh_mapping_probe.py",
+                      "tools/compile_probe.py", "tools/replay_contract.py", "tools/spirv_contract.py")
 RECORD_BYTES = 44928
 MAX_BYTES = 1024**3
 MAX_VIEW = 512 * 1024**2
@@ -56,6 +67,53 @@ LAYOUT = {"stride_bytes": 44928, "stride_words": 11232, "prefix_guard_offset": 0
           "writtenness_initial_word": 0, "writtenness_written_word": 1}
 
 
+def output_profile(name):
+    if name == D8_PROFILE:
+        return {"id": name, "schema": SCHEMA, "result_schema": "open-ocarina.native-mesh-replay-result/v2",
+                "capture_schema": CAPTURE_SCHEMA, "coverage_schema": COVERAGE_SCHEMA,
+                "program": "d8e59341cf4f629c", "variant": "0c8f08626a9d98a4", "layout": LAYOUT,
+                "magic": MAGIC, "engine": instrumenter, "engine_sha256": INSTRUMENTER,
+                "report_schema": "open-ocarina.mesh-output-instrument/v1", "modules": APPROVED_MODULES,
+                "bindings": EXPECTED_BINDINGS, "ubo_count": 5, "kind": "captured-d8"}
+    if name == PROFILE96:
+        return {"id": name, "schema": "open-ocarina.prepared-native-mesh-replay96/v1",
+                "result_schema": "open-ocarina.native-mesh-replay96-result/v1",
+                "capture_schema": "open-ocarina.mesh-input-profile96/v1",
+                "coverage_schema": "open-ocarina.mesh-logical-coverage96/v1",
+                "program": "68642bb810ee3e7c", "variant": "3f3f5b29054673da", "layout": instrumenter96.LAYOUT,
+                "magic": b"OOMESH96", "engine": instrumenter96,
+                "engine_sha256": "4619e081b652b9ed1b72820a22d1948907196b08de05a10cefebd15703f42f09",
+                "report_schema": "open-ocarina.mesh-output-profile96/v1",
+                "modules": {
+                    "original": ("999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93",
+                                 "2d0bd1c6dfb72398a30c6ad4539be01dae27fbc1c92e963de2b2e3db9c381682"),
+                    "conditional": ("a41c6df753f30f8c0646ffa45227304e994b3fbaccdcad64927cd57f5e2327e7",
+                                    "8e10dad18d4b674df682ee03c00b507457de8c691d4e72f85919ce056128e573"),
+                    "synthetic-fixture": ("1944ea426326138609f4fbcbdace60ad34cd4c5d8091235c8469036d44c6b162",
+                                          "9453c1a003e070a69e2dd7462aa6ef0de5c433a91e0976fffa45da9bb70cf3a7")},
+                "bindings": [(0, binding, element, 6 if binding < 4 else 7)
+                             for binding in range(9) for element in range(3 if binding == 8 else 1)],
+                "ubo_count": 4, "kind": "captured-6864"}
+    raise ValueError("Unknown explicit mesh output profile")
+
+
+def validate_driver_profile(name, policy):
+    if not isinstance(name, str) or name not in DRIVER_PROFILES or policy not in DRIVER_PROFILES[name]["policies"]:
+        raise ValueError("Unknown or incompatible driver profile/compiler policy")
+    result = {"name": name, "library_sha256": DRIVER_PROFILES[name]["library_sha256"],
+              "icd_sha256": DRIVER_PROFILES[name]["icd_sha256"], "policy": policy}
+    _, controls = controlled_driver_environment(policy, {})
+    if name == "cache-safe-e5":
+        active = {key: value for key, value in controls["controlled_options"].items() if value is not None}
+        if policy != "native-safe" or active != {"HS_SPILL_BATCH": "1", "HS_PUSH_SHADOW": "1", "shader_spilling_rate": "1"}:
+            raise ValueError("Cache-safe E5 requires the exact named MAX-absent native-safe policy")
+    return result
+
+
+def dependency_hashes():
+    return {name: digest(ROOT / name) for name in DEPENDENCY_SOURCES}
+
+
 def triple(value, name, minimum=0):
     if not isinstance(value, list) or len(value) != 3:
         raise ValueError(f"{name} must have three dimensions")
@@ -69,39 +127,45 @@ def window(grid, origin, groups):
     return grid, origin, groups
 
 
-def initialized_capture(groups):
+def initialized_capture(groups, profile_id=D8_PROFILE):
+    layout = output_profile(profile_id)["layout"]
     count = math.prod(triple(groups, "window", 1))
     if count > 32:
         raise ValueError("Capture supports at most32 workgroups")
-    record = [SENTINEL] * (RECORD_BYTES // 4)
+    record = [SENTINEL] * layout["stride_words"]
     record[:16] = [INNER_GUARD] * 16
-    record[5712:11216] = [0] * 5504
-    record[11216:] = [INNER_GUARD] * 16
+    marker, suffix = layout["writtenness_offset"] // 4, layout["suffix_guard_offset"] // 4
+    record[marker:suffix] = [0] * layout["writtenness_words"]
+    record[suffix:] = [INNER_GUARD] * 16
     words = [OUTER_GUARD] * 16 + record * count + [OUTER_GUARD] * 16
     return struct.pack(f"<{len(words)}I", *words)
 
 
-def check_capture(data, groups):
+def check_capture(data, groups, profile_id=D8_PROFILE):
+    layout = output_profile(profile_id)["layout"]
+    stride, marker, suffix = layout["stride_words"], layout["writtenness_offset"] // 4, layout["suffix_guard_offset"] // 4
+    max_vertices, max_primitives = layout["max_vertices"], layout["max_primitives"]
+    vertex_components = max_vertices * 4 * (1 + len(layout["generic_locations"]))
     count = math.prod(triple(groups, "window", 1))
-    if not 1 <= count <= 32 or len(data) != RECORD_BYTES * count + 128:
+    if not 1 <= count <= 32 or len(data) != layout["stride_bytes"] * count + 128:
         raise ValueError("Capture byte extent differs from the full initialized buffer")
     words = struct.unpack(f"<{len(data) // 4}I", data)
     if words[:16] != (OUTER_GUARD,) * 16 or words[-16:] != (OUTER_GUARD,) * 16:
         raise ValueError("Outer capture guard changed")
     counts = []
     for group in range(count):
-        record = words[16 + group * 11232:16 + (group + 1) * 11232]
-        if record[:16] != (INNER_GUARD,) * 16 or record[11216:] != (INNER_GUARD,) * 16:
+        record = words[16 + group * stride:16 + (group + 1) * stride]
+        if record[:16] != (INNER_GUARD,) * 16 or record[suffix:] != (INNER_GUARD,) * 16:
             raise ValueError(f"Workgroup {group} inner capture guard changed")
         lane_rows = [record[16 + lane * 2:18 + lane * 2] for lane in range(32)]
         vertex_count, primitive_count = lane_rows[0]
-        if vertex_count != 128 or primitive_count > 128 or any(row != lane_rows[0] for row in lane_rows):
+        if vertex_count != max_vertices or primitive_count > max_primitives or any(row != lane_rows[0] for row in lane_rows):
             raise ValueError(f"Workgroup {group} missing/inconsistent/out-of-range per-lane output counts")
-        expected_markers = (1,) * (5120 + primitive_count * 3) + (0,) * ((128 - primitive_count) * 3)
-        if record[5712:11216] != expected_markers:
+        expected_markers = (1,) * (vertex_components + primitive_count * 3) + (0,) * ((max_primitives - primitive_count) * 3)
+        if record[marker:suffix] != expected_markers:
             raise ValueError(f"Workgroup {group} defined-component writtenness differs from output counts")
-        for primitive in range(128):
-            position = 5200 + primitive * 4
+        for primitive in range(max_primitives):
+            position = layout["triangle_offset"] // 4 + primitive * 4
             if record[position + 3] != SENTINEL:
                 raise ValueError(f"Workgroup {group} triangle padding changed")
             indices = record[position:position + 3]
@@ -163,20 +227,26 @@ def verify_overlap(bindings, views):
                     remaining -= length
 
 
-def capture_inputs(path, driver_policy, mode="historical-draw"):
+def capture_inputs(path, driver_policy, mode="historical-draw", profile_id=D8_PROFILE):
     """Keep historical closure separate from an explicitly chosen readonly graph."""
     if mode not in ("historical-draw", "frozen-logical-readonly"):
         raise ValueError("An explicit supported replay evidence mode is required")
+    profile = output_profile(profile_id)
     if path.is_symlink():
         raise ValueError("Capture manifest must not be a symlink")
     root = path.resolve().parent
     document = _json(path)
-    if not isinstance(document, dict) or document.get("schema") != CAPTURE_SCHEMA:
+    if not isinstance(document, dict) or document.get("schema") != profile["capture_schema"]:
         raise ValueError("Unsupported mesh logical input capture schema")
+    if profile_id == PROFILE96 and document.get("profile") != PROFILE96:
+        raise ValueError("Explicit profile96 capture identity is required")
+    if profile_id == PROFILE96 and any(document.get(name) is not False for name in
+            ("runtime_execution_authorized", "equivalence_proven", "replay_complete")):
+        raise ValueError("Profile96 producer flags must retain their explicit unproven/unauthorized state")
     event = document.get("event")
-    if not isinstance(event, dict) or event.get("program") != "d8e59341cf4f629c" or \
-            event.get("variant") != "0c8f08626a9d98a4" or event.get("spirv_sha256") != ORIGINAL:
-        raise ValueError("Captured event differs from the exact audited d8 mesh stage")
+    if not isinstance(event, dict) or event.get("program") != profile["program"] or \
+            event.get("variant") != profile["variant"] or event.get("spirv_sha256") != profile["modules"]["original"][0]:
+        raise ValueError("Captured event differs from the exact audited mesh profile")
     if mode == "historical-draw" and event.get("actual_site_confirmed") is not True:
         raise ValueError("Actual native command site was not confirmed")
     for name in ("selected_occurrence", "recording_sequence", "completed_recording_sequence", "recording_part", "logical_value"):
@@ -221,9 +291,9 @@ def capture_inputs(path, driver_policy, mode="historical-draw"):
         if offset + size >= 1 << 64:
             raise ValueError("Original descriptor range overflows")
         resolved.append({**row, "path": data_path})
-    if sorted(signature) != EXPECTED_BINDINGS:
-        raise ValueError("Descriptor slots differ from the audited d8 input layout")
-    chosen = {"kind": "captured-d8", "mode": mode, "event": event, "event_sha256": event_key, "grid": grid,
+    if sorted(signature) != profile["bindings"]:
+        raise ValueError("Descriptor slots differ from the audited profile input layout")
+    chosen = {"kind": profile["kind"], "output_profile": profile_id, "mode": mode, "event": event, "event_sha256": event_key, "grid": grid,
               "bindings": sorted(resolved, key=lambda row: (row["binding"], row["element"])),
               "source_manifest": path.resolve(), "source_manifest_sha256": digest(path),
               "source_features": document.get("features", {}),
@@ -236,7 +306,7 @@ def capture_inputs(path, driver_policy, mode="historical-draw"):
         return chosen
     coverage_path = _snapshot(root, document.get("coverage_evidence"), maximum=2 * 1024**2)
     evidence = _json(coverage_path)
-    if not isinstance(evidence, dict) or evidence.get("schema") != COVERAGE_SCHEMA or evidence.get("event_sha256") != event_key:
+    if not isinstance(evidence, dict) or evidence.get("schema") != profile["coverage_schema"] or evidence.get("event_sha256") != event_key:
         raise ValueError("Coverage certificate is missing or belongs to another complete event")
     required = ("ownership_complete", "cpu_writers_quiescent", "import_aliases_resolved", "ordered_gpu_before_snapshot")
     if any(evidence.get(name) is not True for name in required) or evidence.get("unresolved") != []:
@@ -279,19 +349,25 @@ def capture_inputs(path, driver_policy, mode="historical-draw"):
     return chosen
 
 
-def validate_instrumentation(report, module, expected_kind):
-    if report.get("schema") != "open-ocarina.mesh-output-instrument/v1" or report.get("source_kind") != expected_kind:
+def validate_instrumentation(report, module, expected_kind, profile_id=D8_PROFILE):
+    profile = output_profile(profile_id)
+    engine = profile["engine"]
+    if report.get("schema") != profile["report_schema"] or report.get("source_kind") != expected_kind:
         raise ValueError("Unexpected stage-preserving instrumentation profile")
+    if profile_id == PROFILE96 and (report.get("output_profile") != PROFILE96 or
+            report.get("frozen_infrastructure_sha256") != INSTRUMENTER or
+            report.get("resource_auditor_sha256") != digest(ROOT / "tools" / "spirv_contract.py")):
+        raise ValueError("Profile96 runtime audit/dependency identity differs")
     required = ("structural_validation_passed", "all_original_output_stores_preserved", "all_original_set_mesh_outputs_preserved",
                 "all_original_control_barriers_preserved", "original_input_bindings_readonly")
     if any(report.get(name) is not True for name in required) or report.get("original_push_constant_bytes") != 0:
         raise ValueError("Instrumentation did not establish the bounded readonly output contract")
-    approved_source, approved_module = APPROVED_MODULES[expected_kind]
+    approved_source, approved_module = profile["modules"][expected_kind]
     if report.get("source_module_sha256") != approved_source or report.get("instrumented_sha256") != approved_module or digest(module) != approved_module:
         raise ValueError("Module differs from the reviewed source/derivative digest pair")
-    if report.get("record_layout") != LAYOUT:
+    if report.get("record_layout") != profile["layout"]:
         raise ValueError("Instrumented record layout/module digest differs")
-    if report.get("instrumenter_source_sha256") != INSTRUMENTER or digest(Path(instrumenter.__file__)) != INSTRUMENTER:
+    if report.get("instrumenter_source_sha256") != profile["engine_sha256"] or digest(Path(engine.__file__)) != profile["engine_sha256"]:
         raise ValueError("Instrumenter source changed during preparation")
     if report.get("capture_descriptor") != {"set": 1, "binding": 0, "type": "storage_buffer"}:
         raise ValueError("Unexpected capture descriptor")
@@ -303,7 +379,7 @@ def validate_instrumentation(report, module, expected_kind):
     reflected = reflect_stage(module.read_bytes(), "mesh")
     if reflected["local_size"] != [32, 1, 1] or reflected["push_constant_bytes"] != 0:
         raise ValueError("Instrumented shader launch/push contract changed")
-    expected = [{"set": 0, "binding": binding, "type": 6 if binding < 5 else 7,
+    expected = [{"set": 0, "binding": binding, "type": 6 if binding < profile["ubo_count"] else 7,
                  "count": 3 if binding == 8 else 1} for binding in range(9)]
     expected += [{"set": 1, "binding": binding, "type": 7, "count": 1} for binding in (0, 1)]
     if reflected["bindings"] != expected:
@@ -318,7 +394,8 @@ def freeze_copy(source, destination, expected_sha256):
     destination.chmod(0o444)
 
 
-def write_native_plan(path, state, origin, groups):
+def write_native_plan(path, state, origin, groups, profile_id=D8_PROFILE):
+    profile = output_profile(profile_id)
     grid, origin, groups = window(state["grid"], origin, groups)
     unique, indices, descriptors = [], {}, []
     for row in state["bindings"]:
@@ -330,12 +407,12 @@ def write_native_plan(path, state, origin, groups):
             indices[key] = len(unique)
             unique.append(row)
         descriptors.append([0, row["binding"], row["element"], row["type"], indices[key], row["range_bytes"]])
-    initial = initialized_capture(groups)
+    initial = initialized_capture(groups, profile_id)
     if len(unique) > 11 or sum(row["range_bytes"] for row in unique) + len(initial) > MAX_BYTES:
         raise ValueError("Bounded replay input budget exceeded")
     with path.open("xb") as target:
         header = [1, len(unique), len(descriptors), 0, len(initial), 64, len(initial) - 128, *groups, *origin, *grid]
-        target.write(struct.pack("<8s16I", MAGIC, *header))
+        target.write(struct.pack("<8s16I", profile["magic"], *header))
         for row in unique:
             target.write(struct.pack("<I", row["range_bytes"]))
             sha = hashlib.sha256()
@@ -366,25 +443,30 @@ def build_helper(output):
 
 
 def prepare(output_path, *, capture=None, original=None, conditional=None, origin=None, groups=None,
-            fixture=False, mode=None, driver_policy="runtime", device=0, null_table_tail=False):
+            fixture=False, mode=None, driver_policy=None, driver_profile=None, profile_id=D8_PROFILE,
+            device=0, null_table_tail=False):
     """CPU-only preparation; even native plan checks stop before vkCreateInstance."""
     _integer(device, "device index", 0, 255)
+    profile = output_profile(profile_id)
+    engine = profile["engine"]
+    selected_driver = validate_driver_profile(driver_profile, driver_policy)
+    initial_dependencies = dependency_hashes()
     origin = [0, 0, 0] if origin is None else origin
     groups = [1, 1, 1] if groups is None else groups
     if fixture:
         if capture is not None or original is not None or conditional is not None or mode is not None:
             raise ValueError("The independent fixture cannot accept captured or arbitrary shader inputs")
-        state = {"kind": "synthetic-fixture", "mode": "synthetic-fixture", "event": None,
+        state = {"kind": "synthetic-fixture", "output_profile": profile_id, "mode": "synthetic-fixture", "event": None,
                  "grid": [512, 512, 512], "bindings": [], "historical_draw_reproduced": False}
     else:
         if null_table_tail:
             raise ValueError("Captured descriptor states cannot be overridden by fixture options")
         if capture is None or original is None or conditional is None or mode is None:
             raise ValueError("Real-module preparation requires capture, both pinned sources and an explicit evidence mode")
-        for path, expected in ((original, ORIGINAL), (conditional, CONDITIONAL)):
+        for path, expected in ((original, profile["modules"]["original"][0]), (conditional, profile["modules"]["conditional"][0])):
             if path.is_symlink() or not path.is_file() or not 20 <= path.stat().st_size <= 2 * 1024**2 or digest(path) != expected:
-                raise ValueError("Only the exact reviewed bounded original and conditional d8 sources are supported")
-        state = capture_inputs(capture, driver_policy, mode)
+                raise ValueError("Only the exact reviewed bounded original and conditional profile sources are supported")
+        state = capture_inputs(capture, driver_policy, mode, profile_id)
     window(state["grid"], origin, groups)
     output = private_output(output_path)
     output.mkdir(parents=True)
@@ -394,9 +476,9 @@ def prepare(output_path, *, capture=None, original=None, conditional=None, origi
         freeze_copy(source, output / name, sha256)
         retained.append(name)
     if fixture:
-        report = instrumenter.prepare_fixture(output / "original")
+        report = engine.prepare_fixture(output / "original")
         state["fixture_source_sha256"] = report["source_module_sha256"]
-        for _, binding, element, descriptor_type in EXPECTED_BINDINGS:
+        for _, binding, element, descriptor_type in profile["bindings"]:
             if null_table_tail and binding == 8 and element in (1, 2):
                 state["bindings"].append({"set": 0, "binding": binding, "element": element, "type": 7,
                                           "null_descriptor": True, "range_bytes": None, "snapshot": None,
@@ -413,16 +495,16 @@ def prepare(output_path, *, capture=None, original=None, conditional=None, origi
     else:
         modules = {}
         for name, source in (("original", original), ("conditional", conditional)):
-            report = instrumenter.prepare(source, output / name)
+            report = engine.prepare(source, output / name)
             modules[name] = (output / name / "instrumented.spv", report)
     for name, (module, report) in modules.items():
-        validate_instrumentation(report, module, "synthetic-fixture" if fixture else name)
+        validate_instrumentation(report, module, "synthetic-fixture" if fixture else name, profile_id)
     helper = build_helper(output)
-    input_info = write_native_plan(output / "inputs.bin", state, origin, groups)
+    input_info = write_native_plan(output / "inputs.bin", state, origin, groups, profile_id)
     if fixture:
-        expected_body = instrumenter.fixture_expected_capture(origin, groups)
-        expected = initialized_capture(groups)[:64] + expected_body + initialized_capture(groups)[-64:]
-        check_capture(expected, groups)
+        expected_body = engine.fixture_expected_capture(origin, groups)
+        expected = initialized_capture(groups, profile_id)[:64] + expected_body + initialized_capture(groups, profile_id)[-64:]
+        check_capture(expected, groups, profile_id)
         (output / "expected.bin").write_bytes(expected)
     cases = [{"name": "original32-a", "module": "original/instrumented.spv", "width": 32},
              {"name": "original32-b", "module": "original/instrumented.spv", "width": 32},
@@ -432,7 +514,7 @@ def prepare(output_path, *, capture=None, original=None, conditional=None, origi
     native_result = json.loads(run_process([str(helper), str(modules["original"][0]), str(output / "inputs.bin"),
                                            str(output / "unused-output.bin"), "32", str(device), "--validate"],
                                           environment(), output, "validate-native-plan", 15))
-    if native_result.get("gpu_executed") is not False or native_result.get("native_plan_validated") is not True:
+    if native_result.get("output_profile") != profile_id or native_result.get("gpu_executed") is not False or native_result.get("native_plan_validated") is not True:
         raise ValueError("Unexpected CPU-only native validation result")
     _, policy = controlled_driver_environment(driver_policy, {})
     artifacts = {}
@@ -440,16 +522,16 @@ def prepare(output_path, *, capture=None, original=None, conditional=None, origi
         if path.is_file() and path.suffix not in (".stdout", ".stderr", ".spvasm"):
             artifacts[path.relative_to(output).as_posix()] = {"size": path.stat().st_size, "sha256": digest(path)}
             path.chmod(0o555 if path == helper else 0o444)
-    sources = {"tools/mesh_replay.py": digest(Path(__file__)),
-               "tools/vulkan_mesh_replay.c": digest(ROOT / "tools" / "vulkan_mesh_replay.c"),
-               "tools/mesh_output_instrument.py": digest(Path(instrumenter.__file__))}
+    sources = dependency_hashes()
+    if sources != initial_dependencies:
+        raise ValueError("Correctness/execution dependency source changed during preparation")
     summary = {key: value for key, value in state.items() if key not in ("bindings", "source_manifest", "retained_artifacts")}
     summary["retained_artifacts"] = retained
     summary["bindings"] = [{key: value for key, value in row.items() if key != "path"} for row in state["bindings"]]
-    plan = {"schema": SCHEMA, "prepare_only": True, "gpu_executed": False, "mode": state["mode"],
+    plan = {"schema": profile["schema"], "output_profile": profile_id, "prepare_only": True, "gpu_executed": False, "mode": state["mode"],
             "kind": state["kind"], "origin": origin, "groups": groups, "native_grid": state["grid"],
             "device_index": device, "driver_policy": policy, "source_capture": summary,
-            "expected_driver_library_sha256": AUDITED_DRIVER,
+            "driver_profile": selected_driver, "expected_driver_library_sha256": selected_driver["library_sha256"],
             "artifacts": artifacts, "sources": sources, "cases": cases, "input_info": input_info,
             "instrumentation": {name: report for name, (_, report) in modules.items()},
             "helper_build_flags": BUILD_FLAGS, "native_plan_validation": native_result,
@@ -482,24 +564,28 @@ def checked_prepared(path, expected_sha256):
     if not isinstance(expected_sha256, str) or len(expected_sha256) != 64 or digest(manifest) != expected_sha256:
         raise ValueError("Prepared plan differs from the explicitly reviewed SHA-256")
     plan = _json(manifest)
-    if plan.get("schema") != SCHEMA or plan.get("prepare_only") is not True or plan.get("gpu_executed") is not False:
+    profile = output_profile(plan.get("output_profile"))
+    if plan.get("schema") != profile["schema"] or plan.get("prepare_only") is not True or plan.get("gpu_executed") is not False:
         raise ValueError("Unexpected prepared native-mesh replay plan")
+    selected_driver = validate_driver_profile(plan.get("driver_profile", {}).get("name"), plan.get("driver_policy", {}).get("name"))
+    if plan.get("driver_profile") != selected_driver or plan.get("expected_driver_library_sha256") != selected_driver["library_sha256"]:
+        raise ValueError("Prepared driver profile/hash/policy identity differs")
     window(plan["native_grid"], plan["origin"], plan["groups"])
     for name, artifact in plan["artifacts"].items():
         _snapshot(path, {"path": name, **artifact}, maximum=MAX_BYTES + 2 * 1024**2)
     for name, expected in plan["sources"].items():
-        if name not in ("tools/mesh_replay.py", "tools/vulkan_mesh_replay.c", "tools/mesh_output_instrument.py") or digest(ROOT / name) != expected:
+        if name not in DEPENDENCY_SOURCES or digest(ROOT / name) != expected:
             raise ValueError("Reviewed implementation source changed")
-    if set(plan["sources"]) != {"tools/mesh_replay.py", "tools/vulkan_mesh_replay.c", "tools/mesh_output_instrument.py"}:
+    if set(plan["sources"]) != set(DEPENDENCY_SOURCES):
         raise ValueError("Incomplete source identity graph")
-    if plan["kind"] not in ("synthetic-fixture", "captured-d8") or \
+    if plan["kind"] not in ("synthetic-fixture", profile["kind"]) or \
             (plan["kind"] == "synthetic-fixture") != (plan["mode"] == "synthetic-fixture"):
         raise ValueError("Prepared module kind and evidence mode disagree")
     expected_names = {"original"} if plan["kind"] == "synthetic-fixture" else {"original", "conditional"}
     if set(plan["instrumentation"]) != expected_names or plan["mode"] not in ("synthetic-fixture", "historical-draw", "frozen-logical-readonly"):
         raise ValueError("Unsupported prepared module/evidence profile")
     for name, report in plan["instrumentation"].items():
-        validate_instrumentation(report, path / name / "instrumented.spv", "synthetic-fixture" if plan["kind"] == "synthetic-fixture" else name)
+        validate_instrumentation(report, path / name / "instrumented.spv", "synthetic-fixture" if plan["kind"] == "synthetic-fixture" else name, profile["id"])
         if digest(path / name / "source.spv") != report["source_module_sha256"] or _json(path / name / "report.json") != report:
             raise ValueError("Prepared source/audit artifacts differ")
     expected_cases = [("original32-a", 32), ("original32-b", 32), ("conditional8", 8), ("conditional16", 16)]
@@ -509,6 +595,16 @@ def checked_prepared(path, expected_sha256):
         expected_module = "original/instrumented.spv" if case["width"] == 32 or plan["kind"] == "synthetic-fixture" else "conditional/instrumented.spv"
         if case["module"] != expected_module or case["module"] not in plan["artifacts"]:
             raise ValueError("Execution module is absent from the frozen artifact graph")
+    with (path / "inputs.bin").open("rb") as native:
+        header = native.read(72)
+    if len(header) != 72:
+        raise ValueError("Native control header is incomplete")
+    native_header = struct.unpack("<8s16I", header)
+    expected_capture_size = profile["layout"]["stride_bytes"] * math.prod(plan["groups"]) + 128
+    if native_header[0] != profile["magic"] or native_header[1] != 1 or native_header[5:8] != (expected_capture_size, 64, expected_capture_size - 128):
+        raise ValueError("Native control magic/profile/record extent differs")
+    if native_header[8:11] != tuple(plan["groups"]) or native_header[11:14] != tuple(plan["origin"]) or native_header[14:17] != tuple(plan["native_grid"]):
+        raise ValueError("Native control launch coordinates differ from the reviewed plan")
     if (path / "execution-started.json").exists() or (path / "execution-report.json").exists():
         raise ValueError("Prepared plan has already been used; choose a fresh preparation")
     return path, plan
@@ -516,8 +612,11 @@ def checked_prepared(path, expected_sha256):
 
 def execute(path, expected_sha256, driver):
     output, plan = checked_prepared(path, expected_sha256)
+    profile = output_profile(plan["output_profile"])
     identity = driver_identity(driver)
-    if identity["library_sha256"] != AUDITED_DRIVER or plan.get("expected_driver_library_sha256") != AUDITED_DRIVER:
+    selected_driver = plan["driver_profile"]
+    if identity["library_sha256"] != selected_driver["library_sha256"] or \
+            (selected_driver["icd_sha256"] is not None and identity["icd_sha256"] != selected_driver["icd_sha256"]):
         raise ValueError("Execution driver differs from the explicitly audited library")
     env, policy = controlled_driver_environment(plan["driver_policy"]["name"], environment())
     if policy != plan["driver_policy"]:
@@ -535,14 +634,14 @@ def execute(path, expected_sha256, driver):
         metadata = json.loads(run_process([str(output / "mesh-replay-helper"), str(output / case["module"]),
                                           str(output / "inputs.bin"), str(result_path), str(case["width"]),
                                           str(plan["device_index"])], env, output, case["name"], 30))
-        if metadata.get("gpu_executed") is not True or metadata.get("actual_width") != case["width"] or \
+        if metadata.get("output_profile") != profile["id"] or metadata.get("gpu_executed") is not True or metadata.get("actual_width") != case["width"] or \
                 metadata.get("requested_width") != case["width"] or metadata.get("executable_stage") != 128 or \
                 metadata.get("width_source") != "pipeline_executable_properties" or metadata.get("mesh_draw_calls") != 1 or \
                 metadata.get("draw_mesh_tasks") != plan["groups"] or metadata.get("origin") != plan["origin"] or \
                 metadata.get("input_bytes_unchanged") is not True or metadata.get("control_bytes_unchanged") is not True:
             raise ValueError("Native helper metadata differs from the reviewed bounded case")
         data = result_path.read_bytes()
-        validation = check_capture(data, plan["groups"])
+        validation = check_capture(data, plan["groups"], profile["id"])
         if plan["kind"] == "synthetic-fixture":
             compare_bytes((output / "expected.bin").read_bytes(), data)
         if reference is None:
@@ -550,8 +649,8 @@ def execute(path, expected_sha256, driver):
         else:
             compare_bytes(reference, data)
         observations.append({"case": case, "metadata": metadata, "capture": validation})
-    report = {"schema": "open-ocarina.native-mesh-replay-result/v1", "reviewed_plan_sha256": expected_sha256,
-              "kind": plan["kind"], "mode": plan["mode"], "driver": identity, "driver_policy": policy,
+    report = {"schema": profile["result_schema"], "output_profile": profile["id"], "reviewed_plan_sha256": expected_sha256,
+              "kind": plan["kind"], "mode": plan["mode"], "driver": identity, "driver_profile": selected_driver, "driver_policy": policy,
               "all_full_buffers_identical": True, "baseline_repeat_identical": True,
               "cases": observations, "historical_draw_reproduced": False, "real_game_rendering_equivalence": False,
               "conditional_transform_equivalence_proven": False, "fps_gain": False,
@@ -576,7 +675,9 @@ def main():
         command.add_argument("--output", type=Path, required=True)
         command.add_argument("--origin", type=parse_triple, default=[0, 0, 0])
         command.add_argument("--groups", type=parse_triple, default=[1, 1, 1])
-        command.add_argument("--driver-policy", choices=("diagnostic", "runtime"), default="runtime")
+        command.add_argument("--driver-policy", choices=("diagnostic", "runtime", "native-safe"), required=True)
+        command.add_argument("--driver-profile", choices=tuple(DRIVER_PROFILES), required=True)
+        command.add_argument("--profile-id", choices=(D8_PROFILE, PROFILE96), default=D8_PROFILE)
         command.add_argument("--device", type=int, default=0)
         if name == "fixture":
             command.add_argument("--null-table-tail", action="store_true", help="Exercise actual null-descriptor framing at binding8 elements1/2")

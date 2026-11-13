@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define RECORD_BYTES 44928u
 #define MAX_INPUTS 11u
 #define MAX_TOTAL_BYTES UINT64_C(1073741824)
 #define REQUIRE(x) do { if (!(x)) { fprintf(stderr, "Invalid bounded mesh plan: %s\n", #x); return 2; } } while (0)
@@ -73,6 +72,8 @@ typedef struct Descriptor { uint32_t binding, element, type, input, range; } Des
 typedef struct Plan {
     uint32_t input_count, descriptor_count, push_size, capture_size, capture_offset, capture_range;
     uint32_t groups[3], origin[3], grid[3];
+    uint32_t record_bytes, record_words, marker_word, suffix_word, max_vertices, max_primitives, ubo_count, vertex_output_components;
+    const char *output_profile;
     Input inputs[MAX_INPUTS];
     Descriptor descriptors[MAX_INPUTS];
     unsigned char push[128];
@@ -90,7 +91,20 @@ static int load_plan(const char *path, Plan *plan) {
     FILE *file = fopen(path, "rb");
     REQUIRE(file);
     unsigned char magic[8];
-    REQUIRE(fread(magic, 1, 8, file) == 8 && !memcmp(magic, "OOMESHR1", 8));
+    REQUIRE(fread(magic, 1, 8, file) == 8);
+    if (!memcmp(magic, "OOMESHR1", 8)) {
+        plan->record_bytes = 44928; plan->record_words = 11232;
+        plan->marker_word = 5712; plan->suffix_word = 11216;
+        plan->max_vertices = 128; plan->max_primitives = 128;
+        plan->ubo_count = 5; plan->vertex_output_components = 40;
+        plan->output_profile = "d8-position9-128/v1";
+    } else if (!memcmp(magic, "OOMESH96", 8)) {
+        plan->record_bytes = 36864; plan->record_words = 9216;
+        plan->marker_word = 4688; plan->suffix_word = 9200;
+        plan->max_vertices = 96; plan->max_primitives = 96;
+        plan->ubo_count = 4; plan->vertex_output_components = 44;
+        plan->output_profile = "6864-position10-96/v1";
+    } else REQUIRE(0);
     int bad = 0;
     REQUIRE(read32(file, &bad) == 1);
     plan->input_count = read32(file, &bad);
@@ -110,7 +124,7 @@ static int load_plan(const char *path, Plan *plan) {
                 plan->origin[i] < plan->grid[i] && plan->groups[i] <= plan->grid[i] - plan->origin[i]);
         groups *= plan->groups[i];
     }
-    REQUIRE(groups <= 32 && plan->capture_range == groups * RECORD_BYTES &&
+    REQUIRE(groups <= 32 && plan->capture_range == groups * plan->record_bytes &&
             plan->capture_offset == 64 && plan->capture_size == plan->capture_range + 128);
     uint64_t total = plan->capture_size;
     for (uint32_t i = 0; i < plan->input_count; ++i) {
@@ -133,6 +147,8 @@ static int load_plan(const char *path, Plan *plan) {
         descriptor->range = read32(file, &bad);
         REQUIRE(!bad && descriptor->binding < 9 && descriptor->element < 3 &&
                 (descriptor->type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER || descriptor->type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER));
+        REQUIRE(descriptor->type == (descriptor->binding < plan->ubo_count ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER : VK_DESCRIPTOR_TYPE_STORAGE_BUFFER) &&
+                (descriptor->binding == 8 || descriptor->element == 0));
         if (descriptor->input == UINT32_MAX) {
             REQUIRE(descriptor->binding == 8 && (descriptor->element == 1 || descriptor->element == 2) &&
                     descriptor->type == VK_DESCRIPTOR_TYPE_STORAGE_BUFFER && descriptor->range == 0);
@@ -163,12 +179,39 @@ static int load_plan(const char *path, Plan *plan) {
         uint32_t expected = 0xcdcdcdcdu;
         if (i < 16 || i >= plan->capture_size / 4 - 16) expected = 0xb0a7d123u;
         else {
-            uint32_t position = (i - 16) % (RECORD_BYTES / 4);
-            if (position < 16 || position >= 11216) expected = 0xa11ce55au;
-            else if (position >= 5712) expected = 0;
+            uint32_t position = (i - 16) % plan->record_words;
+            if (position < 16 || position >= plan->suffix_word) expected = 0xa11ce55au;
+            else if (position >= plan->marker_word) expected = 0;
         }
         REQUIRE(plan->capture[i] == expected);
     }
+    return 0;
+}
+
+static int validate_shader_profile(const uint32_t *code, size_t byte_count, const Plan *plan) {
+    size_t words = byte_count / 4, cursor = 5;
+    uint32_t entry = 0, entries = 0, local_sizes = 0, vertex_modes = 0, primitive_modes = 0;
+    while (cursor < words) {
+        uint32_t count = code[cursor] >> 16, opcode = code[cursor] & 0xffff;
+        REQUIRE(count && count <= words - cursor);
+        if (opcode == 15) { /* OpEntryPoint */
+            REQUIRE(count >= 5 && code[cursor + 1] == 5365 && code[cursor + 3] == 0x6e69616d && code[cursor + 4] == 0);
+            entry = code[cursor + 2]; ++entries;
+        } else if (opcode == 16) { /* OpExecutionMode */
+            REQUIRE(count >= 3 && entry && code[cursor + 1] == entry);
+            uint32_t mode = code[cursor + 2];
+            if (mode == 17) {
+                REQUIRE(count == 6 && code[cursor + 3] == 32 && code[cursor + 4] == 1 && code[cursor + 5] == 1);
+                ++local_sizes;
+            } else if (mode == 26) {
+                REQUIRE(count == 4 && code[cursor + 3] == plan->max_vertices); ++vertex_modes;
+            } else if (mode == 5270) {
+                REQUIRE(count == 4 && code[cursor + 3] == plan->max_primitives); ++primitive_modes;
+            }
+        } else if (opcode == 331) REQUIRE(0); /* OpExecutionModeId is outside both literal profiles. */
+        cursor += count;
+    }
+    REQUIRE(entries == 1 && local_sizes == 1 && vertex_modes == 1 && primitive_modes == 1);
     return 0;
 }
 
@@ -187,8 +230,11 @@ int main(int argc, char **argv) {
     size_t code_size = 0;
     uint32_t *code = read_file(argv[1], 20, 2 * 1024 * 1024, &code_size);
     REQUIRE(code && code[0] == 0x07230203 && code[1] == 0x00010600);
+    int shader_profile = validate_shader_profile(code, code_size, &plan);
+    if (shader_profile) return shader_profile;
     if (argc == 7) {
-        printf("{\"native_plan_validated\":true,\"gpu_executed\":false,\"input_buffers\":%u,\"descriptor_elements\":%u}\n",
+        printf("{\"output_profile\":"); json_string(plan.output_profile);
+        printf(",\"native_plan_validated\":true,\"gpu_executed\":false,\"input_buffers\":%u,\"descriptor_elements\":%u}\n",
                plan.input_count, plan.descriptor_count);
         return 0;
     }
@@ -216,7 +262,8 @@ int main(int argc, char **argv) {
         !(operations.supportedStages & VK_SHADER_STAGE_MESH_BIT_EXT) ||
         !(operations.supportedOperations & VK_SUBGROUP_FEATURE_BASIC_BIT) ||
         mesh_properties.maxMeshWorkGroupInvocations < 32 || mesh_properties.maxMeshWorkGroupSize[0] < 32 ||
-        mesh_properties.maxMeshOutputVertices < 128 || mesh_properties.maxMeshOutputPrimitives < 128 ||
+        mesh_properties.maxMeshOutputVertices < plan.max_vertices || mesh_properties.maxMeshOutputPrimitives < plan.max_primitives ||
+        mesh_properties.maxMeshOutputComponents < plan.vertex_output_components ||
         !float_controls.shaderSignedZeroInfNanPreserveFloat32) return 1;
     uint32_t extension_count = 0;
     CHECK(vkEnumerateDeviceExtensionProperties(physical, NULL, &extension_count, NULL));
@@ -441,7 +488,8 @@ int main(int argc, char **argv) {
     for (uint32_t i = 0; i < plan.input_count; ++i)
         inputs_unchanged &= !memcmp(plan.inputs[i].gpu.mapped, plan.inputs[i].data, plan.inputs[i].size);
     REQUIRE(inputs_unchanged && !memcmp(control.mapped, origin_control, sizeof(origin_control)));
-    printf("{\"schema\":1,\"gpu_executed\":true,\"mesh_draw_calls\":1,\"device\":");
+    printf("{\"schema\":2,\"output_profile\":"); json_string(plan.output_profile);
+    printf(",\"gpu_executed\":true,\"mesh_draw_calls\":1,\"device\":");
     json_string(properties.properties.deviceName);
     printf(",\"driver\":"); json_string(driver.driverName);
     printf(",\"driver_info\":"); json_string(driver.driverInfo);

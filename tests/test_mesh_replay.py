@@ -205,7 +205,7 @@ class MeshReplayTests(unittest.TestCase):
             with patch.object(replay.instrumenter, "prepare") as instrument, patch.object(replay, "build_helper") as build:
                 with self.assertRaisesRegex(ValueError, "exact reviewed"):
                     replay.prepare(root / "output", capture=path, original=wrong, conditional=wrong,
-                                   mode="frozen-logical-readonly")
+                                   mode="frozen-logical-readonly", driver_profile="legacy-5ea", driver_policy="runtime")
                 instrument.assert_not_called()
                 build.assert_not_called()
 
@@ -231,17 +231,43 @@ class MeshReplayTests(unittest.TestCase):
             def cpu_check(command, env, destination, stem, timeout):
                 self.assertEqual(stem, "validate-native-plan")
                 self.assertEqual(command[-1], "--validate")
-                return json.dumps({"gpu_executed": False, "native_plan_validated": True})
+                return json.dumps({"output_profile": replay.D8_PROFILE, "gpu_executed": False, "native_plan_validated": True})
 
             with patch.object(replay.instrumenter, "prepare_fixture", side_effect=fixture), \
                     patch.object(replay, "validate_instrumentation"), patch.object(replay, "build_helper", side_effect=helper), \
                     patch.object(replay, "run_process", side_effect=cpu_check), patch.object(replay, "driver_identity") as driver:
-                plan = replay.prepare(output, fixture=True, origin=[128, 0, 0], groups=[2, 1, 1])
+                plan = replay.prepare(output, fixture=True, origin=[128, 0, 0], groups=[2, 1, 1],
+                                      driver_profile="legacy-5ea", driver_policy="runtime")
                 self.assertTrue(plan["prepare_only"])
                 driver.assert_not_called()
                 self.assertEqual((output / "mesh-replay-helper").stat().st_mode & 0o777, 0o555)
                 reviewed = replay.digest(output / "prepared-plan.json")
                 replay.checked_prepared(output, reviewed)
+                self.assertEqual(set(plan["sources"]), set(replay.DEPENDENCY_SOURCES))
+                manifest = output / "prepared-plan.json"
+                for mutation in (lambda value: value["sources"].pop("tools/spirv_contract.py"),
+                                 lambda value: value["driver_profile"].update(library_sha256="0" * 64),
+                                 lambda value: value.update(driver_policy={"name": "arbitrary"}),
+                                 lambda value: value.update(output_profile="arbitrary"),
+                                 lambda value: value.update(schema="open-ocarina.prepared-native-mesh-replay/v1")):
+                    broken = copy.deepcopy(plan)
+                    mutation(broken)
+                    manifest.chmod(0o644)
+                    manifest.write_text(json.dumps(broken))
+                    with self.assertRaises(ValueError):
+                        replay.checked_prepared(output, replay.digest(manifest))
+                manifest.write_text(json.dumps(plan, indent=2) + "\n")
+                manifest.chmod(0o444)
+                self.assertEqual(replay.digest(manifest), reviewed)
+                for dependency in replay.DEPENDENCY_SOURCES:
+                    original_digest = replay.digest
+
+                    def changed_import(path, changed=dependency):
+                        return "0" * 64 if path == replay.ROOT / changed else original_digest(path)
+
+                    with self.subTest(dependency=dependency), patch.object(replay, "digest", side_effect=changed_import):
+                        with self.assertRaises(ValueError):
+                            replay.checked_prepared(output, reviewed)
                 (output / "execution-started.json").write_text("{}")
                 with self.assertRaisesRegex(ValueError, "already been used"):
                     replay.checked_prepared(output, reviewed)
@@ -260,6 +286,89 @@ class MeshReplayTests(unittest.TestCase):
         self.assertNotIn("vkQueueWaitIdle", source)
         self.assertNotIn("vkDeviceWaitIdle", source)
         self.assertNotIn("vkCmdDispatch", source)
+
+    def test_explicit_driver_profile_and_safe_policy_matrix(self):
+        selected = replay.validate_driver_profile("cache-safe-e5", "native-safe")
+        self.assertEqual(selected["library_sha256"], "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f")
+        self.assertEqual(selected["icd_sha256"], "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3")
+        for name, policy in ((None, "native-safe"), ("arbitrary", "native-safe"), ("cache-safe-e5", "runtime"),
+                             ("cache-safe-e5", "diagnostic"), ("cache-safe-e5", "arbitrary"), ("legacy-5ea", "native-safe")):
+            with self.subTest(name=name, policy=policy), self.assertRaises(ValueError):
+                replay.validate_driver_profile(name, policy)
+        with patch.object(replay.instrumenter, "prepare_fixture") as instrument:
+            with self.assertRaisesRegex(ValueError, "driver profile"):
+                replay.prepare(Path("unused-output"), fixture=True)
+            instrument.assert_not_called()
+        with patch.object(replay, "controlled_driver_environment", return_value=({}, {"controlled_options": {
+                "HS_SPILL_BATCH": "1", "HS_PUSH_SHADOW": "1", "shader_spilling_rate": "1", "HS_FORCE_SIMD8": "1"}})):
+            with self.assertRaisesRegex(ValueError, "exact named"):
+                replay.validate_driver_profile("cache-safe-e5", "native-safe")
+
+    def test_wrong_driver_or_icd_cannot_start_helper(self):
+        selected = replay.validate_driver_profile("cache-safe-e5", "native-safe")
+        plan = {"output_profile": replay.D8_PROFILE, "driver_profile": selected}
+        for identity in ({"library_sha256": "0" * 64, "icd_sha256": selected["icd_sha256"]},
+                         {"library_sha256": selected["library_sha256"], "icd_sha256": "0" * 64}):
+            with patch.object(replay, "checked_prepared", return_value=(Path("unused"), plan)), \
+                    patch.object(replay, "driver_identity", return_value=identity), patch.object(replay, "run_process") as run:
+                with self.assertRaisesRegex(ValueError, "driver differs"):
+                    replay.execute(Path("unused"), "1" * 64, Path("unused-driver.json"))
+                run.assert_not_called()
+
+    def test_profile96_full_empty_tail_and_separate_layout(self):
+        profile = replay.PROFILE96
+        groups = [2, 1, 1]
+        initial = replay.initialized_capture(groups, profile)
+        body = replay.instrumenter96.fixture_expected_capture([96, 0, 0], groups)
+        data = initial[:64] + body + initial[-64:]
+        self.assertEqual(len(data), 73856)
+        self.assertEqual(replay.check_capture(data, groups, profile)["counts"],
+                         [{"vertices": 96, "primitives": 96}, {"vertices": 96, "primitives": 0}])
+        with self.assertRaises(ValueError):
+            replay.check_capture(data, groups, replay.D8_PROFILE)
+        words = list(struct.unpack(f"<{len(data)//4}I", data))
+        for index in (16 + 4688, 16 + 8911, 16 + 8912, 16 + 9199, 16 + 4307, 16 + 9200):
+            changed = words.copy()
+            changed[index] ^= 1
+            with self.subTest(index=index), self.assertRaises(ValueError):
+                replay.check_capture(struct.pack(f"<{len(changed)}I", *changed), groups, profile)
+
+    def test_profile96_capture_schema_slots_and_native_magic_are_distinct(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path, document = chosen_capture(root, certificate=False)
+            profile = replay.output_profile(replay.PROFILE96)
+            document.update(schema=profile["capture_schema"], profile=replay.PROFILE96,
+                            runtime_execution_authorized=False, equivalence_proven=False, replay_complete=False)
+            document["event"].update(program=profile["program"], variant=profile["variant"], spirv_sha256=profile["modules"]["original"][0])
+            row = document["bindings"][4]
+            row.update(type=7, range_bytes=4, snapshot=artifact(root, "profile96-storage.bin", bytes(4)))
+            path.write_text(json.dumps(document))
+            state = replay.capture_inputs(path, "native-safe", "frozen-logical-readonly", replay.PROFILE96)
+            replay.write_native_plan(root / "native.bin", state, [96, 0, 0], [2, 1, 1], replay.PROFILE96)
+            header = struct.unpack_from("<8s16I", (root / "native.bin").read_bytes())
+            self.assertEqual(header[0], b"OOMESH96")
+            self.assertEqual(header[5:8], (73856, 64, 73728))
+            with self.assertRaisesRegex(ValueError, "schema"):
+                replay.capture_inputs(path, "native-safe", "frozen-logical-readonly", replay.D8_PROFILE)
+            for field in ("runtime_execution_authorized", "equivalence_proven", "replay_complete"):
+                document[field] = True
+                path.write_text(json.dumps(document))
+                with self.subTest(field=field), self.assertRaisesRegex(ValueError, "producer flags"):
+                    replay.capture_inputs(path, "native-safe", "frozen-logical-readonly", replay.PROFILE96)
+                document[field] = False
+            document.pop("profile")
+            path.write_text(json.dumps(document))
+            with self.assertRaisesRegex(ValueError, "profile96"):
+                replay.capture_inputs(path, "native-safe", "frozen-logical-readonly", replay.PROFILE96)
+
+    def test_old_v1_prepared_plan_cannot_be_relabelled_implicitly(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "prepared-plan.json").write_text(json.dumps({"schema": "open-ocarina.prepared-native-mesh-replay/v1",
+                                                               "prepare_only": True, "gpu_executed": False}))
+            with self.assertRaises(ValueError):
+                replay.checked_prepared(root, replay.digest(root / "prepared-plan.json"))
 
 
 if __name__ == "__main__":
