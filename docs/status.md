@@ -1,6 +1,6 @@
 # Project status
 
-Updated 2026-11-12. This page distinguishes working tools, local observations, and unproven targets. It is not a completion percentage.
+Updated 2026-11-13. This page distinguishes working tools, local observations, and unproven targets. It is not a completion percentage.
 
 ## Implemented starting point
 
@@ -14,7 +14,7 @@ Updated 2026-11-12. This page distinguishes working tools, local observations, a
 - The shader catalog resolved the initial compute target to native seed identity and cached variant/SPIR-V metadata. A separate bounded runtime observation now confirms the selected variant/digest at dispatch-recording sites; this does not retroactively identify the variant in the earlier timing capture. Full replay remains incomplete; see `research/shader-target.md` and `research/runtime-identity-observation.json`.
 - Optimized compile-only Vulkan probes now cover required subgroup sizes 32 and 16 plus the unpinned driver choice. They use the exact shader, robust buffers, push descriptors, matching push range and audited driver build. Executable statistics establish code-generation differences, not execution speed or correctness; see `docs/compile-probe.md`.
 - The memory-contract analyzer proves that the selected entry genuinely uses physical page-table loads and a read/write storage binding. A logical-buffer-only replay cannot cover it.
-- A versioned logical-buffer replay validator and deterministic benchmark-contract checker now reject unsupported or missing evidence. Neither supplies the still-missing complete physical-memory capture/replay executor or camera-state producer.
+- A versioned logical-buffer replay validator and deterministic benchmark-contract checker now reject unsupported or missing evidence. The newer owned replay tools below cover bounded frozen-input diagnostics; complete historical capture and a deterministic camera-state producer remain separate requirements.
 - The optimized runtime identity patch was built and exercised in a separate headless install. All bounded events matched the selected variant/digest at real dispatch-recording sites with the established subgroup policy. Complete resource coverage remains false; see `research/runtime-identity-observation.json`.
 
 These tools establish inputs and evidence. They do not reconstruct the game's source or prove a complete matching executable. The synthetic test suite is the CI entry point; optional external-tool probes are validated separately.
@@ -96,4 +96,30 @@ requested subgroup policy, linked to the same completed buffer/table capture.
 [Sanitized metadata](../research/gpu-image-dispatch-observation.json) pins the
 tested artifacts. Backing alias provenance, CPU mutation, remaining device and
 temporal state, and independent output comparison still prevent a complete
-replay claim. No shader optimization has yet passed a real output comparison.
+replay claim. That capture alone supplied no shader-output comparison; the later owned experiments below test explicit frozen graphs.
+
+The [backing observer and binding ledger](binding-provenance.md) have now run
+together in a fresh isolated capture. [Verified metadata](../research/gpu-binding-provenance-observation.json)
+records original host leases, successful ordinary/sparse binds and true VMA
+suballocation intervals. Independent normalization found no overlapping canonical
+segments in that dataset. This closes a specific identity gap for the selected
+catalog; CPU content writes and historical snapshot atomicity remain unknown.
+
+The [mesh input capture](mesh-input-capture.md) now retains the exact GPU indirect
+launch, nine complete descriptor slices and two feature-backed null descriptors
+for the selected native mesh stage. [Its observation](../research/gpu-mesh-input-observation.json)
+is separate from the earlier revision that rejected nulls. Full graphics and
+historical draw equivalence remain unproved.
+
+The [owned physical replay executor](physical-replay.md) and
+[stage-preserving mesh replay](native-mesh-replay.md) have passed independent
+synthetic GPU output checks. Original/candidate output experiments use explicitly
+frozen input graphs and keep historical provenance, rendering and performance
+claims separate. Their reports record the exact tested source, helper, plan and
+driver identities. The compute original repeated at width 32 and its width-16/8
+trials agree across all 59 complete allocations. The mesh original repeated at
+width 32 and its conditional width-8/16 rewrite agree across five windows
+covering 160 distinct workgroups, including nonempty geometry, all attributes,
+indices and guards. These are bounded checks on fixed owned input graphs;
+other inputs and full rendering checks remain necessary. No optimization has
+yet been accepted into gameplay.

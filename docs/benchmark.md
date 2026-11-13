@@ -2,6 +2,8 @@
 
 Status: a tested manifest/evidence compatibility validator is implemented. An audited runtime camera/workload evidence producer is **not** implemented or bundled. Existing exploratory runs do not satisfy this contract. No producer is trusted by default, and the validator does not compute a speedup.
 
+The [benchmark producer plan](../research/benchmark-producer-plan.md) identifies concrete source hooks, strict camera/resource coverage, simulation-step and frame-association requirements. It also proposes a separate contract revision for matched rendering-verification cohorts. That proposal is unimplemented and does not relax schema 1 or authorize replacing its per-frame correctness requirement with a separate screenshot run.
+
 The immediate failure to prevent is comparing two runs of the same save while one camera looks down and the other looks forward. A save hash, input script and two FPS lines do not establish equivalent rendering work.
 
 ## What existing Hookshot controls actually do
