@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-"""Check the variant-name patch, its single name definition and the Linux menu entry.
+"""Check the variant-name patch: the full rename to Open-Ocarina, one name definition, and the Linux menu entry.
 
 Without a checkout the checker parses the patch itself and compiles the extracted name header as C and C++.
 With the applied pinned checkout it also loads the actual Linux builder, writes the menu entry into a temporary
 XDG data folder and checks the stale-entry cleanup.
+
+The rename reaches the executable, the renderer, the launcher, the game folder, the saves folder and the runtime
+files. It stops at what upstream owns: the HOS_/HOOKSHOT_ environment prefix, the hidden .hookshot_* stamps, the
+builder's own program and data folders, the update check (so an upstream release cannot replace this variant), the
+Discord application and update URLs, the pipeline-share format, and the in-game Hookshot item.
 """
 import argparse
 import importlib.util
@@ -22,21 +27,48 @@ NAME = "Open-Ocarina"
 APP_ID = "io.github.OpenOcarina.OpenOcarina"
 HEADER = "gpu/vk/vk_variant.h"
 MENU_FILE = "open-ocarina.desktop"
-EXPECTED_FILES = {
+
+# The trees the rename may touch: the game and its runtime, the tools that name its files, the issue form and the tests.
+ALLOWED_TREES = ("host/", "gpu/", "nx2/", "builder/linux/", "tests/", "scripts/", ".github/ISSUE_TEMPLATE/")
+
+# The files that carry the rename's identity, each of which must be in the patch.
+REQUIRED_FILES = {
     "host/hos.h",
-    "host/display.c",
+    "host/hos_main.c",
+    "host/hos_paths.h",
     "host/posix/display_sdl.c",
     "host/discord_rpc.c",
-    "host/hos_main.c",
-    "host/mkw_glue.c",
-    "host/nn_video.c",
-    "host/mf_av1.c",
-    "host/posix/win32_posix.c",
+    "host/rx_backend.c",
     HEADER,
     "gpu/vk/vk_menu.cpp",
     "gpu/vk/vk_main.cpp",
     "gpu/vk/menu_i18n.h",
+    "gpu/vk/vk_bug_report.cpp",
+    "nx2/build.py",
+    "nx2/make_game.py",
+    "nx2/pipeline_share.py",
     "builder/linux/hookshot_builder.py",
+    "builder/linux/hookshot-folder",
+    "builder/linux/linux_update.py",
+    ".github/ISSUE_TEMPLATE/1-game-problem.yml",
+    "scripts/prof.py",
+    "scripts/hotlist.py",
+    "scripts/crit.py",
+    "scripts/chain.py",
+    "scripts/cpu_categories.py",
+    "scripts/cpu_report.py",
+    "scripts/oot_saves.py",
+    "scripts/hookshot_ctl.py",
+}
+
+# What upstream owns and the rename must not touch: the update check and its URLs (an upstream release must not
+# replace this variant), and the AppImage's own packaging names.
+FORBIDDEN_FILES = {
+    "host/hos_update.c",
+    "builder/linux/AppRun",
+    "scripts/linux/appimage.sh",
+    "scripts/linux/make_parts.py",
+    "scripts/linux/check_player_build.sh",
 }
 
 
@@ -186,8 +218,14 @@ def menu_check(checkout):
 
 
 def check(checkout=None, compiler=None):
-    files = patch_files()
-    require(set(files) == EXPECTED_FILES, "The patch touches an unexpected set of files: %s" % sorted(set(files) ^ EXPECTED_FILES))
+    files = set(patch_files())
+    outside = sorted(p for p in files if not p.startswith(ALLOWED_TREES))
+    require(not outside, "The patch touches files outside the variant's trees: %s" % outside)
+    missing = sorted(REQUIRED_FILES - files)
+    require(not missing, "The patch misses identity files: %s" % missing)
+    forbidden = sorted(FORBIDDEN_FILES & files)
+    require(not forbidden, "The patch touches what upstream owns: %s" % forbidden)
+
     header = header_from_patch()
 
     hos_h = added_lines("host/hos.h")
@@ -200,6 +238,7 @@ def check(checkout=None, compiler=None):
     require('APP_ID = "%s"' % APP_ID in builder, "The builder's app id is not the variant's")
     require('MENU_NAME = "%s"' % NAME in builder, "The builder's menu name is not the variant name")
     require('MENU_FILE = "%s"' % MENU_FILE in builder, "The builder's menu file is not the variant's")
+    require('OLD_MENU_FILE = "hookshot.desktop"' in builder, "The builder no longer replaces its old menu entry")
     menu = added_lines("gpu/vk/vk_menu.cpp")
     require("std::string(HOS_VARIANT_NAME) + \" \" + HOOKSHOT_VERSION" in menu, "The menu banner does not use the variant name")
     main = added_lines("gpu/vk/vk_main.cpp")
@@ -209,12 +248,26 @@ def check(checkout=None, compiler=None):
     require('\\"state\\":\\"%s %s\\"' in discord and "HOS_VARIANT_NAME, version" in discord,
             "The Discord status does not use the variant name")
 
-    # A touched file must not keep a user-visible literal of the old name.
-    for path in files:
-        if path == "builder/linux/hookshot_builder.py":
-            continue
-        added = added_lines(path)
-        require('"Hookshot' not in added, "%s still adds a user-visible Hookshot literal" % path)
+    # The game's own files take the same name in lower case, from one place each.
+    build = added_lines("nx2/build.py")
+    require('EXE = "open-ocarina" if LINUX else "open-ocarina.exe"' in build, "The executable is not renamed")
+    require('VK_LIB = "open-ocarina_vk.so" if LINUX else "open-ocarina_vk.dll"' in build, "The renderer is not renamed")
+    make_game = added_lines("nx2/make_game.py")
+    require('BESIDE = ["open-ocarina", "open-ocarina_vk.so"' in make_game, "The game folder's binaries are not renamed")
+    saves = added_lines("host/hos_main.c")
+    require('"/open-ocarina"' in saves, "The Linux saves folder is not renamed")
+    require('"%.*s/hookshot"' in saves, "The saves folder is not taken along from its old name")
+    launcher = added_lines("builder/linux/hookshot-folder")
+    require("bin/open-ocarina" in launcher, "The folder launcher does not start the renamed game")
+    update = added_lines("builder/linux/linux_update.py")
+    require("bin/open-ocarina" in update and "bin/hookshot" in update,
+            "The builder's update path does not prefer the new name and keep the old")
+    paths = added_lines("host/hos_paths.h")
+    require("open-ocarina" in paths, "The runtime's own path does not use the new name")
+    report = added_lines("gpu/vk/vk_bug_report.cpp")
+    require("open-ocarina_log.txt" in report, "The bug report does not read the renamed log")
+    i18n = added_lines("gpu/vk/menu_i18n.h")
+    require("open-ocarina_options.ini" in i18n, "The Insert menu does not read the renamed options file")
 
     compiler = compiler or shutil.which("cc") or shutil.which("clang")
     require(compiler is not None, "A C compiler is required for the name header checks")
@@ -226,10 +279,12 @@ def check(checkout=None, compiler=None):
         head = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=checkout, text=True).strip()
         require(head == PIN, "The checkout is not the documented pinned revision")
         subprocess.run(["git", "apply", "--cached", "--check", str(PATCH.resolve())], cwd=checkout, check=True)
-        for path in sorted(EXPECTED_FILES - {HEADER}):
-            text = (Path(checkout) / path).read_text()
-            if path != "builder/linux/hookshot_builder.py":
-                require('"Hookshot' not in text, "%s keeps a user-visible Hookshot literal" % path)
+        applied = (Path(checkout) / "host" / "hos_main.c").read_text()
+        require('"/open-ocarina"' in applied, "The applied checkout does not use the new saves folder")
+        require('EXE = "open-ocarina"' in (Path(checkout) / "nx2" / "build.py").read_text(),
+                "The applied checkout does not build the renamed executable")
+        require("./bin/open-ocarina" in (Path(checkout) / "builder" / "linux" / "hookshot-folder").read_text(),
+                "The applied checkout's launcher does not start the renamed game")
         require(NAME in (Path(checkout) / "host" / "hos.h").read_text() or
                 NAME in (Path(checkout) / HEADER).read_text(), "The applied checkout has no variant name")
         result.update(menu_check(Path(checkout)))

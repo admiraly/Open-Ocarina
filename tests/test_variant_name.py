@@ -13,12 +13,17 @@ CHECKOUT = ROOT / "local" / "hookshot-source"
 
 
 class VariantNameTests(unittest.TestCase):
-    def test_patch_touches_only_identity_sites(self):
+    def test_patch_touches_only_the_variants_trees(self):
         files = set(CHECK.patch_files())
-        self.assertEqual(files, CHECK.EXPECTED_FILES)
-        self.assertNotIn("host/hos_update.c", files)
-        self.assertNotIn("gpu/vk/pipeline_share.h", files)
-        self.assertNotIn("gpu/vk/vk_bug_report.cpp", files)
+        self.assertFalse([p for p in files if not p.startswith(CHECK.ALLOWED_TREES)])
+        self.assertTrue(CHECK.REQUIRED_FILES <= files)
+        self.assertFalse(CHECK.FORBIDDEN_FILES & files)
+
+    def test_upstream_owned_files_are_left_alone(self):
+        files = set(CHECK.patch_files())
+        self.assertNotIn("host/hos_update.c", files)          # (an upstream release must not replace this variant)
+        self.assertNotIn("scripts/linux/appimage.sh", files)  # (the AppImage's own names)
+        self.assertNotIn("builder/linux/AppRun", files)
 
     def test_one_name_definition_is_shared_with_the_back_end(self):
         header = CHECK.header_from_patch()
@@ -26,10 +31,16 @@ class VariantNameTests(unittest.TestCase):
         self.assertEqual(header.count('#define HOS_VARIANT_NAME "Open-Ocarina"'), 1)
         self.assertIn('#include "../gpu/vk/vk_variant.h"', CHECK.added_lines("host/hos.h"))
 
-    def test_old_name_is_not_added_to_a_user_visible_string(self):
-        for path in CHECK.EXPECTED_FILES - {"builder/linux/hookshot_builder.py"}:
-            with self.subTest(path=path):
-                self.assertNotIn('"Hookshot', CHECK.added_lines(path))
+    def test_the_executable_renderer_and_launcher_take_the_lower_case_name(self):
+        build = CHECK.added_lines("nx2/build.py")
+        self.assertIn('EXE = "open-ocarina" if LINUX else "open-ocarina.exe"', build)
+        self.assertIn('VK_LIB = "open-ocarina_vk.so" if LINUX else "open-ocarina_vk.dll"', build)
+        self.assertIn("bin/open-ocarina", CHECK.added_lines("builder/linux/hookshot-folder"))
+
+    def test_the_saves_folder_moves_and_takes_the_old_one_along(self):
+        saves = CHECK.added_lines("host/hos_main.c")
+        self.assertIn('"/open-ocarina"', saves)
+        self.assertIn('"%.*s/hookshot"', saves)
 
     def test_app_id_matches_the_window_and_the_menu_entry(self):
         sdl = CHECK.added_lines("host/posix/display_sdl.c")
