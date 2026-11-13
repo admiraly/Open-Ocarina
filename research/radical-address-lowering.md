@@ -135,3 +135,5 @@ The new helper assumes descriptors were already classified and supplied in
 source order. It does not implement classification, descriptor creation, atomics,
 all access widths, original alignment validity, or a driver memory oracle.
 Neither it nor the original finite grid may authorize a native pipeline.
+
+The subsequent [actual storage-pointer compilation experiment](storage-pointer-compile-experiment.md) validates pointer returns across two synthetic storage bindings, with a separate physical miss path. It requires `variablePointersStorageBuffer` and preserves the distinction between pointer feasibility, bounded CPU model agreement and runtime shader correctness. No game address-lowering patch follows automatically from that result.
