@@ -323,7 +323,7 @@ jobs:
           (cd "$tools" && "$py" -I -B nx2/pipeline_states.py check --dir assets/pipeline_states)
           (cd "$tools" && "$py" -I -B nx2/make_game.py --help >/dev/null)
           (cd "$tools" && env -u HOOKSHOT_MINGW -u RX_CPM "$py" -I -B -c "import sys; sys.path.insert(0, 'nx2'); import make_game; assert make_game.bundled_mingw(), 'bundled llvm-mingw missing'")
-          (cd "$tools" && env HOOKSHOT_MINGW="$tools/llvm-mingw" -u RX_CPM OOT_WORK="$RUNNER_TEMP/smoke-work" RX_RELEASE=1 "$py" -I -B nx2/build.py --standalone --jobs 1 --dry-run)
+          (cd "$tools" && env -u RX_CPM HOOKSHOT_MINGW="$tools/llvm-mingw" OOT_WORK="$RUNNER_TEMP/smoke-work" RX_RELEASE=1 "$py" -I -B nx2/build.py --standalone --jobs 1 --dry-run)
           # Compile-check host/nn_video.c (FFmpeg + dav1d) and host/dav1d_av1.c and host/pad_sdl.c using only packaged tools
           cc="$tools/llvm-mingw/bin/clang.exe"
           ff_inc=$(ls -d "$tools/cpm/ffmpeg/"*/include | head -1)
