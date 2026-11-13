@@ -1,0 +1,237 @@
+diff --git a/gpu/vk/mesh_warp32_profiles.h b/gpu/vk/mesh_warp32_profiles.h
+new file mode 100644
+index 0000000..49bb755
+--- /dev/null
++++ b/gpu/vk/mesh_warp32_profiles.h
+@@ -0,0 +1,59 @@
++// SPDX-License-Identifier: GPL-3.0-or-later
++// Independently authored exact-identity registry. Contains metadata, no shader words.
++#pragma once
++#include "mesh_warp32_lowering.h"
++#include <cstring>
++#include <array>
++namespace mkwvk::oo_mesh_warp32_profiles {
++inline constexpr uint32_t kRevision = 3;
++inline constexpr uint32_t kScratchBytes = 2 * 32 * sizeof(uint32_t);
++struct Target {
++    uint64_t program, variant;
++    const char *original, *fragment, *candidate;
++    uint32_t original_shared_bytes, payload_bytes, max_vertices, max_primitives, vertex_components;
++    constexpr uint32_t shared_bytes() const { return original_shared_bytes + kScratchBytes; }
++    constexpr uint32_t payload_shared_bytes() const { return payload_bytes + shared_bytes(); }
++};
++inline constexpr Target kD8{
++    oo_mesh_warp32::kProgram, oo_mesh_warp32::kVariant, oo_mesh_warp32::kOriginal,
++    oo_mesh_warp32::kFragment, oo_mesh_warp32::kCandidate, 14356, 128, 128, 128, 40};
++inline constexpr Target kProfile96{
++    0x68642bb810ee3e7cull, 0x3f3f5b29054673daull,
++    "999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93",
++    "3de1d79c321db3863dbb07de0d3fa0cdb126d72c07c2f1d70f0514eda3611b10",
++    "43434b023ff17ee4b92ed8e49f19c937c86f15cf31a7034161dd11878f944099",
++    11156, 128, 96, 96, 44};
++static_assert(kD8.shared_bytes() == 14612 && kProfile96.shared_bytes() == 11412);
++// Exact opt-in, independent of selected width. Unknown spellings remain off.
++inline bool parse_profile96(const char *value) { return value && !std::strcmp(value, "1"); }
++inline const Target *target(uint64_t program, bool profile96) {
++    if (program == kD8.program) return &kD8;
++    if (profile96 && program == kProfile96.program) return &kProfile96;
++    return nullptr;
++}
++inline bool requested(uint64_t program, uint32_t width, bool profile96) {
++    return (width == 8 || width == 16) && target(program, profile96);
++}
++inline std::array<uint32_t, 3> cache_policy(uint32_t width, bool profile96) {
++    return {kRevision, width, profile96 ? 1u : 0u};
++}
++inline uint64_t pipeline_tag(uint32_t width) {
++    return (width == 8 || width == 16) ? (0x4f4f573332030000ull | width) : 0;
++}
++template<class Subgroup, class Mesh>
++bool limits_match(uint32_t width, const Target& target, const Subgroup& subgroup, const Mesh& mesh) {
++    return (width == 8 || width == 16) && (subgroup.requiredSubgroupSizeStages & 128u) &&
++           subgroup.minSubgroupSize <= width && subgroup.maxSubgroupSize >= width &&
++           mesh.maxMeshWorkGroupInvocations >= 32 && mesh.maxMeshWorkGroupSize[0] >= 32 &&
++           mesh.maxMeshOutputVertices >= target.max_vertices && mesh.maxMeshOutputPrimitives >= target.max_primitives &&
++           mesh.maxMeshOutputComponents >= target.vertex_components &&
++           mesh.maxMeshSharedMemorySize >= target.shared_bytes() &&
++           mesh.maxMeshPayloadAndSharedMemorySize >= target.payload_shared_bytes();
++}
++inline bool identity_matches(const Target& t, uint64_t program, uint64_t variant,
++                             int mesh_nvn, uint32_t mesh_vk, int fragment_nvn, uint32_t fragment_vk,
++                             const std::string& mesh_sha, const std::string& fragment_sha) {
++    return program == t.program && variant == t.variant && mesh_nvn == 7 && mesh_vk == 128 &&
++           fragment_nvn == 1 && fragment_vk == 16 && mesh_sha == t.original && fragment_sha == t.fragment;
++}
++} // namespace mkwvk::oo_mesh_warp32_profiles
+diff --git a/gpu/vk/vk_draw.cpp b/gpu/vk/vk_draw.cpp
+index 9dba7e7..9c8191e 100644
+--- a/gpu/vk/vk_draw.cpp
++++ b/gpu/vk/vk_draw.cpp
+@@ -6,6 +6,7 @@
+ // and the draws themselves.
+ //
+ // Pipelines persist in a VkPipelineCache next to the executable (mkw_vk_pipelines.bin).
++#include "mesh_warp32_profiles.h"
+ #include <algorithm>
+ #include <filesystem>
+ #include <iterator>
+@@ -216,7 +217,7 @@ void pin_program_stage(VkPipelineShaderStageCreateInfo& info, const Stage& sourc
+ 
+ uint64_t mesh_warp32_pipeline_tag(const Program& p) {
+     for (const Stage& stage : p.stages)
+-        if (stage.mesh_warp32_width) return 0x4f4f573332020000ull | stage.mesh_warp32_width;
++        if (const uint64_t tag = oo_mesh_warp32_profiles::pipeline_tag(stage.mesh_warp32_width)) return tag;
+     return 0;
+ }
+ 
+diff --git a/gpu/vk/vk_progcache.cpp b/gpu/vk/vk_progcache.cpp
+index b53298c..6fcff91 100644
+--- a/gpu/vk/vk_progcache.cpp
++++ b/gpu/vk/vk_progcache.cpp
+@@ -496,7 +496,7 @@ void program_cache_read(FILE* in, std::mutex* mu, uint64_t key, const std::vecto
+         const uint64_t n = r.count(1);
+         bool ok = !r.bad && n <= 8;   // (a program has at most a few stages)
+         std::vector<std::vector<uint32_t>> oo_original;
+-        const bool oo_mesh = mesh_warp32_requested_width() && p->mesh && !p->fallback && p->key == 0xd8e59341cf4f629cull;
++        const bool oo_mesh = p->mesh && !p->fallback && mesh_warp32_target_requested(p->key);
+         if (oo_mesh) oo_original.reserve((size_t)n);
+         for (uint64_t k = 0; ok && k < n; k++) {
+             p->stages.emplace_back();
+diff --git a/gpu/vk/vk_shader.cpp b/gpu/vk/vk_shader.cpp
+index 904dcbb..f064b63 100644
+--- a/gpu/vk/vk_shader.cpp
++++ b/gpu/vk/vk_shader.cpp
+@@ -57,6 +57,7 @@
+ #include "vk_progcache.h"
+ #include "vk_menu.h"
+ #include "mesh_warp32_lowering.h"
++#include "mesh_warp32_profiles.h"
+ #include "graphics_identity.h"
+ 
+ // (EvilOOT, RX_VK_PTR_DIAG) the pointer pass's counts for this thread's translations
+@@ -697,6 +698,15 @@ uint32_t mesh_warp32_requested_width() {
+     return width;
+ }
+ 
++bool mesh_warp32_profile96_enabled() {
++    static const bool enabled = oo_mesh_warp32_profiles::parse_profile96(std::getenv("RX_VK_OO_MESH_WARP32_PROFILE96"));
++    return enabled;
++}
++
++bool mesh_warp32_target_requested(uint64_t program) {
++    return oo_mesh_warp32_profiles::requested(program, mesh_warp32_requested_width(), mesh_warp32_profile96_enabled());
++}
++
+ namespace {
+ bool mesh_warp32_runtime_policy() {
+     if (env_on("RX_VK_NOOPT")) return false;
+@@ -713,7 +723,7 @@ bool mesh_warp32_runtime_policy() {
+     return true;
+ }
+ 
+-bool mesh_warp32_device(uint32_t width) {
++bool mesh_warp32_device(uint32_t width, const oo_mesh_warp32_profiles::Target& target) {
+     // Deliberately a reviewed A770/Mesa configuration, not a portable lane rule.
+     if (!dev.physical || !dev.device || !dev.mesh_shader || !dev.vk13.subgroupSizeControl ||
+         dev.props.vendorID != 0x8086 || dev.props.deviceID != 0x56a0 ||
+@@ -725,11 +735,7 @@ bool mesh_warp32_device(uint32_t width) {
+     VkPhysicalDeviceProperties2 properties{VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2};
+     properties.pNext = &subgroup;
+     vkGetPhysicalDeviceProperties2(dev.physical, &properties);
+-    return (subgroup.requiredSubgroupSizeStages & VK_SHADER_STAGE_MESH_BIT_EXT) &&
+-           subgroup.minSubgroupSize <= width && subgroup.maxSubgroupSize >= width &&
+-           mesh.maxMeshWorkGroupInvocations >= 32 && mesh.maxMeshWorkGroupSize[0] >= 32 &&
+-           mesh.maxMeshOutputVertices >= 128 && mesh.maxMeshOutputPrimitives >= 128 &&
+-           mesh.maxMeshSharedMemorySize >= 14612 && mesh.maxMeshPayloadAndSharedMemorySize >= 14740;
++    return oo_mesh_warp32_profiles::limits_match(width, target, subgroup, mesh);
+ }
+ 
+ std::string mesh_warp32_digest(const std::vector<uint32_t>& words) {
+@@ -742,7 +748,8 @@ std::string mesh_warp32_digest(const std::vector<uint32_t>& words) {
+ 
+ void mesh_warp32_apply(Program& p, const std::vector<std::vector<uint32_t>>& original) {
+     const uint32_t width = mesh_warp32_requested_width();
+-    if (!width || p.key != oo_mesh_warp32::kProgram) return;
++    const auto* target = oo_mesh_warp32_profiles::target(p.key, mesh_warp32_profile96_enabled());
++    if (!width || !target) return;
+     const auto refused = [&](const char* reason) {
+         static std::atomic<unsigned> told{0};
+         if (told.fetch_add(1) < 32)
+@@ -750,23 +757,23 @@ void mesh_warp32_apply(Program& p, const std::vector<std::vector<uint32_t>>& ori
+                  reason, width, dev.props.vendorID, dev.props.deviceID, dev.props.driverVersion);
+     };
+     // Before ready publication only. No cache fields or descriptor metadata change.
+-    if (!p.mesh || p.fallback || p.variant != oo_mesh_warp32::kVariant || p.stages.size() != 2 || original.size() != 2) {
++    if (!p.mesh || p.fallback || p.variant != target->variant || p.stages.size() != 2 || original.size() != 2) {
+         refused("program/variant/stage shape"); return;
+     }
+     Stage& stage = p.stages[0];
+     if (stage.mesh_warp32_width) return;
+-    if (!mesh_warp32_runtime_policy() || !mesh_warp32_device(width)) {
++    if (!mesh_warp32_runtime_policy() || !mesh_warp32_device(width, *target)) {
+         refused("unreviewed compiler policy/device/capabilities"); return;
+     }
+     try {
+-        if (!oo_mesh_warp32::identity_matches(p.key, p.variant, stage.nvn_stage, (uint32_t)stage.vk_stage,
++        if (!oo_mesh_warp32_profiles::identity_matches(*target, p.key, p.variant, stage.nvn_stage, (uint32_t)stage.vk_stage,
+                 p.stages[1].nvn_stage, (uint32_t)p.stages[1].vk_stage,
+                 mesh_warp32_digest(original[0]), mesh_warp32_digest(original[1]))) {
+             refused("exact original stage identities"); return;
+         }
+         const auto candidate = oo_mesh_warp32::rewrite(original[0]);
+         if (!candidate.ok) { refused(candidate.reason.c_str()); return; }
+-        if (mesh_warp32_digest(candidate.words) != oo_mesh_warp32::kCandidate) {
++        if (mesh_warp32_digest(candidate.words) != target->candidate) {
+             refused("candidate digest differs from reviewed native writer"); return;
+         }
+         // Finish every allocating CPU step before committing a new module.
+@@ -780,9 +787,9 @@ void mesh_warp32_apply(Program& p, const std::vector<std::vector<uint32_t>>& ori
+         stage.mesh_warp32_width = width;
+         stage.oo_identity = actual_identity; // disk cache deliberately retains original words
+         if (baseline) vkDestroyShaderModule(dev.device, baseline, nullptr);
+-        logf("vk: OO mesh-warp32 applied rev %u prog %016llx variant %016llx required %u shared 14612 source %s actual %s; safe-three compiler policy, MAX absent; pipeline failures have no baseline recovery",
+-             oo_mesh_warp32::kRevision, (unsigned long long)p.key, (unsigned long long)p.variant,
+-             width, oo_mesh_warp32::kOriginal, oo_mesh_warp32::kCandidate);
++        logf("vk: OO mesh-warp32 applied rev %u prog %016llx variant %016llx required %u shared %u source %s actual %s; safe-three compiler policy, MAX absent; experimental profile96 %u; pipeline failures have no baseline recovery",
++             oo_mesh_warp32_profiles::kRevision, (unsigned long long)p.key, (unsigned long long)p.variant,
++             width, target->shared_bytes(), target->original, target->candidate, mesh_warp32_profile96_enabled() ? 1u : 0u);
+     } catch (const std::exception& error) {
+         refused(error.what());
+     }
+@@ -1258,8 +1265,8 @@ uint64_t translator_stamp() {
+     // lost it)
+     const uint64_t translator = HOOKSHOT_SHADER_STAMP;
+     add(&translator, sizeof translator);
+-    const uint32_t oo_mesh_policy[] = {oo_mesh_warp32::kRevision, mesh_warp32_requested_width()};
+-    add(oo_mesh_policy, sizeof oo_mesh_policy);
++    const auto oo_mesh_policy = oo_mesh_warp32_profiles::cache_policy(mesh_warp32_requested_width(), mesh_warp32_profile96_enabled());
++    add(oo_mesh_policy.data(), oo_mesh_policy.size() * sizeof(uint32_t));
+     const uint32_t depth = host->depth_minus_w() != 0;   // (d3zessete's PR 54: programs made in either depth mode are kept apart)
+     add(&depth, sizeof depth);
+     // (and a GPU's mesh shaders: a file of native task and mesh programs is no use to the compute fallback, nor its to one)
+diff --git a/gpu/vk/vk_shader.h b/gpu/vk/vk_shader.h
+index 929b38c..41390f4 100644
+--- a/gpu/vk/vk_shader.h
++++ b/gpu/vk/vk_shader.h
+@@ -91,6 +91,8 @@ struct Program {
+ 
+ // Opt-in reviewed native-mesh lowering; original disk-cache words remain canonical.
+ uint32_t mesh_warp32_requested_width();
++bool mesh_warp32_profile96_enabled();
++bool mesh_warp32_target_requested(uint64_t program);
+ void mesh_warp32_apply(Program& p, const std::vector<std::vector<uint32_t>>& original);
+ 
+ enum class ProgramKind { Graphics, Compute, Mesh };
+diff --git a/nx2/build.py b/nx2/build.py
+index 722f777..4acf442 100644
+--- a/nx2/build.py
++++ b/nx2/build.py
+@@ -1173,7 +1173,7 @@ def main():
+         # keeps them)
+         stamp = hashlib.sha1(usedforsecurity=False)
+         translator = [os.path.join(d, f) for top in ("eden", "sirit", "compat") for d, _, fs in os.walk(os.path.join(vk, top)) for f in fs]
+-        for f in sorted(translator) + [os.path.join(vk, n) for n in ("vk_shader.cpp", "vk_bank.cpp", "vk_state.h", "vk_api.h", "mesh_warp32_lowering.h", "mesh_warp32_lowering.cpp")]:
++        for f in sorted(translator) + [os.path.join(vk, n) for n in ("vk_shader.cpp", "vk_bank.cpp", "vk_state.h", "vk_api.h", "mesh_warp32_lowering.h", "mesh_warp32_lowering.cpp", "mesh_warp32_profiles.h")]:
+             with open(f, "rb") as src:
+                 stamp.update(os.path.relpath(f, vk).replace("\\", "/").encode() + src.read().replace(bytes((13, 10)), bytes((10,))))
+         shader_stamp = "-DHOOKSHOT_SHADER_STAMP=0x%sull" % stamp.hexdigest()[:16]

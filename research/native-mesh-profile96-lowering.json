@@ -1,0 +1,184 @@
+{
+  "schema": "open-ocarina.native-mesh-profile96-lowering/v1",
+  "source_pin": "4cf785a0b143bb34026506c9a3fe4f4bb93c797d",
+  "base_tree": "63744713519667ed19e89673507bd87648a7edd8",
+  "twelve_overlay_tree": "58ca709617448e06af382c3443dd88dac3ffcb8e",
+  "patches": [
+    {
+      "patch": "compute-identity.patch",
+      "sha256": "2f14873edfdb47b1f915e75bc4bbe6683ef6632bc66fcbfa1d918aa1c176f018"
+    },
+    {
+      "patch": "page-table-snapshot.patch",
+      "sha256": "c236b96851bc95426202abec6447e672577fdda747fd8405cc435dae435834ab"
+    },
+    {
+      "patch": "allocation-capture.patch",
+      "sha256": "7d8f23d3824374002472bc4a65f3f078c3306d4c5cd395f97e2a1e083fe49aab"
+    },
+    {
+      "patch": "occurrence-capture.patch",
+      "sha256": "defdda2dced583678e39daea0dc7e671fcc8926df8374a62ad45fe675692b752"
+    },
+    {
+      "patch": "graphics-identity.patch",
+      "sha256": "d2572d167c7427c79ce5b600fdeef67a0738678e5e05cbe1ec21db89d8865e53"
+    },
+    {
+      "patch": "sampled-image-capture.patch",
+      "sha256": "45fd019c2670a0c5c4cb0bfba8decb3701531c8248ec205e2b95ba03969aa362"
+    },
+    {
+      "patch": "dispatch-parameters.patch",
+      "sha256": "ff86fe706725f2c70dc759a6e2d295ebedee12b5b93b4b6e2cf407c58a689d8e"
+    },
+    {
+      "patch": "binding-provenance.patch",
+      "sha256": "af88886fb027b91bea136db0c2bf05865cf510232c50fdcbdd9d238d930009b1"
+    },
+    {
+      "patch": "mesh-input-capture.patch",
+      "sha256": "eea7b1b3181751b6b09811a458626958799f2d9a8511a74fdb8bd49854462f5c"
+    },
+    {
+      "patch": "mesh-warp32-lowering.patch",
+      "sha256": "8d0cc053103ccf90b51e6c55c6e7ee39292636f03b85e16d74bd8d8d1221854b"
+    },
+    {
+      "patch": "mesh-input-profile96.patch",
+      "sha256": "d87391e4c8ff1130b2c918da4d6e38c45420acd0f43b12b6ea47a33a3b27f51b"
+    },
+    {
+      "patch": "mesh-warp32-profile96.patch",
+      "sha256": "e419822c42b800ea406e692a366b5891a21baa030632c8f30ec6af134dc5f116"
+    }
+  ],
+  "source_manifest_sha256": "58e0a65ce8dc5b958c838a7b76cd8f83687bab32221b83efa296b3cfbc74b8ca",
+  "sources": {
+    "gpu/vk/mesh_warp32_profiles.h": "516213eec2ef9c1be7f831abbc53a94963888375dfc9f47c078fbc69236d17c4",
+    "gpu/vk/vk_shader.cpp": "057ee93cc7f2d5db9a51dd1806b1f094ccf223e8d1b444833d10b44a4d170028",
+    "gpu/vk/vk_shader.h": "6c88dd381f0d0f0e2aa374769a607ba251a1568ad4172aa832619628b2ef99c8",
+    "gpu/vk/vk_progcache.cpp": "d2943429d285bc7bd9eff80e1e21384b83457763d26fc558784b15db444163fb",
+    "gpu/vk/vk_draw.cpp": "1f0243d368973d6969cb04c766fb1fa713b578cc4932c0af14f7310f48475b49",
+    "nx2/build.py": "d01b1a03e9b355813b8ab2290e591a7271856b409cc3533c7bae0e5b40a94d0b",
+    "gpu/vk/mesh_warp32_lowering.h": "73853cf02de8a365568a50d52fbbd2b80363359634bf3bb1655032e40b347b18",
+    "gpu/vk/mesh_warp32_lowering.cpp": "7aad4045124990b8d5d4e35ac919b1bb641ee802d0e8a34ce3e349a317790882",
+    "gpu/vk/mesh_input_capture.h": "e129b121f6a77673852780da3d0d4510f26672912d6dd5f96bf64376203022a6",
+    "gpu/vk/mesh_input_profile96.h": "cbe6d447278fd352fa7041d2df5e64d41d3ef1aee137d098782686b163a82176",
+    "gpu/vk/vk_memory.cpp": "798c732c88ac9413cb762c5aa32d814c76774527600123da3cf13bde2f9f9ec7",
+    "gpu/vk/vk_internal.h": "5e582b44784962d97edd475fbd314b8e19359d3378facfa1bb87ec2051f215c2"
+  },
+  "renderer_sha256": "629addc24fe06d5170ebd0d6892cd0722dc69e7171ee951abc4188f17d26405d",
+  "renderer_bytes": 27569600,
+  "build_log_sha256": "be2ead4aa4d4cacee2ca5241446db92acf7dcf57afbc22ef8d45e06eec145394",
+  "flags": [
+    "-std=c++20",
+    "-O2",
+    "-g0",
+    "-DNDEBUG",
+    "-DHOOKSHOT_RELEASE",
+    "-march=x86-64-v3"
+  ],
+  "jobs": 4,
+  "renderer_only": true,
+  "compile_files": 207,
+  "compile_failures": 0,
+  "build_source_version": "4ec2a989",
+  "new_patch_checker_sha256": "9dfd547af71f7547d888074499e4f446bb718c0791e6669802b04c776f4225f8",
+  "new_patch_tests_sha256": "7ee0c709e1d531c8013cec74df323e3c2c56473342a6e86446d338993f9bd750",
+  "check_clang_sha256": "1a5282f256c04cf7a6b58482465f2f0dae4c9392a744ca691ad48210c98e5d38",
+  "check_gcc_sha256": "1a5282f256c04cf7a6b58482465f2f0dae4c9392a744ca691ad48210c98e5d38",
+  "targeted_test_log_sha256": "432a08abe37d9b2fc5357f4146b772e38782178bb0fec9ce3c3387ae0425543d",
+  "targeted_tests_passed": 9,
+  "vendor_suite": {
+    "passed": 449,
+    "failed": 9,
+    "skipped": 64,
+    "same_failed_checks_reproduced_on_frozen_base11": true,
+    "failed_checks": [
+      "tests/test_fallback_depth_hold.py",
+      "tests/test_program_cache_cleanup.py",
+      "tests/test_program_cache_format.py",
+      "tests/test_program_cache_one_variant.py",
+      "tests/test_readme_menu_rows.py",
+      "tests/test_shader_stamp_cache.py",
+      "tests/test_shader_stamp_inputs.py",
+      "tests/test_target_image_pool.py",
+      "tests/test_wb_shadow_remake.py"
+    ],
+    "log_sha256": "115e461290f2baf2677cd57aad38230fe2e99a52fe8c9da488238f5433be979c",
+    "baseline_nine_log_sha256": "5af19c85c8080357f26cd1378264d6a708e236985991a551fd4ca982b75483e8"
+  },
+  "goldens_sha256": "4e18396cc0cf86ee4711e15da8b6c726bc226ad4ef55e3c15ee919d9f65e0dfe",
+  "game_or_gpu_execution": false,
+  "new_candidate_live_execution_validated": false,
+  "full67_group_equivalence_validated": false,
+  "date": "2026-11-13",
+  "scope": "Optional12th overlay CPU/build preparation; no new native candidate GPU validation or performance claim",
+  "freeze_receipt_sha256": "d51a854e6dd6243785b607dcb472d100cd56f8cded59344ab94b4f6b80f773cf",
+  "goldens": {
+    "d8": {
+      "source_sha256": "835aa59799c6ecb621034d946e2fa4eadb1aa2407d293321ae3e3052882bc9b3",
+      "python_candidate_sha256": "9d23b7ebf3677f53fe6901c9b94f2c4927f1f0c47ed207c04c53df9b59ae9638",
+      "native_candidate_sha256": "8754612a7395d1f804d4e56a7c18cb5a6f23ed2e02f01879cbc51bd108682de0",
+      "native_ID_preserving_equal_python_preserve_numeric_ids_except_generator": true,
+      "native_generator_word": 0,
+      "python_generator_word": 458752,
+      "words": 44043,
+      "spirv_val": true,
+      "normalized_native_equals_normalized_replayed_python_candidate": true,
+      "normalized_sha256": "c42d03146adc1e84b0d9b97413d84d30e4e0d678121d37fd842f65b1f416911c"
+    },
+    "6864": {
+      "source_sha256": "999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93",
+      "python_candidate_sha256": "a41c6df753f30f8c0646ffa45227304e994b3fbaccdcad64927cd57f5e2327e7",
+      "native_candidate_sha256": "43434b023ff17ee4b92ed8e49f19c937c86f15cf31a7034161dd11878f944099",
+      "native_ID_preserving_equal_python_preserve_numeric_ids_except_generator": true,
+      "native_generator_word": 0,
+      "python_generator_word": 458752,
+      "words": 63210,
+      "spirv_val": true,
+      "normalized_native_equals_normalized_replayed_python_candidate": true,
+      "normalized_sha256": "a41c6df753f30f8c0646ffa45227304e994b3fbaccdcad64927cd57f5e2327e7"
+    }
+  },
+  "opt_in": {
+    "width": "RX_VK_OO_MESH_WARP32=8 or16",
+    "new_target": "RX_VK_OO_MESH_WARP32_PROFILE96=1 exactly",
+    "absent_profile96": "Existing d8 target only",
+    "all_absent": "Original modules and subgroup32 policy"
+  },
+  "targets": [
+    {
+      "program": "d8e59341cf4f629c",
+      "variant": "0c8f08626a9d98a4",
+      "source_shared_bytes": 14356,
+      "added_shared_bytes": 256,
+      "candidate_shared_bytes": 14612,
+      "payload_shared_bytes": 14740,
+      "max_vertices": 128,
+      "max_primitives": 128
+    },
+    {
+      "program": "68642bb810ee3e7c",
+      "variant": "3f3f5b29054673da",
+      "mesh_sha256": "999c8511db93d486543421dde7350e3d0034faa834ef3edaf3553dcdc9b55d93",
+      "fragment_sha256": "3de1d79c321db3863dbb07de0d3fa0cdb126d72c07c2f1d70f0514eda3611b10",
+      "candidate_sha256": "43434b023ff17ee4b92ed8e49f19c937c86f15cf31a7034161dd11878f944099",
+      "source_shared_bytes": 11156,
+      "added_shared_bytes": 256,
+      "candidate_shared_bytes": 11412,
+      "payload_shared_bytes": 11540,
+      "max_vertices": 96,
+      "max_primitives": 96,
+      "vertex_components": 44
+    }
+  ],
+  "required_next_evidence": [
+    "Fresh review/admission and replay of raw43434 candidate or paired actual compiler GEN IR evidence; do not relabel a41c as executed43434",
+    "Full67-group replay coverage for the raw43434 native candidate; original999c/Python a41c coverage is complete in the separate E5 observation",
+    "Native scene quality and matched ordinary frame-rate testing"
+  ],
+  "supporting_python_candidate_full_grid_observation": "research/native-mesh-replay-e5-observation.json",
+  "readonly_freeze_sha256": "19d4e8356b5c531a2bb0d6c18406a302d18e168daa37218e8a7833728acd8524"
+}

@@ -11,6 +11,10 @@ frozen input graph. This verifies those outputs, without establishing a speedup.
 
 [Native mesh lowering revision 2](native-mesh-warp32-integration.md) requires the
 MAX-absent compiler policy; earlier integrated pilots remain explicitly revision 1.
+New [V2/E5 identity pilots](../research/native-renderer-v2-e5-pilot.json) reached
+gameplay at the original, requested 8 and requested 16 configurations with verified
+loaded binaries and settings. Different temporal/UI states, unknown live executable
+width and incomplete native-quality coverage prevent an equivalence or FPS claim.
 The new [driver/profile replay boundary](mesh-replay-driver-profiles.md) pins all
 execution dependencies and separates the D8 and 96-vertex contracts. Both authored
 fixtures now match their complete CPU output oracles at actual widths 32, 32
@@ -18,12 +22,22 @@ repeated, 8 and 16; [the evidence](../research/mesh-replay-e5-fixture-observatio
 tests the new executors, rather than real shader transformation equivalence.
 The [96-vertex capture overlay](mesh-input-profile96.md) and
 [output instrumenter](mesh-output-profile96.md) are implemented and tested.
+The [captured 67-workgroup graph](../research/native-mesh-replay-e5-observation.json)
+now matches at actual widths 32, 32 repeated, 8 and 16 across every workgroup,
+including the partial tail. Historical snapshot atomicity and general race freedom
+remain unproved. The [native C++ extension](native-mesh-profile96-lowering.md)
+is built but has a distinct raw module that still needs GPU validation.
 
 The [native-network investigation](../research/native-network-restoration.md)
 identifies ten omitted startup programs as movie-upscale networks. Their linear
 fallback, gameplay FSR replacement and hair/foliage sampling remain separate quality
 gaps. No native-quality restoration, accepted gameplay optimization or real 60 FPS
 result is established.
+Four [synthetic cooperative-matrix fixtures](../research/matrix-restoration-observation.json)
+match complete CPU outputs at actual width 32. They establish isolated arithmetic
+and layout cases, without restoring an original network. The
+[CPU observer primitives](benchmark-observer.md) still need real producer adapters;
+they do not certify a benchmark.
 
 ## Implemented starting point
 
