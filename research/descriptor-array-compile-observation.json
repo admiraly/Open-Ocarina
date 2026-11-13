@@ -1,0 +1,237 @@
+{
+  "schema": 1,
+  "date": "2026-11-13",
+  "scope": "independently authored typed descriptor-array compile-only stand-ins",
+  "compile_only": true,
+  "dispatch_executed": false,
+  "gpu_execution_time_measured": false,
+  "rendering_checked": false,
+  "runtime_equivalence_established": false,
+  "driver_identity": {
+    "icd_sha256": "14f4eda1b6fd6cbf07d61edeeffdaaede166f4c09d165fec9f661e9f90556ad3",
+    "library_name": "libvulkan_intel.so",
+    "library_sha256": "e5a1305ea3b423a18fccbb945aaedd32f8add303926fcc39276ee01032cd456f",
+    "profile": "cache-safe-e5"
+  },
+  "driver_policy": {
+    "controlled_options": {
+      "HS_CS32_MAX_INSTS": null,
+      "HS_FORCE_SIMD8": null,
+      "HS_LARGE_GRF": null,
+      "HS_LARGE_GRF_BIT": null,
+      "HS_PUSH_SHADOW": "1",
+      "HS_RA_DEBUG": null,
+      "HS_SPILL_BATCH": "1",
+      "HS_SPILL_PCT": null,
+      "HS_SUBGROUP8": null,
+      "INTEL_DEBUG": null,
+      "RX_VK_NOOPT": null,
+      "RX_VK_WARP64": null,
+      "shader_spilling_rate": "1"
+    },
+    "full_environment_snapshot": false,
+    "name": "native-safe"
+  },
+  "profile": {
+    "stage": "compute",
+    "local_size": [
+      64,
+      1,
+      1
+    ],
+    "required_subgroup_size": 32,
+    "full_subgroups": true,
+    "push_constant_bytes": 48,
+    "descriptor_counts": [
+      2,
+      2,
+      1,
+      1,
+      1
+    ],
+    "typed_alias_widths": [
+      4,
+      8,
+      16
+    ],
+    "optimization_disabled": false
+  },
+  "frozen_artifacts": {
+    "generator_sha256": "0e4fc9d15438f078bf206e40d8838052a91a9e16af696f44cbb77a7b8a94838e",
+    "semantic_plan_sha256": "b162f6a20ed01da6835474f873b08a37cc4c74fd2183d92a262c52d081349f2f",
+    "wrapper_sha256": "f9ad859f39cb6b81f06d119001d0872da0c911f6deb51a0a63dd553f4eaf25d0",
+    "base_host_sha256": "69f5900a6993a0c9ab468fd85292f89f9d7405f7c0647c2383517d0daa8f81cc",
+    "native_host_source_sha256": "5bfa187279b3a99737de6f350d75c47e9c4fa333347c10cc9e5ce48d16c9a31b",
+    "native_host_binary_sha256": "15b85f8de69f373cb4916ef00a32793ddb354e2722db5272f6ac8296c62daf53",
+    "layout_sha256": "9021be527826b6cbc644983e5c9164941cba86ae0014bc6c7e527d6a7f5b49d3"
+  },
+  "prepared_plan_sha256": "516960e3c9fa6f9eeea38839905496d8601646d2c4c701ecc023111db07a86e0",
+  "admission_runner_sha256": "a4509a5fcca508a7c9debe9dd9506f81a280d4be3e819dd2be7f49897c862e62",
+  "review_plan_sha256": "728efb564d66adc127c6157b2fc53e5eb659734d1df0fc810684aab6d7f88e9f",
+  "terminal_summary_sha256": "fec67fdd64f5a8feff43a9c4858503af777881978581e10071fd586ac75b7b9c",
+  "file_admission_rechecked_before_and_after": true,
+  "child_resource_limit_overrides": false,
+  "combined_output_limit_bytes": 67108864,
+  "disk_cache_disabled": true,
+  "native_alarm_seconds": 25,
+  "outer_timeout_seconds": 30,
+  "variants": [
+    {
+      "variant": "value",
+      "spirv_sha256": "a7c784c6f41f63666345a02e4a285d0e5e6e88a9d5f60435b70a2971f9bb1691",
+      "result_sha256": "22a4029270f32d71853f318b9c7ec9409d0757b86ffef62c633d8275c6c0374c",
+      "stderr_sha256": "e16f2dd90c394840f8a1afc5d7ca2770c09ca90780a94c55359a14604c15b489",
+      "terminal_success": true,
+      "child_reaped": true,
+      "captured_bytes": {
+        "stderr": 83,
+        "stdout": 316473
+      },
+      "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "enabled_features": {
+        "bufferDeviceAddress": true,
+        "computeFullSubgroups": true,
+        "robustBufferAccess": true,
+        "robustBufferAccess2": true,
+        "shaderImageGatherExtended": true,
+        "shaderInt16": true,
+        "shaderInt64": true,
+        "shaderStorageBufferArrayDynamicIndexing": true,
+        "shaderStorageBufferArrayNonUniformIndexing": true,
+        "subgroupSizeControl": true,
+        "uniformBufferStandardLayout": true,
+        "variablePointersStorageBuffer": true
+      },
+      "executables": [
+        {
+          "name": "compute",
+          "actual_subgroup_size": 32,
+          "compiler_statistics": {
+            "Instructions": 2121,
+            "Code size": 34160,
+            "SENDs": 144,
+            "Loops": 7,
+            "Cycles": 69516,
+            "Spills": 0,
+            "Fills": 0,
+            "Scratch Memory Size": 0,
+            "GRF registers": 0,
+            "Push constant ranges": 0,
+            "Push constant registers": 0,
+            "Max dispatch width": 32,
+            "Max live registers": 128,
+            "Workgroup Memory Size": 0,
+            "Non SSA regs after NIR": 112,
+            "Source hash": 11371342188046813044
+          },
+          "internal_representation_metadata": [
+            {
+              "bytes": 85138,
+              "is_text": true,
+              "name": "Final NIR",
+              "text_sha256": "0b6db4beeb6c0842eddb7d00c0e28a6469252c16bb7055e7e162adcfe28ccd86"
+            },
+            {
+              "bytes": 133,
+              "is_text": true,
+              "name": "Shader push map",
+              "text_sha256": "eda8cc1852cfeb84d3fbc8c3e2cd4995b7a66165cc9b2381c06fbf7d4053dc46"
+            },
+            {
+              "bytes": 207053,
+              "is_text": true,
+              "name": "GEN Assembly",
+              "text_sha256": "cd03f9211a3895ad64b037c4bfe1b88d95bdc5b2dbee438e3f1e3c9259ec1ad6"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "variant": "pointer",
+      "spirv_sha256": "5c2b9e427817f278e6a2ff8e348624c7ed85ae82298af2c53c4f064dae0ac248",
+      "result_sha256": "93ad0d6fe97332297da226b0468e0c5a86c5bab5befbd919f91181cd1813f4bc",
+      "stderr_sha256": "e16f2dd90c394840f8a1afc5d7ca2770c09ca90780a94c55359a14604c15b489",
+      "terminal_success": true,
+      "child_reaped": true,
+      "captured_bytes": {
+        "stderr": 83,
+        "stdout": 283821
+      },
+      "device": "Intel(R) Arc(tm) A770 Graphics (DG2)",
+      "enabled_features": {
+        "bufferDeviceAddress": true,
+        "computeFullSubgroups": true,
+        "robustBufferAccess": true,
+        "robustBufferAccess2": true,
+        "shaderImageGatherExtended": true,
+        "shaderInt16": true,
+        "shaderInt64": true,
+        "shaderStorageBufferArrayDynamicIndexing": true,
+        "shaderStorageBufferArrayNonUniformIndexing": true,
+        "subgroupSizeControl": true,
+        "uniformBufferStandardLayout": true,
+        "variablePointersStorageBuffer": true
+      },
+      "executables": [
+        {
+          "name": "compute",
+          "actual_subgroup_size": 32,
+          "compiler_statistics": {
+            "Instructions": 1918,
+            "Code size": 30256,
+            "SENDs": 116,
+            "Loops": 7,
+            "Cycles": 60612,
+            "Spills": 0,
+            "Fills": 0,
+            "Scratch Memory Size": 0,
+            "GRF registers": 0,
+            "Push constant ranges": 0,
+            "Push constant registers": 0,
+            "Max dispatch width": 32,
+            "Max live registers": 116,
+            "Workgroup Memory Size": 0,
+            "Non SSA regs after NIR": 106,
+            "Source hash": 14752425842857144934
+          },
+          "internal_representation_metadata": [
+            {
+              "bytes": 75805,
+              "is_text": true,
+              "name": "Final NIR",
+              "text_sha256": "83832aeadaf219b0a0992c9b7a8729e0bb9634ec3dc2e3d06efd911f4c2c61ee"
+            },
+            {
+              "bytes": 133,
+              "is_text": true,
+              "name": "Shader push map",
+              "text_sha256": "eda8cc1852cfeb84d3fbc8c3e2cd4995b7a66165cc9b2381c06fbf7d4053dc46"
+            },
+            {
+              "bytes": 186274,
+              "is_text": true,
+              "name": "GEN Assembly",
+              "text_sha256": "a81b89554a73d643c7d4c472d9c9d7b48d2b0623627dee760544bc7fc16bb350"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "earlier_failed_attempt": {
+    "value_process_signal": "SIGXFSZ",
+    "completed_result": false,
+    "stdout_bytes": 0,
+    "affected_file": "unknown",
+    "cause_inference": "Previous64MiB RLIMIT_FSIZE may have interfered with Mesa2GB state-table memfd initialization; no syscall trace establishes the affected file.",
+    "pointer_attempted": false,
+    "terminal_summary_sha256": "2a31eb6eecb7d1456bb49e108c1b0f6569aab23cb728a571192ef3fc8361dac5"
+  },
+  "limitations": [
+    "Pipeline compilation, code-size and compiler-estimated statistics do not measure GPU execution or FPS.",
+    "No shader was dispatched; alias correctness, all-buffer results, robustness and native semantic equivalence remain untested.",
+    "Both variants use precomputed typed interval records; actual renderer records/classification and snapshot capture remain unknown.",
+    "These real descriptor-array results are separate from the earlier two-static-root compiler observations."
+  ]
+}
